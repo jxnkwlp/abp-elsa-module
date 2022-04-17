@@ -1,0 +1,137 @@
+.flow-container {
+    min-height: 100px;
+    display: flex;
+    position: relative;
+    border: 1px solid #dfe3e8;
+
+    .graph-container {
+        flex: 1;
+        height: 100%;
+        min-height: 500px;
+        position: relative;
+        margin-top: 40px;
+    }
+
+    .dnd-box {
+        position: relative;
+        width: 260px;
+        height: 100%;
+        border-right: 1px solid #dfe3e8;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+
+        .dnd-header {
+            height: 40px;
+            line-height: 40px;
+            display: flex;
+            justify-content: space-evenly;
+            background: #fff;
+            border-bottom: 1px solid #d9d9d9;
+        }
+
+        .dnd-body {
+            padding: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #f9f9f9;
+            height: 100%;
+            flex: 1;
+
+            ul {
+                margin: 0;
+                padding: 0;
+
+                li {
+                    margin: 10px 0;
+                    cursor: move;
+
+                    div {
+                        background: rgb(239, 244, 255);
+                        border: 1px solid rgb(95, 149, 255);
+                        // width: 100px;
+                        // height: 30px;
+                        line-height: 30px;
+                        text-align: center;
+                        border-radius: 4px;
+
+                    }
+                }
+            }
+
+        }
+
+        // .dnd-title {
+        //     font-size: 14px;
+        //     font-weight: bold;
+        //     line-height: 40px;
+        //     padding: 0 10px;
+        //     border-bottom: 1px solid #dfe3e8;
+        // }
+
+        // .dnd-group {
+
+        //     .dnd-group-title {
+        //         font-size: 14px;
+        //     }
+        // }
+    }
+
+    .minimap-container {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        z-index: 2;
+        box-sizing: border-box;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 0 10px 0 #00000026;
+
+        .x6-widget-minimap {
+            background: #00000005;
+        }
+
+        .x6-graph {
+            background: #fff;
+        }
+    }
+
+    .toolbar-container {
+        height: 40px;
+        line-height: 40px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 260px;
+        z-index: 2;
+        box-sizing: border-box;
+        overflow: hidden;
+        background: #fff;
+        border-bottom: 1px solid #dfe3e8;
+        // box-shadow: 0 0 10px 0 #00000026;
+    }
+
+    .x6-toolbar {
+        height: 40px;
+    }
+}
+
+.monaco-editor-container {
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    margin: 0 1px;
+}
+
+/** 覆盖节点默认选中色 */
+.x6-node-selected rect {
+    stroke-width: 2px;
+    filter: drop-shadow(2px 1px 2px #5F95FF);
+}
+
+/** 覆盖连线默认选中色 */
+.x6-edge-selected path {
+    stroke: #5F95FF;
+    stroke-width: 2px;
+    // z-index: 0;
+    filter: drop-shadow(2px 3px 3px #5F95FF1a);
+}

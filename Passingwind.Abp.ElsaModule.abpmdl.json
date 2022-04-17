@@ -1,0 +1,79 @@
+{
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {},
+      "host": {}
+    }
+  },
+  "packages": {
+    "Passingwind.Abp.ElsaModule.Domain.Shared": {
+      "path": "src/Passingwind.Abp.ElsaModule.Domain.Shared/Passingwind.Abp.ElsaModule.Domain.Shared.abppkg.json",
+      "folder": "src"
+    },
+    "Passingwind.Abp.ElsaModule.Domain": {
+      "path": "src/Passingwind.Abp.ElsaModule.Domain/Passingwind.Abp.ElsaModule.Domain.abppkg.json",
+      "folder": "src"
+    },
+    "Passingwind.Abp.ElsaModule.Application.Contracts": {
+      "path": "src/Passingwind.Abp.ElsaModule.Application.Contracts/Passingwind.Abp.ElsaModule.Application.Contracts.abppkg.json",
+      "folder": "src"
+    },
+    "Passingwind.Abp.ElsaModule.Application": {
+      "path": "src/Passingwind.Abp.ElsaModule.Application/Passingwind.Abp.ElsaModule.Application.abppkg.json",
+      "folder": "src"
+    },
+    "Passingwind.Abp.ElsaModule.EntityFrameworkCore": {
+      "path": "src/Passingwind.Abp.ElsaModule.EntityFrameworkCore/Passingwind.Abp.ElsaModule.EntityFrameworkCore.abppkg.json",
+      "folder": "src"
+    },
+    "Passingwind.Abp.ElsaModule.MongoDB": {
+      "path": "src/Passingwind.Abp.ElsaModule.MongoDB/Passingwind.Abp.ElsaModule.MongoDB.abppkg.json",
+      "folder": "src"
+    },
+    "Passingwind.Abp.ElsaModule.HttpApi": {
+      "path": "src/Passingwind.Abp.ElsaModule.HttpApi/Passingwind.Abp.ElsaModule.HttpApi.abppkg.json",
+      "folder": "src"
+    },
+    "Passingwind.Abp.ElsaModule.HttpApi.Client": {
+      "path": "src/Passingwind.Abp.ElsaModule.HttpApi.Client/Passingwind.Abp.ElsaModule.HttpApi.Client.abppkg.json",
+      "folder": "src"
+    },
+    "Passingwind.Abp.ElsaModule.TestBase": {
+      "path": "test/Passingwind.Abp.ElsaModule.TestBase/Passingwind.Abp.ElsaModule.TestBase.abppkg.json",
+      "folder": "test"
+    },
+    "Passingwind.Abp.ElsaModule.EntityFrameworkCore.Tests": {
+      "path": "test/Passingwind.Abp.ElsaModule.EntityFrameworkCore.Tests/Passingwind.Abp.ElsaModule.EntityFrameworkCore.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "Passingwind.Abp.ElsaModule.MongoDB.Tests": {
+      "path": "test/Passingwind.Abp.ElsaModule.MongoDB.Tests/Passingwind.Abp.ElsaModule.MongoDB.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "Passingwind.Abp.ElsaModule.Domain.Tests": {
+      "path": "test/Passingwind.Abp.ElsaModule.Domain.Tests/Passingwind.Abp.ElsaModule.Domain.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "Passingwind.Abp.ElsaModule.Application.Tests": {
+      "path": "test/Passingwind.Abp.ElsaModule.Application.Tests/Passingwind.Abp.ElsaModule.Application.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "Passingwind.Abp.ElsaModule.HttpApi.Host": {
+      "path": "host/Passingwind.Abp.ElsaModule.HttpApi.Host/Passingwind.Abp.ElsaModule.HttpApi.Host.abppkg.json",
+      "folder": "host"
+    },
+    "Passingwind.Abp.ElsaModule.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/Passingwind.Abp.ElsaModule.HttpApi.Client.ConsoleTestApp/Passingwind.Abp.ElsaModule.HttpApi.Client.ConsoleTestApp.abppkg.json",
+      "folder": "test"
+    },
+    "Passingwind.Abp.ElsaModule.IdentityServer": {
+      "path": "host/Passingwind.Abp.ElsaModule.IdentityServer/Passingwind.Abp.ElsaModule.IdentityServer.abppkg.json",
+      "folder": "host"
+    },
+    "Passingwind.Abp.ElsaModule.Host.Shared": {
+      "path": "host/Passingwind.Abp.ElsaModule.Host.Shared/Passingwind.Abp.ElsaModule.Host.Shared.abppkg.json",
+      "folder": "host"
+    }
+  }
+}

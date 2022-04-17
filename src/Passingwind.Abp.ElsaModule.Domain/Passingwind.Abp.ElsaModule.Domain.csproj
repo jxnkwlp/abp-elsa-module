@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\common.props" />
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <RootNamespace>Passingwind.Abp.ElsaModule</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Domain.Shared\Passingwind.Abp.ElsaModule.Domain.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Volo.Abp.Ddd.Domain" Version="5.1.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Elsa" Version="2.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Yitter.IdGenerator" Version="1.0.12" />
+    </ItemGroup>
+
+</Project>

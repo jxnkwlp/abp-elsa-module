@@ -1,0 +1,7 @@
+{
+  "modules": {
+    "Passingwind.Abp.ElsaModule": {
+      "path": "Passingwind.Abp.ElsaModule.abpmdl.json"
+    }
+  }
+}
