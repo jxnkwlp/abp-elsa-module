@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 
@@ -29,7 +31,16 @@ public class Program
                 .UseAutofac()
                 .UseSerilog();
             await builder.AddApplicationAsync<ElsaModuleHttpApiHostModule>();
+
             var app = builder.Build();
+
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var sp = scope.ServiceProvider;
+            //    var dbcontext = sp.GetRequiredService<ElsaModuleHttpApiHostMigrationsDbContext>();
+            //    await dbcontext.Database.MigrateAsync();
+            //}
+
             await app.InitializeApplicationAsync();
             await app.RunAsync();
             return 0;
