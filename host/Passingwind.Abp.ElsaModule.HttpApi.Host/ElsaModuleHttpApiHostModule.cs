@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Elsa;
 using Elsa.Activities.UserTask.Extensions;
 using Hangfire;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -265,12 +267,23 @@ public class ElsaModuleHttpApiHostModule : AbpModule
             options.AutoValidate = false;
         });
 
+        context.Services.AddSpaStaticFiles(options =>
+        {
+            options.RootPath = "wwwroot/dist";
+        });
+
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
+
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+            ForwardLimit = null,
+        });
 
         if (env.IsDevelopment())
         {
@@ -281,22 +294,24 @@ public class ElsaModuleHttpApiHostModule : AbpModule
             app.UseHsts();
         }
 
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
         app.UseCorrelationId();
         app.UseStaticFiles();
-
-        app.UseHttpActivities();
+        app.UseSpaStaticFiles();
 
         app.UseRouting();
         app.UseCors();
+
+        app.UseHttpActivities();
+
         app.UseAuthentication();
         if (MultiTenancyConsts.IsEnabled)
         {
             app.UseMultiTenancy();
         }
+
         app.UseHangfireDashboard();
-
-
+         
         app.UseAbpRequestLocalization();
         app.UseAuthorization();
         app.UseSwagger();
@@ -314,6 +329,21 @@ public class ElsaModuleHttpApiHostModule : AbpModule
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+
+        app.Use((context, next) =>
+        {
+            if (context.Request.Path.StartsWithSegments("/api"))
+            {
+                context.Response.StatusCode = 404;
+                return Task.CompletedTask;
+            }
+
+            return next();
+        });
+
+#if !DEBUG
+        app.UseSpa(c => { });
+#endif
     }
 
     public class SwaggerEnumDescriptions : ISchemaFilter

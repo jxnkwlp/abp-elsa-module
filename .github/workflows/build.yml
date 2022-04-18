@@ -1,0 +1,68 @@
+name: build and pack
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+
+      - name: Install Dotnet Tool
+        run: dotnet tool install -g Passingwind.Git-CI-Tools
+
+      - name: Set environment variables
+        uses: rlespinasse/github-slug-action@3.6.0
+
+      - name: Version check and generate
+        run: |
+          gitci release changes --output ./changeslog.md
+          gitci version next --format json --output ./version.json --build-ver "${{env.GITHUB_SHA_SHORT}}" 
+          ls ./
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore -c Release
+
+      - name: Pack
+        run: dotnet pack --no-build --no-restore -c Release /p:Version="${{env.GITCI_NEXT_VERSION}}" -o ./pack_output
+
+      - name: Push package
+        run: dotnet nuget push ./*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+      - run: cd ./src/Passingwind.ElsaDesigner
+      - run: yarn
+      - run: npm run build
+      # - run: cp ./dist/ ${{env.GITHUB_WORKSPACE}}/pack_output/
+      - run: zip ${{env.GITHUB_WORKSPACE}}/pack_output/dist.zip -r ./dist/*
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{env.GITCI_NEXT_VERSION}}
+          artifacts: ./changeslog*, ./pack_output/*
+          bodyFile: ./changeslog.md
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
