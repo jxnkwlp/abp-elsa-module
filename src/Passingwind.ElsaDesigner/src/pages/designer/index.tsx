@@ -135,7 +135,19 @@ const Index: React.FC = () => {
         try {
             const content = await file.text();
             const data = JSON.parse(content);
-            await loadServerData(data as API.WorkflowDefinition, true);
+            const data2 = { connections: [], activities: data.activities };
+            // compatible with offlice export json file
+            if (data?.connections) {
+                data2.connections = data.connections?.map((x: any) => {
+                    return {
+                        sourceId: x.sourceId ?? x.sourceActivityId,
+                        targetId: x.targetId ?? x.targetActivityId,
+                        outcome: x.outcome,
+                    };
+                });
+            }
+
+            await loadServerData(data2 as API.WorkflowDefinition, true);
             message.info('import successful.');
         } catch (error) {
             console.error(error);

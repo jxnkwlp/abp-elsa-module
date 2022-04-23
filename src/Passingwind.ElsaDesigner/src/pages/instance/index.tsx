@@ -67,6 +67,10 @@ const Index: React.FC = () => {
             valueType: 'dateTime',
             search: false,
         },
+        {
+            title: 'CorrelationId',
+            dataIndex: 'correlationId',
+        },
 
         {
             title: 'Action',

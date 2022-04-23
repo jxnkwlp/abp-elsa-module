@@ -80,8 +80,13 @@
     //     path: '/TableList',
     //     component: './TableList',
     // },
+    // {
+    //     path: '/test',
+    //     name: 'test',
+    //     icon: 'smile',
+    //     component: './test',
+    // },
 
-    //
     {
         path: '/',
         redirect: '/dashboard',

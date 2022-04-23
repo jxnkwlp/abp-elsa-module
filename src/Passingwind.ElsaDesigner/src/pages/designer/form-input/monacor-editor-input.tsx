@@ -2,6 +2,7 @@ import { ExpandOutlined } from '@ant-design/icons';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import React, { useEffect } from 'react';
 import MonacoEditor from 'react-monaco-editor';
+import './monacor-editor-input.less';
 
 type MonacorEditorInputProps = {
     id?: string;
@@ -17,10 +18,15 @@ type MonacorEditorInputProps = {
 const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
     const ref = React.createRef<MonacoEditor>();
 
+    const [value] = React.useState(props.value || '');
     const [isFullscreen, setIsFullscreen] = React.useState(false);
 
     const [originSize, setOriginSize] = React.useState<{ w?: number; h: number }>();
     const [currentSize, setCurrentSize] = React.useState<{ w?: number; h: number }>();
+
+    const handleValueChanged = (v: string) => {
+        props?.onChange?.(v);
+    };
 
     const handleToggleFullScreen = () => {
         if (isFullscreen) {
@@ -54,11 +60,6 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
     };
 
     useEffect(() => {
-        // console.log(props);
-        ref.current?.editor?.setValue(props.value ?? '');
-    }, [props, ref]);
-
-    useEffect(() => {
         setOriginSize({ w: props.width, h: props.height ?? 150 });
         setCurrentSize({ w: props.width, h: props.height ?? 150 });
     }, [0]);
@@ -66,32 +67,6 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
     useEffect(() => {
         if (props.language == 'javascript') {
             updateEditorScriptExtraLibs();
-            // const libs = (props.javaScriptLibs ?? []).map((x) => {
-            //     return { content: x.content, filePath: x.filePath };
-            // });
-            // monaco.languages.registerCompletionItemProvider(props.language ?? 'typescript', {
-            //     triggerCharacters: [':'],
-            //     provideCompletionItems: (model, position) => {
-            //         const word = model.getWordUntilPosition(position);
-            //         const range = {
-            //             startLineNumber: position.lineNumber,
-            //             endLineNumber: position.lineNumber,
-            //             startColumn: word.startColumn,
-            //             endColumn: word.endColumn,
-            //         };
-            //         return {
-            //             suggestions: [
-            //                 {
-            //                     label: '"lodash"',
-            //                     kind: monaco.languages.CompletionItemKind.Function,
-            //                     documentation: 'The Lodash library exported as Node.js modules.',
-            //                     insertText: '"lodash": "*"',
-            //                     range: range,
-            //                 },
-            //             ],
-            //         };
-            //     },
-            // });
         }
     }, [props.language]);
 
@@ -106,9 +81,8 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
             <MonacoEditor
                 ref={ref}
                 language={props.language}
-                defaultValue={props.value}
                 onChange={(v) => {
-                    props?.onChange?.(v);
+                    handleValueChanged(v);
                 }}
                 options={{
                     minimap: { enabled: isFullscreen },
@@ -116,10 +90,13 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                     wordWrapColumn: 1024,
                     automaticLayout: true,
                     autoIndent: 'full',
+                    tabSize: 2,
+                    autoClosingBrackets: 'languageDefined',
+                    foldingStrategy: 'auto',
                     ...props?.options,
                 }}
                 editorDidMount={(e) => {
-                    e.setValue(props.value ?? '');
+                    e.setValue(value);
                 }}
             />
             <div className="fullscreen-toggle">
