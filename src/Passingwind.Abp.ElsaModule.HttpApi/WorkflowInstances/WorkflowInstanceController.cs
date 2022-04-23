@@ -18,6 +18,24 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
             _service = service;
         }
 
+        [HttpPost("{id}/cancel")]
+        public Task CancelAsync(Guid id)
+        {
+            return _service.CancelAsync(id);
+        }
+
+        [HttpPost("{id}/dispatch")]
+        public Task DispatchAsync(Guid id, WorkflowInstanceDispatchRequestDto input)
+        {
+            return _service.DispatchAsync(id, input);
+        }
+
+        [HttpPost("{id}/execute")]
+        public Task ExecuteAsync(Guid id, WorkflowInstanceExecuteRequestDto input)
+        {
+            return _service.ExecuteAsync(id, input);
+        }
+
         [HttpGet("{id}")]
         public virtual Task<WorkflowInstanceDto> GetAsync(Guid id)
         {
@@ -36,5 +54,10 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
             return _service.GetListAsync(input);
         }
 
+        [HttpPost("{id}/retry")]
+        public Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input)
+        {
+            return _service.RetryAsync(id, input);
+        }
     }
 }

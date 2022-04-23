@@ -1,7 +1,7 @@
 /**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 12
+ * Total count: 14
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -190,6 +190,39 @@ export async function workflowDefinitionPublish(
     return request<any>(`/api/workflow-definitions/${id}/publish`, {
         method: 'PUT',
         getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* POST /api/workflow-definitions/{id}/execute
+ * 
+ **/
+export async function workflowDefinitionExecute(
+    id: string,
+    payload: API.WorkflowDefinitionExecuteRequest,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/workflow-definitions/${id}/execute`, {
+        method: 'POST',
+        data: payload,
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* POST /api/workflow-definitions/{id}/dispatch
+ * 
+ **/
+export async function workflowDefinitionDispatch(
+    id: string,
+    payload: API.WorkflowDefinitionDispatchRequest,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowDefinitionDispatchResult>(`/api/workflow-definitions/${id}/dispatch`, {
+        method: 'POST',
+        data: payload,
         ...(options || {}),
     });
 }

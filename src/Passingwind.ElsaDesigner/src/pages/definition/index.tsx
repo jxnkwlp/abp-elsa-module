@@ -1,16 +1,18 @@
 import {
     deleteWorkflowDefinition,
     getWorkflowDefinitionList,
+    getWorkflowDefinitionVersion,
     updateWorkflowDefinitionDefinition,
+    workflowDefinitionDispatch,
     workflowDefinitionPublish,
     workflowDefinitionUnPublish,
 } from '@/services/WorkflowDefinition';
-import { ModalForm } from '@ant-design/pro-form';
+import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import { TableDropdown } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, message, Modal, Popconfirm } from 'antd';
+import { Button, message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import { useHistory } from 'umi';
 import EditFormItems from './edit-form-items';
@@ -38,10 +40,15 @@ const Index: React.FC = () => {
 
     const history = useHistory();
 
+    const [actionRow, setActionRow] = useState<API.WorkflowDefinition>();
+
     const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
     const [editModalTitle, setEditModalTitle] = useState<string>('');
     const [editModalData, setEditModalData] = useState<API.WorkflowDefinition>();
     const [editModalDataId, setEditModalDataId] = useState<string>();
+
+    const [dispatchFormVisible, setDispatchFormVisible] = useState<boolean>(false);
+    const [dispatchId, setDispatchId] = useState<string>();
 
     // const [searchKey, setSearchKey] = useState<string>();
 
@@ -94,6 +101,16 @@ const Index: React.FC = () => {
             width: 200,
             align: 'center',
             render: (text, record, _, action) => [
+                <a
+                    key="dispatch"
+                    onClick={() => {
+                        setDispatchId(record.id);
+                        setActionRow(record);
+                        setDispatchFormVisible(true);
+                    }}
+                >
+                    Dispatch
+                </a>,
                 <a
                     key="edit"
                     onClick={() => {
@@ -205,6 +222,7 @@ const Index: React.FC = () => {
                 }}
             />
 
+            {/*  */}
             <ModalForm
                 layout="horizontal"
                 preserve={false}
@@ -226,6 +244,58 @@ const Index: React.FC = () => {
                 }}
             >
                 <EditFormItems />
+            </ModalForm>
+
+            {/*  */}
+            <ModalForm
+                layout="horizontal"
+                preserve={false}
+                labelCol={{ span: 5 }}
+                width={600}
+                labelWrap
+                title={'Dispatch'}
+                visible={dispatchFormVisible}
+                modalProps={{ destroyOnClose: true, maskClosable: false }}
+                onVisibleChange={setDispatchFormVisible}
+                onFinish={async (value) => {
+                    const result = await workflowDefinitionDispatch(dispatchId!, value);
+                    if (result?.workflowInstanceId) {
+                        message.success(
+                            'Dispatch success. Instance Id: ' + result.workflowInstanceId,
+                        );
+                        return true;
+                    }
+                    return false;
+                }}
+            >
+                <ProFormSelect
+                    label="Activity"
+                    name="activityId"
+                    request={async () => {
+                        const result = await getWorkflowDefinitionVersion(
+                            dispatchId!,
+                            actionRow?.publishedVersion ?? 1,
+                        );
+                        return (result.activities ?? []).map((x) => {
+                            return {
+                                label: `${x.displayName} (${x.name})`,
+                                value: x.activityId,
+                            };
+                        });
+                    }}
+                />
+                <ProFormText label="Correlation Id" name="correlationId" rules={[{ max: 36 }]} />
+                <ProFormText label="Context Id" name="contextId" rules={[{ max: 36 }]} />
+                <ProFormTextArea
+                    label="Input"
+                    name="input"
+                    fieldProps={{
+                        autoSize: {
+                            minRows: 2,
+                            maxRows: 10,
+                        },
+                    }}
+                />
             </ModalForm>
         </PageContainer>
     );

@@ -88,5 +88,17 @@ namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions
         {
             return _service.PublishAsync(id);
         }
+
+        [HttpPost("{id}/execute")]
+        public Task ExecuteAsync(Guid id, WorkflowDefinitionExecuteRequestDto input)
+        {
+            return _service.ExecuteAsync(id, input);
+        }
+
+        [HttpPost("{id}/dispatch")]
+        public Task<WorkflowDefinitionDispatchResultDto> DispatchAsync(Guid id, WorkflowDefinitionDispatchRequestDto input)
+        {
+            return _service.DispatchAsync(id, input);
+        }
     }
 }

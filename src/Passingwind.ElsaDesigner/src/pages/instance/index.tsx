@@ -1,11 +1,12 @@
-import { WorkflowPersistenceBehavior, WorkflowStatus } from '@/services/enums';
-import { enumToStatus } from '@/services/utils';
-import { getWorkflowInstanceList } from '@/services/WorkflowInstance';
-import { ModalForm } from '@ant-design/pro-form';
+import {
+    getWorkflowInstanceList,
+    workflowInstanceCancel,
+    workflowInstanceRetry,
+} from '@/services/WorkflowInstance';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, message, Popconfirm } from 'antd';
+import { message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import { Link, useHistory } from 'umi';
 
@@ -16,17 +17,28 @@ const Index: React.FC = () => {
 
     const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
     const [editModalTitle, setEditModalTitle] = useState<string>('');
-    const [editModalData, setEditModalData] = useState<API.WorkflowDefinition>();
+    const [editModalData, setEditModalData] = useState<API.WorkflowInstance>();
     const [editModalDataId, setEditModalDataId] = useState<string>();
 
     // const [searchKey, setSearchKey] = useState<string>();
 
-    const columns: ProColumnType<API.WorkflowDefinition>[] = [
+    const columns: ProColumnType<API.WorkflowInstance>[] = [
         {
             dataIndex: 'name',
             title: 'Name',
             render: (_, record) => {
-                return <Link to={`/definition/${record.id}`}>{_}</Link>;
+                return (
+                    <Link
+                        to={{
+                            pathname: `/instance/${record.id}`,
+                            state: {
+                                id: record.id,
+                            },
+                        }}
+                    >
+                        {_}
+                    </Link>
+                );
             },
         },
         // {
@@ -71,20 +83,50 @@ const Index: React.FC = () => {
             title: 'CorrelationId',
             dataIndex: 'correlationId',
         },
-
         {
             title: 'Action',
             valueType: 'option',
-            width: 80,
+            width: 200,
             align: 'center',
             render: (text, record, _, action) => [
                 <a
-                    key="edit"
+                    key="cancel"
                     onClick={() => {
-                        history.push('/instance/' + record.id, { id: record.id });
+                        Modal.confirm({
+                            title: 'Are you sure to cancel this instance?',
+                            content:
+                                'This operation will cancel the instance and all the tasks in it.',
+                            onOk: async () => {
+                                const result = await workflowInstanceCancel(record.id!);
+                                if (result?.response?.ok) {
+                                    message.success('Canceled successfully');
+                                    action?.reload();
+                                }
+                            },
+                        });
                     }}
                 >
-                    Details
+                    {(record.workflowStatus == 'Idle' ||
+                        record.workflowStatus == 'Running' ||
+                        record.workflowStatus == 'Suspended') && <span>Cancel</span>}
+                </a>,
+                <a
+                    key="retry"
+                    onClick={() => {
+                        Modal.confirm({
+                            title: 'Are you sure to retry this instance?',
+                            content: 'This operation will retry the instance.',
+                            onOk: async () => {
+                                const result = await workflowInstanceRetry(record.id!, {});
+                                if (result?.response?.ok) {
+                                    message.success('Retried successfully');
+                                    action?.reload();
+                                }
+                            },
+                        });
+                    }}
+                >
+                    {record.workflowStatus == 'Faulted' && <span>Retry</span>}
                 </a>,
             ],
         },

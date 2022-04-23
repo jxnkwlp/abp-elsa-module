@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Elsa.Models;
+using Elsa.Services;
 using Passingwind.Abp.ElsaModule.Workflow;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Volo.Abp;
@@ -15,12 +17,14 @@ namespace Passingwind.Abp.ElsaModule.Common
         private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
         private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
         private readonly WorkflowDefinitionManager _workflowDefinitionManager;
+        private readonly IWorkflowLaunchpad _workflowLaunchpad;
 
-        public WorkflowDefinitionAppService(IWorkflowDefinitionRepository workflowDefinitionRepository, IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository, WorkflowDefinitionManager workflowDefinitionManager)
+        public WorkflowDefinitionAppService(IWorkflowDefinitionRepository workflowDefinitionRepository, IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository, WorkflowDefinitionManager workflowDefinitionManager, IWorkflowLaunchpad workflowLaunchpad)
         {
             _workflowDefinitionRepository = workflowDefinitionRepository;
             _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
             _workflowDefinitionManager = workflowDefinitionManager;
+            _workflowLaunchpad = workflowLaunchpad;
         }
 
         public virtual async Task<WorkflowDefinitionVersionDto> CreateAsync(WorkflowDefinitionVersionCreateOrUpdateDto input)
@@ -206,5 +210,37 @@ namespace Passingwind.Abp.ElsaModule.Common
             }
         }
 
+        public async Task<WorkflowDefinitionDispatchResultDto> DispatchAsync(Guid id, WorkflowDefinitionDispatchRequestDto input)
+        {
+            var entity = await _workflowDefinitionVersionRepository.GetLatestAsync(id);
+
+            var tenantId = CurrentTenant.Id?.ToString();
+
+            var startableWorkflow = await _workflowLaunchpad.FindStartableWorkflowAsync(id.ToString(), input.ActivityId?.ToString(), input.CorrelationId, input.ContextId, tenantId);
+
+            if (startableWorkflow == null)
+                throw new UserFriendlyException("The workflow is not found.");
+
+            var result = await _workflowLaunchpad.DispatchStartableWorkflowAsync(startableWorkflow, new WorkflowInput(input.Input));
+
+            return new WorkflowDefinitionDispatchResultDto
+            {
+                WorkflowInstanceId = Guid.Parse(result.WorkflowInstanceId),
+            };
+        }
+
+        public async Task ExecuteAsync(Guid id, WorkflowDefinitionExecuteRequestDto input)
+        {
+            var entity = await _workflowDefinitionVersionRepository.GetLatestAsync(id);
+
+            var tenantId = CurrentTenant.Id?.ToString();
+
+            var startableWorkflow = await _workflowLaunchpad.FindStartableWorkflowAsync(id.ToString(), input.ActivityId?.ToString(), input.CorrelationId, input.ContextId, tenantId);
+
+            if (startableWorkflow == null)
+                throw new UserFriendlyException("The workflow is not found.");
+
+            var result = await _workflowLaunchpad.ExecuteStartableWorkflowAsync(startableWorkflow, new WorkflowInput(input.Input));
+        }
     }
 }

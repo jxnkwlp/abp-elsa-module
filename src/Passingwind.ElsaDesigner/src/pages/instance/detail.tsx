@@ -1,20 +1,7 @@
 import { getWorkflowDefinitionVersion } from '@/services/WorkflowDefinition';
 import { getWorkflowInstance, getWorkflowInstanceExecutionLogs } from '@/services/WorkflowInstance';
 import { PageContainer } from '@ant-design/pro-layout';
-import {
-    Alert,
-    Button,
-    Card,
-    Col,
-    Modal,
-    Popover,
-    Result,
-    Row,
-    Tabs,
-    Tag,
-    Timeline,
-    Typography,
-} from 'antd';
+import { Alert, Card, Col, Modal, Popover, Row, Tag, Timeline, Typography } from 'antd';
 import moment from 'moment';
 import React, { useEffect } from 'react';
 import { useHistory, useLocation } from 'umi';

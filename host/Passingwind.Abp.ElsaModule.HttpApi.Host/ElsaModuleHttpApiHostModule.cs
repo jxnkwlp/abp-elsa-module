@@ -32,6 +32,9 @@ using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.SqlServer;
+using Volo.Abp.Json;
+using Volo.Abp.Json.SystemTextJson;
+using Volo.Abp.Json.SystemTextJson.JsonConverters;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.MultiTenancy;
@@ -262,14 +265,23 @@ public class ElsaModuleHttpApiHostModule : AbpModule
             options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver() { NamingStrategy = new CamelCaseNamingStrategy(false, true) };
         });
 
+        //PostConfigure<AbpSystemTextJsonSerializerOptions>(options =>
+        //{
+        //    options.JsonSerializerOptions.Converters.RemoveAll(x => x.GetType() == typeof(AbpStringToEnumFactory));
+        //});
+
+        //PostConfigure<AbpJsonOptions>(options =>
+        //{
+        //});
+
+        //PostConfigure<JsonOptions>(options =>
+        //{
+        //    options.JsonSerializerOptions.Converters.RemoveAll(x => x.GetType() == typeof(AbpStringToEnumFactory));
+        //});
+
         Configure<AbpAntiForgeryOptions>(options =>
         {
             options.AutoValidate = false;
-        });
-
-        context.Services.AddSpaStaticFiles(options =>
-        {
-            options.RootPath = "wwwroot/dist";
         });
 
     }
@@ -297,7 +309,7 @@ public class ElsaModuleHttpApiHostModule : AbpModule
         // app.UseHttpsRedirection();
         app.UseCorrelationId();
         app.UseStaticFiles();
-        app.UseSpaStaticFiles();
+        //app.UseSpaStaticFiles();
 
         app.UseRouting();
         app.UseCors();
@@ -311,7 +323,7 @@ public class ElsaModuleHttpApiHostModule : AbpModule
         }
 
         app.UseHangfireDashboard();
-         
+
         app.UseAbpRequestLocalization();
         app.UseAuthorization();
         app.UseSwagger();
@@ -341,9 +353,9 @@ public class ElsaModuleHttpApiHostModule : AbpModule
             return next();
         });
 
-#if !DEBUG
-        app.UseSpa(c => { });
-#endif
+//#if !DEBUG
+//        app.UseSpa(c => { });
+//#endif
     }
 
     public class SwaggerEnumDescriptions : ISchemaFilter

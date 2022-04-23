@@ -11,5 +11,10 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         Task<WorkflowInstanceDto> GetAsync(Guid id);
         Task<PagedResultDto<WorkflowInstanceBasicDto>> GetListAsync(WorkflowInstanceListRequestDto input);
         Task<ListResultDto<WorkflowExecutionLogDto>> GetExecutionLogsAsync(Guid id);
+
+        Task CancelAsync(Guid id);
+        Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input);
+        Task DispatchAsync(Guid id, WorkflowInstanceDispatchRequestDto input);
+        Task ExecuteAsync(Guid id, WorkflowInstanceExecuteRequestDto input);
     }
 }

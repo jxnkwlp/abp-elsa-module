@@ -16,5 +16,8 @@ namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions
 
         Task UnPublishAsync(Guid id);
         Task PublishAsync(Guid id);
+
+        Task ExecuteAsync(Guid id, WorkflowDefinitionExecuteRequestDto input);
+        Task<WorkflowDefinitionDispatchResultDto> DispatchAsync(Guid id, WorkflowDefinitionDispatchRequestDto input);
     }
 }

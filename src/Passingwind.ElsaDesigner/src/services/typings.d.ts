@@ -1,6 +1,6 @@
 /**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
- * Total count: 117
+ * Total count: 124
  **/
 declare namespace API {
     /**
@@ -1218,6 +1218,33 @@ declare namespace API {
     /**
      *  *TODO*
      **/
+    type WorkflowDefinitionDispatchRequest = {
+        activityId?: string | undefined;
+        correlationId?: string | undefined;
+        contextId?: string | undefined;
+        input?: any | undefined;
+    };
+
+    /**
+     *  *TODO*
+     **/
+    type WorkflowDefinitionDispatchResult = {
+        workflowInstanceId?: string | undefined;
+    };
+
+    /**
+     *  *TODO*
+     **/
+    type WorkflowDefinitionExecuteRequest = {
+        activityId?: string | undefined;
+        correlationId?: string | undefined;
+        contextId?: string | undefined;
+        input?: any | undefined;
+    };
+
+    /**
+     *  *TODO*
+     **/
     type WorkflowDefinitionVersion = {
         id?: string | undefined;
         creationTime?: string | undefined;
@@ -1287,6 +1314,14 @@ declare namespace API {
     /**
      *  *TODO*
      **/
+    type WorkflowInput = {
+        input?: any | undefined;
+        storageProviderName?: string | undefined;
+    };
+
+    /**
+     *  *TODO*
+     **/
     type WorkflowInputReference = {
         providerName?: string | undefined;
     };
@@ -1347,6 +1382,29 @@ declare namespace API {
         cancelledTime?: string | undefined;
         faultedTime?: string | undefined;
         fault?: WorkflowFault | undefined;
+    };
+
+    /**
+     *  *TODO*
+     **/
+    type WorkflowInstanceDispatchRequest = {
+        activityId?: string | undefined;
+        input?: WorkflowInput | undefined;
+    };
+
+    /**
+     *  *TODO*
+     **/
+    type WorkflowInstanceExecuteRequest = {
+        activityId?: string | undefined;
+        input?: WorkflowInput | undefined;
+    };
+
+    /**
+     *  *TODO*
+     **/
+    type WorkflowInstanceRetryRequest = {
+        runImmediately?: boolean | undefined;
     };
 
     /**
