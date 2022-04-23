@@ -32,7 +32,7 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         public List<BlockingActivity> BlockingActivities { get; set; }
         public List<ActivityScope> Scopes { get; set; }
         public ScheduledActivity CurrentActivity { get; set; }
-        public long? LastExecutedActivityId { get; set; }
+        public Guid? LastExecutedActivityId { get; set; }
         public Dictionary<string, Dictionary<string, object>> ActivityData { get; set; }
         public Dictionary<string, object> Metadata { get; set; }
     }

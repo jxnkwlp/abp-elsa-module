@@ -55,6 +55,7 @@ export type NodeUpdatePropData = {
     name: string;
     syntax?: string;
     value?: any;
+    valueType?: 'string' | 'number' | 'boolean' | 'object' | 'array';
     expressions?: Record<string, string>;
 };
 

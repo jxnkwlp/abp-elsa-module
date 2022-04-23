@@ -28,7 +28,7 @@ export async function getWorkflowExecutionLog(
 export async function getWorkflowExecutionLogList(
     params: {
         workflowInstanceId?: string | undefined,
-        activityId?: number | undefined,
+        activityId?: string | undefined,
         skipCount?: number | undefined,
         maxResultCount?: number | undefined
     },

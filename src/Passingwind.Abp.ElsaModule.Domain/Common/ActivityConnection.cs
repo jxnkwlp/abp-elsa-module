@@ -6,9 +6,8 @@ namespace Passingwind.Abp.ElsaModule.Common
     public class ActivityConnection : CreationAuditedEntity
     {
         public Guid DefinitionVersionId { get; set; }
-
-        public long SourceId { get; set; }
-        public long TargetId { get; set; }
+        public Guid SourceId { get; set; }
+        public Guid TargetId { get; set; }
         public string Outcome { get; set; }
 
         public override object[] GetKeys()

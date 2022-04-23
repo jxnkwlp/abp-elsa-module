@@ -17,7 +17,7 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
         {
         }
 
-        public async Task<long> GetCountAsync(Guid? workflowInstanceId = null, long? activityId = null, CancellationToken cancellationToken = default)
+        public async Task<long> GetCountAsync(Guid? workflowInstanceId = null, Guid? activityId = null, CancellationToken cancellationToken = default)
         {
             var dbset = await GetDbSetAsync();
             return await dbset
@@ -26,7 +26,7 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
                 .LongCountAsync(cancellationToken);
         }
 
-        public async Task<List<WorkflowExecutionLog>> GetListAsync(Guid? workflowInstanceId = null, long? activityId = null, bool includeDetails = false, CancellationToken cancellationToken = default)
+        public async Task<List<WorkflowExecutionLog>> GetListAsync(Guid? workflowInstanceId = null, Guid? activityId = null, bool includeDetails = false, CancellationToken cancellationToken = default)
         {
             var dbset = await GetDbSetAsync();
             return await dbset
@@ -35,7 +35,7 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<WorkflowExecutionLog>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting, Guid? workflowInstanceId = null, long? activityId = null, bool includeDetails = false, CancellationToken cancellationToken = default)
+        public async Task<List<WorkflowExecutionLog>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting, Guid? workflowInstanceId = null, Guid? activityId = null, bool includeDetails = false, CancellationToken cancellationToken = default)
         {
             var dbset = await GetDbSetAsync();
             return await dbset

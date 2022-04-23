@@ -136,6 +136,7 @@ const Index: React.FC = () => {
             const content = await file.text();
             const data = JSON.parse(content);
             await loadServerData(data as API.WorkflowDefinition, true);
+            message.info('import successful.');
         } catch (error) {
             console.error(error);
             message.error('Import file failed');
@@ -177,22 +178,28 @@ const Index: React.FC = () => {
             let syntax = item.syntax!;
 
             // load syntax if not found
-            if (!syntax && Object.keys(item.expressions ?? {}).length > 0) {
-                syntax = Object.keys(item.expressions ?? {})[0];
+            if (
+                !syntax &&
+                Object.keys(item.expressions ?? {}).filter((x) => x != '$id').length > 0
+            ) {
+                syntax = Object.keys(item.expressions ?? {}).filter((x) => x != '$id')[0];
             }
 
             if (item.expressions?.[syntax]) {
-                const expressionValue = item.expressions![syntax];
+                const expressionValue = item.expressions[syntax];
                 item.value = expressionValue;
                 //
-                if (syntax == 'Literal') {
-                    if (
-                        (expressionValue.startsWith('{') && expressionValue.endsWith('}')) ||
-                        (expressionValue.startsWith('[') && expressionValue.endsWith(']'))
-                    ) {
-                        item.value = JSON.parse(expressionValue);
-                    }
-                }
+                // if (
+                //     syntax == 'Literal' &&
+                //     (item.valueType == 'object' || item.valueType == 'array')
+                // ) {
+                //     if (
+                //         (expressionValue.startsWith('{') && expressionValue.endsWith('}')) ||
+                //         (expressionValue.startsWith('[') && expressionValue.endsWith(']'))
+                //     ) {
+                //         item.value = JSON.parse(expressionValue);
+                //     }
+                // }
             }
 
             nodeData.props[item.name] = {

@@ -148,15 +148,16 @@ const Index: React.FC = () => {
                                                 title="Data"
                                                 placement="left"
                                                 content={
-                                                    <Typography.Paragraph
+                                                    <Typography.Text
                                                         style={{
+                                                            display: 'block',
                                                             maxWidth: 500,
                                                             overflow: 'hidden',
                                                             wordWrap: 'break-word',
                                                         }}
                                                     >
-                                                        {JSON.stringify(item.data ?? {})}
-                                                    </Typography.Paragraph>
+                                                        <pre>{JSON.stringify(item.data ?? {})}</pre>
+                                                    </Typography.Text>
                                                 }
                                             >
                                                 {item.eventName} <Tag>{item.activityType}</Tag>
@@ -173,19 +174,19 @@ const Index: React.FC = () => {
                             </Timeline>
                         )}
                         {tabKey === 'fault' && (
-                            <Typography.Paragraph>
-                                <code>{JSON.stringify(data?.fault ?? {})}</code>
-                            </Typography.Paragraph>
+                            <Typography.Text>
+                                <pre>{JSON.stringify(data?.fault ?? {})}</pre>
+                            </Typography.Text>
                         )}
                         {tabKey === 'variables' && (
-                            <Typography.Paragraph>
-                                <code>{JSON.stringify(data?.variables ?? {})}</code>
-                            </Typography.Paragraph>
+                            <Typography.Text>
+                                <pre>{JSON.stringify(data?.variables ?? {})}</pre>
+                            </Typography.Text>
                         )}
                         {tabKey === 'data' && (
-                            <Typography.Paragraph>
-                                <code>{JSON.stringify(data?.activityData ?? {})}</code>
-                            </Typography.Paragraph>
+                            <Typography.Text>
+                                <pre>{JSON.stringify(data?.activityData ?? {})}</pre>
+                            </Typography.Text>
                         )}
                     </Card>
                 </Col>

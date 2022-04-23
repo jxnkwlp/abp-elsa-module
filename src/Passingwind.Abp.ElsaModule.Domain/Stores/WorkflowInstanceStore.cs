@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.Common;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Linq;
+using Volo.Abp.Timing;
 using WorkflowInstanceModel = Elsa.Models.WorkflowInstance;
 using WorkflowStatus = Elsa.Models.WorkflowStatus;
 
@@ -18,13 +19,13 @@ namespace Passingwind.Abp.ElsaModule.Stores
     {
         private readonly IStoreMapper _storeMapper;
         private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
-        private readonly IIdGenerator _idGenerator;
+        private readonly IClock _clock;
 
-        public WorkflowInstanceStore(ILoggerFactory loggerFactory, IRepository<WorkflowInstance, Guid> repository, IAsyncQueryableExecuter asyncQueryableExecuter, IStoreMapper storeMapper, IWorkflowDefinitionRepository workflowDefinitionRepository, IIdGenerator idGenerator) : base(loggerFactory, repository, asyncQueryableExecuter)
+        public WorkflowInstanceStore(ILoggerFactory loggerFactory, IRepository<WorkflowInstance, Guid> repository, IAsyncQueryableExecuter asyncQueryableExecuter, IStoreMapper storeMapper, IWorkflowDefinitionRepository workflowDefinitionRepository, IClock clock) : base(loggerFactory, repository, asyncQueryableExecuter)
         {
             _storeMapper = storeMapper;
             _workflowDefinitionRepository = workflowDefinitionRepository;
-            _idGenerator = idGenerator;
+            _clock = clock;
         }
 
         protected override async Task<WorkflowInstance> MapToEntityAsync(WorkflowInstanceModel model)
@@ -33,8 +34,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
             var workflowDefinition = await _workflowDefinitionRepository.GetAsync(entity.DefinitionId);
 
-            entity.Name = $"{workflowDefinition.Name}-{_idGenerator.Generate()}";
-            // entity.DisplayName = workflowDefinition.DisplayName;
+            entity.Name = $"{workflowDefinition.Name}-{_clock.Now.ToString("yyyyMMddHHmmss")}";
 
             return entity;
         }

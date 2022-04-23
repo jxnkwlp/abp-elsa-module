@@ -40,7 +40,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             if (specification is ActivityIdSpecification activityIdSpecification)
             {
-                return x => x.ActivityId == long.Parse(activityIdSpecification.ActivityId);
+                return x => x.ActivityId == Guid.Parse(activityIdSpecification.ActivityId);
             }
             else if (specification is ActivityTypeSpecification activityTypeSpecification)
             {

@@ -18,7 +18,7 @@ namespace Passingwind.Abp.ElsaModule.Common
 
         public Guid? TenantId { get; protected set; }
 
-        public long ActivityId { get; set; }
+        public Guid ActivityId { get; set; }
         public string ActivityType { get; set; }
         public string Hash { get; set; }
         public string ModelType { get; set; }

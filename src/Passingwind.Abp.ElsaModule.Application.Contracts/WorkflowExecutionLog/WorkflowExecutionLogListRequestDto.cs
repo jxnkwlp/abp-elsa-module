@@ -6,6 +6,6 @@ namespace Passingwind.Abp.ElsaModule.Common
     public class WorkflowExecutionLogListRequestDto : PagedResultRequestDto
     {
         public Guid? WorkflowInstanceId { get; set; }
-        public long? ActivityId { get; set; }
+        public Guid? ActivityId { get; set; }
     }
 }

@@ -183,7 +183,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             return new Activity()
             {
-                ActivityId = long.Parse(model.ActivityId),
+                ActivityId = Guid.Parse(model.ActivityId),
                 Description = model.Description,
                 Name = model.Name,
                 DisplayName = model.DisplayName,
@@ -200,8 +200,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
             return new ActivityConnection
             {
                 Outcome = model.Outcome,
-                SourceId = long.Parse(model.SourceActivityId),
-                TargetId = long.Parse(model.TargetActivityId),
+                SourceId = Guid.Parse(model.SourceActivityId),
+                TargetId = Guid.Parse(model.TargetActivityId),
             };
         }
 
@@ -209,7 +209,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             return new Bookmark(model.Id.ToGuid().Value)
             {
-                ActivityId = long.Parse(model.ActivityId),
+                ActivityId = Guid.Parse(model.ActivityId),
                 ActivityType = model.ActivityType,
                 CorrelationId = model.CorrelationId,
                 Hash = model.Hash,
@@ -221,7 +221,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual Bookmark MapToEntity(BookmarkModel model, Bookmark entity)
         {
-            entity.ActivityId = long.Parse(model.ActivityId);
+            entity.ActivityId = Guid.Parse(model.ActivityId);
             entity.ActivityType = model.ActivityType;
             entity.CorrelationId = model.CorrelationId;
             entity.Hash = model.Hash;
@@ -252,7 +252,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             return new Trigger(model.Id.ToGuid().Value)
             {
-                ActivityId = long.Parse(model.ActivityId),
+                ActivityId = Guid.Parse(model.ActivityId),
                 ActivityType = model.ActivityType,
                 Hash = model.Hash,
                 Model = model.Model,
@@ -264,7 +264,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual Trigger MapToEntity(TriggerModel model, Trigger entity)
         {
-            entity.ActivityId = long.Parse(model.ActivityId);
+            entity.ActivityId = Guid.Parse(model.ActivityId);
             entity.ActivityType = model.ActivityType;
             entity.Hash = model.Hash;
             entity.Model = model.Model;
@@ -293,7 +293,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             return new WorkflowExecutionLog()
             {
-                ActivityId = long.Parse(model.ActivityId),
+                ActivityId = Guid.Parse(model.ActivityId),
                 ActivityType = model.ActivityType,
                 Data = model.Data,
                 EventName = model.EventName,
@@ -306,7 +306,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual WorkflowExecutionLog MapToEntity(WorkflowExecutionLogRecordModel model, WorkflowExecutionLog entity)
         {
-            entity.ActivityId = long.Parse(model.ActivityId);
+            entity.ActivityId = Guid.Parse(model.ActivityId);
             entity.ActivityType = model.ActivityType;
             entity.Data = model.Data;
             entity.EventName = model.EventName;
@@ -364,7 +364,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 Fault = model.Fault,
                 Input = model.Input,
                 Output = model.Output,
-                LastExecutedActivityId = string.IsNullOrEmpty(model.LastExecutedActivityId) ? null : long.Parse(model.LastExecutedActivityId),
+                LastExecutedActivityId = string.IsNullOrEmpty(model.LastExecutedActivityId) ? null : Guid.Parse(model.LastExecutedActivityId),
                 Metadata = (System.Collections.Generic.Dictionary<string, object>)model.Metadata,
                 Variables = model.Variables?.Data?.ToDictionary(x => x.Key, x => x.Value),
             };
@@ -372,8 +372,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual WorkflowInstance MapToEntity(WorkflowInstanceModel model, WorkflowInstance entity)
         {
-            // readonly
-            // entity.Name = model.Name;
+            if (!string.IsNullOrEmpty(model.Name))
+                entity.Name = model.Name;
 
             entity.Version = model.Version;
             entity.WorkflowStatus = model.WorkflowStatus;
@@ -399,7 +399,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             entity.Fault = model.Fault;
             entity.Input = model.Input;
             entity.Output = model.Output;
-            entity.LastExecutedActivityId = string.IsNullOrEmpty(model.LastExecutedActivityId) ? null : long.Parse(model.LastExecutedActivityId);
+            entity.LastExecutedActivityId = string.IsNullOrEmpty(model.LastExecutedActivityId) ? null : Guid.Parse(model.LastExecutedActivityId);
             entity.Metadata = model.Metadata as Dictionary<string, object>;
             entity.Variables = model.Variables?.Data as Dictionary<string, object>;
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Elsa.Models;
 
@@ -6,7 +7,7 @@ namespace Passingwind.Abp.ElsaModule.Workflow;
 
 public class ActivityCreateOrUpdateDto
 {
-    public long ActivityId { get; set; }
+    public Guid ActivityId { get; set; }
 
     [Required]
     [MaxLength(32)]

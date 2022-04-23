@@ -57,7 +57,7 @@ public class WorkflowInstance : FullAuditedEntity<Guid>, IMultiTenant
 
     public ScheduledActivity CurrentActivity { get; set; }
 
-    public long? LastExecutedActivityId { get; set; }
+    public Guid? LastExecutedActivityId { get; set; }
 
     public Dictionary<string, IDictionary<string, object>> ActivityData { get; set; }
 

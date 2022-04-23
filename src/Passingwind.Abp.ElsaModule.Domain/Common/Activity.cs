@@ -8,8 +8,7 @@ namespace Passingwind.Abp.ElsaModule.Common;
 public class Activity : AuditedEntity
 {
     public Guid DefinitionVersionId { get; set; }
-
-    public long ActivityId { get; set; }
+    public Guid ActivityId { get; set; }
     public string Type { get; set; }
     public string Name { get; set; }
     public string DisplayName { get; set; }

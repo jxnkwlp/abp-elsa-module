@@ -121,7 +121,7 @@ const CaseEditorInput: React.FC<CaseEditorInputProps> = (props) => {
                                             // console.log(itemValue);
                                             return syntax ? (
                                                 <ProForm.Item
-                                                    label="Expressions"
+                                                    // label="Expressions"
                                                     name={['expressions', syntax]}
                                                     rules={[
                                                         { required: true, message: 'Required' },

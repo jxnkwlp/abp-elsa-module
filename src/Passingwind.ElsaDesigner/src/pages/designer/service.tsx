@@ -1,56 +1,56 @@
 import { getDesignerActivityTypes, getDesignerScriptTypeDefinition } from '@/services/Designer';
-import { genrateId } from '@/services/IdGenerator';
 import { randString } from '@/services/utils';
 import type { Edge, Node } from '@antv/x6';
 import type { PortManager } from '@antv/x6/lib/model/port';
+import { uuid } from '@antv/x6/es/util/string/uuid';
 import type { IGraphData, NodeTypeGroup, NodeTypeProperty } from './type';
 
-export const getTestData = () => {
-    const id1 = genrateId();
-    const id2 = genrateId();
-    const id3 = genrateId();
-    return {
-        // 节点
-        nodes: [
-            {
-                id: id1, // String，可选，节点的唯一标识
-                x: 18, // Number，必选，节点位置的 x 值
-                y: 10, // Number，必选，节点位置的 y 值
-                // width: 80, // Number，可选，节点大小的 width 值
-                // height: 40, // Number，可选，节点大小的 height 值
-                label: 'activity', // String，节点标签
-                shape: 'activity',
-                type: 'activity',
-                name: 'activity',
-            },
-            {
-                id: id2, // String，节点的唯一标识
-                x: 300, // Number，必选，节点位置的 x 值
-                y: 180, // Number，必选，节点位置的 y 值
-                // width: 80, // Number，可选，节点大小的 width 值
-                // height: 40, // Number，可选，节点大小的 height 值
-                label: 'event', // String，节点标签
-                shape: 'event',
-            },
-            {
-                id: id3, // String，节点的唯一标识
-                x: 0, // Number，必选，节点位置的 x 值
-                y: 300, // Number，必选，节点位置的 y 值
-                // width: 80, // Number，可选，节点大小的 width 值
-                // height: 40, // Number，可选，节点大小的 height 值
-                label: 'gateway', // String，节点标签
-                shape: 'gateway',
-            },
-        ],
-        // 边
-        edges: [
-            {
-                source: id1, // String，必须，起始节点 id
-                target: id2, // String，必须，目标节点 id
-            },
-        ],
-    };
-};
+// export const getTestData = () => {
+//     const id1 = genrateId();
+//     const id2 = genrateId();
+//     const id3 = genrateId();
+//     return {
+//         // 节点
+//         nodes: [
+//             {
+//                 id: id1, // String，可选，节点的唯一标识
+//                 x: 18, // Number，必选，节点位置的 x 值
+//                 y: 10, // Number，必选，节点位置的 y 值
+//                 // width: 80, // Number，可选，节点大小的 width 值
+//                 // height: 40, // Number，可选，节点大小的 height 值
+//                 label: 'activity', // String，节点标签
+//                 shape: 'activity',
+//                 type: 'activity',
+//                 name: 'activity',
+//             },
+//             {
+//                 id: id2, // String，节点的唯一标识
+//                 x: 300, // Number，必选，节点位置的 x 值
+//                 y: 180, // Number，必选，节点位置的 y 值
+//                 // width: 80, // Number，可选，节点大小的 width 值
+//                 // height: 40, // Number，可选，节点大小的 height 值
+//                 label: 'event', // String，节点标签
+//                 shape: 'event',
+//             },
+//             {
+//                 id: id3, // String，节点的唯一标识
+//                 x: 0, // Number，必选，节点位置的 x 值
+//                 y: 300, // Number，必选，节点位置的 y 值
+//                 // width: 80, // Number，可选，节点大小的 width 值
+//                 // height: 40, // Number，可选，节点大小的 height 值
+//                 label: 'gateway', // String，节点标签
+//                 shape: 'gateway',
+//             },
+//         ],
+//         // 边
+//         edges: [
+//             {
+//                 source: id1, // String，必须，起始节点 id
+//                 target: id2, // String，必须，目标节点 id
+//             },
+//         ],
+//     };
+// };
 
 export const getGraphOptions = () => {
     return {};
@@ -170,7 +170,7 @@ export const getPropertySyntaxes = (property: NodeTypeProperty) => {
 };
 
 // export const configNode = (node: Node.Metadata) => {
-//     const nodeId = node.id || genrateId();
+//     const nodeId = node.id || uuid();
 //     node.id = nodeId.toString();
 //     return node;
 // };
@@ -195,7 +195,7 @@ export const setNodeOutPorts = (node: Node<Node.Properties>, outcomes: string[])
     // node.addPorts(
     //     outcomes.map((item) => {
     //         return {
-    //             id: genrateId().toString(),
+    //             id: uuid(),
     //             group: 'bottom',
     //             tooltip: item,
     //             outcome: item,
@@ -222,7 +222,7 @@ export const updateNodePorts = (node: Node<Node.Properties>) => {
     node.addPorts(
         outcomes.map((item) => {
             return {
-                id: genrateId().toString(),
+                id: uuid(),
                 group: 'bottom',
                 label: item,
                 outcome: item,
@@ -285,7 +285,7 @@ export const compareOutputEdges = (
  */
 export const createNodeConfig = (config: any) => {
     const { id, label, name, type, displayName } = config;
-    const nodeId = id || genrateId().toString();
+    const nodeId = id || uuid();
     const nodeLabel = label ?? type;
     const node = {
         shape: 'activity',
@@ -304,7 +304,7 @@ export const createNodeConfig = (config: any) => {
  */
 export const createEdgeConfig = (config: any) => {
     const { id, label, name } = config;
-    const edgeId = id ?? genrateId().toString();
+    const edgeId = id ?? uuid();
     const edgeName = label ?? name ?? 'Done';
     return {
         shape: 'bpmn-edge',
@@ -335,8 +335,8 @@ export const conventToServerData = (data: IGraphData) => {
     console.log(data);
     const edges: API.ActivityConnectionCreate[] = data.edges.map((item: any) => {
         return {
-            sourceId: parseInt(item.source.cell),
-            targetId: parseInt(item.target.cell),
+            sourceId: item.source.cell,
+            targetId: item.target.cell,
             outcome: item.name ?? item.outcome ?? 'Done',
         } as API.ActivityConnectionCreate;
     });
@@ -350,7 +350,7 @@ export const conventToServerData = (data: IGraphData) => {
         //     outcomes = ['Done'];
         // }
         return {
-            activityId: parseInt(item.id as string),
+            activityId: item.id as string,
             type: item.type,
             name: item.name ?? randString(item.type),
             displayName: item.label ?? item.displayName,
@@ -406,8 +406,8 @@ export const conventToGraphData = async (
     });
 
     const edges = connections.map((item) => {
-        const sourceId = item.sourceId?.toString();
-        const targetId = item.targetId?.toString();
+        const sourceId = item.sourceId;
+        const targetId = item.targetId;
 
         return createEdgeConfig({
             id: '', // be generated

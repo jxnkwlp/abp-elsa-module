@@ -13,7 +13,7 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Passingwind.Abp.ElsaModule.Migrations
 {
     [DbContext(typeof(ElsaModuleHttpApiHostMigrationsDbContext))]
-    [Migration("20220408100038_Add_Elsa")]
+    [Migration("20220423061349_Add_Elsa")]
     partial class Add_Elsa
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,8 +31,8 @@ namespace Passingwind.Abp.ElsaModule.Migrations
                     b.Property<Guid>("DefinitionVersionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("ActivityId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("ActivityId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Arrtibutes")
                         .HasColumnType("nvarchar(max)");
@@ -93,11 +93,11 @@ namespace Passingwind.Abp.ElsaModule.Migrations
                     b.Property<Guid>("DefinitionVersionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("SourceId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("SourceId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("TargetId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Outcome")
                         .HasMaxLength(64)
@@ -122,8 +122,8 @@ namespace Passingwind.Abp.ElsaModule.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("ActivityId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("ActivityId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ActivityType")
                         .HasMaxLength(256)
@@ -178,8 +178,8 @@ namespace Passingwind.Abp.ElsaModule.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("ActivityId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("ActivityId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ActivityType")
                         .HasMaxLength(256)
@@ -381,8 +381,8 @@ namespace Passingwind.Abp.ElsaModule.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<long>("ActivityId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("ActivityId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ActivityType")
                         .HasMaxLength(128)
@@ -497,8 +497,8 @@ namespace Passingwind.Abp.ElsaModule.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("IsDeleted");
 
-                    b.Property<long?>("LastExecutedActivityId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("LastExecutedActivityId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("LastExecutedTime")
                         .HasColumnType("datetime2");
@@ -516,8 +516,8 @@ namespace Passingwind.Abp.ElsaModule.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Output")
                         .HasColumnType("nvarchar(max)");

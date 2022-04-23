@@ -1,4 +1,3 @@
-import { genrateId } from '@/services/IdGenerator';
 import { randString } from '@/services/utils';
 import {
     CompressOutlined,
@@ -16,6 +15,7 @@ import '@antv/x6-react-components/es/menu/style/index.css';
 import '@antv/x6-react-components/es/toolbar/style/index.css';
 import type { Edge, Node } from '@antv/x6/es';
 import { Addon } from '@antv/x6/es';
+import { uuid } from '@antv/x6/es/util/string/uuid';
 import type { Dnd } from '@antv/x6/lib/addon';
 import { message } from 'antd';
 import React, { useEffect, useImperativeHandle } from 'react';
@@ -32,7 +32,7 @@ import {
     getNodeTypeRawData,
     toggleNodePortVisible,
 } from './service';
-import type { IGraphData, NodeUpdateData, ToolBarGroupData, ToolBarItemData } from './type';
+import type { IGraphData, NodeUpdateData, ToolBarGroupData } from './type';
 
 type IFlowProps = {
     height?: number;
@@ -201,7 +201,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                         const c2 = graph?.paste({
                             offset: 100,
                             nodeProps: {
-                                id: genrateId().toString(),
+                                id: uuid(),
                                 name: randString(),
                             },
                         });

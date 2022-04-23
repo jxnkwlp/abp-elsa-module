@@ -27,7 +27,7 @@ declare namespace API {
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
-        activityId?: number | undefined;
+        activityId?: string | undefined;
         type?: string | undefined;
         name?: string | undefined;
         displayName?: string | undefined;
@@ -45,8 +45,8 @@ declare namespace API {
     type ActivityConnection = {
         creationTime?: string | undefined;
         creatorId?: string | undefined;
-        sourceId?: number | undefined;
-        targetId?: number | undefined;
+        sourceId?: string | undefined;
+        targetId?: string | undefined;
         outcome?: string | undefined;
     };
 
@@ -54,8 +54,8 @@ declare namespace API {
      *  *TODO*
      **/
     type ActivityConnectionCreate = {
-        sourceId?: number | undefined;
-        targetId?: number | undefined;
+        sourceId?: string | undefined;
+        targetId?: string | undefined;
         outcome?: string | undefined;
     };
 
@@ -63,7 +63,7 @@ declare namespace API {
      *  *TODO*
      **/
     type ActivityCreateOrUpdate = {
-        activityId?: number | undefined;
+        activityId?: string | undefined;
         type: string;
         name: string;
         displayName?: string | undefined;
@@ -1264,7 +1264,7 @@ declare namespace API {
         creationTime?: string | undefined;
         creatorId?: string | undefined;
         workflowInstanceId?: string | undefined;
-        activityId?: number | undefined;
+        activityId?: string | undefined;
         activityType?: string | undefined;
         timestamp?: string | undefined;
         eventName?: string | undefined;
@@ -1320,7 +1320,7 @@ declare namespace API {
         blockingActivities?: BlockingActivity[] | undefined;
         scopes?: ActivityScope[] | undefined;
         currentActivity?: ScheduledActivity | undefined;
-        lastExecutedActivityId?: number | undefined;
+        lastExecutedActivityId?: string | undefined;
         activityData?: object | undefined;
         metadata?: object | undefined;
     };

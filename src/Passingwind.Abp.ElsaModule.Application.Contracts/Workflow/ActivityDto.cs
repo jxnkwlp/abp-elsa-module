@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Elsa.Models;
 using Volo.Abp.Application.Dtos;
 
@@ -6,7 +7,7 @@ namespace Passingwind.Abp.ElsaModule.Workflow
 {
     public class ActivityDto : AuditedEntityDto
     {
-        public long ActivityId { get; set; }
+        public Guid ActivityId { get; set; }
 
         public string Type { get; set; }
         public string Name { get; set; }

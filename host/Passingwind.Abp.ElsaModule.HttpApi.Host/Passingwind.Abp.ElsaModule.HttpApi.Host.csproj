@@ -56,8 +56,4 @@
         <None Remove="Logs\**" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Migrations\" />
-    </ItemGroup>
-
 </Project>
