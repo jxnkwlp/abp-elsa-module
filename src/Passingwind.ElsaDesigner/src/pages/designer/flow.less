@@ -109,6 +109,7 @@
         background: #fff;
         border-bottom: 1px solid #dfe3e8;
         // box-shadow: 0 0 10px 0 #00000026;
+
     }
 
     .x6-toolbar {
@@ -120,6 +121,36 @@
     border: 1px solid #d9d9d9;
     border-radius: 2px;
     margin: 0 1px;
+    position: relative;
+
+    &.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        background: #fff;
+    }
+
+    .fullscreen-toggle {
+        position: absolute;
+        z-index: 10;
+        right: 20px;
+        top: 8px;
+        background: #0000001c;
+        color: #fff;
+
+        &:hover {
+            background: #0004;
+        }
+
+        a {
+            display: block;
+            color: #fff;
+            padding: 2px 6px;
+        }
+    }
 }
 
 /** 覆盖节点默认选中色 */

@@ -1,6 +1,7 @@
+import { ExpandOutlined } from '@ant-design/icons';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import React, { useEffect } from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 type MonacorEditorInputProps = {
     id?: string;
@@ -15,6 +16,21 @@ type MonacorEditorInputProps = {
 
 const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
     const ref = React.createRef<MonacoEditor>();
+
+    const [isFullscreen, setIsFullscreen] = React.useState(false);
+
+    const [originSize, setOriginSize] = React.useState<{ w?: number; h: number }>();
+    const [currentSize, setCurrentSize] = React.useState<{ w?: number; h: number }>();
+
+    const handleToggleFullScreen = () => {
+        if (isFullscreen) {
+            setIsFullscreen(false);
+            setCurrentSize(originSize);
+        } else {
+            setIsFullscreen(true);
+            setCurrentSize({ w: document.body.clientWidth, h: document.body.clientHeight });
+        }
+    };
 
     const updateEditorScriptExtraLibs = async () => {
         if (props.getJavaScriptLibs) {
@@ -41,6 +57,11 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
         // console.log(props);
         ref.current?.editor?.setValue(props.value ?? '');
     }, [props, ref]);
+
+    useEffect(() => {
+        setOriginSize({ w: props.width, h: props.height ?? 150 });
+        setCurrentSize({ w: props.width, h: props.height ?? 150 });
+    }, [0]);
 
     useEffect(() => {
         if (props.language == 'javascript') {
@@ -75,19 +96,24 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
     }, [props.language]);
 
     return (
-        <div className="monaco-editor-container" id={props.id}>
+        <div
+            className={
+                isFullscreen ? 'monaco-editor-container fullscreen' : 'monaco-editor-container'
+            }
+            id={props.id}
+            style={{ width: currentSize?.w, height: currentSize?.h }}
+        >
             <MonacoEditor
                 ref={ref}
-                width={props.width}
-                height={props.height}
                 language={props.language}
                 defaultValue={props.value}
                 onChange={(v) => {
                     props?.onChange?.(v);
                 }}
                 options={{
-                    minimap: { enabled: false },
+                    minimap: { enabled: isFullscreen },
                     wordWrap: 'bounded',
+                    wordWrapColumn: 1024,
                     automaticLayout: true,
                     autoIndent: 'full',
                     ...props?.options,
@@ -96,6 +122,11 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                     e.setValue(props.value ?? '');
                 }}
             />
+            <div className="fullscreen-toggle">
+                <a onClick={() => handleToggleFullScreen()} title="Toggle fullscreen">
+                    <ExpandOutlined />
+                </a>
+            </div>
         </div>
     );
 };
