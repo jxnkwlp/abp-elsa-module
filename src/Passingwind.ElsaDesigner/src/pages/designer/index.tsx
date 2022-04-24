@@ -200,18 +200,19 @@ const Index: React.FC = () => {
             if (item.expressions?.[syntax]) {
                 const expressionValue = item.expressions[syntax];
                 item.value = expressionValue;
-                //
-                // if (
-                //     syntax == 'Literal' &&
-                //     (item.valueType == 'object' || item.valueType == 'array')
-                // ) {
-                //     if (
-                //         (expressionValue.startsWith('{') && expressionValue.endsWith('}')) ||
-                //         (expressionValue.startsWith('[') && expressionValue.endsWith(']'))
-                //     ) {
-                //         item.value = JSON.parse(expressionValue);
-                //     }
-                // }
+                const property = nodeType.inputProperties?.find((x) => x.name == item.name);
+
+                if (
+                    syntax == 'Literal' &&
+                    (property?.uiHint == 'check-list' || property?.uiHint == 'multi-text')
+                ) {
+                    if (
+                        (expressionValue.startsWith('{') && expressionValue.endsWith('}')) ||
+                        (expressionValue.startsWith('[') && expressionValue.endsWith(']'))
+                    ) {
+                        item.value = JSON.parse(expressionValue);
+                    }
+                }
             }
 
             nodeData.props[item.name] = {

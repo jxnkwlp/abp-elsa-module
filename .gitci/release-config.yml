@@ -1,0 +1,52 @@
+﻿version-resolver:
+  major:
+    commits:
+      - "Major"
+      - "[break changes]"
+    labels:
+      - "Versioning - major"
+  minor:
+    commits:
+      - "[feat]"
+    labels:
+      - "Versioning - Minor"
+  patch:
+    commits:
+      - "[fix]"
+      - "[fix bugs]"
+    labels:
+      - "Versioning - Patch"
+  default: patch
+
+categories:
+  - title: "🌈 Breaking Changes"
+    labels:
+      - "Feature"
+    commits:
+      - "[break]"
+  - title: "🚀 Features"
+    labels:
+      - "Feature"
+    commits:
+      - "[feat]"
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "Bug - Fixed"
+      - "Fix"
+    commits:
+      - "[fix]"
+      - "[fix bugs]"
+  - title: "📖 Documentation"
+    labels:
+      - "Documentation"
+    commits:
+      - "[docs]"
+  - title: "🧰 Maintenance"
+    labels:
+      - "Chore"
+      - "Maintenance"
+
+template: |
+  ## Changes
+  Contributors: $CONTRIBUTORS
+  $CHANGES
