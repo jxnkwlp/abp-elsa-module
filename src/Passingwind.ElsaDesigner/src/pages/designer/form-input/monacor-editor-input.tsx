@@ -77,6 +77,16 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
             }
             id={props.id}
             style={{ width: currentSize?.w, height: currentSize?.h }}
+            onKeyDown={(e) => {
+                // keyCode: 27
+                if (e.code == 'Escape') {
+                    if (isFullscreen) {
+                        handleToggleFullScreen();
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }}
         >
             <MonacoEditor
                 ref={ref}

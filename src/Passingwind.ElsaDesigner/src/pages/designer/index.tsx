@@ -372,15 +372,22 @@ const Index: React.FC = () => {
         }
 
         if (result) {
-            if (id) {
-                message.success('Save successed. version: ' + result.version);
+            if (publish) {
+                message.success('Publish workflow success. version: ' + result.version);
             } else {
-                message.success('Create successed.');
+                message.success('Save draft successed. version: ' + result.version);
+            }
+            // new
+            if (!id) {
+                // message.success('Create successed.');
                 history.replace(`/designer?id=${result.definition?.id}`);
             }
 
             setId(result.definition!.id);
             setVersion(result.version!);
+            //
+            setDefinitionVersion(result);
+            setDefinition(result.definition);
         }
 
         setSubmiting(false);
@@ -437,9 +444,10 @@ const Index: React.FC = () => {
                         <Col flex={1} className="title-bar">
                             <Typography.Text>
                                 {definition?.name}{' '}
-                                <Tag>
-                                    <Tooltip title={'Current Version'}>{version}</Tooltip>
-                                </Tag>
+                                <Tag>Draft :{definition?.latestVersion ?? 1}</Tag>
+                                {definition?.publishedVersion && (
+                                    <Tag> Published :{definition?.publishedVersion}</Tag>
+                                )}
                             </Typography.Text>
                         </Col>
                         <Col>
@@ -532,6 +540,7 @@ const Index: React.FC = () => {
                         actionRef={flowAction}
                         graphData={graphData}
                         onNodeDoubleClick={handleOnShowNodeEditForm}
+                        height={800}
                     />
                 </Spin>
             </Card>
@@ -618,17 +627,21 @@ const Index: React.FC = () => {
                         {
                             title: 'Latest',
                             dataIndex: 'isLatest',
+                            align: 'center',
                             valueEnum: { true: { text: 'Y' }, false: { text: '-' } },
                         },
                         {
                             title: 'Published',
                             dataIndex: 'isPublished',
+                            align: 'center',
                             valueEnum: { true: { text: 'Y' }, false: { text: '-' } },
                         },
                         {
                             title: 'Modification Time',
                             dataIndex: 'creationTime',
                             valueType: 'dateTime',
+                            width: 160,
+                            align: 'center',
                             renderText: (_, record) => {
                                 return record.lastModificationTime ?? record.creationTime;
                             },

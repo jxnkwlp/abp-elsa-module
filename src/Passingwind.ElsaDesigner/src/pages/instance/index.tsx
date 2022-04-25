@@ -1,3 +1,4 @@
+import { WorkflowStatus } from '@/services/enums';
 import {
     getWorkflowInstanceList,
     workflowInstanceCancel,
@@ -15,10 +16,10 @@ const Index: React.FC = () => {
 
     const history = useHistory();
 
-    const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
-    const [editModalTitle, setEditModalTitle] = useState<string>('');
-    const [editModalData, setEditModalData] = useState<API.WorkflowInstance>();
-    const [editModalDataId, setEditModalDataId] = useState<string>();
+    // const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
+    // const [editModalTitle, setEditModalTitle] = useState<string>('');
+    // const [editModalData, setEditModalData] = useState<API.WorkflowInstance>();
+    // const [editModalDataId, setEditModalDataId] = useState<string>();
 
     // const [searchKey, setSearchKey] = useState<string>();
 
@@ -54,6 +55,32 @@ const Index: React.FC = () => {
             dataIndex: 'workflowStatus',
             title: 'Status',
             // valueEnum: enumToStatus(WorkflowStatus),
+            valueEnum: {
+                [WorkflowStatus.Idle]: {
+                    text: WorkflowStatus[WorkflowStatus.Idle],
+                    status: 'default',
+                },
+                [WorkflowStatus.Running]: {
+                    text: WorkflowStatus[WorkflowStatus.Running],
+                    status: 'processing',
+                },
+                [WorkflowStatus.Finished]: {
+                    text: WorkflowStatus[WorkflowStatus.Finished],
+                    status: 'success',
+                },
+                [WorkflowStatus.Suspended]: {
+                    text: WorkflowStatus[WorkflowStatus.Suspended],
+                    status: 'warning',
+                },
+                [WorkflowStatus.Faulted]: {
+                    text: WorkflowStatus[WorkflowStatus.Faulted],
+                    status: 'error',
+                },
+                [WorkflowStatus.Cancelled]: {
+                    text: WorkflowStatus[WorkflowStatus.Cancelled],
+                    status: 'default',
+                },
+            },
         },
         {
             title: 'Creation Time',
@@ -106,9 +133,9 @@ const Index: React.FC = () => {
                         });
                     }}
                 >
-                    {(record.workflowStatus == 'Idle' ||
-                        record.workflowStatus == 'Running' ||
-                        record.workflowStatus == 'Suspended') && <span>Cancel</span>}
+                    {(record.workflowStatus == WorkflowStatus.Idle ||
+                        record.workflowStatus == WorkflowStatus.Running ||
+                        record.workflowStatus == WorkflowStatus.Suspended) && <span>Cancel</span>}
                 </a>,
                 <a
                     key="retry"
@@ -126,7 +153,7 @@ const Index: React.FC = () => {
                         });
                     }}
                 >
-                    {record.workflowStatus == 'Faulted' && <span>Retry</span>}
+                    {record.workflowStatus == WorkflowStatus.Faulted && <span>Retry</span>}
                 </a>,
             ],
         },

@@ -14,7 +14,7 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         public string Name { get; set; }
         public int Version { get; set; }
 
-        public WorkflowStatus WorkflowStatus { get; set; }
+        public int WorkflowStatus { get; set; }
         public string CorrelationId { get; set; }
         public string ContextType { get; set; }
         public string ContextId { get; set; }

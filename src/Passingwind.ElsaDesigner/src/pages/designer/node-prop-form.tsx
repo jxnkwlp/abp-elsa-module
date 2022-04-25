@@ -255,7 +255,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         <ProFormText
                             label="Display Name"
                             name="displayName"
-                            rules={[{ required: false }, { max: 32 }]}
+                            rules={[{ required: true }, { max: 32 }]}
                         />
                         <ProFormTextArea
                             label="Description"

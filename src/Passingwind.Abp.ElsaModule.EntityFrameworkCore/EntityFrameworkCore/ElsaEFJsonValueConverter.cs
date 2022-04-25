@@ -18,6 +18,11 @@ namespace EcsShop.EntityFrameworkCore
         static ElsaEFJsonValueConverter()
         {
             JsonSerializerSettings.Converters.Add(new TypeJsonConverter());
+            JsonSerializerSettings.Error += (e, s) =>
+            {
+                // ignore error
+                s.ErrorContext.Handled = true;
+            };
         }
 
 

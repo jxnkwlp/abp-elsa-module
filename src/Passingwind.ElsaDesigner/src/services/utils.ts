@@ -35,6 +35,14 @@ export const enumToStatus = (value: any) => {
                 },
             };
         });
-    console.log(result);
     return result;
 };
+
+// export const enumToRecord = (value: any) => {
+//     return Object.keys(value)
+//         .filter((x) => parseInt(x) >= 0)
+//         .map((key) => {
+//             const v = parseInt(key);
+//             return [v]:value[key]
+//         });
+// };

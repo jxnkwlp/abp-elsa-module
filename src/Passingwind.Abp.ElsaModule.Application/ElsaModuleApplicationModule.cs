@@ -35,6 +35,7 @@ public partial class ElsaModuleApplicationModule : AbpModule
         {
             options.UnsupportedTypes.AddIfNotContains(typeof(ActivityTypeDescriptorListResultDto));
             options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowInstanceDto));
+            options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowInstanceBasicDto));
             options.UnsupportedTypes.AddIfNotContains(typeof(PagedResultDto<WorkflowInstanceBasicDto>));
             options.UnsupportedTypes.AddIfNotContains(typeof(ListResultDto<WorkflowExecutionLogDto>));
             options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowDefinitionVersionCreateOrUpdateDto));
