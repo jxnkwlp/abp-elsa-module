@@ -80,7 +80,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             {
                 var ids = workflowInstanceIdsSpecification.WorkflowInstanceIds.ToList().ConvertAll(Guid.Parse);
                 return x => ids.Contains(x.WorkflowInstanceId);
-            }
+            } 
             else
                 return base.MapSpecification(specification);
         }

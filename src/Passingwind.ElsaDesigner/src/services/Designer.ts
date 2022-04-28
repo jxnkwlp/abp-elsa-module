@@ -9,11 +9,9 @@ import { request } from 'umi';
 
 /**
  * *TODO* GET /api/designer/activity-types
- * 
+ *
  **/
-export async function getDesignerActivityTypes(
-    options?: { [key: string]: any }
-) {
+export async function getDesignerActivityTypes(options?: { [key: string]: any }) {
     return request<API.ActivityTypeDescriptorListResult>(`/api/designer/activity-types`, {
         method: 'GET',
         ...(options || {}),
@@ -22,11 +20,11 @@ export async function getDesignerActivityTypes(
 
 /**
  * *TODO* GET /api/designer/script-type-definitions/{id}
- * 
+ *
  **/
 export async function getDesignerScriptTypeDefinition(
     id: string,
-    options?: { [key: string]: any }
+    options?: { [key: string]: any },
 ) {
     return request<any>(`/api/designer/script-type-definitions/${id}`, {
         method: 'GET',

@@ -53,9 +53,9 @@ export type NodeUpdateData = {
 
 export type NodeUpdatePropData = {
     name: string;
-    syntax?: string;
+    syntax: string | null;
     value?: any;
-    valueType?: 'string' | 'number' | 'boolean' | 'object' | 'array';
+    // valueType?: 'string' | 'number' | 'boolean' | 'object' | 'array';
     expressions?: Record<string, string>;
 };
 
@@ -72,11 +72,10 @@ export type NodeEditFormData = {
 };
 
 export type NodeEditFormPropItemData = {
-    name: string;
+    // name: string;
     syntax: string;
     value?: any;
     expressions?: Record<string, any>;
-    // supportedSyntaxes?: string[];
 };
 
 export type NodeEditFormPropData = Record<string, NodeEditFormPropItemData>;

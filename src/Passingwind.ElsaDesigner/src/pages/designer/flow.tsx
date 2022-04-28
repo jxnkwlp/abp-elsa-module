@@ -242,6 +242,8 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             type: type,
             id: '',
             outcomes: nodeType.outcomes ?? [],
+            displayName: nodeType.displayName,
+            label: nodeType.displayName,
             typeDescriptor: type,
         });
 

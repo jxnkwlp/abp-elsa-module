@@ -306,6 +306,7 @@ public class ElsaModuleHttpApiHostModule : AbpModule
             app.UseHsts();
         }
 
+        app.UseStatusCodePages();
         // app.UseHttpsRedirection();
         app.UseCorrelationId();
         app.UseStaticFiles();

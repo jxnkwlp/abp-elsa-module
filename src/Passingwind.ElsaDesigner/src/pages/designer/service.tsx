@@ -142,30 +142,44 @@ export const getEditorLanguage = (syntax: string) => {
     }
 };
 
+/**
+ *  获取属性值配置
+ */
 export const getPropertySyntaxes = (property: NodeTypeProperty) => {
-    let syntaxes = property.supportedSyntaxes ?? [];
+    let syntaxes = (property.supportedSyntaxes ?? []).map((x) => {
+        return x;
+    });
     let defaultSyntax: string = property.defaultSyntax ?? '';
+    //
     if (defaultSyntax && syntaxes.length == 0) {
         syntaxes.push(defaultSyntax);
-    } else if (!defaultSyntax && syntaxes.length == 0) {
-        syntaxes.push('Literal');
     }
-    if (property.uiHint != 'switch-case-builder' && syntaxes.indexOf('Literal') == -1) {
-        syntaxes = ['Literal', ...syntaxes];
+
+    // if (property.uiHint != 'switch-case-builder' && syntaxes.indexOf('Literal') == -1) {
+    //     syntaxes = ['Literal', ...syntaxes];
+    // }
+    if (defaultSyntax == 'Switch') {
+        syntaxes.push('JSON');
     }
     // if (!defaultSyntax && syntaxes.length > 0) {
     //     defaultSyntax = syntaxes[0];
     // }
     if (property.options?.syntax) {
-        syntaxes = [property.options?.syntax ?? 'Literal'];
+        syntaxes = [property.options?.syntax];
+    }
+    if (property.uiHint === 'single-line' || property.uiHint === 'multi-line') {
+        if (syntaxes.indexOf('Literal') == -1) syntaxes = ['Literal', ...syntaxes];
+        else {
+            //
+        }
     }
     // end
-    if (syntaxes.length == 0) {
-        syntaxes.push('Literal');
-    }
+    // if (syntaxes.length == 0) {
+    //     syntaxes.push('Literal');
+    // }
     if (syntaxes.length > 0) defaultSyntax = syntaxes[0];
     //
-
+    // console.log({ defaultSyntax, syntaxes });
     return { defaultSyntax, syntaxes };
 };
 

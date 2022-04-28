@@ -77,6 +77,7 @@ const Index: React.FC = () => {
     const [nodeTypePropList, setNodeTypePropList] = React.useState<NodeTypeProperty[]>([]);
     const [nodeTypeDescriptor, setNodeTypeDescriptor] =
         React.useState<API.ActivityTypeDescriptor>();
+    const [nodeTypeFormSyntax, setNodeTypeFormSyntax] = React.useState<Record<string, string[]>>();
 
     const [editNodeId, setEditNodeId] = React.useState<string>('');
     const [editNodeFormData, setEditNodeFormData] = React.useState<NodeEditFormData>();
@@ -160,6 +161,8 @@ const Index: React.FC = () => {
     // show node edit form
     // 显示节点属性编辑表单
     const handleOnShowNodeEditForm = async (nodeConfig: Node.Properties, node: Node) => {
+        // console.log('load : ', nodeConfig);
+        // console.log('load: ', node);
         const loading2 = message.loading('Loading....');
         //
         setNodeTypePropFormTitle(`Properties - ${nodeConfig.displayName} (${nodeConfig.type})`);
@@ -171,9 +174,21 @@ const Index: React.FC = () => {
         const nodeType = allNodeTypes.items?.find((x) => x.type == nodeConfig.type);
 
         if (!nodeType) {
-            message.error(`The node type ${nodeConfig.type} not found.`);
+            message.error(`The node type '${nodeConfig.type}' not found.`);
             return;
         }
+
+        const propItems = (nodeType.inputProperties ?? [])
+            .filter((x) => x.isBrowsable)
+            .map((x) => {
+                return {
+                    ...x,
+                    isRequired: x.isDesignerCritical,
+                } as NodeTypeProperty;
+            });
+
+        // save to status
+        setNodeTypePropList(propItems ?? []);
 
         // build node edit data
         const nodeData: NodeEditFormData = {
@@ -183,81 +198,86 @@ const Index: React.FC = () => {
             props: {},
         };
 
-        // property
-        const sourceProperties = (node.getProp('properties') ?? []) as NodeUpdatePropData[];
+        setNodeTypeDescriptor(nodeType);
 
-        sourceProperties.forEach((item) => {
-            let syntax = item.syntax!;
+        // initial all form fields
+        const propertySyntaxs = {};
+        propItems?.forEach((propItem) => {
+            //
+            const { defaultSyntax, syntaxes } = getPropertySyntaxes(propItem);
+            propertySyntaxs[propItem.name] = syntaxes;
+            //
+            const defaultValue: any = propItem.defaultValue;
 
-            // load syntax if not found
-            if (
-                !syntax &&
-                Object.keys(item.expressions ?? {}).filter((x) => x != '$id').length > 0
-            ) {
-                syntax = Object.keys(item.expressions ?? {}).filter((x) => x != '$id')[0];
-            }
-
-            if (item.expressions?.[syntax]) {
-                const expressionValue = item.expressions[syntax];
-                item.value = expressionValue;
-                const property = nodeType.inputProperties?.find((x) => x.name == item.name);
-
-                if (
-                    syntax == 'Literal' &&
-                    (property?.uiHint == 'check-list' || property?.uiHint == 'multi-text')
-                ) {
-                    if (
-                        (expressionValue.startsWith('{') && expressionValue.endsWith('}')) ||
-                        (expressionValue.startsWith('[') && expressionValue.endsWith(']'))
-                    ) {
-                        item.value = JSON.parse(expressionValue);
-                    }
-                }
-            }
-
-            nodeData.props[item.name] = {
-                name: item.name!,
-                value: item.value,
-                syntax: syntax,
+            nodeData.props[propItem.name] = {
+                syntax: 'Default',
+                value: defaultValue,
                 expressions: {
-                    [syntax]: item.value,
+                    [defaultSyntax]: null,
                 },
             };
         });
 
-        // console.debug('load form data: ', JSON.stringify(nodeData));
+        setNodeTypeFormSyntax(propertySyntaxs);
 
-        setNodeTypeDescriptor(nodeType);
+        // property
+        const sourceProperties = (node.getProp('properties') ?? []) as NodeUpdatePropData[];
+        console.log('sourceProperties: ', sourceProperties);
 
-        const propItems = nodeType.inputProperties?.map((x) => {
-            return {
-                ...x,
-                isRequired: x.isDesignerCritical,
-            } as NodeTypeProperty;
-        });
+        // convert to form data
+        sourceProperties.forEach((item) => {
+            const syntax = !item.syntax ? 'Default' : item.syntax;
+            let syntaxValue: any = undefined;
+            let expressionValue: string = '';
 
-        // save to status
-        setNodeTypePropList(propItems ?? []);
-
-        // set initialValue when value not exist
-        propItems?.forEach((propItem) => {
-            //
-            const { defaultSyntax, syntaxes } = getPropertySyntaxes(propItem);
-            //
-            const defaultValue: any = propItem.defaultValue;
-
-            if (!nodeData.props?.[propItem.name]) {
-                nodeData.props[propItem.name] = {
-                    name: propItem.name,
-                    syntax: defaultSyntax,
-                    value: defaultValue,
-                    expressions: {
-                        [defaultSyntax]: null,
-                    },
-                };
-            } else if (!nodeData.props[propItem.name].syntax) {
-                nodeData.props[propItem.name].syntax = defaultSyntax;
+            // load syntax value
+            let valueSyntax = '';
+            if (Object.keys(item.expressions ?? {}).filter((x) => x != '$id').length > 0) {
+                valueSyntax = Object.keys(item.expressions ?? {}).filter((x) => x != '$id')[0];
+                expressionValue = item.expressions![valueSyntax];
             }
+
+            if (syntax == 'Default') {
+                const property = nodeType.inputProperties?.find((x) => x.name == item.name);
+                // default
+                syntaxValue = expressionValue;
+                //
+                if (property?.uiHint == 'check-list' || property?.uiHint == 'multi-text') {
+                    if (
+                        (expressionValue.startsWith('{') && expressionValue.endsWith('}')) ||
+                        (expressionValue.startsWith('[') && expressionValue.endsWith(']'))
+                    ) {
+                        syntaxValue = JSON.parse(expressionValue);
+                    }
+                }
+            }
+
+            // if (syntax && item.expressions?.[syntax]) {
+            //     const expressionValue = item.expressions[syntax];
+            //     const property = nodeType.inputProperties?.find((x) => x.name == item.name);
+            //     syntaxValue = expressionValue;
+
+            //     if (
+            //         syntax == 'Literal' &&
+            //         (property?.uiHint == 'check-list' || property?.uiHint == 'multi-text')
+            //     ) {
+            //         if (
+            //             (expressionValue.startsWith('{') && expressionValue.endsWith('}')) ||
+            //             (expressionValue.startsWith('[') && expressionValue.endsWith(']'))
+            //         ) {
+            //             syntaxValue = JSON.parse(expressionValue);
+            //         }
+            //     }
+            // }
+
+            nodeData.props[item.name] = {
+                ...nodeData.props[item.name],
+                syntax: syntax,
+                expressions: {
+                    Default: syntaxValue,
+                    [valueSyntax]: expressionValue,
+                },
+            };
         });
 
         setEditNodeFormData(nodeData);
@@ -284,12 +304,17 @@ const Index: React.FC = () => {
             outcomes: [],
         };
         if (formData.props) {
-            for (const key in formData.props ?? {}) {
-                const curObj = formData.props[key];
-                // source value
-                const syntaxSourceValue = curObj.expressions?.[curObj.syntax!] ?? null;
+            for (const name in formData.props ?? {}) {
+                const curObj = formData.props[name];
+                const syntaxSourceValue = curObj.expressions?.[curObj.syntax] ?? null;
+                let valueSyntax = curObj.syntax;
+                //
                 let sytaxStringValue: string = '';
-                // to string
+                const syntaxes = nodeTypeFormSyntax![name];
+                if (curObj.syntax == 'Default' && syntaxes?.length > 0) {
+                    valueSyntax = syntaxes[0];
+                }
+                // server save value as string
                 if (
                     curObj.expressions &&
                     Object.keys(curObj.expressions).indexOf(curObj.syntax!) >= 0
@@ -304,9 +329,9 @@ const Index: React.FC = () => {
                 }
 
                 result.properties.push({
-                    name: key,
-                    syntax: curObj.syntax,
-                    expressions: { [curObj.syntax!]: sytaxStringValue },
+                    name: name,
+                    syntax: curObj.syntax == 'Default' ? null : curObj.syntax,
+                    expressions: { [valueSyntax]: sytaxStringValue },
                     value: syntaxSourceValue,
                 });
             }
@@ -329,6 +354,22 @@ const Index: React.FC = () => {
                     newValue.endsWith(']')
                 ) {
                     outcomes.push(...JSON.parse(newValue));
+                }
+            }
+        }
+
+        if (nodeTypeDescriptor?.type == 'Switch') {
+            const newValue = result.properties.find((x) => x.name == 'Cases')?.value;
+            if (newValue) {
+                if (
+                    typeof newValue == 'string' &&
+                    newValue.startsWith('[') &&
+                    newValue.endsWith(']')
+                ) {
+                    const o: string[] = JSON.parse(newValue).map((x: any) => {
+                        return x.name;
+                    });
+                    outcomes.push(...o);
                 }
             }
         }

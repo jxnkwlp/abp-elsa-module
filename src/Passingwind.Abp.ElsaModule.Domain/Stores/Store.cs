@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Elsa.Persistence.Specifications;
@@ -168,11 +169,35 @@ namespace Passingwind.Abp.ElsaModule.Stores
             }
             else if (specification is NotSpecification<TModel> notSpecification)
             {
-                return _ => true;
+                Expression<Func<TEntity, bool>> expression = null;
+
+                if (_notSpecificationCache.ContainsKey(notSpecification.GetType()))
+                {
+                    expression = MapSpecification(_notSpecificationCache[notSpecification.GetType()]);
+                }
+                else
+                {
+                    var sp = notSpecification.GetType().GetField("_specification", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).GetValue(notSpecification) as ISpecification<TModel>;
+
+                    _notSpecificationCache[notSpecification.GetType()] = sp;
+
+                    expression = MapSpecification(sp);
+                }
+
+                return Expression.Lambda<Func<TEntity, bool>>(Expression.Not(expression.Body), new ParameterExpression[1]
+                             {
+                                expression.Parameters.Single()
+                             });
+            }
+            else if (specification.GetType().Name.StartsWith("IdentitySpecification`1"))
+            {
+                return (_) => true;
             }
             else
                 throw new NotSupportedException($"{specification.GetType().FullName} of {typeof(TModel).FullName} is not supported.");
         }
+
+        private static readonly Dictionary<Type, ISpecification<TModel>> _notSpecificationCache = new Dictionary<Type, ISpecification<TModel>>();
 
         protected abstract TKey ConvertKey(string value);
 
