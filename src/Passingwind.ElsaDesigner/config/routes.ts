@@ -44,32 +44,32 @@
     // },
     //
     {
-        name: 'dashboard',
+        name: 'Dashboard',
         icon: 'table',
         path: '/dashboard',
         component: './dashboard',
     },
     {
-        name: 'instance',
+        name: 'Instances',
         icon: 'table',
         path: '/instance',
         component: './instance',
     },
     {
-        name: 'instance details',
+        name: 'Instance Detail',
         icon: 'table',
         path: '/instance/:id',
         component: './instance/detail',
         hideInMenu: true,
     },
     {
-        name: 'definition',
+        name: 'Definitions',
         icon: 'table',
         path: '/definition',
         component: './definition',
     },
     {
-        name: 'designer',
+        name: 'Designer',
         icon: 'table',
         path: '/designer',
         component: './designer',

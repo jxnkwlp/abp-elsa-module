@@ -8,7 +8,8 @@ import Footer from '@/components/Footer';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import defaultSettings from '../config/defaultSettings';
-import { message, notification } from 'antd';
+import { ConfigProvider, message, notification } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -56,7 +57,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             // if (initialState?.loading) return <PageLoading />;
             return (
                 <>
-                    {children}
+                    <ConfigProvider locale={enUS}>{children}</ConfigProvider>
                     {isDev && !props.location?.pathname?.includes('/login') && (
                         <SettingDrawer
                             enableDarkTheme

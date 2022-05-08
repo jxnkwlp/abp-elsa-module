@@ -329,7 +329,10 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                 // height: props.height ?? 600,
                 // width: '100vm',
                 autoResize: true,
-                grid: true,
+                grid: {
+                    size: 10,
+                    visible: true,
+                },
                 history: {
                     enabled: true,
                     // ignoreChange: true,
@@ -377,13 +380,13 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                 connecting: {
                     router: {
                         name: 'manhattan',
-                        args: {
-                            startDirections: ['bottom'],
-                            endDirections: ['top'],
-                        },
+                        args: { step: 10, startDirections: ['bottom'], endDirections: ['top'] },
                     },
                     connector: {
                         name: 'rounded',
+                        args: {
+                            radius: 10,
+                        },
                     },
                     anchor: 'center',
                     connectionPoint: 'anchor',
