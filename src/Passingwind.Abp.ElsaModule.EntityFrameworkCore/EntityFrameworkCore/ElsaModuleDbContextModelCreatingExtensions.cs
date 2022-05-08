@@ -95,6 +95,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.HasKey(x => new { x.DefinitionVersionId, x.SourceId, x.TargetId, x.Outcome, });
 
             b.Property(x => x.Outcome).IsRequired().HasMaxLength(64);
+            b.Property(x => x.Arrtibutes).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
         });
 
         builder.Entity<Bookmark>(b =>

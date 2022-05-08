@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Passingwind.Abp.ElsaModule.Common
@@ -9,6 +10,7 @@ namespace Passingwind.Abp.ElsaModule.Common
         public Guid SourceId { get; set; }
         public Guid TargetId { get; set; }
         public string Outcome { get; set; }
+        public Dictionary<string, object> Arrtibutes { get; set; }
 
         public override object[] GetKeys()
         {
