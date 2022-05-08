@@ -45,10 +45,7 @@ export const nodePorts = {
         top: {
             position: 'top',
             attrs: nodePortAttr,
-            text: {
-                text: '输入',
-            },
-            tooltip: '输入',
+            tooltip: '',
             label: {
                 position: {
                     name: 'top',
@@ -58,22 +55,39 @@ export const nodePorts = {
         bottom: {
             position: 'bottom',
             attrs: nodePortAttr,
-            text: {
-                text: '输出',
-            },
-            tooltip: '输出',
+            tooltip: '',
             label: {
                 position: {
                     name: 'bottom',
                 },
             },
         },
+        left: {
+            position: 'left',
+            attrs: nodePortAttr,
+            tooltip: '',
+            label: {
+                position: {
+                    name: 'left',
+                },
+            },
+        },
+        right: {
+            position: 'right',
+            attrs: nodePortAttr,
+            tooltip: '',
+            label: {
+                position: {
+                    name: 'right',
+                },
+            },
+        },
     },
     items: [
-        // 入，
-        { id: 'In', group: 'top' },
-        // 出，0+1个
-        { id: 'Done', group: 'bottom' },
+        { id: 'top', group: 'top' },
+        { id: 'bottom', group: 'bottom' },
+        { id: 'left', group: 'left' },
+        { id: 'right', group: 'right' },
     ],
 };
 

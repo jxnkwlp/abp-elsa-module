@@ -15,7 +15,6 @@ import { Toolbar } from '@antv/x6-react-components';
 import '@antv/x6-react-components/es/menu/style/index.css';
 import '@antv/x6-react-components/es/toolbar/style/index.css';
 import type { Dnd } from '@antv/x6/lib/addon';
-import { uuid } from '@antv/x6/lib/util/string/uuid';
 import { message } from 'antd';
 import React, { useEffect, useImperativeHandle } from 'react';
 import './flow.less';
@@ -278,7 +277,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
     const loadGraphData = (data: IGraphData) => {
         // @ts-ignore
         graphInstance?.fromJSON(data);
-        graphInstance?.centerContent();
+        graphInstance?.centerContent({ padding: 50 });
         props?.onDataUpdate?.(graphInstance!);
     };
 
@@ -380,7 +379,9 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                 connecting: {
                     router: {
                         name: 'manhattan',
-                        args: { step: 10, startDirections: ['bottom'], endDirections: ['top'] },
+                        args: {
+                            step: 10,
+                        },
                     },
                     connector: {
                         name: 'rounded',
@@ -396,14 +397,9 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                     highlight: true,
                     allowLoop: false,
                     allowEdge: false,
+                    // 是否可以新增边
                     validateMagnet({ cell, view, magnet }) {
                         if (!magnet) return false;
-                        //
-                        const group = magnet.getAttribute('port-group');
-                        const name = magnet.getAttribute('port');
-                        if (group != 'bottom') {
-                            return false;
-                        }
 
                         if (cell.isNode())
                             if (!checkCanCreateEdge(cell, graph.getOutgoingEdges(cell) ?? [])) {
@@ -414,17 +410,32 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                         //
                         return true;
                     },
+                    // 边是否有效
                     validateConnection({ sourceCell, targetMagnet }) {
                         if (!targetMagnet) {
                             return false;
                         }
 
-                        if (targetMagnet.getAttribute('port-group') != 'top') {
-                            return false;
-                        }
-
                         return true;
                     },
+                    // 边是否生效
+                    validateEdge({ edge, type }) {
+                        console.log(edge, type);
+                        if (edge.getProp('shape') != 'bpmn-edge') {
+                            return false;
+                        }
+                        // if (edge.get) {
+                        //     const nextName = getNextEdgeName(
+                        //         sourceCell,
+                        //         graph.getOutgoingEdges(sourceCell) ?? [],
+                        //     );
+                        //     if (!nextName) {
+                        //         return false;
+                        //     }
+                        // }
+                        return true;
+                    },
+                    // 创建边
                     createEdge: ({ sourceCell, sourceMagnet }) => {
                         // const portName = sourceMagnet.getAttribute('port') ?? 'Done';
                         // console.log(typeof sourceCell);
@@ -510,7 +521,6 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             graph.on('edge:click', ({ edge }) => {
                 console.debug(edge);
                 edge.toFront();
-                edge.setZIndex(-1);
                 props.onEdgeClick?.({ ...edge });
             });
 
@@ -538,22 +548,31 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             });
 
             graph.on('edge:mouseenter', ({ edge }) => {
-                if (!readonly)
+                if (!readonly) {
+                    edge.toFront();
                     edge.addTools([
                         {
                             name: 'button-remove',
                             args: { distance: -40 },
                         },
                     ]);
+                }
             });
 
             graph.on('edge:mouseleave', ({ edge }) => {
                 edge.removeTools();
+                edge.setZIndex(-1);
             });
 
             graph.on('blank:click', ({}) => {
                 (graph.getCells() ?? []).forEach((item) => {
-                    if (item.isNode()) toggleNodePortVisible(item, false);
+                    if (item.isNode()) {
+                        toggleNodePortVisible(item, false);
+                    }
+                    if (item.isEdge()) {
+                        item.setZIndex(-1);
+                        item.removeTools();
+                    }
                 });
             });
         }

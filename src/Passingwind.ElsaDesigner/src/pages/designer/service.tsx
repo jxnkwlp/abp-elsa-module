@@ -1,6 +1,6 @@
 import { getDesignerActivityTypes, getDesignerScriptTypeDefinition } from '@/services/Designer';
 import { randString } from '@/services/utils';
-import type { Node, Edge } from '@antv/x6';
+import type { Edge, Node } from '@antv/x6';
 import type { PortManager } from '@antv/x6/lib/model/port';
 import { uuid } from '@antv/x6/lib/util/string/uuid';
 import type { IGraphData, NodePropertySyntax, NodeTypeGroup, NodeTypeProperty } from './type';
@@ -350,11 +350,15 @@ export const createEdgeConfig = (config: Edge.Metadata): Edge.Metadata => {
  */
 export const conventToServerData = (data: IGraphData) => {
     console.debug(data);
-    const edges: API.ActivityConnectionCreate[] = data.edges.map((item: any) => {
+    const edges: API.ActivityConnectionCreate[] = data.edges.map((item) => {
         return {
             sourceId: item.source.cell,
             targetId: item.target.cell,
             outcome: item.name ?? item.outcome ?? 'Done',
+            arrtibutes: {
+                sourcePort: item.source.port,
+                targetPort: item.target.port,
+            },
         } as API.ActivityConnectionCreate;
     });
 
@@ -426,6 +430,7 @@ export const conventToGraphData = async (
     connections.forEach((item) => {
         const sourceId = item.sourceId;
         const targetId = item.targetId;
+        const attr = item.arrtibutes ?? {};
 
         // check source
         if (
@@ -439,13 +444,15 @@ export const conventToGraphData = async (
                     id: uuid(),
                     label: item.outcome,
                     outcome: item.outcome,
+                    // source: sourceId,
+                    // target: targetId,
                     source: {
                         cell: sourceId,
-                        port: item.outcome ?? 'Done',
+                        port: attr.sourcePort ?? 'bottom',
                     },
                     target: {
                         cell: targetId,
-                        port: 'In',
+                        port: attr.targetPort ?? 'top',
                     },
                 } as Edge.Metadata),
             );

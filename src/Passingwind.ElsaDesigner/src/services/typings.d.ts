@@ -48,6 +48,7 @@ declare namespace API {
         sourceId?: string | undefined;
         targetId?: string | undefined;
         outcome?: string | undefined;
+        arrtibutes?: any | undefined;
     };
 
     /**
