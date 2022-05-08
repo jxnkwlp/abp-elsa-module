@@ -1,18 +1,15 @@
-import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
-import { SettingDrawer } from '@ant-design/pro-layout';
-import { PageLoading } from '@ant-design/pro-layout';
-import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
-import { history, Link } from 'umi';
-import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
-import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
-import { BookOutlined, LinkOutlined } from '@ant-design/icons';
+import RightContent from '@/components/RightContent';
+import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
+import { PageLoading, SettingDrawer } from '@ant-design/pro-layout';
+import { message, notification } from 'antd';
+import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
+import { history } from 'umi';
 import defaultSettings from '../config/defaultSettings';
-import { ConfigProvider, message, notification } from 'antd';
-import enUS from 'antd/lib/locale/en_US';
+import { getAbpApplicationConfiguration } from './services/AbpApplicationConfiguration';
 
 const isDev = process.env.NODE_ENV === 'development';
-const loginPath = '/user/login';
+const loginPath = '/auth/login';
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -26,10 +23,42 @@ export async function getInitialState(): Promise<{
     settings?: Partial<LayoutSettings>;
     currentUser?: API.CurrentUser;
     loading?: boolean;
-    // fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+    fetchData?: () => Promise<API.CurrentUser | undefined>;
 }> {
+    const loadData = async () => {
+        const result = await getAbpApplicationConfiguration();
+        return result?.currentUser;
+    };
+
+    if (isDev) {
+        return {
+            settings: defaultSettings,
+            currentUser: {
+                isAuthenticated: true,
+                name: 'admin',
+                surName: 'admin',
+                userName: 'admin',
+            },
+            fetchData: loadData,
+        };
+    }
+
+    const user = await loadData();
+
+    if (!user?.isAuthenticated) {
+        history.replace('/auth/login');
+        return {
+            settings: defaultSettings,
+            currentUser: user,
+            loading: true,
+            fetchData: loadData,
+        };
+    }
+
     return {
         settings: defaultSettings,
+        currentUser: user,
+        fetchData: loadData,
     };
 }
 
@@ -38,17 +67,20 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     return {
         rightContentRender: () => <RightContent />,
         disableContentMargin: false,
-        waterMarkProps: {
-            content: initialState?.currentUser?.name,
-        },
-        footerRender: () => <Footer />,
-        // onPageChange: () => {
-        //     const { location } = history;
-        //     // 如果没有登录，重定向到 login
-        //     if (!initialState?.currentUser && location.pathname !== loginPath) {
-        //         history.push(loginPath);
-        //     }
+        // waterMarkProps: {
+        //     content: initialState?.currentUser?.name,
         // },
+        footerRender: () => <Footer />,
+        onPageChange: () => {
+            const { location } = history;
+            if (
+                !isDev &&
+                !initialState?.currentUser?.isAuthenticated &&
+                location.pathname !== loginPath
+            ) {
+                history.push(loginPath);
+            }
+        },
         menuHeaderRender: undefined,
         // 自定义 403 页面
         // unAccessible: <div>unAccessible</div>,
@@ -57,7 +89,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             // if (initialState?.loading) return <PageLoading />;
             return (
                 <>
-                    <ConfigProvider locale={enUS}>{children}</ConfigProvider>
+                    {children}
                     {isDev && !props.location?.pathname?.includes('/login') && (
                         <SettingDrawer
                             enableDarkTheme

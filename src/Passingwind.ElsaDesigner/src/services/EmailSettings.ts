@@ -8,30 +8,29 @@
 import { request } from 'umi';
 
 /**
- * *TODO* GET /signals/dispatch/{token}
+ * *TODO* GET /api/setting-management/emailing
  * 
  **/
-export async function dispatchEndpointHandleGET(
-    token: string,
+export async function getEmailSettings(
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/signals/dispatch/${token}`, {
+    return request<API.EmailSettings>(`/api/setting-management/emailing`, {
         method: 'GET',
-        getResponse: true,
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* POST /signals/dispatch/{token}
+ * *TODO* POST /api/setting-management/emailing
  * 
  **/
-export async function dispatchEndpointHandlePOST(
-    token: string,
+export async function updateEmailSettings(
+    payload: API.UpdateEmailSettings,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/signals/dispatch/${token}`, {
+    return request<any>(`/api/setting-management/emailing`, {
         method: 'POST',
+        data: payload,
         getResponse: true,
         ...(options || {}),
     });

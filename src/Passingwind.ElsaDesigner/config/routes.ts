@@ -1,23 +1,23 @@
 ﻿export default [
-    // {
-    //     path: '/user',
-    //     layout: false,
-    //     routes: [
-    //         {
-    //             path: '/user',
-    //             routes: [
-    //                 {
-    //                     name: 'login',
-    //                     path: '/user/login',
-    //                     component: './user/Login',
-    //                 },
-    //             ],
-    //         },
-    //         {
-    //             component: './404',
-    //         },
-    //     ],
-    // },
+    {
+        path: '/auth',
+        layout: false,
+        routes: [
+            {
+                path: '/auth',
+                routes: [
+                    {
+                        name: 'login',
+                        path: '/auth/login',
+                        component: './auth/login',
+                    },
+                ],
+            },
+            {
+                component: './404',
+            },
+        ],
+    },
     // {
     //     path: '/welcome',
     //     name: 'welcome',
@@ -86,6 +86,14 @@
     //     icon: 'smile',
     //     component: './test',
     // },
+
+    {
+        path: '/account/changepassword',
+        name: 'Change Password',
+        icon: 'smile',
+        hideInMenu: true,
+        component: './profile/changepassword',
+    },
 
     {
         path: '/',
