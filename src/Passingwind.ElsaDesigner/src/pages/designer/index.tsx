@@ -11,7 +11,7 @@ import { ModalForm } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { DagreLayout } from '@antv/layout';
-import type { Node } from '@antv/x6/es';
+import type { Node } from '@antv/x6';
 import {
     Button,
     Card,
@@ -77,7 +77,8 @@ const Index: React.FC = () => {
     const [nodeTypePropList, setNodeTypePropList] = React.useState<NodeTypeProperty[]>([]);
     const [nodeTypeDescriptor, setNodeTypeDescriptor] =
         React.useState<API.ActivityTypeDescriptor>();
-    const [nodeTypeFormSyntax, setNodeTypeFormSyntax] = React.useState<Record<string, string[]>>();
+    const [nodePropertySyntaxs, setNodePropertySyntaxs] =
+        React.useState<Record<string, string[]>>();
 
     const [editNodeId, setEditNodeId] = React.useState<string>('');
     const [editNodeFormData, setEditNodeFormData] = React.useState<NodeEditFormData>();
@@ -105,7 +106,9 @@ const Index: React.FC = () => {
                 ranksep: 40,
             });
 
+            // @ts-ignore
             const newModel = layout.layout(gData);
+            // @ts-ignore
             setGraphData(newModel);
         } else {
             setGraphData(gData);
@@ -161,8 +164,6 @@ const Index: React.FC = () => {
     // show node edit form
     // 显示节点属性编辑表单
     const handleOnShowNodeEditForm = async (nodeConfig: Node.Properties, node: Node) => {
-        // console.log('load : ', nodeConfig);
-        // console.log('load: ', node);
         const loading2 = message.loading('Loading....');
         //
         setNodeTypePropFormTitle(`Properties - ${nodeConfig.displayName} (${nodeConfig.type})`);
@@ -204,25 +205,49 @@ const Index: React.FC = () => {
         const propertySyntaxs = {};
         propItems?.forEach((propItem) => {
             //
-            const { defaultSyntax, syntaxes } = getPropertySyntaxes(propItem);
-            propertySyntaxs[propItem.name] = syntaxes;
+            const propSyntax = getPropertySyntaxes(propItem);
+            propertySyntaxs[propItem.name] = propSyntax.supports;
+            const defaultSyntax = propSyntax.default;
             //
-            const defaultValue: any = propItem.defaultValue;
+            const defaultValue: string | object | number | undefined =
+                propItem.defaultValue ?? undefined;
+            let syntaxStringValue: string = '';
+            if (defaultValue) {
+                if (typeof defaultValue == 'object') {
+                    syntaxStringValue = JSON.stringify(defaultValue);
+                } else if (defaultValue) {
+                    syntaxStringValue = defaultValue?.toString();
+                } else {
+                    syntaxStringValue = '';
+                }
+            }
 
-            nodeData.props[propItem.name] = {
-                syntax: 'Default',
-                value: defaultValue,
-                expressions: {
-                    [defaultSyntax]: null,
-                },
-            };
+            if (defaultSyntax)
+                nodeData.props[propItem.name] = {
+                    syntax: 'Default',
+                    value: defaultValue,
+                    expressions: {
+                        Default: defaultValue,
+                        [defaultSyntax]: syntaxStringValue,
+                    },
+                };
+
+            if (propSyntax.editor) {
+                nodeData.props[propItem.name] = {
+                    syntax: propSyntax.editor,
+                    value: defaultValue,
+                    expressions: {
+                        Literal: syntaxStringValue,
+                    },
+                };
+            }
         });
 
-        setNodeTypeFormSyntax(propertySyntaxs);
+        setNodePropertySyntaxs(propertySyntaxs);
 
         // property
         const sourceProperties = (node.getProp('properties') ?? []) as NodeUpdatePropData[];
-        console.log('sourceProperties: ', sourceProperties);
+        console.debug('sourceProperties: ', sourceProperties);
 
         // convert to form data
         sourceProperties.forEach((item) => {
@@ -252,24 +277,6 @@ const Index: React.FC = () => {
                 }
             }
 
-            // if (syntax && item.expressions?.[syntax]) {
-            //     const expressionValue = item.expressions[syntax];
-            //     const property = nodeType.inputProperties?.find((x) => x.name == item.name);
-            //     syntaxValue = expressionValue;
-
-            //     if (
-            //         syntax == 'Literal' &&
-            //         (property?.uiHint == 'check-list' || property?.uiHint == 'multi-text')
-            //     ) {
-            //         if (
-            //             (expressionValue.startsWith('{') && expressionValue.endsWith('}')) ||
-            //             (expressionValue.startsWith('[') && expressionValue.endsWith(']'))
-            //         ) {
-            //             syntaxValue = JSON.parse(expressionValue);
-            //         }
-            //     }
-            // }
-
             nodeData.props[item.name] = {
                 ...nodeData.props[item.name],
                 syntax: syntax,
@@ -282,7 +289,7 @@ const Index: React.FC = () => {
 
         setEditNodeFormData(nodeData);
 
-        console.log('load form data: ', nodeData);
+        console.debug('load form data: ', nodeData);
 
         editNodeFormRef.resetFields();
         editNodeFormRef.setFieldsValue(nodeData);
@@ -295,7 +302,7 @@ const Index: React.FC = () => {
     // handle on node edit form submit
     // 更新节点数据
     const handleUpdateNodeProperties = async (formData: NodeEditFormData) => {
-        console.log('save form data: ', formData);
+        console.debug('save form data: ', formData);
         const result: NodeUpdateData = {
             name: formData.name,
             displayName: formData.displayName,
@@ -304,36 +311,56 @@ const Index: React.FC = () => {
             outcomes: [],
         };
         if (formData.props) {
+            // as default, one syntax map one expressions key value
+            // if not, use expressions first key as syntax and use expressions first value as value
+            // if syntax is default, use expressions first key as syntax
             for (const name in formData.props ?? {}) {
                 const curObj = formData.props[name];
-                const syntaxSourceValue = curObj.expressions?.[curObj.syntax] ?? null;
-                let valueSyntax = curObj.syntax;
                 //
+                let valueSyntaxName = curObj.syntax;
+                let syntaxSourceValue: any = undefined;
                 let sytaxStringValue: string = '';
-                const syntaxes = nodeTypeFormSyntax![name];
-                if (curObj.syntax == 'Default' && syntaxes?.length > 0) {
-                    valueSyntax = syntaxes[0];
-                }
-                // server save value as string
-                if (
-                    curObj.expressions &&
-                    Object.keys(curObj.expressions).indexOf(curObj.syntax!) >= 0
-                ) {
-                    if (typeof syntaxSourceValue == 'object')
-                        sytaxStringValue = JSON.stringify(syntaxSourceValue);
-                    else if (typeof syntaxSourceValue != 'string')
-                        sytaxStringValue = syntaxSourceValue.toString();
-                    else {
-                        sytaxStringValue = syntaxSourceValue as string;
+                const expressions = curObj.expressions ?? {};
+                const syntaxes = nodePropertySyntaxs![name];
+                //
+                if (curObj.expressions && Object.keys(expressions).length > 0) {
+                    if (curObj.syntax == 'Default' && syntaxes.length > 0) {
+                        valueSyntaxName = syntaxes[0];
+                        syntaxSourceValue = curObj.expressions?.[curObj.syntax] ?? undefined;
+                    } else {
+                        syntaxSourceValue = curObj.expressions?.[valueSyntaxName] ?? undefined;
                     }
-                }
+                    // special case
+                    if (Object.keys(expressions).indexOf(curObj.syntax) == -1) {
+                        // first key value
+                        valueSyntaxName = Object.keys(expressions)[0];
+                        syntaxSourceValue = curObj.expressions?.[valueSyntaxName] ?? undefined;
+                    }
 
-                result.properties.push({
-                    name: name,
-                    syntax: curObj.syntax == 'Default' ? null : curObj.syntax,
-                    expressions: { [valueSyntax]: sytaxStringValue },
-                    value: syntaxSourceValue,
-                });
+                    // server save value as string
+                    if (syntaxSourceValue) {
+                        if (typeof syntaxSourceValue == 'object')
+                            sytaxStringValue = JSON.stringify(syntaxSourceValue);
+                        else if (typeof syntaxSourceValue != 'string')
+                            sytaxStringValue = syntaxSourceValue.toString();
+                        else {
+                            sytaxStringValue = syntaxSourceValue as string;
+                        }
+                    }
+
+                    // end
+                    result.properties.push({
+                        name: name,
+                        syntax:
+                            curObj.syntax == 'Default'
+                                ? undefined
+                                : curObj.syntax == valueSyntaxName
+                                ? valueSyntaxName
+                                : undefined,
+                        expressions: { [valueSyntaxName]: sytaxStringValue },
+                        value: syntaxSourceValue,
+                    });
+                }
             }
         }
 
@@ -342,10 +369,8 @@ const Index: React.FC = () => {
         const outcomeValueProp = nodeTypePropList.find((x) => x.considerValuesAsOutcomes);
 
         if (outcomeValueProp) {
-            // console.log(result.properties.find((x) => x.name == outcomeValueProp.name));
             const newValue = result.properties.find((x) => x.name == outcomeValueProp.name)?.value;
             if (newValue) {
-                // console.log(newValue);
                 if (isArray<string>(newValue)) {
                     outcomes.push(...newValue);
                 } else if (
@@ -376,11 +401,8 @@ const Index: React.FC = () => {
 
         result.outcomes = outcomes;
 
-        console.log('updated node: ', result);
+        console.debug('updated node: ', result);
         flowAction.current?.updateNodeProperties(editNodeId, result);
-        //
-        // console.log('start update ports', outcomes);
-        // flowAction.current?.updateNodeOutPorts(editNodeId, outcomes);
     };
 
     const handleSaveGraphData = async (publish: boolean = false) => {

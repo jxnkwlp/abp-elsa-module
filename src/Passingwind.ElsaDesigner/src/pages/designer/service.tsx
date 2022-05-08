@@ -1,9 +1,9 @@
 import { getDesignerActivityTypes, getDesignerScriptTypeDefinition } from '@/services/Designer';
 import { randString } from '@/services/utils';
-import type { Edge, Node } from '@antv/x6';
+import type { Node, Edge } from '@antv/x6';
 import type { PortManager } from '@antv/x6/lib/model/port';
-import { uuid } from '@antv/x6/es/util/string/uuid';
-import type { IGraphData, NodeTypeGroup, NodeTypeProperty } from './type';
+import { uuid } from '@antv/x6/lib/util/string/uuid';
+import type { IGraphData, NodePropertySyntax, NodeTypeGroup, NodeTypeProperty } from './type';
 
 // export const getTestData = () => {
 //     const id1 = genrateId();
@@ -145,11 +145,12 @@ export const getEditorLanguage = (syntax: string) => {
 /**
  *  获取属性值配置
  */
-export const getPropertySyntaxes = (property: NodeTypeProperty) => {
+export const getPropertySyntaxes = (property: NodeTypeProperty): NodePropertySyntax => {
     let syntaxes = (property.supportedSyntaxes ?? []).map((x) => {
         return x;
     });
-    let defaultSyntax: string = property.defaultSyntax ?? '';
+    let defaultSyntax: string | undefined = property.defaultSyntax ?? undefined;
+    let editorSyntax = '';
     //
     if (defaultSyntax && syntaxes.length == 0) {
         syntaxes.push(defaultSyntax);
@@ -159,28 +160,35 @@ export const getPropertySyntaxes = (property: NodeTypeProperty) => {
     //     syntaxes = ['Literal', ...syntaxes];
     // }
     if (defaultSyntax == 'Switch') {
-        syntaxes.push('JSON');
+        syntaxes.push('Json');
     }
     // if (!defaultSyntax && syntaxes.length > 0) {
     //     defaultSyntax = syntaxes[0];
     // }
     if (property.options?.syntax) {
-        syntaxes = [property.options?.syntax];
+        // syntaxes = [property.options?.syntax];
+        syntaxes = [];
+        defaultSyntax = 'Literal';
+        editorSyntax = property.options?.syntax;
     }
-    if (property.uiHint === 'single-line' || property.uiHint === 'multi-line') {
-        if (syntaxes.indexOf('Literal') == -1) syntaxes = ['Literal', ...syntaxes];
-        else {
-            //
-        }
+    if (
+        (property.uiHint === 'single-line' ||
+            property.uiHint === 'multi-line' ||
+            property.uiHint === 'dropdown' ||
+            property.uiHint === 'checkbox') &&
+        syntaxes.indexOf('Literal') == -1
+    ) {
+        syntaxes = ['Literal', ...syntaxes];
     }
+
     // end
-    // if (syntaxes.length == 0) {
-    //     syntaxes.push('Literal');
-    // }
     if (syntaxes.length > 0) defaultSyntax = syntaxes[0];
-    //
-    // console.log({ defaultSyntax, syntaxes });
-    return { defaultSyntax, syntaxes };
+
+    return {
+        supports: syntaxes,
+        default: defaultSyntax,
+        editor: editorSyntax,
+    } as NodePropertySyntax;
 };
 
 // export const configNode = (node: Node.Metadata) => {
@@ -228,11 +236,9 @@ export const updateNodePorts = (node: Node<Node.Properties>) => {
     // const currentPorts = node.getPorts();
     // remove out ports
     const buttomPorts = node.getPortsByGroup('bottom');
-    console.log(buttomPorts);
     node.removePorts(buttomPorts, { silent: true });
     // add out port
     const outcomes: string[] = node.getProp('outcomes') ?? [];
-    console.log(outcomes);
     node.addPorts(
         outcomes.map((item) => {
             return {
@@ -257,7 +263,6 @@ export const checkCanCreateEdge = (node: Node, outEdges: Edge<Edge.Properties>[]
     const outcomes: string[] = (node.getProp('outcomes') ?? []).map((x: { toString: () => any }) =>
         x.toString(),
     );
-    // console.log('count: ', outcomes.length, outEdges.length);
     return outcomes.length > currentEdgeNames.length;
 };
 
@@ -274,7 +279,7 @@ export const getNextEdgeName = (node: Node, outEdges: Edge<Edge.Properties>[]) =
     //
     if (process.env.NODE_ENV === 'development') {
         console.debug('all: ', outcomes);
-        console.log('current: ', currentEdgeNames);
+        console.debug('current: ', currentEdgeNames);
     }
     const result = outcomes.filter((x) => currentEdgeNames.indexOf(x) == -1);
     return result.length > 0 ? result[0].toString() : null;
@@ -290,18 +295,17 @@ export const compareOutputEdges = (
 ): string[] => {
     const currentEdgeNames: string[] = (outEdges ?? []).map((x) => x.getProp('name') ?? '');
     const beRemoved = currentEdgeNames.filter((x) => outcomes.indexOf(x) == -1);
-    // console.log('remove :', beRemoved);
     return beRemoved;
 };
 
 /**
  *  统一创建节点配置信息
  */
-export const createNodeConfig = (config: any) => {
+export const createNodeConfig = (config: Node.Metadata): Node.Metadata => {
     const { id, label, name, type, displayName } = config;
     const nodeId = id || uuid();
     const nodeLabel = label ?? type;
-    const node = {
+    return {
         shape: 'activity',
         ...config,
         id: nodeId,
@@ -309,17 +313,16 @@ export const createNodeConfig = (config: any) => {
         displayName: displayName ?? nodeLabel,
         name: name ?? randString(type),
     };
-
-    return node;
 };
 
 /**
  *  统一创建边配置信息
  */
-export const createEdgeConfig = (config: any) => {
+export const createEdgeConfig = (config: Edge.Metadata): Edge.Metadata => {
     const { id, label, name } = config;
     const edgeId = id ?? uuid();
     const edgeName = label ?? name ?? 'Done';
+
     return {
         shape: 'bpmn-edge',
         attrs: {
@@ -346,7 +349,7 @@ export const createEdgeConfig = (config: any) => {
  *  转换为Server数据
  */
 export const conventToServerData = (data: IGraphData) => {
-    console.log(data);
+    console.debug(data);
     const edges: API.ActivityConnectionCreate[] = data.edges.map((item: any) => {
         return {
             sourceId: item.source.cell,
@@ -355,7 +358,7 @@ export const conventToServerData = (data: IGraphData) => {
         } as API.ActivityConnectionCreate;
     });
 
-    const activities = data.nodes.map((item: Node.Metadata) => {
+    const activities = data.nodes.map((item) => {
         let outcomes = item.outcomes ?? []; //edges.filter((x) => x.sourceId == item.id).map((x) => x.outcome);
         if (!outcomes.length) {
             outcomes = edges.filter((x) => x.sourceId == item.id).map((x) => x.outcome);
@@ -388,54 +391,67 @@ export const conventToGraphData = async (
     activities: API.Activity[],
     connections: API.ActivityConnection[],
 ): Promise<IGraphData> => {
-    // console.log('convert input: ', activities, connections);
-
-    const nodes: Node.Metadata = [];
+    const nodes: Node.Properties[] = [];
 
     activities.forEach(async (item) => {
-        const n = createNodeConfig({
-            shape: 'activity',
-            id: item.activityId?.toString(),
-            // @ts-ignore
-            x: parseInt(item.arrtibutes?.x ?? 0),
-            // @ts-ignore
-            y: parseInt(item.arrtibutes?.y ?? 0),
-            outcomes: item.arrtibutes?.outcomes ?? [],
-            label: item.displayName ?? item.type,
-            //
-            // data: {
-            //     name: item.name,
-            //     type: item.type,
-            //     displayName: item.displayName,
-            //     description: item.description,
-            //     properties: item.properties,
-            // },
-            name: item.name,
-            type: item.type,
-            displayName: item.displayName,
-            description: item.description,
-            properties: item.properties,
-        }) as Node.Metadata;
-        nodes.push(n);
+        nodes.push(
+            createNodeConfig({
+                shape: 'activity', // TODO
+                id: item.activityId?.toString(),
+                // @ts-ignore
+                x: parseInt(item.arrtibutes?.x ?? 0),
+                // @ts-ignore
+                y: parseInt(item.arrtibutes?.y ?? 0),
+                outcomes: item.arrtibutes?.outcomes ?? [],
+                label: item.displayName ?? item.type,
+                //
+                // data: {
+                //     name: item.name,
+                //     type: item.type,
+                //     displayName: item.displayName,
+                //     description: item.description,
+                //     properties: item.properties,
+                // },
+                name: item.name,
+                type: item.type,
+                displayName: item.displayName,
+                description: item.description,
+                properties: item.properties,
+            }) as Node.Properties,
+        );
     });
 
-    const edges = connections.map((item) => {
+    const edges: Edge.Metadata[] = [];
+
+    connections.forEach((item) => {
         const sourceId = item.sourceId;
         const targetId = item.targetId;
 
-        return createEdgeConfig({
-            id: '', // be generated
-            label: item.outcome,
-            outcome: item.outcome,
-            source: {
-                cell: sourceId,
-                port: item.outcome ?? 'Done',
-            },
-            target: {
-                cell: targetId,
-                port: 'In',
-            },
-        });
+        // check source
+        if (
+            sourceId &&
+            nodes.findIndex((x) => x.id == sourceId) >= 0 &&
+            targetId &&
+            nodes.findIndex((x) => x.id == targetId) >= 0
+        ) {
+            edges.push(
+                createEdgeConfig({
+                    id: uuid(),
+                    label: item.outcome,
+                    outcome: item.outcome,
+                    source: {
+                        cell: sourceId,
+                        port: item.outcome ?? 'Done',
+                    },
+                    target: {
+                        cell: targetId,
+                        port: 'In',
+                    },
+                } as Edge.Metadata),
+            );
+        } else {
+            console.debug(`edge source id ${sourceId} or target id ${targetId} not found`);
+        }
     });
 
     return { nodes: nodes, edges: edges };

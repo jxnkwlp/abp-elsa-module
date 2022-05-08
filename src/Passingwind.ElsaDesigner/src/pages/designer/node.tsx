@@ -1,5 +1,30 @@
-import { Graph } from '@antv/x6';
-import { Edge } from '@antv/x6/es';
+import { Edge, Graph } from '@antv/x6';
+
+export const nodeAttribites = {
+    activity: {
+        normal: {
+            body: {
+                rx: 6,
+                ry: 6,
+                stroke: '#91d5ff',
+                fill: '#e6f7ff',
+                strokeWidth: 1,
+            },
+            // img: {
+            //     x: 6,
+            //     y: 6,
+            //     width: 16,
+            //     height: 16,
+            //     'xlink:href':
+            //         'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*pwLpRr7QPGwAAAAAAAAAAAAAARQnAQ',
+            // },
+            label: {
+                fontSize: 12,
+                fill: '#262626',
+            },
+        },
+    },
+};
 
 export const nodePortAttr = {
     circle: {
@@ -85,27 +110,7 @@ export const flowNodes = {
                 selector: 'label',
             },
         ],
-        attrs: {
-            body: {
-                rx: 6,
-                ry: 6,
-                stroke: '#5F95FF',
-                fill: '#EFF4FF',
-                strokeWidth: 1,
-            },
-            // img: {
-            //     x: 6,
-            //     y: 6,
-            //     width: 16,
-            //     height: 16,
-            //     'xlink:href':
-            //         'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*pwLpRr7QPGwAAAAAAAAAAAAAARQnAQ',
-            // },
-            label: {
-                fontSize: 12,
-                fill: '#262626',
-            },
-        },
+        attrs: nodeAttribites.activity.normal,
     },
     gateway: {
         inherit: 'polygon',
@@ -155,7 +160,7 @@ export const registerNodeTypes = () => {
         true,
     );
 
-    Edge.define('bpmn-edge', {});
+    // Edge.define('bpmn-edge', {});
 
     // 默认设置
     Edge.config({

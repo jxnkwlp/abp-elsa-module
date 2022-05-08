@@ -106,7 +106,7 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                     ...props?.options,
                 }}
                 editorDidMount={(e) => {
-                    e.setValue(value);
+                    e.setValue(value?.toString());
                 }}
             />
             <div className="fullscreen-toggle">

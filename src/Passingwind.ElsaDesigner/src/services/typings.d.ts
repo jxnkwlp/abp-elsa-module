@@ -35,7 +35,7 @@ declare namespace API {
         persistWorkflow?: boolean | undefined;
         loadWorkflowContext?: boolean | undefined;
         saveWorkflowContext?: boolean | undefined;
-        arrtibutes?: object | undefined;
+        arrtibutes?: any | undefined;
         properties?: ActivityDefinitionProperty[] | undefined;
     };
 
@@ -574,20 +574,17 @@ declare namespace API {
     /**
      *  *TODO*
      **/
-    type ICustomAttributeProvider = {
-    };
+    type ICustomAttributeProvider = {};
 
     /**
      *  *TODO*
      **/
-    type IntPtr = {
-    };
+    type IntPtr = {};
 
     /**
      *  *TODO*
      **/
-    type JToken = {
-    };
+    type JToken = {};
 
     /**
      *  *TODO*
@@ -1414,6 +1411,4 @@ declare namespace API {
         providerName?: string | undefined;
         activityId?: string | undefined;
     };
-
-
 }

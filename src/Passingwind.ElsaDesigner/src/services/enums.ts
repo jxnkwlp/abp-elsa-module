@@ -1,9 +1,9 @@
 /**
- * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json 
+ * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
  **/
 /**
  * enum types
-* */
+ * */
 /**
  *  *TODO*
  **/
@@ -244,4 +244,3 @@ export enum WorkflowStatus {
     Faulted = 4,
     Cancelled = 5,
 }
-

@@ -9,14 +9,13 @@ import {
     ZoomInOutlined,
     ZoomOutOutlined,
 } from '@ant-design/icons';
-import { Graph, Shape } from '@antv/x6';
+import type { Edge, Node } from '@antv/x6';
+import { Addon, Graph, Shape } from '@antv/x6';
 import { Toolbar } from '@antv/x6-react-components';
 import '@antv/x6-react-components/es/menu/style/index.css';
 import '@antv/x6-react-components/es/toolbar/style/index.css';
-import type { Edge, Node } from '@antv/x6/es';
-import { Addon } from '@antv/x6/es';
-import { uuid } from '@antv/x6/es/util/string/uuid';
 import type { Dnd } from '@antv/x6/lib/addon';
+import { uuid } from '@antv/x6/lib/util/string/uuid';
 import { message } from 'antd';
 import React, { useEffect, useImperativeHandle } from 'react';
 import './flow.less';
@@ -32,7 +31,8 @@ import {
     getNodeTypeRawData,
     toggleNodePortVisible,
 } from './service';
-import type { IGraphData, NodeUpdateData, ToolBarGroupData } from './type';
+import type { IGraphData, NodeTypeStyleName, NodeUpdateData, ToolBarGroupData } from './type';
+import { NodeTypeStyleNames } from './type';
 
 type IFlowProps = {
     height?: number;
@@ -49,12 +49,20 @@ type IFlowProps = {
     onEdgeClick?: (edge: Edge.Properties) => void;
     onEdgeDoubleClick?: (edge: Edge.Properties) => void;
     //
+    onGraphInitial?: (graph: Graph) => void;
+    onDataUpdate?: (graph: Graph) => void;
 };
 
 export type FlowActionType = {
     getGraphData: () => Promise<IGraphData>;
     updateNodeProperties: (id: string, value: NodeUpdateData) => void;
     updateNodeOutPorts: (id: string, outNames: string[]) => void;
+    setNodeStyle: (id: string, style: NodeTypeStyleName) => void;
+    setAllNodesStyle: (style: NodeTypeStyleName) => void;
+    setEdgeStyle: (id: string, style: NodeTypeStyleName) => void;
+    setAllEdgesStyle: (style: NodeTypeStyleName) => void;
+    setNodeIncomingEdgesStyle: (id: string, style: NodeTypeStyleName) => void;
+    setNodeOutgoingEdgesStyle: (id: string, style: NodeTypeStyleName) => void;
 };
 
 const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
@@ -113,6 +121,60 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             node.prop('outcomes', outcomes);
             // node.addPort({ group: 'bottom' });
             // setNodeOutPorts(node, outcomes);
+        },
+        setAllNodesStyle: (style) => {
+            const allNodes = graphInstance?.getNodes() ?? [];
+            allNodes.forEach((node) => {
+                const view = graphInstance?.findViewByCell(node);
+                view?.removeClass(NodeTypeStyleNames);
+                view?.addClass(style);
+            });
+        },
+        setNodeStyle: (id, style) => {
+            const node = graphInstance?.getNodes().find((x) => x.id == id);
+            if (node) {
+                const view = node.findView(graphInstance!);
+                view?.removeClass(NodeTypeStyleNames);
+                view?.addClass(style);
+            }
+        },
+        setAllEdgesStyle: (style) => {
+            const allEdges = graphInstance?.getEdges() ?? [];
+            allEdges.forEach((edge) => {
+                const view = graphInstance?.findViewByCell(edge);
+                view?.removeClass(NodeTypeStyleNames);
+                view?.addClass(style);
+            });
+        },
+        setEdgeStyle: (id, style) => {
+            const edge = graphInstance?.getEdges().find((x) => x.id == id);
+            if (edge) {
+                const view = edge.findView(graphInstance!);
+                view?.removeClass(NodeTypeStyleNames);
+                view?.addClass(style);
+            }
+        },
+        setNodeIncomingEdgesStyle: (id, style) => {
+            const node = graphInstance?.getNodes().find((x) => x.id == id);
+            if (node) {
+                const edges = graphInstance?.getIncomingEdges(node);
+                edges?.forEach((edge) => {
+                    const view = edge.findView(graphInstance!);
+                    view?.removeClass(NodeTypeStyleNames);
+                    view?.addClass(style);
+                });
+            }
+        },
+        setNodeOutgoingEdgesStyle: (id, style) => {
+            const node = graphInstance?.getNodes().find((x) => x.id == id);
+            if (node) {
+                const edges = graphInstance?.getOutgoingEdges(node);
+                edges?.forEach((edge) => {
+                    const view = edge.findView(graphInstance!);
+                    view?.removeClass(NodeTypeStyleNames);
+                    view?.addClass(style);
+                });
+            }
         },
     }));
 
@@ -199,9 +261,8 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                     //
                     if (!graph?.isClipboardEmpty()) {
                         const c2 = graph?.paste({
-                            offset: 100,
+                            offset: 80,
                             nodeProps: {
-                                id: uuid(),
                                 name: randString(),
                             },
                         });
@@ -218,6 +279,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         // @ts-ignore
         graphInstance?.fromJSON(data);
         graphInstance?.centerContent();
+        props?.onDataUpdate?.(graphInstance!);
     };
 
     const handleOnDrag = async (type: string, e: any) => {
@@ -247,16 +309,18 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             typeDescriptor: type,
         });
 
-        const node = graphInstance?.createNode(nodeConfig);
+        // graphInstance.addNode({ ...nodeConfig, x: 100, y: 100 });
 
-        dnd?.start(node!, e);
+        const node = graphInstance.createNode(nodeConfig);
+
+        if (node) dnd?.start(node!, e);
     };
 
     const initial = async () => {
         const readonly = props.readonly ?? false;
 
         if (!graphInstance) {
-            // console.log('graph initial...');
+            console.debug('graph initial...');
 
             registerNodeTypes();
 
@@ -280,12 +344,35 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                 mousewheel: {
                     enabled: true,
                     zoomAtMousePosition: true,
-                    modifiers: 'ctrl',
+                    modifiers: ['ctrl'],
                     minScale: 0.5,
                     maxScale: 1.5,
                 },
                 scroller: {
                     padding: 40,
+                },
+                panning: {
+                    enabled: true,
+                    // modifiers: 'ctrl',
+                },
+                minimap: {
+                    enabled: true,
+                    container: document.getElementById('minimap')!,
+                    width: 230,
+                    height: 180,
+                },
+                snapline: true,
+                keyboard: true,
+                selecting: {
+                    enabled: true,
+                    showNodeSelectionBox: false,
+                },
+                clipboard: {
+                    enabled: true,
+                    useLocalStorage: true,
+                },
+                translating: {
+                    restrict: true,
                 },
                 connecting: {
                     router: {
@@ -377,42 +464,19 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                         },
                     },
                 },
-                panning: {
-                    enabled: true,
-                    // modifiers: 'ctrl',
-                },
-                minimap: {
-                    enabled: true,
-                    container: document.getElementById('minimap')!,
-                    width: 230,
-                    height: 180,
-                },
-                snapline: true,
-                keyboard: true,
-                selecting: {
-                    enabled: true,
-                    showNodeSelectionBox: false,
-                },
-                clipboard: {
-                    enabled: true,
-                    useLocalStorage: true,
-                },
-                translating: {
-                    restrict: true,
-                },
+
                 ...getGraphOptions(),
             });
 
             setGraphInstance(graph);
+            props?.onGraphInitial?.(graph);
 
             if (readonly) {
                 graph.disableClipboard();
                 graph.disableHistory();
-                graph.disableMouseWheel();
                 graph.disableSnapline();
                 graph.disableSelection();
-                // graph.disablePanning();
-                // graph.disableRubberband()
+                graph.disableRubberband();
                 // @ts-ignore
                 graph.options.interacting.nodeMovable = false;
             }
@@ -421,20 +485,19 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                 target: graph!,
                 scaled: false,
                 animation: true,
-                getDragNode: (node) => node.clone({ keepId: true }),
-                getDropNode: (node) => {
-                    const node2 = node.clone({ keepId: true });
-                    // updateNodePorts(node2);
-                    return node2;
-                },
+                // getDragNode: (node) => node.clone({ keepId: true }),
+                // getDropNode: (node) => {
+                //     const node2 = node.clone({ keepId: true });
+                //     // updateNodePorts(node2);
+                //     return node2;
+                // },
             });
             setDnd(dnd);
 
             graph.on('node:click', ({ node }) => {
-                console.log(node);
+                console.debug(node);
                 node.toFront();
-                // node.setZIndex(0);
-                // graph.select(node);
+                props.onNodeClick?.(node.getProp() as Node.Properties, node);
             });
 
             graph.on('node:dblclick', ({ node }) => {
@@ -442,7 +505,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             });
 
             graph.on('edge:click', ({ edge }) => {
-                // console.log(edge);
+                console.debug(edge);
                 edge.toFront();
                 edge.setZIndex(-1);
                 props.onEdgeClick?.({ ...edge });
@@ -495,8 +558,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
 
     useEffect(() => {
         if (graphData && graphInstance) {
-            console.log('graph load: ', graphData);
-
+            console.debug('graph load: ', graphData);
             loadGraphData(graphData);
         }
     }, [graphData, graphInstance]);

@@ -11,7 +11,7 @@ import ProForm, {
 } from '@ant-design/pro-form';
 import { Button, Card, Col, Form, Row, Tabs } from 'antd';
 import type { NamePath } from 'antd/lib/form/interface';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import CaseEditorInput from './form-input/case-editor-builder-input';
 import MonacorEditorInput from './form-input/monacor-editor-input';
@@ -54,12 +54,12 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
     const renderItemInput = (
         inputName: NamePath,
         value: any,
-        syntax: string,
+        uiEditor: string,
         propItem: NodeTypeProperty,
         inputProps: any,
         options: any,
     ) => {
-        if (syntax == 'Default') {
+        if (uiEditor == 'Default') {
             switch (propItem.uiHint) {
                 case 'check-list':
                     return (
@@ -100,7 +100,6 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         />
                     );
                 case 'multi-line':
-                case 'code-editor':
                     return (
                         <ProFormTextArea
                             {...inputProps}
@@ -112,6 +111,34 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                             }}
                             rules={[{ required: propItem.isRequired }]}
                         />
+                    );
+                case 'code-editor':
+                    return (
+                        <Col span={defaultInputSpan}>
+                            <ProForm.Item
+                                label={inputProps.label}
+                                name={inputName}
+                                required={propItem.isRequired}
+                                extra={propItem.hint}
+                                rules={[{ required: propItem.isRequired }]}
+                            >
+                                <MonacorEditorInput
+                                    height={150}
+                                    language={getEditorLanguage(uiEditor)}
+                                    getJavaScriptLibs={async () => {
+                                        if (uiEditor.toLocaleLowerCase() == 'javascript') {
+                                            return [
+                                                {
+                                                    content: await getScriptDefinitonsContent(),
+                                                    filePath: 'script.d.ts',
+                                                },
+                                            ];
+                                        }
+                                        return [];
+                                    }}
+                                />
+                            </ProForm.Item>
+                        </Col>
                     );
                 case 'switch-case-builder':
                     return (
@@ -136,7 +163,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         />
                     );
             }
-        } else if (syntax == 'Switch') {
+        } else if (uiEditor == 'Switch') {
             return (
                 <Col span={defaultInputSpan}>
                     <ProForm.Item
@@ -162,9 +189,9 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                 >
                     <MonacorEditorInput
                         height={150}
-                        language={getEditorLanguage(syntax)}
+                        language={getEditorLanguage(uiEditor)}
                         getJavaScriptLibs={async () => {
-                            if (syntax.toLocaleLowerCase() == 'javascript') {
+                            if (uiEditor.toLocaleLowerCase() == 'javascript') {
                                 return [
                                     {
                                         content: await getScriptDefinitonsContent(),
@@ -202,43 +229,59 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                 required: propItem.isRequired,
             };
 
-            const { defaultSyntax, syntaxes } = getPropertySyntaxes(propItem);
-            let syntaxeList = ['Default', ...syntaxes];
-            if (propItem.defaultSyntax == 'Switch') {
-                syntaxeList = [...syntaxes];
+            const propSyntax = getPropertySyntaxes(propItem);
+            let syntaxeList = (propSyntax.supports ?? []).map((x) => {
+                return { label: x, key: x };
+            });
+            if (propSyntax.editor) {
+                syntaxeList = [{ label: propSyntax.editor, key: propSyntax.editor ?? 'Literal' }];
+            } else if (propItem.defaultSyntax != 'Switch') {
+                syntaxeList = [{ label: 'Default', key: 'Default' }, ...syntaxeList];
+            } else {
+                // no-op
             }
 
             return (
                 <ProFormGroup key={propItem.name}>
-                    <ProFormDependency name={['name', ['props', propItem.name, 'syntax']]}>
-                        {({ props }) => {
-                            // console.log(props);
-                            const syntax = props?.[propItem.name]?.syntax ?? defaultSyntax;
-                            // return (
-                            //     <ProFormText
-                            //         {...inputProps}
-                            //         colProps={{ span: 20 }}
-                            //         name={['props', propItem.name, 'expressions', syntax]}
-                            //     />
-                            // );
-                            return renderItemInput(
-                                ['props', propItem.name, 'expressions', syntax],
-                                propItem.defaultValue,
-                                syntax,
-                                propItem,
-                                inputProps,
-                                options,
-                            );
-                        }}
-                    </ProFormDependency>
+                    {propSyntax.editor ? (
+                        renderItemInput(
+                            [
+                                'props',
+                                propItem.name,
+                                'expressions',
+                                propSyntax.default ?? 'Literal',
+                            ],
+                            propItem.defaultValue,
+                            propSyntax.editor,
+                            propItem,
+                            inputProps,
+                            options,
+                        )
+                    ) : (
+                        <>
+                            <ProFormDependency name={['name', ['props', propItem.name, 'syntax']]}>
+                                {({ props }) => {
+                                    const syntax = props?.[propItem.name]?.syntax;
+                                    return renderItemInput(
+                                        ['props', propItem.name, 'expressions', syntax],
+                                        propItem.defaultValue,
+                                        syntax,
+                                        propItem,
+                                        inputProps,
+                                        options,
+                                    );
+                                }}
+                            </ProFormDependency>
+                        </>
+                    )}
 
                     {/* syntax */}
                     <ProFormSelect
                         name={['props', propItem.name, 'syntax']}
                         options={syntaxeList.map((item) => {
                             return {
-                                label: item,
-                                value: item,
+                                label: item.label,
+                                value: item.key,
                             };
                         })}
                         // initialValue={defaultSyntax}
@@ -250,12 +293,17 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
         });
     };
 
+    const renderFormItemMemo = useMemo(
+        () => renderFormItems(),
+        [props.properties, renderFormItems],
+    );
+
     return (
         <>
             <Tabs defaultActiveKey={tabKey} type="line" style={{ width: '100%', flex: 1 }}>
                 {properties.length > 0 && (
                     <Tabs.TabPane tab="Properties" key="1">
-                        <Row>{renderFormItems()}</Row>
+                        <Row>{renderFormItemMemo}</Row>
                     </Tabs.TabPane>
                 )}
 

@@ -117,17 +117,115 @@
     }
 }
 
-
-/** 覆盖节点默认选中色 */
-.x6-node-selected rect {
-    stroke-width: 2px;
-    filter: drop-shadow(2px 1px 2px #5F95FF);
+@keyframes processing-line {
+    to {
+        stroke-dashoffset: -1000;
+    }
 }
 
-/** 覆盖连线默认选中色 */
-.x6-edge-selected path {
-    stroke: #5F95FF;
-    stroke-width: 2px;
-    // z-index: 0;
-    filter: drop-shadow(2px 3px 3px #5F95FF1a);
+.x6-node {
+    &.default rect {
+        fill: #f5f5f5;
+        stroke: #d5d5d5,
+    }
+
+    &.processing rect {
+        animation: ~'processing-line 30s infinite linear';
+        stroke: #39ca74cc;
+        stroke-width: 2px;
+        stroke-dasharray: 8px, 2px;
+        fill: #f5f5f5;
+    }
+
+    &.success rect {
+        fill: #f6ffed;
+        stroke: #b7eb8f,
+    }
+
+    &.error rect {
+        fill: #fff2f0;
+        stroke: #ffccc7,
+    }
+
+    /** 覆盖节点默认选中色 */
+    &.x6-node-selected rect {
+        stroke-width: 2px;
+        filter: drop-shadow(2px 1px 2px #5F95FF);
+    }
+}
+
+.x6-edge {
+    // 系统状态
+    stroke-width: 1px;
+    stroke-dasharray: none;
+
+    &.default {
+        path:nth-child(2) {
+            stroke: #d5d5d5 !important;
+            stroke-dasharray: 8px, 4px;
+        }
+
+        // path:nth-child(3) {
+        //     fill: #d5d5d5 !important;
+        //     stroke: #d5d5d5 !important;
+        // }
+    }
+
+    &.success {
+        stroke-width: 2px;
+
+        path:nth-child(2) {
+            stroke: #b7eb8f !important;
+            stroke-dasharray: none;
+        }
+    }
+
+    &.error {
+        stroke-width: 2px;
+
+        path:nth-child(2) {
+            stroke-dasharray: none;
+            stroke: #ffccc7;
+            stroke-width: 2px;
+        }
+    }
+
+    &.processing {
+        path:nth-child(2) {
+            animation: ~'processing-line 30s infinite linear';
+            // stroke: rgba(57, 202, 116, 0.8);
+            stroke-width: 2px;
+            stroke-dasharray: 8px, 2px;
+        }
+    }
+
+    // 交互状态
+    // &.x6-edge-selected {
+    //     path:nth-child(2) {
+    //         stroke: #1890ff;
+    //         stroke-width: 2px;
+    //     }
+    // }
+
+    // &:hover {
+    //     path:nth-child(2) {
+    //         stroke: #1890ff;
+    //         stroke-width: 2px;
+    //     }
+    // }
+
+    // &.hoverHighlight {
+    //     path:nth-child(2) {
+    //         stroke: #1890ff;
+    //         stroke-width: 2px;
+    //     }
+    // }
+
+    /** 覆盖连线默认选中色 */
+    &.x6-edge-selected path {
+        stroke: #5F95FF;
+        stroke-width: 2px;
+        // z-index: 0;
+        filter: drop-shadow(2px 3px 3px #5F95FF1a);
+    }
 }

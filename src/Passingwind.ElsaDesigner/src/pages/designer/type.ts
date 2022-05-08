@@ -1,9 +1,8 @@
-import type { Node } from '@antv/x6/es';
-import type { Cell, Edge, Graph } from '@antv/x6';
+import type { Edge, Graph, Node } from '@antv/x6';
 
 export interface IGraphData {
-    nodes: Node.Metadata[] | Cell.Properties;
-    edges: Edge.Metadata[] | Cell.Properties;
+    nodes: Node.Properties[];
+    edges: Edge.Properties[];
 }
 
 // export interface INode extends Node.Metadata {
@@ -20,7 +19,7 @@ export interface NodeTypeGroup {
 export type NodeTypeProperty = {
     name: string;
     type: string;
-    uiHint: string;
+    uiHint: NodePropertySyntaxNames;
     label: string;
     hint: string;
     options?: NodeTypePropertyOption;
@@ -53,7 +52,7 @@ export type NodeUpdateData = {
 
 export type NodeUpdatePropData = {
     name: string;
-    syntax: string | null;
+    syntax: string | undefined;
     value?: any;
     // valueType?: 'string' | 'number' | 'boolean' | 'object' | 'array';
     expressions?: Record<string, string>;
@@ -92,3 +91,43 @@ export type ToolBarItemData = {
     disabled?: boolean;
     onClick: (graph: Graph) => void;
 };
+
+export type NodeTypeStyleName =
+    | 'normal'
+    | 'default'
+    | 'success'
+    | 'error'
+    | 'processing'
+    | 'warning';
+
+export const NodeTypeStyleNames = [
+    'normal',
+    'default',
+    'success',
+    'error',
+    'processing',
+    'warning',
+];
+
+export type NodePropertySyntax = {
+    /** 支持的列表，可以空 */
+    supports: string[] | undefined;
+    /** 默认 */
+    default: string | undefined;
+    /** 固定输入 */
+    editor: string | undefined;
+};
+
+// https://github1s.com/elsa-workflows/elsa-core/blob/HEAD/src/core/Elsa.Abstractions/Design/ActivityPropertyUIHints.cs
+export type NodePropertySyntaxNames =
+    | 'single-line'
+    | 'multi-line'
+    | 'checkbox'
+    | 'check-list'
+    | 'radio-list'
+    | 'dropdown'
+    | 'multi-text'
+    | 'code-editor'
+    | 'dynamic-list'
+    | 'json'
+    | 'switch-case-builder';
