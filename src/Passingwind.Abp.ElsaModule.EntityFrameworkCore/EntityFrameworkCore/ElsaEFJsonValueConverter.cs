@@ -11,18 +11,25 @@ namespace EcsShop.EntityFrameworkCore
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver() { NamingStrategy = new CamelCaseNamingStrategy(false, false) },
             NullValueHandling = NullValueHandling.Ignore,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            TypeNameHandling = TypeNameHandling.None,
+            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+            TypeNameHandling = TypeNameHandling.Auto,
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
         };
 
         static ElsaEFJsonValueConverter()
         {
             JsonSerializerSettings.Converters.Add(new TypeJsonConverter());
-            JsonSerializerSettings.Error += (e, s) =>
-            {
-                // ignore error
-                s.ErrorContext.Handled = true;
-            };
+            JsonSerializerSettings.Converters.Add(new FlagEnumConverter(new DefaultNamingStrategy()));
+            JsonSerializerSettings.Converters.Add(new TypeJsonConverter());
+            JsonSerializerSettings.Converters.Add(new VersionOptionsJsonConverter());
+            JsonSerializerSettings.Converters.Add(new InlineFunctionJsonConverter());
+
+            //JsonSerializerSettings.Error += (e, s) =>
+            //{
+            //    // ignore error
+            //    s.ErrorContext.Handled = true;
+            //};
         }
 
 

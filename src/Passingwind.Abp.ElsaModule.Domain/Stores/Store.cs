@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -33,12 +34,16 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task AddAsync(TModel model, CancellationToken cancellationToken = default)
         {
+            Logger.LogDebug($"Add [{model.GetType()}] {model.Id} ... ");
+
             var entity = await MapToEntityAsync(model);
             await Repository.InsertAsync(entity, true, cancellationToken);
         }
 
         public virtual async Task AddManyAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
         {
+            Logger.LogDebug($"AddMany [{models.GetType()}] ... ");
+
             var entities = new List<TEntity>();
 
             foreach (var item in models)
@@ -57,6 +62,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task DeleteAsync(TModel model, CancellationToken cancellationToken = default)
         {
+            Logger.LogDebug($"Delete [{model.GetType()}] {model.Id} ... ");
+
             var id = (TKey)Convert.ChangeType(model.Id, typeof(TKey));
             await Repository.DeleteAsync(x => x.Id.Equals(id), true, cancellationToken);
         }
@@ -106,6 +113,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             await _semaphore.WaitAsync(cancellationToken);
 
+            Logger.LogDebug($"Save [{model.GetType()}] {model.Id} ... ");
+
             try
             {
                 TKey id = ConvertKey(model.Id);
@@ -136,6 +145,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task UpdateAsync(TModel model, CancellationToken cancellationToken = default)
         {
+            Logger.LogDebug($"Update [{model.GetType()}] {model.Id} ... ");
+
             TKey id = ConvertKey(model.Id);
 
             var entity = await Repository.GetAsync(x => x.Id.Equals(id));
