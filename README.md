@@ -1,6 +1,6 @@
 # Abp & Elsa & Designer
 
-Elsa module for abp 
+Elsa module for abp. [![NuGet](https://img.shields.io/nuget/v/Passingwind.Abp.ElsaModule.Domain?style=flat-square)](https://www.nuget.org/packages?q=Passingwind.Abp.ElsaModule)
 
 ## What's changes 
 
