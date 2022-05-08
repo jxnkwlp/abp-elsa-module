@@ -24,7 +24,6 @@ import {
     Row,
     Spin,
     Tag,
-    Tooltip,
     Typography,
     Upload,
 } from 'antd';
@@ -236,6 +235,7 @@ const Index: React.FC = () => {
                 nodeData.props[propItem.name] = {
                     syntax: propSyntax.editor,
                     value: defaultValue,
+                    noSyntax: true, // special case
                     expressions: {
                         Literal: syntaxStringValue,
                     },
@@ -249,7 +249,7 @@ const Index: React.FC = () => {
         const sourceProperties = (node.getProp('properties') ?? []) as NodeUpdatePropData[];
         console.debug('sourceProperties: ', sourceProperties);
 
-        // convert to form data
+        // load form data and overwrite
         sourceProperties.forEach((item) => {
             const syntax = !item.syntax ? 'Default' : item.syntax;
             let syntaxValue: any = undefined;
@@ -277,14 +277,29 @@ const Index: React.FC = () => {
                 }
             }
 
-            nodeData.props[item.name] = {
-                ...nodeData.props[item.name],
-                syntax: syntax,
-                expressions: {
-                    Default: syntaxValue,
-                    [valueSyntax]: expressionValue,
-                },
-            };
+            const current = nodeData.props[item.name] ?? {};
+            const expressions = current?.expressions ?? {};
+            if (current.noSyntax) {
+                nodeData.props[item.name] = {
+                    ...current,
+                    expressions: {
+                        ...expressions,
+                        Default: syntaxValue,
+                        [valueSyntax]: expressionValue,
+                        Literal: expressionValue,
+                    },
+                };
+            } else {
+                nodeData.props[item.name] = {
+                    ...current,
+                    syntax: syntax,
+                    expressions: {
+                        ...expressions,
+                        Default: syntaxValue,
+                        [valueSyntax]: expressionValue,
+                    },
+                };
+            }
         });
 
         setEditNodeFormData(nodeData);
@@ -383,6 +398,7 @@ const Index: React.FC = () => {
             }
         }
 
+        // special case
         if (nodeTypeDescriptor?.type == 'Switch') {
             const newValue = result.properties.find((x) => x.name == 'Cases')?.value;
             if (newValue) {

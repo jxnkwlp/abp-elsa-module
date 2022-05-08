@@ -73,6 +73,7 @@ export type NodeEditFormData = {
 export type NodeEditFormPropItemData = {
     // name: string;
     syntax: string;
+    noSyntax?: boolean;
     value?: any;
     expressions?: Record<string, any>;
 };
