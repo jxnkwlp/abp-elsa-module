@@ -1,4 +1,5 @@
 import { ExpandOutlined } from '@ant-design/icons';
+import { Modal } from 'antd';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import React, { useEffect } from 'react';
 import MonacoEditor from 'react-monaco-editor';
@@ -17,24 +18,24 @@ type MonacorEditorInputProps = {
 
 const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
     const ref = React.createRef<MonacoEditor>();
+    const ref2 = React.createRef<MonacoEditor>();
 
-    const [value] = React.useState(props.value || '');
+    const [value, setValue] = React.useState(props.value || '');
     const [isFullscreen, setIsFullscreen] = React.useState(false);
 
-    const [originSize, setOriginSize] = React.useState<{ w?: number; h: number }>();
     const [currentSize, setCurrentSize] = React.useState<{ w?: number; h: number }>();
 
     const handleValueChanged = (v: string) => {
         props?.onChange?.(v);
+        setValue(v);
     };
 
     const handleToggleFullScreen = () => {
         if (isFullscreen) {
             setIsFullscreen(false);
-            setCurrentSize(originSize);
         } else {
             setIsFullscreen(true);
-            setCurrentSize({ w: document.body.clientWidth, h: document.body.clientHeight });
+            ref2.current?.editor?.setValue(value);
         }
     };
 
@@ -60,7 +61,7 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
     };
 
     useEffect(() => {
-        setOriginSize({ w: props.width, h: props.height ?? 150 });
+        // setOriginSize({ w: props.width, h: props.height ?? 150 });
         setCurrentSize({ w: props.width, h: props.height ?? 150 });
     }, [0]);
 
@@ -72,11 +73,9 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
 
     return (
         <div
-            className={
-                isFullscreen ? 'monaco-editor-container fullscreen' : 'monaco-editor-container'
-            }
+            className="monaco-editor-container"
             id={props.id}
-            style={{ width: currentSize?.w, height: currentSize?.h }}
+            style={{ height: currentSize?.h }}
             onKeyDown={(e) => {
                 // keyCode: 27
                 if (e.code == 'Escape') {
@@ -114,6 +113,57 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                     <ExpandOutlined />
                 </a>
             </div>
+
+            <Modal
+                title="Edit"
+                visible={isFullscreen}
+                onCancel={() => setIsFullscreen(false)}
+                onOk={() => {
+                    setIsFullscreen(false);
+                }}
+                width="96%"
+                style={{ top: 20 }}
+                destroyOnClose
+                maskClosable={false}
+                closable={false}
+                bodyStyle={{ padding: 0 }}
+            >
+                <div
+                    style={{ height: document.body.clientHeight * 0.8 + 'px' }}
+                    onKeyDown={(e) => {
+                        if (e.code == 'Escape') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        } else if (e.ctrlKey && e.code == 'KeyS') {
+                            // setIsFullscreen(false);
+                            // e.preventDefault();
+                            // e.stopPropagation();
+                        }
+                    }}
+                >
+                    <MonacoEditor
+                        ref={ref2}
+                        language={props.language}
+                        onChange={(v) => {
+                            ref.current?.editor?.setValue(v);
+                        }}
+                        options={{
+                            minimap: { enabled: isFullscreen },
+                            wordWrap: 'bounded',
+                            wordWrapColumn: 1024,
+                            automaticLayout: true,
+                            autoIndent: 'full',
+                            tabSize: 2,
+                            autoClosingBrackets: 'languageDefined',
+                            foldingStrategy: 'auto',
+                            ...props?.options,
+                        }}
+                        editorDidMount={(e) => {
+                            e.setValue(value?.toString());
+                        }}
+                    />
+                </div>
+            </Modal>
         </div>
     );
 };
