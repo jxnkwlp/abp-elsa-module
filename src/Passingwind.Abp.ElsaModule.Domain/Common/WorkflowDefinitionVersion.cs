@@ -53,4 +53,14 @@ public class WorkflowDefinitionVersion : FullAuditedEntity<Guid>, IMultiTenant
     {
         IsPublished = value;
     }
+
+    public void SetId(Guid id)
+    {
+        Id = id;
+    }
+
+    public void SetDefinitionId(Guid id)
+    {
+        DefinitionId = id;
+    }
 }

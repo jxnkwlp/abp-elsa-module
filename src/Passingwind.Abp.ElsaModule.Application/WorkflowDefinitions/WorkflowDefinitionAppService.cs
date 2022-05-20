@@ -32,7 +32,6 @@ namespace Passingwind.Abp.ElsaModule.Common
             WorkflowDefinition defintion = ObjectMapper.Map<WorkflowDefinitionCreateOrUpdateDto, WorkflowDefinition>(input.Definition);
             WorkflowDefinitionVersion version = ObjectMapper.Map<WorkflowDefinitionVersionCreateOrUpdateDto, WorkflowDefinitionVersion>(input);
 
-            // version.Definition = defintion;
             version.SetIsLatest(true);
 
             defintion.SetVersion(version.Version, null);
@@ -43,7 +42,10 @@ namespace Passingwind.Abp.ElsaModule.Common
                 defintion.SetVersion(version.Version, version.Version);
             }
 
-            await _workflowDefinitionRepository.InsertAsync(defintion);
+            defintion.SetId(GuidGenerator.Create());
+            version.SetDefinitionId(defintion.Id);
+
+            defintion = await _workflowDefinitionRepository.InsertAsync(defintion);
             await _workflowDefinitionVersionRepository.InsertAsync(version);
 
             var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(version);
