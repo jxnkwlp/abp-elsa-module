@@ -37,7 +37,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             return Task.FromResult(_storeMapper.MapToModel(entity));
         }
 
-        protected override Expression<Func<Bookmark, bool>> MapSpecification(ISpecification<BookmarkModel> specification)
+        protected override async Task<Expression<Func<Bookmark, bool>>> MapSpecificationAsync(ISpecification<BookmarkModel> specification)
         {
             if (specification is BookmarkHashSpecification hashSpecification)
             {
@@ -80,9 +80,9 @@ namespace Passingwind.Abp.ElsaModule.Stores
             {
                 var ids = workflowInstanceIdsSpecification.WorkflowInstanceIds.ToList().ConvertAll(Guid.Parse);
                 return x => ids.Contains(x.WorkflowInstanceId);
-            } 
+            }
             else
-                return base.MapSpecification(specification);
+                return await base.MapSpecificationAsync(specification);
         }
 
         protected override Guid ConvertKey(string value)

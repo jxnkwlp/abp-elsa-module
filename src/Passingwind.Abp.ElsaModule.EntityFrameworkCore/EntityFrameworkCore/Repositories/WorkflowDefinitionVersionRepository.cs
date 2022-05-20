@@ -19,6 +19,35 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
         {
         }
 
+        public async Task<WorkflowDefinitionVersion> FindByVersionAsync(Guid definitionId, int version, bool includeDetails = true, CancellationToken cancellationToken = default)
+        {
+            var dbset = await GetDbSetAsync();
+
+            var entity = await dbset
+                .IncludeIf(includeDetails, x => x.Activities)
+                .IncludeIf(includeDetails, x => x.Connections)
+                .Where(x => x.DefinitionId == definitionId && x.Version == version)
+                .FirstOrDefaultAsync();
+
+            return entity;
+        }
+
+        public async Task<WorkflowDefinitionVersion> GetByVersionAsync(Guid definitionId, int version, bool includeDetails = true, CancellationToken cancellationToken = default)
+        {
+            var dbset = await GetDbSetAsync();
+
+            var entity = await dbset
+                .IncludeIf(includeDetails, x => x.Activities)
+                .IncludeIf(includeDetails, x => x.Connections)
+                .Where(x => x.DefinitionId == definitionId && x.Version == version)
+                .FirstOrDefaultAsync();
+
+            if (entity == null)
+                throw new EntityNotFoundException();
+
+            return entity;
+        }
+
         public async Task<long> GetCountAsync(Expression<Func<WorkflowDefinitionVersion, bool>> expression, CancellationToken cancellationToken = default)
         {
             var dbset = await GetDbSetAsync();
@@ -36,7 +65,6 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
             var entity = await dbset
                 .IncludeIf(includeDetails, x => x.Activities)
                 .IncludeIf(includeDetails, x => x.Connections)
-                .IncludeIf(includeDetails, x => x.Definition)
                 .OrderByDescending(x => x.Version)
                 .Where(x => x.DefinitionId == id)
                 .FirstOrDefaultAsync();

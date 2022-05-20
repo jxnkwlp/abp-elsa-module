@@ -32,7 +32,7 @@ namespace Passingwind.Abp.ElsaModule.Common
             WorkflowDefinition defintion = ObjectMapper.Map<WorkflowDefinitionCreateOrUpdateDto, WorkflowDefinition>(input.Definition);
             WorkflowDefinitionVersion version = ObjectMapper.Map<WorkflowDefinitionVersionCreateOrUpdateDto, WorkflowDefinitionVersion>(input);
 
-            version.Definition = defintion;
+            // version.Definition = defintion;
             version.SetIsLatest(true);
 
             defintion.SetVersion(version.Version, null);
@@ -43,9 +43,12 @@ namespace Passingwind.Abp.ElsaModule.Common
                 defintion.SetVersion(version.Version, version.Version);
             }
 
+            await _workflowDefinitionRepository.InsertAsync(defintion);
             await _workflowDefinitionVersionRepository.InsertAsync(version);
 
-            return ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(version);
+            var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(version);
+            dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(defintion);
+            return dto;
         }
 
         public virtual async Task DeleteAsync(Guid id)
@@ -61,9 +64,11 @@ namespace Passingwind.Abp.ElsaModule.Common
 
         public virtual async Task<WorkflowDefinitionVersionDto> GetAsync(Guid id)
         {
-            var entity = await _workflowDefinitionVersionRepository.GetLatestAsync(id);
+            var entity = await _workflowDefinitionRepository.GetAsync(id);
+            var version = await _workflowDefinitionVersionRepository.GetLatestAsync(id);
 
-            var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(entity);
+            var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(version);
+            dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(entity);
             return dto;
         }
 
@@ -84,9 +89,11 @@ namespace Passingwind.Abp.ElsaModule.Common
 
         public virtual async Task<WorkflowDefinitionVersionDto> GetVersionAsync(Guid id, int version)
         {
-            var entity = await _workflowDefinitionVersionRepository.GetAsync(x => x.DefinitionId == id && x.Version == version);
+            var entity = await _workflowDefinitionRepository.GetAsync(id);
+            var versionEntity = await _workflowDefinitionVersionRepository.GetByVersionAsync(id, version);
 
-            var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(entity);
+            var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(versionEntity);
+            dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(entity);
             return dto;
         }
 
@@ -105,6 +112,7 @@ namespace Passingwind.Abp.ElsaModule.Common
 
             WorkflowDefinitionVersion currentVersion = null;
             WorkflowDefinition defintion = await _workflowDefinitionRepository.GetAsync(id);
+
             int latestVersion = defintion.LatestVersion;
 
             if (input.IsPublished)
@@ -112,10 +120,13 @@ namespace Passingwind.Abp.ElsaModule.Common
                 await _workflowDefinitionManager.UnsetPublishedVersionAsync(id);
             }
 
+            // update defintion
+            defintion = ObjectMapper.Map<WorkflowDefinitionCreateOrUpdateDto, WorkflowDefinition>(input.Definition, defintion);
+
+            // check version
             if (defintion.PublishedVersion == defintion.LatestVersion)
             {
                 await _workflowDefinitionManager.UnsetLatestVersionAsync(id);
-
 
                 currentVersion = await _workflowDefinitionManager.CreateDefinitionVersionAsync(id, CurrentTenant.Id, ObjectMapper.Map<List<ActivityCreateOrUpdateDto>, List<Activity>>(input.Activities), ObjectMapper.Map<List<ActivityConnectionCreateDto>, List<ActivityConnection>>(input.Connections));
 
@@ -130,19 +141,15 @@ namespace Passingwind.Abp.ElsaModule.Common
                 // new version
                 await _workflowDefinitionVersionRepository.InsertAsync(currentVersion);
 
-                await _workflowDefinitionVersionRepository.EnsurePropertyLoadedAsync(currentVersion, x => x.Definition);
-
-                defintion = currentVersion.Definition;
             }
             else
             {
                 currentVersion = await _workflowDefinitionVersionRepository.FindAsync(x => x.DefinitionId == id && x.Version == defintion.LatestVersion);
 
                 if (currentVersion == null)
-                    throw new UserFriendlyException($"the latest versiont '{defintion.LatestVersion}' not found.");
+                    throw new UserFriendlyException($"The latest versiont '{defintion.LatestVersion}' not found.");
 
                 currentVersion = ObjectMapper.Map<WorkflowDefinitionVersionCreateOrUpdateDto, WorkflowDefinitionVersion>(input, currentVersion);
-
 
                 if (input.IsPublished)
                 {
@@ -151,18 +158,20 @@ namespace Passingwind.Abp.ElsaModule.Common
 
                 // update latest version 
                 await _workflowDefinitionVersionRepository.UpdateAsync(currentVersion);
-
-                defintion = currentVersion.Definition;
             }
 
+            // check version
             if (input.IsPublished)
                 defintion.SetVersion(currentVersion.Version, currentVersion.Version);
             else
                 defintion.SetLatestVersion(currentVersion.Version);
 
-            await CurrentUnitOfWork.SaveChangesAsync();
+            // update 
+            await _workflowDefinitionRepository.UpdateAsync(defintion);
 
-            return ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(currentVersion);
+            var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(currentVersion);
+            dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(defintion);
+            return dto;
         }
 
         public virtual async Task<WorkflowDefinitionDto> UpdateDefinitionAsync(Guid id, WorkflowDefinitionCreateOrUpdateDto input)
@@ -182,14 +191,15 @@ namespace Passingwind.Abp.ElsaModule.Common
 
             if (entity.PublishedVersion.HasValue)
             {
-                var version = await _workflowDefinitionVersionRepository.GetAsync(x => x.DefinitionId == id && x.Version == entity.PublishedVersion.Value);
+                var version = await _workflowDefinitionVersionRepository.GetByVersionAsync(id, entity.PublishedVersion.Value);
 
+                // update version
                 version.SetIsPublished(false);
-
-                entity = version.Definition;
-                entity.SetPublishedVersion(null);
-
                 await _workflowDefinitionVersionRepository.UpdateAsync(version);
+
+                // update definition
+                entity.SetPublishedVersion(null);
+                await _workflowDefinitionRepository.UpdateAsync(entity);
             }
         }
 
@@ -199,14 +209,15 @@ namespace Passingwind.Abp.ElsaModule.Common
 
             if (!entity.PublishedVersion.HasValue)
             {
-                var version = await _workflowDefinitionVersionRepository.GetAsync(x => x.DefinitionId == id && x.Version == entity.LatestVersion);
+                var version = await _workflowDefinitionVersionRepository.GetByVersionAsync(id, entity.LatestVersion);
 
+                // update version
                 version.SetIsPublished(true);
-
-                entity = version.Definition;
-                entity.SetPublishedVersion(entity.LatestVersion);
-
                 await _workflowDefinitionVersionRepository.UpdateAsync(version);
+
+                // update definition
+                entity.SetPublishedVersion(entity.LatestVersion);
+                await _workflowDefinitionRepository.UpdateAsync(entity);
             }
         }
 

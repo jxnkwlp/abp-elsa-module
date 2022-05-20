@@ -37,7 +37,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             return Task.FromResult(_storeMapper.MapToModel(entity));
         }
 
-        protected override Expression<Func<Trigger, bool>> MapSpecification(ISpecification<TriggerModel> specification)
+        protected override async Task<Expression<Func<Trigger, bool>>> MapSpecificationAsync(ISpecification<TriggerModel> specification)
         {
             if (specification is WorkflowDefinitionIdSpecification idSpecification)
             {
@@ -65,7 +65,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 return x => ids.Contains(x.Id);
             }
             else
-                return base.MapSpecification(specification);
+                return await base.MapSpecificationAsync(specification);
         }
 
         protected override Guid ConvertKey(string value)

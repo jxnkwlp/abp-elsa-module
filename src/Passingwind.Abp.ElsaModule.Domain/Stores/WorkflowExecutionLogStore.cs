@@ -36,7 +36,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             return Task.FromResult(_storeMapper.MapToModel(entity));
         }
 
-        protected override Expression<Func<WorkflowExecutionLog, bool>> MapSpecification(ISpecification<WorkflowExecutionLogRecordModel> specification)
+        protected override async Task<Expression<Func<WorkflowExecutionLog, bool>>> MapSpecificationAsync(ISpecification<WorkflowExecutionLogRecordModel> specification)
         {
             if (specification is ActivityIdSpecification activityIdSpecification)
             {
@@ -51,7 +51,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 return x => x.WorkflowInstanceId == Guid.Parse(workflowInstanceIdSpecification.WorkflowInstanceId);
             }
             else
-                throw new NotSupportedException(specification.GetType().Name);
+                return await base.MapSpecificationAsync(specification);
         }
 
         protected override long ConvertKey(string value)

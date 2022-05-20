@@ -1,47 +1,35 @@
-﻿using Elsa.Models;
-using Passingwind.Abp.ElsaModule.Common;
+﻿using Passingwind.Abp.ElsaModule.Common;
 using Volo.Abp.DependencyInjection;
+using ActivityDefinition = Elsa.Models.ActivityDefinition;
+using BookmarkModel = Elsa.Models.Bookmark;
+using ConnectionDefinitionModel = Elsa.Models.ConnectionDefinition;
+using TriggerModel = Elsa.Models.Trigger;
+using WorkflowDefinitionModel = Elsa.Models.WorkflowDefinition;
+using WorkflowExecutionLogRecordModel = Elsa.Models.WorkflowExecutionLogRecord;
+using WorkflowInstanceModel = Elsa.Models.WorkflowInstance;
 
 namespace Passingwind.Abp.ElsaModule.Stores
 {
     public interface IStoreMapper : ITransientDependency
     {
         Activity MapToEntity(ActivityDefinition model);
-
-        Common.Bookmark MapToEntity(Elsa.Models.Bookmark model);
-
-        Common.Bookmark MapToEntity(Elsa.Models.Bookmark model, Common.Bookmark entity);
-
-        ActivityConnection MapToEntity(ConnectionDefinition model);
-
-        Common.Trigger MapToEntity(Elsa.Models.Trigger model);
-
-        Common.Trigger MapToEntity(Elsa.Models.Trigger model, Common.Trigger entity);
-
-        WorkflowExecutionLog MapToEntity(WorkflowExecutionLogRecord model);
-
-        WorkflowExecutionLog MapToEntity(WorkflowExecutionLogRecord model, WorkflowExecutionLog entity);
-
-        Common.WorkflowInstance MapToEntity(Elsa.Models.WorkflowInstance model);
-
-        Common.WorkflowInstance MapToEntity(Elsa.Models.WorkflowInstance model, Common.WorkflowInstance entity);
-
-        WorkflowDefinitionVersion MapToEntity(Elsa.Models.WorkflowDefinition model);
-
-        WorkflowDefinitionVersion MapToEntity(Elsa.Models.WorkflowDefinition model, WorkflowDefinitionVersion entity);
-
+        ActivityConnection MapToEntity(ConnectionDefinitionModel model);
         ActivityDefinition MapToModel(Activity entity);
-
-        ConnectionDefinition MapToModel(ActivityConnection entity);
-
-        Elsa.Models.Bookmark MapToModel(Common.Bookmark entity);
-
-        Elsa.Models.Trigger MapToModel(Common.Trigger entity);
-
-        Elsa.Models.WorkflowDefinition MapToModel(WorkflowDefinitionVersion entity);
-
-        WorkflowExecutionLogRecord MapToModel(WorkflowExecutionLog entity);
-
-        Elsa.Models.WorkflowInstance MapToModel(Common.WorkflowInstance entity);
+        Bookmark MapToEntity(BookmarkModel model);
+        Bookmark MapToEntity(BookmarkModel model, Bookmark entity);
+        BookmarkModel MapToModel(Bookmark entity);
+        ConnectionDefinitionModel MapToModel(ActivityConnection entity);
+        Trigger MapToEntity(TriggerModel model);
+        Trigger MapToEntity(TriggerModel model, Trigger entity);
+        TriggerModel MapToModel(Trigger entity);
+        WorkflowDefinitionModel MapToModel(WorkflowDefinitionVersion entity, WorkflowDefinition definition);
+        WorkflowDefinitionVersion MapToEntity(WorkflowDefinitionModel model);
+        WorkflowDefinitionVersion MapToEntity(WorkflowDefinitionModel model, WorkflowDefinitionVersion entity);
+        WorkflowExecutionLog MapToEntity(WorkflowExecutionLogRecordModel model);
+        WorkflowExecutionLog MapToEntity(WorkflowExecutionLogRecordModel model, WorkflowExecutionLog entity);
+        WorkflowExecutionLogRecordModel MapToModel(WorkflowExecutionLog entity);
+        WorkflowInstance MapToEntity(WorkflowInstanceModel model);
+        WorkflowInstance MapToEntity(WorkflowInstanceModel model, WorkflowInstance entity);
+        WorkflowInstanceModel MapToModel(WorkflowInstance entity);
     }
 }

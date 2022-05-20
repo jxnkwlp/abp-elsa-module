@@ -29,7 +29,7 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
 
         CreateMap<WorkflowDefinitionVersionCreateOrUpdateDto, WorkflowDefinitionVersion>()
             .Ignore(x => x.TenantId)
-            .Ignore(x => x.Definition)
+            //.Ignore(x => x.Definition)
             .Ignore(x => x.DefinitionId)
             .Ignore(x => x.Id)
             .Ignore(x => x.IsLatest)
@@ -39,7 +39,8 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
 
         CreateMap<WorkflowDefinitionVersion, WorkflowDefinitionVersionListItemDto>();
         CreateMap<WorkflowDefinition, WorkflowDefinitionDto>();
-        CreateMap<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>();
+        CreateMap<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>()
+            .Ignore(x => x.Definition);
 
         CreateMap<ActivityCreateOrUpdateDto, Activity>()
             .Ignore(x => x.DefinitionVersionId)

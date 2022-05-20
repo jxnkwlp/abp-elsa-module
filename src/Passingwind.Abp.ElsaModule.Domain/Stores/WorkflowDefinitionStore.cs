@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 using Elsa.Persistence;
 using Elsa.Persistence.Specifications;
@@ -26,20 +24,6 @@ namespace Passingwind.Abp.ElsaModule.Stores
             _storeMapper = storeMapper;
         }
 
-        public override async Task<IEnumerable<WorkflowDefinitionModel>> FindManyAsync(ISpecification<WorkflowDefinitionModel> specification, IOrderBy<WorkflowDefinitionModel> orderBy = null, IPaging paging = null, CancellationToken cancellationToken = default)
-        {
-            var result = await base.FindManyAsync(specification, orderBy, paging, cancellationToken);
-
-            return result;
-        }
-
-        public override async Task<WorkflowDefinitionModel> FindAsync(ISpecification<WorkflowDefinitionModel> specification, CancellationToken cancellationToken = default)
-        {
-            var result = await base.FindAsync(specification, cancellationToken);
-
-            return result;
-        }
-
         protected override Task<WorkflowDefinitionVersion> MapToEntityAsync(WorkflowDefinitionModel model)
         {
             throw new NotImplementedException();
@@ -54,11 +38,13 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         protected override async Task<WorkflowDefinitionModel> MapToModelAsync(WorkflowDefinitionVersion entity)
         {
-            await Repository.EnsurePropertyLoadedAsync(entity, x => x.Definition);
-            return _storeMapper.MapToModel(entity);
+            var definitionId = entity.DefinitionId;
+            var definition = await _workflowDefinitionRepository.GetAsync(definitionId);
+
+            return _storeMapper.MapToModel(entity, definition);
         }
 
-        protected override Expression<Func<WorkflowDefinitionVersion, bool>> MapSpecification(ISpecification<WorkflowDefinitionModel> specification)
+        protected override async Task<Expression<Func<WorkflowDefinitionVersion, bool>>> MapSpecificationAsync(ISpecification<WorkflowDefinitionModel> specification)
         {
             if (specification is LatestOrPublishedWorkflowDefinitionIdSpecification latestOrPublishedWorkflowDefinitionIdSpecification)
             {
@@ -74,7 +60,9 @@ namespace Passingwind.Abp.ElsaModule.Stores
             }
             else if (specification is ManyWorkflowDefinitionNamesSpecification manyWorkflowDefinitionNamesSpecification)
             {
-                return x => manyWorkflowDefinitionNamesSpecification.Names.Contains(x.Definition.Name);
+                var ids = await _workflowDefinitionRepository.GetIdsByNamesAsync(manyWorkflowDefinitionNamesSpecification.Names);
+
+                return x => ids.Contains(x.Id);
             }
             else if (specification is ManyWorkflowDefinitionVersionIdsSpecification manyWorkflowDefinitionVersionIdsSpecification)
             {
@@ -98,8 +86,9 @@ namespace Passingwind.Abp.ElsaModule.Stores
             else if (specification is WorkflowDefinitionNameSpecification workflowDefinitionNameSpecification)
             {
                 var tenantId = workflowDefinitionNameSpecification.TenantId.ToGuid();
+                var id = await _workflowDefinitionRepository.GetIdByNameAsync(workflowDefinitionNameSpecification.Name);
 
-                Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => x.Definition.Name == workflowDefinitionNameSpecification.Name && x.TenantId == tenantId;
+                Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => x.Id == id && x.TenantId == tenantId;
 
                 return expression.WithVersion(workflowDefinitionNameSpecification.VersionOptions);
             }
@@ -107,7 +96,9 @@ namespace Passingwind.Abp.ElsaModule.Stores
             {
                 var tenantId = workflowDefinitionTagSpecification.TenantId.ToGuid();
 
-                Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => x.Definition.Tag == workflowDefinitionTagSpecification.Tag && x.TenantId == tenantId;
+                var id = await _workflowDefinitionRepository.GetIdByTagAsync(workflowDefinitionTagSpecification.Tag);
+
+                Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => x.Id == id && x.TenantId == tenantId;
 
                 return expression.WithVersion(workflowDefinitionTagSpecification.VersionOptions);
             }
@@ -116,7 +107,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 return x => x.Id == Guid.Parse(workflowDefinitionVersionIdSpecification.VersionId);
             }
             else
-                return base.MapSpecification(specification);
+                return await base.MapSpecificationAsync(specification);
         }
 
         protected override Guid ConvertKey(string value)

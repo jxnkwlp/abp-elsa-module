@@ -49,7 +49,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             return Task.FromResult(_storeMapper.MapToModel(entity));
         }
 
-        protected override Expression<Func<WorkflowInstance, bool>> MapSpecification(ISpecification<WorkflowInstanceModel> specification)
+        protected override async Task<Expression<Func<WorkflowInstance, bool>>> MapSpecificationAsync(ISpecification<WorkflowInstanceModel> specification)
         {
             if (specification is CorrelationIdsSpecification correlationIdsSpecification)
             {
@@ -141,10 +141,10 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 var left = andSpecification.Left;
                 var right = andSpecification.Right;
 
-                return MapSpecification(left).And(MapSpecification(right));
+                return (await MapSpecificationAsync(left)).And(await MapSpecificationAsync(right));
             }
             else
-                return base.MapSpecification(specification);
+                return await base.MapSpecificationAsync(specification);
         }
 
         protected override Guid ConvertKey(string value)

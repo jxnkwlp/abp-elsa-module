@@ -19,13 +19,15 @@ namespace Passingwind.Abp.ElsaModule.Designer
         private readonly ITypeScriptDefinitionService _typeScriptDefinitionService;
         private readonly IStoreMapper _storeMapper;
         private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
+        private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
 
-        public DesignerAppService(IActivityTypeService activityTypeService, ITypeScriptDefinitionService typeScriptDefinitionService, IStoreMapper storeMapper, IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository)
+        public DesignerAppService(IActivityTypeService activityTypeService, ITypeScriptDefinitionService typeScriptDefinitionService, IStoreMapper storeMapper, IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository, IWorkflowDefinitionRepository workflowDefinitionRepository)
         {
             _activityTypeService = activityTypeService;
             _typeScriptDefinitionService = typeScriptDefinitionService;
             _storeMapper = storeMapper;
             _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
+            _workflowDefinitionRepository = workflowDefinitionRepository;
         }
 
         public async Task<ActivityTypeDescriptorListResultDto> GetActivityTypesAsync()
@@ -47,9 +49,10 @@ namespace Passingwind.Abp.ElsaModule.Designer
 
         public async Task<IRemoteStreamContent> GetScriptTypeDefinitionAsync(Guid id)
         {
-            var definition = await _workflowDefinitionVersionRepository.GetLatestAsync(id);
+            var version = await _workflowDefinitionVersionRepository.GetLatestAsync(id);
+            var definition = await _workflowDefinitionRepository.GetAsync(version.DefinitionId);
 
-            var workflowDefinition = _storeMapper.MapToModel(definition);
+            var workflowDefinition = _storeMapper.MapToModel(version, definition);
 
             var typeDefinitions = await _typeScriptDefinitionService.GenerateTypeScriptDefinitionsAsync(workflowDefinition);
 
@@ -59,5 +62,6 @@ namespace Passingwind.Abp.ElsaModule.Designer
 
             return new RemoteStreamContent(new MemoryStream(data), fileName, "application/x-typescript");
         }
+
     }
 }

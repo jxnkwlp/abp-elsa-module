@@ -64,8 +64,6 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.HasIndex(x => new { x.DefinitionId, x.Version });
 
-            b.HasOne(x => x.Definition).WithMany().HasForeignKey(x => x.DefinitionId);
-
             b.HasMany(x => x.Activities).WithOne().HasForeignKey(x => x.DefinitionVersionId);
             b.HasMany(x => x.Connections).WithOne().HasForeignKey(x => x.DefinitionVersionId);
         });

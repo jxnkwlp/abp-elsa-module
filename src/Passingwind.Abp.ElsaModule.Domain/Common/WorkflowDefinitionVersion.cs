@@ -23,7 +23,7 @@ public class WorkflowDefinitionVersion : FullAuditedEntity<Guid>, IMultiTenant
         Connections = connections;
     }
 
-    public WorkflowDefinition Definition { get; set; }
+    // public WorkflowDefinition Definition { get; set; }
 
     public Guid DefinitionId { get; protected set; }
 

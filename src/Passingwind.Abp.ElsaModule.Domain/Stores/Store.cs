@@ -56,7 +56,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task<int> CountAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
         {
-            var expression = MapSpecification(specification);
+            var expression = await MapSpecificationAsync(specification);
             return await Repository.CountAsync(expression, cancellationToken);
         }
 
@@ -70,7 +70,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task<int> DeleteManyAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
         {
-            var expression = MapSpecification(specification);
+            var expression = await MapSpecificationAsync(specification);
             var count = await Repository.CountAsync(expression, cancellationToken);
             await Repository.DeleteAsync(expression, true, cancellationToken);
 
@@ -79,7 +79,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task<TModel> FindAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
         {
-            var expression = MapSpecification(specification);
+            var expression = await MapSpecificationAsync(specification);
             var entity = await Repository.FindAsync(expression, true, cancellationToken);
 
             if (entity == null)
@@ -91,9 +91,10 @@ namespace Passingwind.Abp.ElsaModule.Stores
             return await MapToModelAsync(entity);
         }
 
+        [UnitOfWork]
         public virtual async Task<IEnumerable<TModel>> FindManyAsync(ISpecification<TModel> specification, IOrderBy<TModel> orderBy = null, IPaging paging = null, CancellationToken cancellationToken = default)
         {
-            var filter = MapSpecification(specification);
+            var filter = await MapSpecificationAsync(specification).ConfigureAwait(false);
 
             var query = await Repository.WithDetailsAsync();
 
@@ -104,9 +105,16 @@ namespace Passingwind.Abp.ElsaModule.Stores
             if (paging != null)
                 query = query.OrderByDescending(x => x.Id).Skip(paging.Skip).Take(paging.Take);
 
-            var list = await AsyncQueryableExecuter.ToListAsync(query, cancellationToken);
+            var list = await AsyncQueryableExecuter.ToListAsync(query, cancellationToken).ConfigureAwait(false);
 
-            return await Task.WhenAll(list.Select(async x => await MapToModelAsync(x)));
+            var result = new List<TModel>();
+
+            foreach (var item in list)
+            {
+                result.Add(await MapToModelAsync(item));
+            }
+
+            return result;
         }
 
         public virtual async Task SaveAsync(TModel model, CancellationToken cancellationToken = default)
@@ -157,7 +165,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
         }
 
 
-        protected virtual Expression<Func<TEntity, bool>> MapSpecification(ISpecification<TModel> specification)
+        protected virtual async Task<Expression<Func<TEntity, bool>>> MapSpecificationAsync(ISpecification<TModel> specification)
         {
             // TODO auto mapper
 
@@ -169,14 +177,14 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 var left = leftField.GetValue(specification) as ISpecification<TModel>;
                 var right = rightField.GetValue(specification) as ISpecification<TModel>;
 
-                return MapSpecification(left).Or(MapSpecification(right));
+                return (await MapSpecificationAsync(left)).Or(await MapSpecificationAsync(right));
             }
             else if (specification is AndSpecification<TModel> andSpecification)
             {
                 var left = andSpecification.Left;
                 var right = andSpecification.Right;
 
-                return MapSpecification(left).And(MapSpecification(right));
+                return (await MapSpecificationAsync(left)).And(await MapSpecificationAsync(right));
             }
             else if (specification is NotSpecification<TModel> notSpecification)
             {
@@ -184,15 +192,16 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
                 if (_notSpecificationCache.ContainsKey(notSpecification.GetType()))
                 {
-                    expression = MapSpecification(_notSpecificationCache[notSpecification.GetType()]);
+                    expression = await MapSpecificationAsync(_notSpecificationCache[notSpecification.GetType()]);
                 }
                 else
                 {
+                    // TODO
                     var sp = notSpecification.GetType().GetField("_specification", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).GetValue(notSpecification) as ISpecification<TModel>;
 
                     _notSpecificationCache[notSpecification.GetType()] = sp;
 
-                    expression = MapSpecification(sp);
+                    expression = await MapSpecificationAsync(sp);
                 }
 
                 return Expression.Lambda<Func<TEntity, bool>>(Expression.Not(expression.Body), new ParameterExpression[1]

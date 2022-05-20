@@ -46,12 +46,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
             }
         }
 
-        public virtual WorkflowDefinitionModel MapToModel(WorkflowDefinitionVersion entity)
+        public virtual WorkflowDefinitionModel MapToModel(WorkflowDefinitionVersion entity, WorkflowDefinition definition)
         {
-            var definition = entity.Definition;
-            if (definition == null)
-                throw new Exception($"The WorkflowDefinitionVersion '{entity.Id}' definition is null");
-
             var model = new WorkflowDefinitionModel
             {
                 DefinitionId = definition.Id.ToString(),

@@ -14,6 +14,10 @@ namespace Passingwind.Abp.ElsaModule.Common
         Task<List<WorkflowDefinitionVersion>> GetPagedListAsync(int skipCount, int maxResultCount, Expression<Func<WorkflowDefinitionVersion, bool>> expression, string sorting, bool includeDetails = false, CancellationToken cancellationToken = default);
 
         Task<WorkflowDefinitionVersion> GetLatestAsync(Guid definitionId, bool includeDetails = true, CancellationToken cancellationToken = default);
+
+        Task<WorkflowDefinitionVersion> GetByVersionAsync(Guid definitionId, int version, bool includeDetails = true, CancellationToken cancellationToken = default);
+
+        Task<WorkflowDefinitionVersion> FindByVersionAsync(Guid definitionId, int version, bool includeDetails = true, CancellationToken cancellationToken = default);
     }
 
 }
