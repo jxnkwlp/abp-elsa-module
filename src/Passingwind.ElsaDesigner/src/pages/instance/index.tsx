@@ -1,5 +1,6 @@
 import { WorkflowStatus } from '@/services/enums';
 import {
+    deleteWorkflowInstance,
     getWorkflowInstanceList,
     workflowInstanceCancel,
     workflowInstanceRetry,
@@ -31,7 +32,7 @@ const Index: React.FC = () => {
                 return (
                     <Link
                         to={{
-                            pathname: `/instance/${record.id}`,
+                            pathname: `/instances/${record.id}`,
                             state: {
                                 id: record.id,
                             },
@@ -115,47 +116,83 @@ const Index: React.FC = () => {
             valueType: 'option',
             width: 200,
             align: 'center',
-            render: (text, record, _, action) => [
-                <a
-                    key="cancel"
-                    onClick={() => {
-                        Modal.confirm({
-                            title: 'Are you sure to cancel this instance?',
-                            content:
-                                'This operation will cancel the instance and all the tasks in it.',
-                            onOk: async () => {
-                                const result = await workflowInstanceCancel(record.id!);
-                                if (result?.response?.ok) {
-                                    message.success('Canceled successfully');
-                                    action?.reload();
-                                }
-                            },
-                        });
-                    }}
-                >
-                    {(record.workflowStatus == WorkflowStatus.Idle ||
-                        record.workflowStatus == WorkflowStatus.Running ||
-                        record.workflowStatus == WorkflowStatus.Suspended) && <span>Cancel</span>}
-                </a>,
-                <a
-                    key="retry"
-                    onClick={() => {
-                        Modal.confirm({
-                            title: 'Are you sure to retry this instance?',
-                            content: 'This operation will retry the instance.',
-                            onOk: async () => {
-                                const result = await workflowInstanceRetry(record.id!, {});
-                                if (result?.response?.ok) {
-                                    message.success('Retried successfully');
-                                    action?.reload();
-                                }
-                            },
-                        });
-                    }}
-                >
-                    {record.workflowStatus == WorkflowStatus.Faulted && <span>Retry</span>}
-                </a>,
-            ],
+            render: (text, record, _, action) => {
+                const menus = [];
+
+                if (
+                    record.workflowStatus == WorkflowStatus.Idle ||
+                    record.workflowStatus == WorkflowStatus.Running ||
+                    record.workflowStatus == WorkflowStatus.Suspended
+                ) {
+                    menus.push(
+                        <a
+                            key="cancel"
+                            onClick={() => {
+                                Modal.confirm({
+                                    title: 'Are you sure to cancel this instance?',
+                                    content:
+                                        'This operation will cancel the instance and all the tasks in it.',
+                                    onOk: async () => {
+                                        const result = await workflowInstanceCancel(record.id!);
+                                        if (result?.response?.ok) {
+                                            message.success('Canceled successfully');
+                                            action?.reload();
+                                        }
+                                    },
+                                });
+                            }}
+                        >
+                            <span>Cancel</span>
+                        </a>,
+                    );
+                }
+
+                if (record.workflowStatus == WorkflowStatus.Faulted) {
+                    menus.push(
+                        <a
+                            key="retry"
+                            onClick={() => {
+                                Modal.confirm({
+                                    title: 'Are you sure to retry this instance?',
+                                    content: 'This operation will retry the instance.',
+                                    onOk: async () => {
+                                        const result = await workflowInstanceRetry(record.id!, {});
+                                        if (result?.response?.ok) {
+                                            message.success('Retried successfully');
+                                            action?.reload();
+                                        }
+                                    },
+                                });
+                            }}
+                        >
+                            <span>Retry</span>
+                        </a>,
+                    );
+                }
+
+                menus.push(
+                    <a
+                        key="delete"
+                        onClick={() => {
+                            Modal.confirm({
+                                title: 'Are you sure to delete this instance?',
+                                content: 'This operation will delete the instance.',
+                                onOk: async () => {
+                                    const result = await deleteWorkflowInstance(record.id!);
+                                    if (result?.response?.ok) {
+                                        message.success('Deleted successfully');
+                                        action?.reload();
+                                    }
+                                },
+                            });
+                        }}
+                    >
+                        <span>Delete</span>
+                    </a>,
+                );
+
+                return menus;
+            },
         },
     ];
 

@@ -22,6 +22,6 @@ namespace Passingwind.Abp.ElsaModule.Workflow
 
         public List<ActivityDefinitionProperty> Properties { get; set; }
 
-        // public Dictionary<string, string> PropertyStorageProviders { get; set; }
+        public Dictionary<string, string> PropertyStorageProviders { get; set; }
     }
 }

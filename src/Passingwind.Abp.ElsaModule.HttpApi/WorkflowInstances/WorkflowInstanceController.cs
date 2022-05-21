@@ -18,10 +18,22 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
             _service = service;
         }
 
+        [HttpDelete]
+        public Task BatchDeleteAsync([FromBody] WorkflowInstancesBatchDeleteRequestDto input)
+        {
+            return _service.BatchDeleteAsync(input);
+        }
+
         [HttpPost("{id}/cancel")]
         public Task CancelAsync(Guid id)
         {
             return _service.CancelAsync(id);
+        }
+
+        [HttpDelete("{id}")]
+        public Task DeleteAsync(Guid id)
+        {
+            return _service.DeleteAsync(id);
         }
 
         [HttpPost("{id}/dispatch")]

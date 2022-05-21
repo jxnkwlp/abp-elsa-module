@@ -1,7 +1,9 @@
 import { ShowDownloadJsonFile } from '@/services/utils';
 import {
     createWorkflowDefinition,
+    deleteWorkflowDefinitionVersion,
     getWorkflowDefinition,
+    getWorkflowDefinitionPreviousVersion,
     getWorkflowDefinitionVersion,
     getWorkflowDefinitionVersions,
     updateWorkflowDefinition,
@@ -21,6 +23,7 @@ import {
     Menu,
     message,
     Modal,
+    Popconfirm,
     Row,
     Spin,
     Tag,
@@ -30,6 +33,7 @@ import {
 import type { RcFile } from 'antd/lib/upload';
 import { isArray } from 'lodash';
 import React, { useEffect, useRef } from 'react';
+import { MonacoDiffEditor } from 'react-monaco-editor';
 import { useHistory, useLocation } from 'umi';
 import EditFormItems from '../definition/edit-form-items';
 import type { FlowActionType } from './flow';
@@ -83,7 +87,14 @@ const Index: React.FC = () => {
     const [editNodeFormData, setEditNodeFormData] = React.useState<NodeEditFormData>();
     const [editNodeFormRef] = Form.useForm();
 
+    const [editForm] = Form.useForm();
+
     const [versionListModalVisible, setVersionListModalVisible] = React.useState<boolean>(false);
+
+    const [versionDiffModalTitle, setVersionDiffModalTitle] = React.useState<string>('Diff');
+    const [versionDiffModalVisible, setVersionDiffModalVisible] = React.useState<boolean>(false);
+    const [versionDiffData, setVersionDiffData] =
+        React.useState<{ source: string; target: string }>();
 
     const loadServerData = async (
         definiton: API.WorkflowDefinitionVersion,
@@ -122,12 +133,14 @@ const Index: React.FC = () => {
             const result2 = conventToServerData(result);
             ShowDownloadJsonFile(
                 `${definition.name}-${version}.json`,
-                JSON.stringify({
-                    ...result2,
-                    name: definition.name,
-                    displayName: definition.displayName,
-                    version: version,
-                }),
+                JSON.stringify(
+                    {
+                        ...result2,
+                        ...definition,
+                    },
+                    null,
+                    2,
+                ),
             );
         } else {
             message.error('Get graph data failed');
@@ -165,7 +178,7 @@ const Index: React.FC = () => {
     const handleOnShowNodeEditForm = async (nodeConfig: Node.Properties, node: Node) => {
         const loading2 = message.loading('Loading....');
         //
-        setNodeTypePropFormTitle(`Properties - ${nodeConfig.displayName} (${nodeConfig.type})`);
+        setNodeTypePropFormTitle(`Settings - ${nodeConfig.type} - ${nodeConfig.displayName} `);
 
         setEditNodeId(node.id);
 
@@ -192,6 +205,7 @@ const Index: React.FC = () => {
 
         // build node edit data
         const nodeData: NodeEditFormData = {
+            ...(node.getData() ?? {}),
             name: node.getProp('name') ?? '',
             displayName: node.getProp('displayName') ?? '',
             description: node.getProp('description') ?? '',
@@ -247,7 +261,7 @@ const Index: React.FC = () => {
 
         // property
         const sourceProperties = (node.getProp('properties') ?? []) as NodeUpdatePropData[];
-        console.debug('sourceProperties: ', sourceProperties);
+        console.debug('activity properties source : ', sourceProperties);
 
         // load form data and overwrite
         sourceProperties.forEach((item) => {
@@ -319,12 +333,15 @@ const Index: React.FC = () => {
     const handleUpdateNodeProperties = async (formData: NodeEditFormData) => {
         console.debug('save form data: ', formData);
         const result: NodeUpdateData = {
+            ...formData,
             name: formData.name,
             displayName: formData.displayName,
             description: formData.description,
             properties: [],
             outcomes: [],
+            attribtues: formData,
         };
+
         if (formData.props) {
             // as default, one syntax map one expressions key value
             // if not, use expressions first key as syntax and use expressions first value as value
@@ -477,6 +494,42 @@ const Index: React.FC = () => {
         setEditModalVisible(true);
     };
 
+    const handleVersionComparison = async (
+        sourceVersionNumber: number,
+        targetVersionNumber?: number,
+    ) => {
+        const loading = message.loading('Loading ... ');
+
+        const sourceVersion = await getWorkflowDefinitionVersion(id!, sourceVersionNumber);
+        let targetVersion: API.WorkflowDefinitionVersion | undefined = undefined;
+        if (targetVersionNumber) {
+            targetVersion = await getWorkflowDefinitionVersion(id!, targetVersionNumber);
+        } else {
+            targetVersion = await getWorkflowDefinitionPreviousVersion(id!, sourceVersionNumber);
+        }
+
+        if (!targetVersion) {
+            message.error('The comparison version not found.');
+            return;
+        }
+
+        setVersionDiffData({
+            source: JSON.stringify(
+                { activities: sourceVersion.activities, connections: sourceVersion.connections },
+                null,
+                2,
+            ),
+            target: JSON.stringify(
+                { activities: targetVersion.activities, connections: targetVersion.connections },
+                null,
+                2,
+            ),
+        });
+        setVersionDiffModalTitle(`Comparison ${sourceVersionNumber} and ${targetVersion.version}`);
+        setVersionDiffModalVisible(true);
+        loading();
+    };
+
     const loadData = async (did: string, version?: number) => {
         setLoading(true);
         let definitonVersion: API.WorkflowDefinitionVersion;
@@ -574,6 +627,11 @@ const Index: React.FC = () => {
                                 // icon={<SettingOutlined />}
                                 onClick={() => {
                                     setEditModalTitle('Edit');
+                                    setDefinition({
+                                        ...definition,
+                                        // @ts-ignore
+                                        variablesString: JSON.stringify(definition.variables ?? {}),
+                                    });
                                     setEditModalVisible(true);
                                 }}
                                 overlay={
@@ -625,6 +683,7 @@ const Index: React.FC = () => {
             </Card>
             {/*  */}
             <ModalForm
+                form={editForm}
                 layout="horizontal"
                 preserve={false}
                 labelCol={{ span: 5 }}
@@ -635,8 +694,20 @@ const Index: React.FC = () => {
                 initialValues={definition}
                 onVisibleChange={setEditModalVisible}
                 onFinish={async (formData) => {
-                    setDefinition({ ...definition, ...formData });
+                    setDefinition({
+                        ...definition,
+                        ...formData,
+                        // @ts-ignore
+                        variables: JSON.parse(formData.variablesString ?? '{}'),
+                    });
                     return true;
+                }}
+                onValuesChange={(value) => {
+                    if (value.displayName) {
+                        editForm.setFieldsValue({
+                            name: value.displayName?.replaceAll(' ', '-'),
+                        });
+                    }
                 }}
             >
                 <EditFormItems />
@@ -686,7 +757,7 @@ const Index: React.FC = () => {
                 destroyOnClose
                 visible={versionListModalVisible}
                 onCancel={() => setVersionListModalVisible(false)}
-                width={650}
+                width={680}
                 onOk={() => {
                     if (oldVersion) {
                         setVersionListModalVisible(false);
@@ -697,7 +768,7 @@ const Index: React.FC = () => {
                     }
                 }}
             >
-                <ProTable
+                <ProTable<API.WorkflowDefinitionVersionListItem>
                     search={false}
                     toolBarRender={false}
                     rowKey="version"
@@ -723,6 +794,65 @@ const Index: React.FC = () => {
                             align: 'center',
                             renderText: (_, record) => {
                                 return record.lastModificationTime ?? record.creationTime;
+                            },
+                        },
+                        {
+                            title: 'Comparison',
+                            dataIndex: 'Comparison',
+                            width: 120,
+                            align: 'center',
+                            render: (_, record) => {
+                                return (
+                                    <>
+                                        <a
+                                            onClick={() => {
+                                                handleVersionComparison(record.version!, version);
+                                            }}
+                                        >
+                                            Latest
+                                        </a>
+                                        <br />
+                                        <a
+                                            onClick={() => {
+                                                handleVersionComparison(record.version!);
+                                            }}
+                                        >
+                                            Previous
+                                        </a>
+                                    </>
+                                );
+                            },
+                        },
+                        {
+                            title: 'Action',
+                            valueType: 'option',
+                            width: 80,
+                            align: 'center',
+                            render: (text, record, _, action) => {
+                                return (
+                                    <Popconfirm
+                                        title="Are you sure?"
+                                        onConfirm={async () => {
+                                            if (record.isPublished || record.isLatest) {
+                                                message.error(
+                                                    'Cannot delete published or latest version',
+                                                );
+                                            } else {
+                                                const result =
+                                                    await deleteWorkflowDefinitionVersion(
+                                                        id!,
+                                                        record.version!,
+                                                    );
+
+                                                if (result?.response?.ok) {
+                                                    action?.reload();
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <a>Delete</a>
+                                    </Popconfirm>
+                                );
                             },
                         },
                     ]}
@@ -759,6 +889,28 @@ const Index: React.FC = () => {
                                 success: false,
                             };
                         }
+                    }}
+                />
+            </Modal>
+
+            <Modal
+                title={versionDiffModalTitle}
+                visible={versionDiffModalVisible}
+                onCancel={() => setVersionDiffModalVisible(false)}
+                footer={false}
+                width="90%"
+                destroyOnClose
+            >
+                <MonacoDiffEditor
+                    height="600"
+                    language="json"
+                    original={versionDiffData?.source}
+                    value={versionDiffData?.target}
+                    options={{
+                        automaticLayout: true,
+                        autoIndent: 'keep',
+                        autoClosingBrackets: 'languageDefined',
+                        foldingStrategy: 'auto',
                     }}
                 />
             </Modal>

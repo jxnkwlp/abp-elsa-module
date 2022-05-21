@@ -60,9 +60,6 @@ public class WorkflowDefinition : FullAuditedEntity<Guid>, IMultiTenant
 
     public Dictionary<string, object> CustomAttributes { get; set; }
 
-    // public List<WorkflowDefinitionVersion> Versions { get; set; }
-
-
     public void SetVersion(int latestVersion, int? publishedVersion)
     {
         LatestVersion = latestVersion;

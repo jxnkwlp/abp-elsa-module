@@ -100,5 +100,12 @@ namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions
         {
             return _service.DispatchAsync(id, input);
         }
+
+        [HttpGet("{id}/versions/{version}/previous-version")]
+        public Task<WorkflowDefinitionVersionDto> GetPreviousVersionAsync(Guid id, int version)
+        {
+            return _service.GetPreviousVersionAsync(id, version);
+        }
+
     }
 }

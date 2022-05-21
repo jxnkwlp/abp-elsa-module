@@ -19,5 +19,7 @@ namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions
 
         Task ExecuteAsync(Guid id, WorkflowDefinitionExecuteRequestDto input);
         Task<WorkflowDefinitionDispatchResultDto> DispatchAsync(Guid id, WorkflowDefinitionDispatchRequestDto input);
+
+        Task<WorkflowDefinitionVersionDto> GetPreviousVersionAsync(Guid id, int version);
     }
 }

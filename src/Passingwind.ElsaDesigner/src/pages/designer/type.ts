@@ -66,7 +66,7 @@ export type NodeEditFormData = {
     displayName: string;
     description?: string;
     props: NodeEditFormPropData;
-    attribtues?: Record<string, any>;
+    // attribtues?: Record<string, any>;
     [key: string]: any;
 };
 

@@ -10,7 +10,7 @@ namespace EcsShop.EntityFrameworkCore
 {
     public class ElsaEFJsonValueConverter<TModel> : ValueConverter<TModel, string>
     {
-        public static Func<JsonSerializerSettings> Create { get; set; }
+        public static Func<JsonSerializerSettings> Create;
 
         static ElsaEFJsonValueConverter()
         {

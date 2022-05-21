@@ -82,7 +82,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.Property(x => x.Properties).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.ActivityDefinitionProperty>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ActivityDefinitionProperty>), false));
             b.Property(x => x.Arrtibutes).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
-            // b.Property(x => x.PropertyStorageProviders).HasConversion(new JsonValueConverter<Dictionary<string, string>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, string>), false));
+            b.Property(x => x.PropertyStorageProviders).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, string>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, string>), false));
         });
 
         builder.Entity<ActivityConnection>(b =>

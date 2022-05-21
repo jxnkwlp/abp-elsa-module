@@ -8,13 +8,13 @@
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/abp/application-configuration
+ * *TODO* GET /api/workflows/storage-providers
  * 
  **/
-export async function getAbpApplicationConfiguration(
+export async function getWorkflowStorageProviders(
     options?: { [key: string]: any }
 ) {
-    return request<API.ApplicationConfiguration>(`/api/abp/application-configuration`, {
+    return request<API.WorkflowStorageProviderInfoListResult>(`/api/workflows/storage-providers`, {
         method: 'GET',
         ...(options || {}),
     });

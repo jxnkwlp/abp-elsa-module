@@ -1,18 +1,16 @@
+import { getWorkflowStorageProviders } from '@/services/Workflow';
 import ProForm, {
-    ModalForm,
     ProFormCheckbox,
     ProFormDependency,
     ProFormGroup,
-    ProFormList,
     ProFormSelect,
     ProFormSwitch,
     ProFormText,
     ProFormTextArea,
 } from '@ant-design/pro-form';
-import { Button, Card, Col, Form, Row, Tabs } from 'antd';
+import { Col, Divider, Row, Tabs } from 'antd';
 import type { NamePath } from 'antd/lib/form/interface';
 import React, { useEffect, useMemo } from 'react';
-import MonacoEditor from 'react-monaco-editor';
 import CaseEditorInput from './form-input/case-editor-builder-input';
 import MonacorEditorInput from './form-input/monacor-editor-input';
 import {
@@ -38,6 +36,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
     const { properties } = props;
 
     const [tabKey, setTabKey] = React.useState<string>('1');
+    const [storageProviders, setStorageProviders] = React.useState<any[]>([]);
 
     useEffect(() => {
         if (properties.length > 0) {
@@ -49,6 +48,11 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
         if (!props.workflowDefinitionId) return '';
         const result = await getEditorScriptDefinitonsContent(props.workflowDefinitionId);
         return result;
+    };
+
+    const loadStorageProviders = async () => {
+        const result = await getWorkflowStorageProviders();
+        setStorageProviders(result?.items ?? []);
     };
 
     const renderItemInput = (
@@ -298,6 +302,10 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
         [props.properties, renderFormItems],
     );
 
+    useEffect(() => {
+        loadStorageProviders();
+    }, []);
+
     return (
         <>
             <Tabs defaultActiveKey={tabKey} type="line" style={{ width: '100%', flex: 1 }}>
@@ -312,19 +320,74 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         <ProFormText
                             label="Name"
                             name="name"
-                            rules={[{ required: true }, { max: 32 }]}
+                            rules={[
+                                { required: true },
+                                { max: 32 },
+                                { pattern: /^\w+$/, message: 'Invalid characters' },
+                            ]}
+                            placeholder="The technical name of the activity."
                         />
                         <ProFormText
                             label="Display Name"
                             name="displayName"
                             rules={[{ required: true }, { max: 32 }]}
+                            placeholder="The friendly name of the activity."
                         />
                         <ProFormTextArea
                             label="Description"
                             name="description"
                             rules={[{ max: 128 }]}
                             fieldProps={{ autoSize: { minRows: 2, maxRows: 10 } }}
+                            placeholder="A custom description for this activity."
                         />
+                    </Row>
+                </Tabs.TabPane>
+                <Tabs.TabPane tab="Storage" key="3">
+                    <Row>
+                        <ProFormSwitch
+                            name="loadWorkflowContext"
+                            label="Load Workflow Context"
+                            extra="When enabled, this will load the workflow context into memory before executing this activity."
+                        />
+                        <ProFormSwitch
+                            name="saveWorkflowContext"
+                            label="Save Workflow Context"
+                            extra="When enabled, this will save the workflow context back into storage after executing this activity."
+                        />
+                        <ProFormSwitch
+                            name="persistWorkflow"
+                            label="Save Workflow Instance"
+                            extra="When enabled, this will save the workflow instance back into storage right after executing this activity."
+                        />
+                    </Row>
+                </Tabs.TabPane>
+                <Tabs.TabPane tab="Activity Output" key="4">
+                    <Row>
+                        <ProFormSelect
+                            name={['propertyStorageProviders', 'Output']}
+                            label="Default Storage Provider"
+                            extra="Configure the desired storage for each output property of this activity."
+                            options={[{ label: 'Default', value: '' }].concat(
+                                storageProviders.map((x: any) => {
+                                    return { label: x.displayName, value: x.name };
+                                }),
+                            )}
+                        />
+                        <Divider style={{ marginTop: 0 }} />
+                        {(props.properties ?? []).map((item) => {
+                            return (
+                                <ProFormSelect
+                                    key={'propertyStorageProviders_' + item.name}
+                                    name={['propertyStorageProviders', item.name]}
+                                    label={item.name}
+                                    options={[{ label: 'Default', value: '' }].concat(
+                                        storageProviders.map((x: any) => {
+                                            return { label: x.displayName, value: x.name };
+                                        }),
+                                    )}
+                                />
+                            );
+                        })}
                     </Row>
                 </Tabs.TabPane>
             </Tabs>

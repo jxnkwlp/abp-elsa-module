@@ -4,10 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Elsa;
-using Elsa.Activities.Http;
-using Elsa.Activities.JavaScript;
 using Elsa.Activities.UserTask.Extensions;
-using Elsa.Builders;
+using Elsa.Serialization.Converters;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -268,6 +266,8 @@ public class ElsaModuleHttpApiHostModule : AbpModule
         Configure<MvcNewtonsoftJsonOptions>((options) =>
         {
             options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver() { NamingStrategy = new CamelCaseNamingStrategy(false, true) };
+            options.SerializerSettings.Converters.Add(new VersionOptionsJsonConverter());
+            options.SerializerSettings.Converters.Add(new NewtonsoftJsonTypeJsonConverter());
         });
 
         Configure<AbpSystemTextJsonSerializerOptions>(options =>

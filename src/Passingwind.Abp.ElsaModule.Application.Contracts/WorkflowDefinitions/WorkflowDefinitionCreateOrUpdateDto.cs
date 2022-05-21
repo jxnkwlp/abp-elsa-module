@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Elsa.Models;
 
 namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions
@@ -25,10 +26,8 @@ namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions
 
         public WorkflowPersistenceBehavior PersistenceBehavior { get; set; } = WorkflowPersistenceBehavior.WorkflowBurst;
 
-        //public WorkflowContextOptions ContextOptions { get; set; }
+        public WorkflowContextOptions ContextOptions { get; set; }
 
-        //public string Variables { get; set; }
-
-        //public Variables CustomAttributes { get; set; }
+        public Dictionary<string, object> Variables { get; set; }
     }
 }

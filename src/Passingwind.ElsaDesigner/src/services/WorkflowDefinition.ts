@@ -1,7 +1,7 @@
 /**
- * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
+ * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 14
+ * Total count: 15
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -223,6 +223,20 @@ export async function workflowDefinitionDispatch(
     return request<API.WorkflowDefinitionDispatchResult>(`/api/workflow-definitions/${id}/dispatch`, {
         method: 'POST',
         data: payload,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/workflow-definitions/{id}/versions/{version}/previous-version
+ * 
+ **/
+export async function getWorkflowDefinitionPreviousVersion(
+    id: string,    version: number,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowDefinitionVersion>(`/api/workflow-definitions/${id}/versions/${version}/previous-version`, {
+        method: 'GET',
         ...(options || {}),
     });
 }

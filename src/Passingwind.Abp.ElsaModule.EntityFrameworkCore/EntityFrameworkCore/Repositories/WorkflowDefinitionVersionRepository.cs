@@ -98,5 +98,15 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<int?> GetPreviousVersionNumberAsync(Guid definitionId, int version, CancellationToken cancellationToken = default)
+        {
+            var dbset = await GetDbSetAsync();
+            return await dbset
+                .Where(x => x.DefinitionId == definitionId)
+                .OrderByDescending(x => x.Version)
+                .Where(x => x.Version < version)
+                .Select(x => x.Version)
+                .FirstOrDefaultAsync();
+        }
     }
 }

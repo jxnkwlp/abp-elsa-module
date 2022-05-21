@@ -52,20 +52,20 @@
     {
         name: 'Instances',
         icon: 'table',
-        path: '/instance',
+        path: '/instances',
         component: './instance',
     },
     {
         name: 'Instance Detail',
         icon: 'table',
-        path: '/instance/:id',
+        path: '/instances/:id',
         component: './instance/detail',
         hideInMenu: true,
     },
     {
         name: 'Definitions',
         icon: 'table',
-        path: '/definition',
+        path: '/definitions',
         component: './definition',
     },
     {

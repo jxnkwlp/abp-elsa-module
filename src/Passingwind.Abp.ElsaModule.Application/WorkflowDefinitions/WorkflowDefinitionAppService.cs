@@ -99,6 +99,21 @@ namespace Passingwind.Abp.ElsaModule.Common
             return dto;
         }
 
+        public virtual async Task<WorkflowDefinitionVersionDto> GetPreviousVersionAsync(Guid id, int version)
+        {
+            var entity = await _workflowDefinitionRepository.GetAsync(id);
+            var previousVersion = await _workflowDefinitionVersionRepository.GetPreviousVersionNumberAsync(id, version);
+
+            if (previousVersion.HasValue == false)
+                return null;
+
+            var versionEntity = await _workflowDefinitionVersionRepository.GetByVersionAsync(id, previousVersion.Value);
+
+            var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(versionEntity);
+            dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(entity);
+            return dto;
+        }
+
         public virtual async Task<PagedResultDto<WorkflowDefinitionVersionListItemDto>> GetVersionsAsync(Guid id, WorkflowDefinitionVersionListRequestDto input)
         {
             var count = await _workflowDefinitionVersionRepository.GetCountAsync(x => x.DefinitionId == id);
@@ -121,9 +136,6 @@ namespace Passingwind.Abp.ElsaModule.Common
             {
                 await _workflowDefinitionManager.UnsetPublishedVersionAsync(id);
             }
-
-            // update defintion
-            defintion = ObjectMapper.Map<WorkflowDefinitionCreateOrUpdateDto, WorkflowDefinition>(input.Definition, defintion);
 
             // check version
             if (defintion.PublishedVersion == defintion.LatestVersion)
@@ -169,6 +181,15 @@ namespace Passingwind.Abp.ElsaModule.Common
                 defintion.SetLatestVersion(currentVersion.Version);
 
             // update 
+            defintion.Name = input.Definition.Name;
+            defintion.DisplayName = input.Definition.DisplayName;
+            defintion.Description = input.Definition.Description;
+            defintion.IsSingleton = input.Definition.IsSingleton;
+            defintion.Channel = input.Definition.Channel;
+            defintion.Tag = input.Definition.Tag;
+            defintion.PersistenceBehavior = input.Definition.PersistenceBehavior;
+            defintion.ContextOptions = input.Definition.ContextOptions;
+            defintion.Variables = input.Definition.Variables;
             await _workflowDefinitionRepository.UpdateAsync(defintion);
 
             var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(currentVersion);
@@ -180,7 +201,15 @@ namespace Passingwind.Abp.ElsaModule.Common
         {
             var entity = await _workflowDefinitionRepository.GetAsync(id);
 
-            ObjectMapper.Map<WorkflowDefinitionCreateOrUpdateDto, WorkflowDefinition>(input, entity);
+            entity.Name = input.Name;
+            entity.DisplayName = input.DisplayName;
+            entity.Description = input.Description;
+            entity.IsSingleton = input.IsSingleton;
+            entity.Channel = input.Channel;
+            entity.Tag = input.Tag;
+            entity.PersistenceBehavior = input.PersistenceBehavior;
+            entity.ContextOptions = input.ContextOptions;
+            entity.Variables = input.Variables;
 
             await _workflowDefinitionRepository.UpdateAsync(entity);
 

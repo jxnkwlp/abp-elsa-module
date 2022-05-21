@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Elsa.Services;
 using Passingwind.Abp.ElsaModule.Stores;
@@ -105,6 +106,20 @@ namespace Passingwind.Abp.ElsaModule.Common
             return new PagedResultDto<WorkflowInstanceBasicDto>(count, ObjectMapper.Map<List<WorkflowInstance>, List<WorkflowInstanceBasicDto>>(list));
         }
 
+        public async Task DeleteAsync(Guid id)
+        {
+            await _workflowInstanceRepository.DeleteAsync(id);
+        }
 
+        public async Task BatchDeleteAsync(WorkflowInstancesBatchDeleteRequestDto input)
+        {
+            if (input?.Ids?.Any() == true)
+            {
+                foreach (var id in input.Ids)
+                {
+                    await DeleteAsync(id);
+                }
+            }
+        }
     }
 }

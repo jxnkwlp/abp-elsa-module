@@ -18,6 +18,8 @@ namespace Passingwind.Abp.ElsaModule.Common
         Task<WorkflowDefinitionVersion> GetByVersionAsync(Guid definitionId, int version, bool includeDetails = true, CancellationToken cancellationToken = default);
 
         Task<WorkflowDefinitionVersion> FindByVersionAsync(Guid definitionId, int version, bool includeDetails = true, CancellationToken cancellationToken = default);
+
+        Task<int?> GetPreviousVersionNumberAsync(Guid definitionId, int version, CancellationToken cancellationToken = default);
     }
 
 }

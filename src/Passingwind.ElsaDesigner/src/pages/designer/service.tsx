@@ -349,7 +349,7 @@ export const createEdgeConfig = (config: Edge.Metadata): Edge.Metadata => {
  *  转换为Server数据
  */
 export const conventToServerData = (data: IGraphData) => {
-    console.debug(data);
+    console.debug('graph data: ', data);
     const edges: API.ActivityConnectionCreate[] = data.edges.map((item) => {
         return {
             sourceId: item.source.cell,
@@ -371,6 +371,7 @@ export const conventToServerData = (data: IGraphData) => {
         //     outcomes = ['Done'];
         // }
         return {
+            ...(item.data ?? {}),
             activityId: item.id as string,
             type: item.type,
             name: item.name ?? randString(item.type),
@@ -400,8 +401,9 @@ export const conventToGraphData = async (
     activities.forEach(async (item) => {
         nodes.push(
             createNodeConfig({
+                data: item,
                 shape: 'activity', // TODO
-                id: item.activityId?.toString(),
+                id: item.activityId,
                 // @ts-ignore
                 x: parseInt(item.arrtibutes?.x ?? 0),
                 // @ts-ignore
@@ -444,15 +446,13 @@ export const conventToGraphData = async (
                     id: uuid(),
                     label: item.outcome,
                     outcome: item.outcome,
-                    // source: sourceId,
-                    // target: targetId,
                     source: {
                         cell: sourceId,
-                        port: attr.sourcePort ?? 'bottom',
+                        port: attr?.sourcePort ?? 'bottom',
                     },
                     target: {
                         cell: targetId,
-                        port: attr.targetPort ?? 'top',
+                        port: attr?.targetPort ?? 'top',
                     },
                 } as Edge.Metadata),
             );

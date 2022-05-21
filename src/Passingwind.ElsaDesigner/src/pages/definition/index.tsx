@@ -12,10 +12,11 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import { TableDropdown } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, message, Modal } from 'antd';
+import { Button, Form, message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import { useHistory } from 'umi';
 import EditFormItems from './edit-form-items';
+import { useForm } from 'antd/lib/form/Form';
 
 const handleEdit = async (id: string, data: any) => {
     const response = await updateWorkflowDefinitionDefinition(id, data);
@@ -51,6 +52,8 @@ const Index: React.FC = () => {
     const [dispatchId, setDispatchId] = useState<string>();
 
     // const [searchKey, setSearchKey] = useState<string>();
+
+    const [editForm] = Form.useForm();
 
     const columns: ProColumnType<API.WorkflowDefinition>[] = [
         {
@@ -114,10 +117,14 @@ const Index: React.FC = () => {
                 <a
                     key="edit"
                     onClick={() => {
-                        setEditModalData(record);
+                        setEditModalData(
+                            Object.assign({}, record, {
+                                variablesString: JSON.stringify(record.variables ?? {}),
+                            }),
+                        );
                         setEditModalDataId(record.id);
                         setEditModalVisible(true);
-                        setEditModalTitle(`编辑 ${record.name}`);
+                        setEditModalTitle(`Edit ${record.name}`);
                     }}
                 >
                     Edit
@@ -225,17 +232,33 @@ const Index: React.FC = () => {
             {/*  */}
             <ModalForm
                 layout="horizontal"
+                form={editForm}
                 preserve={false}
                 labelCol={{ span: 5 }}
-                width={600}
+                width={650}
                 labelWrap
                 title={editModalTitle}
                 visible={editModalVisible}
                 modalProps={{ destroyOnClose: true, maskClosable: false }}
                 onVisibleChange={setEditModalVisible}
                 initialValues={editModalData}
+                onValuesChange={(value) => {
+                    if (value.displayName) {
+                        editForm.setFieldsValue({
+                            name: value.displayName?.replaceAll(' ', '-'),
+                        });
+                    }
+                }}
                 onFinish={async (value) => {
-                    const success = await handleEdit(editModalDataId!, value);
+                    const success = await handleEdit(
+                        editModalDataId!,
+                        Object.assign(
+                            {},
+                            editModalData,
+                            { variables: JSON.parse(value.variablesString ?? '{}') },
+                            value,
+                        ),
+                    );
 
                     if (success) {
                         setEditModalVisible(false);
