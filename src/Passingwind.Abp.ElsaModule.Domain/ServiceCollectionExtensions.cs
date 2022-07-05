@@ -9,8 +9,8 @@ namespace Passingwind.Abp.ElsaModule
         public static ElsaOptionsBuilder UseStore(this ElsaOptionsBuilder builder)
         {
             return builder
-                       .UseWorkflowBookmarkTriggerStore(sp => sp.GetRequiredService<TriggerStore>())
-                       .UseWorkflowTriggerStore(sp => sp.GetRequiredService<BookmarkStore>())
+                       .UseTriggerStore(sp => sp.GetRequiredService<TriggerStore>())
+                       .UseBookmarkStore(sp => sp.GetRequiredService<BookmarkStore>())
                        .UseWorkflowDefinitionStore(sp => sp.GetRequiredService<WorkflowDefinitionStore>())
                        .UseWorkflowExecutionLogStore(sp => sp.GetRequiredService<WorkflowExecutionLogStore>())
                        .UseWorkflowInstanceStore(sp => sp.GetRequiredService<WorkflowInstanceStore>())

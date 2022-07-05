@@ -12,8 +12,10 @@ namespace Passingwind.Abp.ElsaModule.Stores
         ILocalEventHandler<EntityCreatedEventData<WorkflowDefinitionVersion>>,
         ILocalEventHandler<EntityUpdatedEventData<WorkflowDefinitionVersion>>,
         ILocalEventHandler<EntityDeletedEventData<WorkflowDefinitionVersion>>,
+        // 
         ILocalEventHandler<EntityUpdatedEventData<WorkflowDefinition>>,
         ILocalEventHandler<EntityDeletedEventData<WorkflowInstance>>,
+        // 
         ITransientDependency
     {
         private readonly IMediator _mediator;
@@ -57,12 +59,12 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public async Task HandleEventAsync(EntityDeletedEventData<WorkflowDefinitionVersion> eventData)
         {
-            await _mediator.Publish(new WorkflowDefinitionDeleted(new Elsa.Models.WorkflowDefinition()
-            {
-                Id = eventData.Entity.Id.ToString(),
-                DefinitionId = eventData.Entity.DefinitionId.ToString(),
-                Version = eventData.Entity.Version
-            }));
+            var definitionId = eventData.Entity.DefinitionId;
+            var definition = await _workflowDefinitionRepository.GetAsync(definitionId);
+
+            var model = _storeMapper.MapToModel(eventData.Entity, definition);
+
+            await _mediator.Publish(new WorkflowDefinitionDeleted(model));
         }
 
         public async Task HandleEventAsync(EntityDeletedEventData<WorkflowInstance> eventData)
@@ -76,25 +78,24 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             var definitionId = eventData.Entity.Id;
 
-            if (!eventData.Entity.PublishedVersion.HasValue)
+            // PublishedVersion
+            if (eventData.Entity.PublishedVersion.HasValue)
             {
-                var version = eventData.Entity.LatestVersion;
-                var versionEntity = await _workflowDefinitionVersionRepository.GetByVersionAsync(definitionId, version);
+                var publishVersion = eventData.Entity.PublishedVersion.Value;
+                var publishtVersionEntity = await _workflowDefinitionVersionRepository.GetByVersionAsync(definitionId, publishVersion);
 
-                var model = _storeMapper.MapToModel(versionEntity, eventData.Entity);
+                var publishModel = _storeMapper.MapToModel(publishtVersionEntity, eventData.Entity);
 
-                await _mediator.Publish(new WorkflowDefinitionDeleted(model));
+                await _mediator.Publish(new WorkflowDefinitionSaved(publishModel));
             }
-            else
-            {
-                var version = eventData.Entity.PublishedVersion.Value;
-                var versionEntity = await _workflowDefinitionVersionRepository.GetByVersionAsync(definitionId, version);
 
-                var model = _storeMapper.MapToModel(versionEntity, eventData.Entity);
+            // LatestVersion
+            var latestVersion = eventData.Entity.LatestVersion;
+            var latestVersionEntity = await _workflowDefinitionVersionRepository.GetByVersionAsync(definitionId, latestVersion);
 
-                await _mediator.Publish(new WorkflowDefinitionSaved(model));
-                await _mediator.Publish(new WorkflowDefinitionPublished(model));
-            }
+            var latestModel = _storeMapper.MapToModel(latestVersionEntity, eventData.Entity);
+
+            await _mediator.Publish(new WorkflowDefinitionSaved(latestModel));
         }
     }
 }

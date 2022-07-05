@@ -7,5 +7,5 @@
     <RootNamespace>Passingwind.Abp.ElsaModule</RootNamespace>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
+ 
 </Project>

@@ -12,22 +12,25 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.*" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
-        <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
         <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
-        <PackageReference Include="IdentityModel" Version="5.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="6.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
-        <PackageReference Include="Volo.Abp.Autofac" Version="5.1.4" />
-        <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="5.1.4" />
-        <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy" Version="5.1.4" />
-        <PackageReference Include="Volo.Abp.EntityFrameworkCore.SqlServer" Version="5.1.4" />
-        <PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="5.1.4" />
-        <PackageReference Include="Volo.Abp.Swashbuckle" Version="5.1.4" />
-        <PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="5.1.4" />
-        <PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="5.1.4" />
-        <PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="5.1.4" />
-        <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="5.1.4" />
+        <PackageReference Include="IdentityModel" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.6" />
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="6.0.6" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.6">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Volo.Abp.Autofac" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.EntityFrameworkCore.SqlServer" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.Swashbuckle" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="5.3.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -38,15 +41,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elsa" Version="2.5.0" />
-        <PackageReference Include="Elsa.Activities.Email" Version="2.5.0" />
-        <PackageReference Include="Elsa.Activities.Http" Version="2.5.0" />
-        <PackageReference Include="Elsa.Activities.UserTask" Version="2.5.0" /> 
-        <PackageReference Include="Elsa.Activities.BlobStorage" Version="2.5.0" />
-        <PackageReference Include="Elsa.Activities.File" Version="2.5.0" />
+        <PackageReference Include="Elsa" Version="2.8.2" />
+        <PackageReference Include="Elsa.Activities.Email" Version="2.8.2" />
+        <PackageReference Include="Elsa.Activities.Http" Version="2.8.2" />
+        <PackageReference Include="Elsa.Activities.UserTask" Version="2.8.2" /> 
+        <PackageReference Include="Elsa.Activities.BlobStorage" Version="2.8.2" />
+        <PackageReference Include="Elsa.Activities.File" Version="2.8.2" />
         <!--<PackageReference Include="Elsa.Activities.Temporal.Quartz" Version="2.5.0" />-->
-        <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.5.0" />
-        <PackageReference Include="Elsa.Activities.Entity" Version="2.5.0" />
+        <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.8.2" />
+        <PackageReference Include="Elsa.Activities.Entity" Version="2.8.2" />
         <!--<PackageReference Include="Elsa.Activities.Sql" Version="2.5.0" />-->
     </ItemGroup>
 
@@ -56,5 +59,5 @@
         <EmbeddedResource Remove="Logs\**" />
         <None Remove="Logs\**" />
     </ItemGroup>
-
+ 
 </Project>

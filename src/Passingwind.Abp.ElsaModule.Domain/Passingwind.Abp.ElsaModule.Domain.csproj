@@ -12,15 +12,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.Ddd.Domain" Version="5.1.4" />
+        <PackageReference Include="Volo.Abp.Ddd.Domain" Version="5.3.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elsa" Version="2.5.0" />
+        <PackageReference Include="Elsa" Version="2.8.2" />
     </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Yitter.IdGenerator" Version="1.0.12" />
-    </ItemGroup>
-
+ 
 </Project>

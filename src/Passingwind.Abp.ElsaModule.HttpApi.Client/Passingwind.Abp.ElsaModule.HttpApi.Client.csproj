@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.Http.Client" Version="5.1.4" />
+        <PackageReference Include="Volo.Abp.Http.Client" Version="5.3.1" />
         <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Application.Contracts\Passingwind.Abp.ElsaModule.Application.Contracts.csproj" />
     </ItemGroup>
 
@@ -16,5 +16,5 @@
         <EmbeddedResource Include="**\*generate-proxy.json" />
         <Content Remove="**\*generate-proxy.json" />
     </ItemGroup>
-
+ 
 </Project>

@@ -10,13 +10,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.Studio.ModuleInstaller" Version="5.1.4" />
-        <PackageReference Include="Volo.Abp.VirtualFileSystem" Version="5.1.4" />
+        <PackageReference Include="Volo.Abp.Studio.ModuleInstaller" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.VirtualFileSystem" Version="5.3.1" />
     </ItemGroup>
 
     <ItemGroup>
       <None Remove="..\..\Passingwind.Abp.ElsaModule.abpmdl.json" />
       <EmbeddedResource Include="..\..\Passingwind.Abp.ElsaModule.abpmdl.json" />
     </ItemGroup>
-
+ 
 </Project>

@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="5.1.4" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="5.3.1" />
     <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Application.Contracts\Passingwind.Abp.ElsaModule.Application.Contracts.csproj" />
   </ItemGroup>
-
+ 
 </Project>
