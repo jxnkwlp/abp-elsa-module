@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Elsa.Models;
 using Elsa.Services;
-using Passingwind.Abp.ElsaModule.Workflow;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -29,12 +28,45 @@ namespace Passingwind.Abp.ElsaModule.Common
 
         public virtual async Task<WorkflowDefinitionVersionDto> CreateAsync(WorkflowDefinitionVersionCreateOrUpdateDto input)
         {
-            WorkflowDefinition defintion = ObjectMapper.Map<WorkflowDefinitionCreateOrUpdateDto, WorkflowDefinition>(input.Definition);
-            WorkflowDefinitionVersion version = ObjectMapper.Map<WorkflowDefinitionVersionCreateOrUpdateDto, WorkflowDefinitionVersion>(input);
+            WorkflowDefinition defintion = await _workflowDefinitionManager.CreateDefinitionAsync(
+                input.Definition.Name,
+                input.Definition.DisplayName,
+                CurrentTenant.Id,
+                input.Definition.Description,
+                input.Definition.IsSingleton,
+                input.Definition.DeleteCompletedInstances,
+                input.Definition.Channel,
+                input.Definition.Tag,
+                input.Definition.PersistenceBehavior,
+                input.Definition.ContextOptions,
+                input.Definition.Variables,
+                default
+            );
+            defintion.SetVersion(1, null);
+
+            WorkflowDefinitionVersion version = await _workflowDefinitionManager.CreateDefinitionVersionAsync(
+                defintion.Id,
+                CurrentTenant.Id,
+                input.Activities?.Select(x => new Activity(
+                    x.ActivityId,
+                    x.Type,
+                    x.Name,
+                    x.DisplayName,
+                    x.Description,
+                    x.PersistWorkflow,
+                    x.LoadWorkflowContext,
+                    x.SaveWorkflowContext,
+                    x.Attributes,
+                    x.Properties,
+                    x.PropertyStorageProviders))?.ToList(),
+                input.Connections.Select(x => new ActivityConnection(
+                    x.SourceId,
+                    x.TargetId,
+                    x.Outcome,
+                    x.Attributes))?.ToList()
+                );
 
             version.SetIsLatest(true);
-
-            defintion.SetVersion(version.Version, null);
 
             if (input.IsPublished)
             {
@@ -42,11 +74,8 @@ namespace Passingwind.Abp.ElsaModule.Common
                 defintion.SetVersion(version.Version, version.Version);
             }
 
-            defintion.SetId(GuidGenerator.Create());
-            version.SetDefinitionId(defintion.Id);
-
             defintion = await _workflowDefinitionRepository.InsertAsync(defintion);
-            await _workflowDefinitionVersionRepository.InsertAsync(version);
+            version = await _workflowDefinitionVersionRepository.InsertAsync(version);
 
             var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(version);
             dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(defintion);
@@ -142,7 +171,26 @@ namespace Passingwind.Abp.ElsaModule.Common
             {
                 await _workflowDefinitionManager.UnsetLatestVersionAsync(id);
 
-                currentVersion = await _workflowDefinitionManager.CreateDefinitionVersionAsync(id, CurrentTenant.Id, ObjectMapper.Map<List<ActivityCreateOrUpdateDto>, List<Activity>>(input.Activities), ObjectMapper.Map<List<ActivityConnectionCreateDto>, List<ActivityConnection>>(input.Connections));
+                currentVersion = await _workflowDefinitionManager.CreateDefinitionVersionAsync(
+                    id,
+                    CurrentTenant.Id,
+                    input.Activities?.Select(x => new Activity(
+                        x.ActivityId,
+                        x.Type,
+                        x.Name,
+                        x.DisplayName,
+                        x.Description,
+                        x.PersistWorkflow,
+                        x.LoadWorkflowContext,
+                        x.SaveWorkflowContext,
+                        x.Attributes,
+                        x.Properties,
+                        x.PropertyStorageProviders))?.ToList(),
+                    input.Connections.Select(x => new ActivityConnection(
+                        x.SourceId,
+                        x.TargetId,
+                        x.Outcome,
+                        x.Attributes))?.ToList());
 
                 currentVersion.SetVersion(defintion.LatestVersion + 1);
                 currentVersion.SetIsLatest(true);
@@ -163,7 +211,23 @@ namespace Passingwind.Abp.ElsaModule.Common
                 if (currentVersion == null)
                     throw new UserFriendlyException($"The latest versiont '{defintion.LatestVersion}' not found.");
 
-                currentVersion = ObjectMapper.Map<WorkflowDefinitionVersionCreateOrUpdateDto, WorkflowDefinitionVersion>(input, currentVersion);
+                await _workflowDefinitionManager.UpdateDefinitionVersionAsync(currentVersion, input.Activities?.Select(x => new Activity(
+                         x.ActivityId,
+                         x.Type,
+                         x.Name,
+                         x.DisplayName,
+                         x.Description,
+                         x.PersistWorkflow,
+                         x.LoadWorkflowContext,
+                         x.SaveWorkflowContext,
+                         x.Attributes,
+                         x.Properties,
+                         x.PropertyStorageProviders))?.ToList(),
+                     input.Connections.Select(x => new ActivityConnection(
+                         x.SourceId,
+                         x.TargetId,
+                         x.Outcome,
+                         x.Attributes))?.ToList());
 
                 if (input.IsPublished)
                 {

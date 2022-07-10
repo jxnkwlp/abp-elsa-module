@@ -32,7 +32,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             var entity = _storeMapper.MapToEntity(model);
 
-            var workflowDefinition = await _workflowDefinitionRepository.GetAsync(entity.DefinitionId);
+            var workflowDefinition = await _workflowDefinitionRepository.GetAsync(entity.WorkflowDefinitionId);
 
             entity.Name = $"{workflowDefinition.Name}-{_clock.Now.ToString("yyyyMMddHHmmss")}";
 
@@ -71,12 +71,12 @@ namespace Passingwind.Abp.ElsaModule.Stores
             }
             else if (specification is WorkflowDefinitionIdSpecification workflowDefinitionIdSpecification)
             {
-                return (x) => x.DefinitionId == Guid.Parse(workflowDefinitionIdSpecification.WorkflowDefinitionId);
+                return (x) => x.WorkflowDefinitionId == Guid.Parse(workflowDefinitionIdSpecification.WorkflowDefinitionId);
             }
             else if (specification is WorkflowDefinitionVersionIdsSpecification workflowDefinitionVersionIdsSpecification)
             {
                 var ids = workflowDefinitionVersionIdsSpecification.WorkflowDefinitionVersionIds.ToList().ConvertAll(Guid.Parse);
-                return (x) => ids.Contains(x.DefinitionVersionId);
+                return (x) => ids.Contains(x.WorkflowDefinitionVersionId);
             }
             else if (specification is WorkflowFinishedStatusSpecification workflowFinishedStatusSpecification)
             {
@@ -92,7 +92,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             }
             else if (specification is WorkflowInstanceCorrelationIdSpecification workflowInstanceCorrelationIdSpecification)
             {
-                return x => x.DefinitionId == Guid.Parse(workflowInstanceCorrelationIdSpecification.DefinitionId) && x.CorrelationId == workflowInstanceCorrelationIdSpecification.CorrelationId;
+                return x => x.WorkflowDefinitionId == Guid.Parse(workflowInstanceCorrelationIdSpecification.DefinitionId) && x.CorrelationId == workflowInstanceCorrelationIdSpecification.CorrelationId;
             }
             else if (specification is WorkflowInstanceIdSpecification workflowInstanceIdSpecification)
             {

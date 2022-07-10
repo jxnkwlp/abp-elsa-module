@@ -18,7 +18,7 @@ namespace Passingwind.Abp.ElsaModule.Workflow
         public bool LoadWorkflowContext { get; set; }
         public bool SaveWorkflowContext { get; set; }
 
-        public Dictionary<string, object> Arrtibutes { get; set; }
+        public Dictionary<string, object> Attributes { get; set; }
 
         public List<ActivityDefinitionProperty> Properties { get; set; }
 

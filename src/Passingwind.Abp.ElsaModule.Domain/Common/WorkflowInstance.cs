@@ -7,9 +7,9 @@ using Volo.Abp.MultiTenancy;
 
 namespace Passingwind.Abp.ElsaModule.Common;
 
-public class WorkflowInstance : FullAuditedEntity<Guid>, IMultiTenant
+public class WorkflowInstance : FullAuditedAggregateRoot<Guid>, IMultiTenant
 {
-    public WorkflowInstance()
+    protected WorkflowInstance()
     {
     }
 
@@ -17,9 +17,9 @@ public class WorkflowInstance : FullAuditedEntity<Guid>, IMultiTenant
     {
     }
 
-    public Guid DefinitionId { get; set; }
+    public Guid WorkflowDefinitionId { get; set; }
 
-    public Guid DefinitionVersionId { get; set; }
+    public Guid WorkflowDefinitionVersionId { get; set; }
 
     public Guid? TenantId { get; protected set; }
 
@@ -41,7 +41,7 @@ public class WorkflowInstance : FullAuditedEntity<Guid>, IMultiTenant
     public DateTime? FaultedTime { get; set; }
 
 
-    public Dictionary<string, object> Variables { get; set; }
+    public Dictionary<string, object> Variables { get; set; } = new Dictionary<string, object>();
 
     public WorkflowInputReference Input { get; set; }
 
@@ -49,18 +49,18 @@ public class WorkflowInstance : FullAuditedEntity<Guid>, IMultiTenant
 
     public WorkflowFault Fault { get; set; }
 
-    public List<ScheduledActivity> ScheduledActivities { get; set; }
+    public List<ScheduledActivity> ScheduledActivities { get; set; } = new List<ScheduledActivity>();
 
-    public List<BlockingActivity> BlockingActivities { get; set; }
+    public List<BlockingActivity> BlockingActivities { get; set; } = new List<BlockingActivity>();
 
-    public List<ActivityScope> Scopes { get; set; }
+    public List<ActivityScope> Scopes { get; set; } = new List<ActivityScope>();
 
     public ScheduledActivity CurrentActivity { get; set; }
 
     public Guid? LastExecutedActivityId { get; set; }
 
-    public Dictionary<string, IDictionary<string, object>> ActivityData { get; set; }
+    public Dictionary<string, IDictionary<string, object>> ActivityData { get; set; } = new Dictionary<string, IDictionary<string, object>>();
 
-    public Dictionary<string, object> Metadata { get; set; }
+    public Dictionary<string, object> Metadata { get; set; } = new Dictionary<string, object>();
 
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Modularity;
 using Volo.Abp.MongoDB;
+using Volo.Abp.Uow;
 
 namespace Passingwind.Abp.ElsaModule.MongoDB;
 
@@ -14,9 +15,16 @@ public class ElsaModuleMongoDbModule : AbpModule
     {
         context.Services.AddMongoDbContext<ElsaModuleMongoDbContext>(options =>
         {
-                /* Add custom repositories here. Example:
-                 * options.AddRepository<Question, MongoQuestionRepository>();
-                 */
+            /* Add custom repositories here. Example:
+             * options.AddRepository<Question, MongoQuestionRepository>();
+             */
+
+            options.AddDefaultRepositories();
+        });
+
+        Configure<AbpUnitOfWorkDefaultOptions>(options =>
+        {
+            options.TransactionBehavior = UnitOfWorkTransactionBehavior.Disabled;
         });
     }
 }

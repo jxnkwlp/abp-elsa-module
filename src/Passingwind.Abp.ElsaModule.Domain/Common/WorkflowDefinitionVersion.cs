@@ -5,10 +5,12 @@ using Volo.Abp.MultiTenancy;
 
 namespace Passingwind.Abp.ElsaModule.Common;
 
-public class WorkflowDefinitionVersion : FullAuditedEntity<Guid>, IMultiTenant
+public class WorkflowDefinitionVersion : FullAuditedAggregateRoot<Guid>, IMultiTenant
 {
     public WorkflowDefinitionVersion()
     {
+        Activities = new List<Activity>();
+        Connections = new List<ActivityConnection>();
     }
 
     public WorkflowDefinitionVersion(Guid id) : base(id)
@@ -19,8 +21,8 @@ public class WorkflowDefinitionVersion : FullAuditedEntity<Guid>, IMultiTenant
     {
         DefinitionId = definitionId;
         TenantId = tenantId;
-        Activities = activities;
-        Connections = connections;
+        Activities = activities ?? new List<Activity>();
+        Connections = connections ?? new List<ActivityConnection>();
     }
 
     // public WorkflowDefinition Definition { get; set; }
@@ -54,13 +56,4 @@ public class WorkflowDefinitionVersion : FullAuditedEntity<Guid>, IMultiTenant
         IsPublished = value;
     }
 
-    public void SetId(Guid id)
-    {
-        Id = id;
-    }
-
-    public void SetDefinitionId(Guid id)
-    {
-        DefinitionId = id;
-    }
 }

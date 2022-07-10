@@ -6,8 +6,9 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
 {
     public class WorkflowInstanceBasicDto : AuditedEntityDto<Guid>
     {
-        public Guid DefinitionId { get; set; }
-        public Guid DefinitionVersionId { get; set; }
+        public Guid WorkflowDefinitionId { get; set; }
+
+        public Guid WorkflowDefinitionVersionId { get; set; }
 
         public string Name { get; set; }
         public int Version { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using NodaTime;
 using Passingwind.Abp.ElsaModule.Common;
 using ActivityDefinition = Elsa.Models.ActivityDefinition;
@@ -50,6 +51,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             var model = new WorkflowDefinitionModel
             {
+                Id = entity.Id.ToString(), // version id
                 DefinitionId = definition.Id.ToString(),
                 // VersionId = entity.Id.ToString(), // same as id
                 Version = entity.Version,
@@ -70,7 +72,6 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 Variables = new Elsa.Models.Variables(definition.Variables ?? new Dictionary<string, object>()),
                 PersistenceBehavior = definition.PersistenceBehavior,
 
-                Id = entity.Id.ToString(),
 
                 IsLatest = entity.IsLatest,
                 IsPublished = entity.IsPublished,
@@ -177,28 +178,23 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual Activity MapToEntity(ActivityDefinition model)
         {
-            return new Activity()
-            {
-                ActivityId = Guid.Parse(model.ActivityId),
-                Description = model.Description,
-                Name = model.Name,
-                DisplayName = model.DisplayName,
-                LoadWorkflowContext = model.LoadWorkflowContext,
-                PersistWorkflow = model.PersistWorkflow,
-                Properties = model.Properties?.ToList(),
-                SaveWorkflowContext = model.SaveWorkflowContext,
-                Type = model.Type,
-            };
+            return new Activity(
+                Guid.Parse(model.ActivityId),
+                model.Type,
+                model.Name,
+                model.DisplayName,
+                model.Description,
+                model.PersistWorkflow,
+                model.LoadWorkflowContext,
+                model.SaveWorkflowContext,
+                default,
+                model.Properties?.ToList(),
+                model.PropertyStorageProviders.ToDictionary(x => x.Key, x => x.Value));
         }
 
         public virtual ActivityConnection MapToEntity(ConnectionDefinitionModel model)
         {
-            return new ActivityConnection
-            {
-                Outcome = model.Outcome,
-                SourceId = Guid.Parse(model.SourceActivityId),
-                TargetId = Guid.Parse(model.TargetActivityId),
-            };
+            return new ActivityConnection(Guid.Parse(model.SourceActivityId), Guid.Parse(model.TargetActivityId), model.Outcome, default);
         }
 
         public virtual Bookmark MapToEntity(BookmarkModel model)
@@ -291,7 +287,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             {
                 ActivityId = Guid.Parse(model.ActivityId),
                 ActivityType = model.ActivityType,
-                Data = model.Data,
+                Data = model.Data?.ToString(),
                 EventName = model.EventName,
                 Message = model.Message,
                 Source = model.Source,
@@ -304,7 +300,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             entity.ActivityId = Guid.Parse(model.ActivityId);
             entity.ActivityType = model.ActivityType;
-            entity.Data = model.Data;
+            entity.Data = model.Data?.ToString();
             entity.EventName = model.EventName;
             entity.Message = model.Message;
             entity.Source = model.Source;
@@ -321,7 +317,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 Id = entity.Id.ToString(),
                 ActivityId = entity.ActivityId.ToString(),
                 ActivityType = entity.ActivityType,
-                Data = entity.Data,
+                Data = string.IsNullOrEmpty(entity.Data) ? null : JObject.Parse(entity.Data),
                 EventName = entity.EventName,
                 Message = entity.Message,
                 Source = entity.Source,
@@ -354,8 +350,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 CorrelationId = model.CorrelationId,
                 CurrentActivity = model.CurrentActivity,
 
-                DefinitionId = Guid.Parse(model.DefinitionId),
-                DefinitionVersionId = Guid.Parse(model.DefinitionVersionId),
+                WorkflowDefinitionId = Guid.Parse(model.DefinitionId),
+                WorkflowDefinitionVersionId = Guid.Parse(model.DefinitionVersionId),
 
                 Fault = model.Fault,
                 Input = model.Input,
@@ -430,8 +426,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 CorrelationId = entity.CorrelationId,
                 CurrentActivity = entity.CurrentActivity,
 
-                DefinitionId = entity.DefinitionId.ToString(),
-                DefinitionVersionId = entity.DefinitionVersionId.ToString(),
+                DefinitionId = entity.WorkflowDefinitionId.ToString(),
+                DefinitionVersionId = entity.WorkflowDefinitionVersionId.ToString(),
 
                 Fault = entity.Fault,
                 Input = entity.Input,

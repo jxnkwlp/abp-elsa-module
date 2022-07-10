@@ -42,6 +42,9 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task AddManyAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
         {
+            if (models.Any() == false)
+                return;
+
             Logger.LogDebug($"AddMany [{models.GetType()}] ... ");
 
             var entities = new List<TEntity>();

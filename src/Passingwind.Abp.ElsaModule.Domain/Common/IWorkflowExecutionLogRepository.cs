@@ -4,15 +4,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories;
 
-namespace Passingwind.Abp.ElsaModule.Common
+namespace Passingwind.Abp.ElsaModule.Common;
+
+public interface IWorkflowExecutionLogRepository : IRepository<WorkflowExecutionLog, Guid>
 {
-    public interface IWorkflowExecutionLogRepository : IRepository<WorkflowExecutionLog, long>
-    {
-        Task<long> GetCountAsync(Guid? workflowInstanceId = null, Guid? activityId = null, CancellationToken cancellationToken = default);
+    Task<long> GetCountAsync(Guid? workflowInstanceId = null, Guid? activityId = null, CancellationToken cancellationToken = default);
 
-        Task<List<WorkflowExecutionLog>> GetListAsync(Guid? workflowInstanceId = null, Guid? activityId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
+    Task<List<WorkflowExecutionLog>> GetListAsync(Guid? workflowInstanceId = null, Guid? activityId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
-        Task<List<WorkflowExecutionLog>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting, Guid? workflowInstanceId = null, Guid? activityId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
+    Task<List<WorkflowExecutionLog>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting, Guid? workflowInstanceId = null, Guid? activityId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
-    }
 }

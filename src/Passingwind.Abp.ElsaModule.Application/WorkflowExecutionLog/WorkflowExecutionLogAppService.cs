@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
@@ -13,7 +14,7 @@ namespace Passingwind.Abp.ElsaModule.Common
             _workflowExecutionLogRepository = workflowExecutionLogRepository;
         }
 
-        public async Task<WorkflowExecutionLogDto> GetAsync(long id)
+        public async Task<WorkflowExecutionLogDto> GetAsync(Guid id)
         {
             var entity = await _workflowExecutionLogRepository.GetAsync(id);
 

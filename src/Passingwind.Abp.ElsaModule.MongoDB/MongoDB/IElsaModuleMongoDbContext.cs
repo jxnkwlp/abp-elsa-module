@@ -1,4 +1,6 @@
-﻿using Volo.Abp.Data;
+﻿using MongoDB.Driver;
+using Passingwind.Abp.ElsaModule.Common;
+using Volo.Abp.Data;
 using Volo.Abp.MongoDB;
 
 namespace Passingwind.Abp.ElsaModule.MongoDB;
@@ -6,7 +8,10 @@ namespace Passingwind.Abp.ElsaModule.MongoDB;
 [ConnectionStringName(ElsaModuleDbProperties.ConnectionStringName)]
 public interface IElsaModuleMongoDbContext : IAbpMongoDbContext
 {
-    /* Define mongo collections here. Example:
-     * IMongoCollection<Question> Questions { get; }
-     */
+    IMongoCollection<Bookmark> Bookmarks { get; }
+    IMongoCollection<Trigger> Triggers { get; }
+    IMongoCollection<WorkflowDefinition> WorkflowDefinitions { get; }
+    IMongoCollection<WorkflowDefinitionVersion> WorkflowDefinitionVersions { get; }
+    IMongoCollection<WorkflowExecutionLog> WorkflowExecutionLogs { get; }
+    IMongoCollection<WorkflowInstance> WorkflowInstances { get; }
 }

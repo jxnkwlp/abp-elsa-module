@@ -6,17 +6,20 @@ using Volo.Abp.MultiTenancy;
 
 namespace Passingwind.Abp.ElsaModule.Common;
 
-public class WorkflowDefinition : FullAuditedEntity<Guid>, IMultiTenant
+public class WorkflowDefinition : FullAuditedAggregateRoot<Guid>, IMultiTenant
 {
-    public WorkflowDefinition()
+    protected WorkflowDefinition()
     {
+        Variables = new Dictionary<string, object>();
+        CustomAttributes = new Dictionary<string, object>();
     }
 
     public WorkflowDefinition(Guid id) : base(id)
     {
+
     }
 
-    public WorkflowDefinition(string name, string displayName, Guid? tenantId, string description, bool isSingleton, bool deleteCompletedInstances, string channel, string tag, WorkflowPersistenceBehavior persistenceBehavior, WorkflowContextOptions contextOptions, Dictionary<string, object> variables, Dictionary<string, object> customAttributes)
+    public WorkflowDefinition(Guid id, string name, string displayName, Guid? tenantId, string description, bool isSingleton, bool deleteCompletedInstances, string channel, string tag, WorkflowPersistenceBehavior persistenceBehavior, WorkflowContextOptions contextOptions, Dictionary<string, object> variables, Dictionary<string, object> customAttributes) : base(id)
     {
         Name = name;
         DisplayName = displayName;
@@ -28,8 +31,8 @@ public class WorkflowDefinition : FullAuditedEntity<Guid>, IMultiTenant
         Tag = tag;
         PersistenceBehavior = persistenceBehavior;
         ContextOptions = contextOptions;
-        Variables = variables;
-        CustomAttributes = customAttributes;
+        Variables = variables ?? new Dictionary<string, object>();
+        CustomAttributes = customAttributes ?? new Dictionary<string, object>();
     }
 
     public string Name { get; set; }
@@ -76,8 +79,4 @@ public class WorkflowDefinition : FullAuditedEntity<Guid>, IMultiTenant
         PublishedVersion = version;
     }
 
-    public void SetId(Guid id)
-    {
-        Id = id;
-    }
 }

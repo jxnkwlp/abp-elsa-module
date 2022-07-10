@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
@@ -17,7 +18,7 @@ namespace Passingwind.Abp.ElsaModule.Common
         }
 
         [HttpGet("{id}")]
-        public virtual Task<WorkflowExecutionLogDto> GetAsync(long id)
+        public virtual Task<WorkflowExecutionLogDto> GetAsync(Guid id)
         {
             return _service.GetAsync(id);
         }

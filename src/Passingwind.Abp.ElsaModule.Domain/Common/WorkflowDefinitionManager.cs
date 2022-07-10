@@ -4,53 +4,60 @@ using System.Threading.Tasks;
 using Elsa.Models;
 using Volo.Abp.Domain.Services;
 
-namespace Passingwind.Abp.ElsaModule.Common
+namespace Passingwind.Abp.ElsaModule.Common;
+
+public class WorkflowDefinitionManager : DomainService
 {
-    public class WorkflowDefinitionManager : DomainService
+    private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
+    private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
+
+    public WorkflowDefinitionManager(IWorkflowDefinitionRepository workflowDefinitionRepository, IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository)
     {
-        private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
-        private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
+        _workflowDefinitionRepository = workflowDefinitionRepository;
+        _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
+    }
 
-        public WorkflowDefinitionManager(IWorkflowDefinitionRepository workflowDefinitionRepository, IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository)
+    public virtual Task<WorkflowDefinition> CreateDefinitionAsync(string name, string displayName, Guid? tenantId, string description, bool isSingleton, bool deleteCompletedInstances, string channel, string tag, WorkflowPersistenceBehavior persistenceBehavior, WorkflowContextOptions contextOptions, Dictionary<string, object> variables, Dictionary<string, object> customAttributes)
+    {
+        var definition = new WorkflowDefinition(GuidGenerator.Create(), name, displayName, tenantId, description, isSingleton, deleteCompletedInstances, channel, tag, persistenceBehavior, contextOptions, variables, customAttributes);
+
+        return Task.FromResult(definition);
+    }
+
+    public virtual Task<WorkflowDefinitionVersion> CreateDefinitionVersionAsync(Guid definitionId, Guid? tenantId, List<Activity> activities, List<ActivityConnection> connections)
+    {
+        var entity = new WorkflowDefinitionVersion(definitionId, tenantId, activities, connections);
+
+        return Task.FromResult(entity);
+    }
+
+    public virtual Task UpdateDefinitionVersionAsync(WorkflowDefinitionVersion entity, List<Activity> activities, List<ActivityConnection> connections)
+    {
+        entity.Activities = activities;
+        entity.Connections = connections;
+
+        return Task.CompletedTask;
+    }
+
+    public virtual async Task UnsetLatestVersionAsync(Guid definitionId)
+    {
+        var entity = await _workflowDefinitionVersionRepository.FindAsync(x => x.DefinitionId == definitionId && x.IsLatest);
+
+        if (entity != null)
         {
-            _workflowDefinitionRepository = workflowDefinitionRepository;
-            _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
+            entity.SetIsLatest(false);
+            await _workflowDefinitionVersionRepository.UpdateAsync(entity);
         }
+    }
 
-        public virtual Task<WorkflowDefinition> CreateDefinitionAsync(string name, string displayName, Guid? tenantId, string description, bool isSingleton, bool deleteCompletedInstances, string channel, string tag, WorkflowPersistenceBehavior persistenceBehavior, WorkflowContextOptions contextOptions, Dictionary<string, object> variables, Dictionary<string, object> customAttributes)
+    public virtual async Task UnsetPublishedVersionAsync(Guid definitionId)
+    {
+        var entity = await _workflowDefinitionVersionRepository.FindAsync(x => x.DefinitionId == definitionId && x.IsPublished);
+
+        if (entity != null)
         {
-            var definition = new WorkflowDefinition(name, displayName, tenantId, description, isSingleton, deleteCompletedInstances, channel, tag, persistenceBehavior, contextOptions, variables, customAttributes);
-
-            return Task.FromResult(definition);
-        }
-
-        public virtual Task<WorkflowDefinitionVersion> CreateDefinitionVersionAsync(Guid definitionId, Guid? tenantId, List<Activity> activities, List<ActivityConnection> connections)
-        {
-            var entity = new WorkflowDefinitionVersion(definitionId, tenantId, activities, connections);
-
-            return Task.FromResult(entity);
-        }
-
-        public virtual async Task UnsetLatestVersionAsync(Guid definitionId)
-        {
-            var entity = await _workflowDefinitionVersionRepository.FindAsync(x => x.DefinitionId == definitionId && x.IsLatest);
-
-            if (entity != null)
-            {
-                entity.SetIsLatest(false);
-                await _workflowDefinitionVersionRepository.UpdateAsync(entity);
-            }
-        }
-
-        public virtual async Task UnsetPublishedVersionAsync(Guid definitionId)
-        {
-            var entity = await _workflowDefinitionVersionRepository.FindAsync(x => x.DefinitionId == definitionId && x.IsPublished);
-
-            if (entity != null)
-            {
-                entity.SetIsPublished(false);
-                await _workflowDefinitionVersionRepository.UpdateAsync(entity);
-            }
+            entity.SetIsPublished(false);
+            await _workflowDefinitionVersionRepository.UpdateAsync(entity);
         }
     }
 }
