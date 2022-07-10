@@ -21,8 +21,8 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
         {
             var dbset = await GetDbSetAsync();
             return await dbset
-                .WhereIf(definitionId.HasValue, x => x.DefinitionId == definitionId)
-                .WhereIf(definitionVersionId.HasValue, x => x.DefinitionVersionId == definitionVersionId)
+                .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
+                .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
                 .WhereIf(version.HasValue, x => x.Version == version)
                 .WhereIf(status.HasValue, x => x.WorkflowStatus == status)
                 .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)
@@ -34,8 +34,8 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
         {
             var dbset = await GetDbSetAsync();
             return await dbset
-                .WhereIf(definitionId.HasValue, x => x.DefinitionId == definitionId)
-                .WhereIf(definitionVersionId.HasValue, x => x.DefinitionVersionId == definitionVersionId)
+                .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
+                .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
                 .WhereIf(version.HasValue, x => x.Version == version)
                 .WhereIf(status.HasValue, x => x.WorkflowStatus == status)
                 .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)
@@ -47,8 +47,8 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
         {
             var dbset = await GetDbSetAsync();
             return await dbset
-                .WhereIf(definitionId.HasValue, x => x.DefinitionId == definitionId)
-                .WhereIf(definitionVersionId.HasValue, x => x.DefinitionVersionId == definitionVersionId)
+                .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
+                .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
                 .WhereIf(version.HasValue, x => x.Version == version)
                 .WhereIf(status.HasValue, x => x.WorkflowStatus == status)
                 .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)

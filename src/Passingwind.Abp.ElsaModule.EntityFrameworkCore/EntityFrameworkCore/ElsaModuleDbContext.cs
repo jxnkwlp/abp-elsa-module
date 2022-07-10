@@ -8,10 +8,6 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 [ConnectionStringName(ElsaModuleDbProperties.ConnectionStringName)]
 public class ElsaModuleDbContext : AbpDbContext<ElsaModuleDbContext>, IElsaModuleDbContext
 {
-    public DbSet<Activity> Activities { get; set; }
-
-    public DbSet<ActivityConnection> ActivityConnections { get; set; }
-
     public DbSet<Bookmark> Bookmarks { get; set; }
 
     public DbSet<Trigger> Triggers { get; set; }
@@ -27,7 +23,6 @@ public class ElsaModuleDbContext : AbpDbContext<ElsaModuleDbContext>, IElsaModul
     public ElsaModuleDbContext(DbContextOptions<ElsaModuleDbContext> options)
         : base(options)
     {
-
     }
 
     protected override void OnModelCreating(ModelBuilder builder)

@@ -11,7 +11,7 @@ using Volo.Abp.EntityFrameworkCore;
 
 namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
 {
-    public class WorkflowExecutionLogRepository : EfCoreRepository<ElsaModuleDbContext, WorkflowExecutionLog, long>, IWorkflowExecutionLogRepository
+    public class WorkflowExecutionLogRepository : EfCoreRepository<ElsaModuleDbContext, WorkflowExecutionLog, Guid>, IWorkflowExecutionLogRepository
     {
         public WorkflowExecutionLogRepository(IDbContextProvider<ElsaModuleDbContext> dbContextProvider) : base(dbContextProvider)
         {

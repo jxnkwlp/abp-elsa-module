@@ -50,6 +50,7 @@ namespace Passingwind.Abp.ElsaModule;
 [DependsOn(
     typeof(ElsaModuleApplicationModule),
     typeof(ElsaModuleEntityFrameworkCoreModule),
+    //typeof(ElsaModuleMongoDbModule),
     typeof(ElsaModuleHttpApiModule),
     typeof(AbpAspNetCoreMvcUiMultiTenancyModule),
     typeof(AbpAutofacModule),
@@ -68,6 +69,8 @@ public class ElsaModuleHttpApiHostModule : AbpModule
     {
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         var configuration = context.Services.GetConfiguration();
+
+        context.Services.AddAbpDbContext<ElsaModuleHttpApiHostMigrationsDbContext>();
 
         Configure<AbpDbContextOptions>(options =>
         {

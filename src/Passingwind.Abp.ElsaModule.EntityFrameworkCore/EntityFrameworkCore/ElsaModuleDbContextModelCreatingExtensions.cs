@@ -2,7 +2,6 @@
 using EcsShop.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Newtonsoft.Json.Linq;
 using Passingwind.Abp.ElsaModule.Common;
 using Volo.Abp;
 using Volo.Abp.EntityFrameworkCore.Modeling;
@@ -64,8 +63,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.HasIndex(x => new { x.DefinitionId, x.Version });
 
-            b.HasMany(x => x.Activities).WithOne().HasForeignKey(x => x.DefinitionVersionId);
-            b.HasMany(x => x.Connections).WithOne().HasForeignKey(x => x.DefinitionVersionId);
+            b.HasMany(x => x.Activities).WithOne().HasForeignKey(x => x.WorkflowDefinitionVersionId);
+            b.HasMany(x => x.Connections).WithOne().HasForeignKey(x => x.WorkflowDefinitionVersionId);
         });
 
         builder.Entity<Activity>(b =>
@@ -73,7 +72,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "Activities", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
 
-            b.HasKey(x => new { x.DefinitionVersionId, x.ActivityId });
+            b.HasKey(x => new { x.WorkflowDefinitionVersionId, x.ActivityId });
 
             b.Property(x => x.Type).IsRequired().HasMaxLength(32);
             b.Property(x => x.Name).IsRequired().HasMaxLength(64);
@@ -81,7 +80,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Description).HasMaxLength(256);
 
             b.Property(x => x.Properties).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.ActivityDefinitionProperty>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ActivityDefinitionProperty>), false));
-            b.Property(x => x.Arrtibutes).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            b.Property(x => x.Attributes).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
             b.Property(x => x.PropertyStorageProviders).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, string>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, string>), false));
         });
 
@@ -90,10 +89,10 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "ActivityConnections", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
 
-            b.HasKey(x => new { x.DefinitionVersionId, x.SourceId, x.TargetId, x.Outcome, });
+            b.HasKey(x => new { x.WorkflowDefinitionVersionId, x.SourceId, x.TargetId, x.Outcome, });
 
             b.Property(x => x.Outcome).IsRequired().HasMaxLength(64);
-            b.Property(x => x.Arrtibutes).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            b.Property(x => x.Attributes).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
         });
 
         builder.Entity<Bookmark>(b =>
@@ -154,7 +153,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.ActivityType).HasMaxLength(128);
             b.Property(x => x.EventName).HasMaxLength(128);
             b.Property(x => x.Source).HasMaxLength(128);
-            b.Property(x => x.Data).HasConversion(new ElsaEFJsonValueConverter<JObject>(), ValueComparer.CreateDefault(typeof(JObject), false));
+            // b.Property(x => x.Data).HasConversion(new ElsaEFJsonValueConverter<JObject>(), ValueComparer.CreateDefault(typeof(JObject), false));
 
         });
 

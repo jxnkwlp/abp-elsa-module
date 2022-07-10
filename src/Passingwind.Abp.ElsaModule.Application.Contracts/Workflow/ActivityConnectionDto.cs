@@ -4,7 +4,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Workflow
 {
-    public class ActivityConnectionDto : CreationAuditedEntityDto
+    public class ActivityConnectionDto : EntityDto
     {
         public Guid SourceId { get; set; }
         public Guid TargetId { get; set; }

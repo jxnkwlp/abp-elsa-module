@@ -8,8 +8,6 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 [ConnectionStringName(ElsaModuleDbProperties.ConnectionStringName)]
 public interface IElsaModuleDbContext : IEfCoreDbContext
 {
-    DbSet<Activity> Activities { get; }
-    DbSet<ActivityConnection> ActivityConnections { get; }
     DbSet<Bookmark> Bookmarks { get; }
     DbSet<Trigger> Triggers { get; }
     DbSet<WorkflowDefinition> WorkflowDefinitions { get; }

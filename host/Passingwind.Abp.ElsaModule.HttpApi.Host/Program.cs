@@ -34,12 +34,12 @@ public class Program
 
             var app = builder.Build();
 
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var sp = scope.ServiceProvider;
-            //    var dbcontext = sp.GetRequiredService<ElsaModuleHttpApiHostMigrationsDbContext>();
-            //    await dbcontext.Database.MigrateAsync();
-            //}
+            using (var scope = app.Services.CreateScope())
+            {
+                var sp = scope.ServiceProvider;
+                var dbcontext = sp.GetRequiredService<ElsaModuleHttpApiHostMigrationsDbContext>();
+                await dbcontext.Database.MigrateAsync();
+            }
 
             await app.InitializeApplicationAsync();
             await app.RunAsync();

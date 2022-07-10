@@ -16,10 +16,9 @@ public class ElsaModuleEntityFrameworkCoreModule : AbpModule
     {
         context.Services.AddAbpDbContext<ElsaModuleDbContext>(options =>
         {
-            options.AddDefaultRepositories(true);
+            options.AddDefaultRepositories();
 
             options.Entity<WorkflowDefinitionVersion>(x => x.DefaultWithDetailsFunc = q => q.Include(c => c.Activities).Include(c => c.Connections));
-
         });
 
     }

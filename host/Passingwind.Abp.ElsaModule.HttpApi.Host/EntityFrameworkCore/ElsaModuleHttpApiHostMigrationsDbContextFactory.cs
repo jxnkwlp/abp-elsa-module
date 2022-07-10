@@ -9,7 +9,11 @@ public class ElsaModuleHttpApiHostMigrationsDbContextFactory : IDesignTimeDbCont
 {
     public ElsaModuleHttpApiHostMigrationsDbContext CreateDbContext(string[] args)
     {
-        var configuration = BuildConfiguration();
+        var configuration = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory())
+               .AddJsonFile("appsettings.json", optional: false)
+               .AddJsonFile("appsettings.development.json", optional: false)
+               .Build();
 
         var builder = new DbContextOptionsBuilder<ElsaModuleHttpApiHostMigrationsDbContext>()
             .UseSqlServer(configuration.GetConnectionString("Elsa"));
@@ -17,12 +21,4 @@ public class ElsaModuleHttpApiHostMigrationsDbContextFactory : IDesignTimeDbCont
         return new ElsaModuleHttpApiHostMigrationsDbContext(builder.Options);
     }
 
-    private static IConfigurationRoot BuildConfiguration()
-    {
-        var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false);
-
-        return builder.Build();
-    }
 }
