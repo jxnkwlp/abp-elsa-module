@@ -355,7 +355,7 @@ export const conventToServerData = (data: IGraphData) => {
             sourceId: item.source.cell,
             targetId: item.target.cell,
             outcome: item.name ?? item.outcome ?? 'Done',
-            arrtibutes: {
+            attributes: {
                 sourcePort: item.source.port,
                 targetPort: item.target.port,
             },
@@ -378,7 +378,7 @@ export const conventToServerData = (data: IGraphData) => {
             displayName: item.label ?? item.displayName,
             description: item.description,
             properties: item.properties,
-            arrtibutes: {
+            attributes: {
                 x: Math.round(item.position?.x ?? 0),
                 y: Math.round(item.position?.y ?? 0),
                 outcomes: outcomes,
@@ -405,10 +405,10 @@ export const conventToGraphData = async (
                 shape: 'activity', // TODO
                 id: item.activityId,
                 // @ts-ignore
-                x: parseInt(item.arrtibutes?.x ?? 0),
+                x: parseInt(item.attributes?.x ?? 0),
                 // @ts-ignore
-                y: parseInt(item.arrtibutes?.y ?? 0),
-                outcomes: item.arrtibutes?.outcomes ?? [],
+                y: parseInt(item.attributes?.y ?? 0),
+                outcomes: item.attributes?.outcomes ?? [],
                 label: item.displayName ?? item.type,
                 //
                 // data: {
@@ -432,7 +432,7 @@ export const conventToGraphData = async (
     connections.forEach((item) => {
         const sourceId = item.sourceId;
         const targetId = item.targetId;
-        const attr = item.arrtibutes ?? {};
+        const attr = item.attributes ?? {};
 
         // check source
         if (

@@ -1,10 +1,12 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
- * Total count: 127
+ * Total count: 128
  **/
+import * as Enum from "./enums";
+
 declare namespace API {
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ActionApiDescriptionModel = {
         uniqueName?: string | undefined;
@@ -20,7 +22,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type Activity = {
         creationTime?: string | undefined;
@@ -35,13 +37,13 @@ declare namespace API {
         persistWorkflow?: boolean | undefined;
         loadWorkflowContext?: boolean | undefined;
         saveWorkflowContext?: boolean | undefined;
-        arrtibutes?: object | undefined;
+        attributes?: any | undefined;
         properties?: ActivityDefinitionProperty[] | undefined;
-        propertyStorageProviders?: object | undefined;
+        propertyStorageProviders?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ActivityConnection = {
         creationTime?: string | undefined;
@@ -49,21 +51,21 @@ declare namespace API {
         sourceId?: string | undefined;
         targetId?: string | undefined;
         outcome?: string | undefined;
-        arrtibutes?: object | undefined;
+        attributes?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ActivityConnectionCreate = {
         sourceId?: string | undefined;
         targetId?: string | undefined;
         outcome?: string | undefined;
-        arrtibutes?: object | undefined;
+        attributes?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ActivityCreateOrUpdate = {
         activityId?: string | undefined;
@@ -74,22 +76,22 @@ declare namespace API {
         persistWorkflow?: boolean | undefined;
         loadWorkflowContext?: boolean | undefined;
         saveWorkflowContext?: boolean | undefined;
-        arrtibutes?: object | undefined;
+        attributes?: any | undefined;
         properties?: ActivityDefinitionProperty[] | undefined;
-        propertyStorageProviders?: object | undefined;
+        propertyStorageProviders?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ActivityDefinitionProperty = {
         name?: string | undefined;
         syntax?: string | undefined;
-        expressions?: object | undefined;
+        expressions?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ActivityInputDescriptor = {
         name?: string | undefined;
@@ -112,7 +114,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ActivityOutputDescriptor = {
         name?: string | undefined;
@@ -123,7 +125,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ActivityScope = {
         activityId?: string | undefined;
@@ -131,22 +133,22 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ActivityTypeDescriptor = {
         type?: string | undefined;
         displayName?: string | undefined;
         description?: string | undefined;
         category?: string | undefined;
-        traits?: ActivityTraits | undefined;
+        traits?: Enum.ActivityTraits | undefined;
         outcomes?: string[] | undefined;
         inputProperties?: ActivityInputDescriptor[] | undefined;
         outputProperties?: ActivityOutputDescriptor[] | undefined;
-        customAttributes?: object | undefined;
+        customAttributes?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ActivityTypeDescriptorListResult = {
         items?: ActivityTypeDescriptor[] | undefined;
@@ -154,23 +156,23 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ApplicationApiDescriptionModel = {
-        modules?: object | undefined;
-        types?: object | undefined;
+        modules?: Record<any, ModuleApiDescriptionModel> | undefined;
+        types?: Record<any, TypeApiDescriptionModel> | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ApplicationAuthConfiguration = {
-        policies?: object | undefined;
-        grantedPolicies?: object | undefined;
+        policies?: any | undefined;
+        grantedPolicies?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ApplicationConfiguration = {
         localization?: ApplicationLocalizationConfiguration | undefined;
@@ -178,6 +180,7 @@ declare namespace API {
         setting?: ApplicationSettingConfiguration | undefined;
         currentUser?: CurrentUser | undefined;
         features?: ApplicationFeatureConfiguration | undefined;
+        globalFeatures?: ApplicationGlobalFeatureConfiguration | undefined;
         multiTenancy?: MultiTenancyInfo | undefined;
         currentTenant?: CurrentTenant | undefined;
         timing?: Timing | undefined;
@@ -186,33 +189,40 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ApplicationFeatureConfiguration = {
-        values?: object | undefined;
+        values?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
+     **/
+    type ApplicationGlobalFeatureConfiguration = {
+        enabledFeatures?: string[] | undefined;
+    };
+
+    /**
+     * *TODO*
      **/
     type ApplicationLocalizationConfiguration = {
-        values?: object | undefined;
+        values?: any | undefined;
         languages?: LanguageInfo[] | undefined;
         currentCulture?: CurrentCulture | undefined;
         defaultResourceName?: string | undefined;
-        languagesMap?: object | undefined;
-        languageFilesMap?: object | undefined;
+        languagesMap?: any | undefined;
+        languageFilesMap?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ApplicationSettingConfiguration = {
-        values?: object | undefined;
+        values?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type Assembly = {
         definedTypes?: TypeInfo[] | undefined;
@@ -232,11 +242,11 @@ declare namespace API {
         modules?: Module[] | undefined;
         globalAssemblyCache?: boolean | undefined;
         hostContext?: number | undefined;
-        securityRuleSet?: SecurityRuleSet | undefined;
+        securityRuleSet?: Enum.SecurityRuleSet | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type BlockingActivity = {
         activityId?: string | undefined;
@@ -245,14 +255,14 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type Clock = {
         kind?: string | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ConstructorInfo = {
         name?: string | undefined;
@@ -262,9 +272,9 @@ declare namespace API {
         customAttributes?: CustomAttributeData[] | undefined;
         isCollectible?: boolean | undefined;
         metadataToken?: number | undefined;
-        attributes?: MethodAttributes | undefined;
-        methodImplementationFlags?: MethodImplAttributes | undefined;
-        callingConvention?: CallingConventions | undefined;
+        attributes?: Enum.MethodAttributes | undefined;
+        methodImplementationFlags?: Enum.MethodImplAttributes | undefined;
+        callingConvention?: Enum.CallingConventions | undefined;
         isAbstract?: boolean | undefined;
         isConstructor?: boolean | undefined;
         isFinal?: boolean | undefined;
@@ -286,29 +296,31 @@ declare namespace API {
         isSecurityCritical?: boolean | undefined;
         isSecuritySafeCritical?: boolean | undefined;
         isSecurityTransparent?: boolean | undefined;
-        memberType?: MemberTypes | undefined;
+        memberType?: Enum.MemberTypes | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ControllerApiDescriptionModel = {
         controllerName?: string | undefined;
         controllerGroupName?: string | undefined;
+        isRemoteService?: boolean | undefined;
+        apiVersion?: string | undefined;
         type?: string | undefined;
         interfaces?: ControllerInterfaceApiDescriptionModel[] | undefined;
-        actions?: object | undefined;
+        actions?: Record<any, ActionApiDescriptionModel> | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ControllerInterfaceApiDescriptionModel = {
         type?: string | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type CurrentCulture = {
         displayName?: string | undefined;
@@ -323,7 +335,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type CurrentTenant = {
         id?: string | undefined;
@@ -332,7 +344,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type CurrentUser = {
         isAuthenticated?: boolean | undefined;
@@ -353,7 +365,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type CustomAttributeData = {
         attributeType?: Type | undefined;
@@ -363,7 +375,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type CustomAttributeNamedArgument = {
         memberInfo?: MemberInfo | undefined;
@@ -373,7 +385,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type CustomAttributeTypedArgument = {
         argumentType?: Type | undefined;
@@ -381,7 +393,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type DateTimeFormat = {
         calendarAlgorithmType?: string | undefined;
@@ -394,15 +406,15 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type EntityExtension = {
-        properties?: object | undefined;
-        configuration?: object | undefined;
+        properties?: Record<any, ExtensionProperty> | undefined;
+        configuration?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type EventInfo = {
         name?: string | undefined;
@@ -412,8 +424,8 @@ declare namespace API {
         customAttributes?: CustomAttributeData[] | undefined;
         isCollectible?: boolean | undefined;
         metadataToken?: number | undefined;
-        memberType?: MemberTypes | undefined;
-        attributes?: EventAttributes | undefined;
+        memberType?: Enum.MemberTypes | undefined;
+        attributes?: Enum.EventAttributes | undefined;
         isSpecialName?: boolean | undefined;
         addMethod?: MethodInfo | undefined;
         removeMethod?: MethodInfo | undefined;
@@ -423,7 +435,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionEnum = {
         fields?: ExtensionEnumField[] | undefined;
@@ -431,7 +443,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionEnumField = {
         name?: string | undefined;
@@ -439,7 +451,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionProperty = {
         type?: string | undefined;
@@ -448,12 +460,12 @@ declare namespace API {
         api?: ExtensionPropertyApi | undefined;
         ui?: ExtensionPropertyUi | undefined;
         attributes?: ExtensionPropertyAttribute[] | undefined;
-        configuration?: object | undefined;
+        configuration?: any | undefined;
         defaultValue?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionPropertyApi = {
         onGet?: ExtensionPropertyApiGet | undefined;
@@ -462,36 +474,36 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionPropertyApiCreate = {
         isAvailable?: boolean | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionPropertyApiGet = {
         isAvailable?: boolean | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionPropertyApiUpdate = {
         isAvailable?: boolean | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionPropertyAttribute = {
         typeSimple?: string | undefined;
-        config?: object | undefined;
+        config?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionPropertyUi = {
         onTable?: ExtensionPropertyUiTable | undefined;
@@ -501,14 +513,14 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionPropertyUiForm = {
         isVisible?: boolean | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionPropertyUiLookup = {
         url?: string | undefined;
@@ -519,14 +531,14 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ExtensionPropertyUiTable = {
         isVisible?: boolean | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type FieldInfo = {
         name?: string | undefined;
@@ -536,8 +548,8 @@ declare namespace API {
         customAttributes?: CustomAttributeData[] | undefined;
         isCollectible?: boolean | undefined;
         metadataToken?: number | undefined;
-        memberType?: MemberTypes | undefined;
-        attributes?: FieldAttributes | undefined;
+        memberType?: Enum.MemberTypes | undefined;
+        attributes?: Enum.FieldAttributes | undefined;
         fieldType?: Type | undefined;
         isInitOnly?: boolean | undefined;
         isLiteral?: boolean | undefined;
@@ -558,7 +570,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type FindTenantResult = {
         success?: boolean | undefined;
@@ -568,32 +580,32 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
+     **/
+    type ICustomAttributeProvider = {
+    };
+
+    /**
+     * *TODO*
      **/
     type IanaTimeZone = {
         timeZoneName?: string | undefined;
     };
 
     /**
-     *  *TODO*
-     **/
-    type ICustomAttributeProvider = {
-    };
-
-    /**
-     *  *TODO*
+     * *TODO*
      **/
     type IntPtr = {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type JToken = {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type LanguageInfo = {
         cultureName?: string | undefined;
@@ -603,7 +615,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type LocalizableString = {
         name?: string | undefined;
@@ -611,10 +623,10 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type MemberInfo = {
-        memberType?: MemberTypes | undefined;
+        memberType?: Enum.MemberTypes | undefined;
         declaringType?: Type | undefined;
         reflectedType?: Type | undefined;
         name?: string | undefined;
@@ -625,10 +637,10 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type MethodBase = {
-        memberType?: MemberTypes | undefined;
+        memberType?: Enum.MemberTypes | undefined;
         name?: string | undefined;
         declaringType?: Type | undefined;
         reflectedType?: Type | undefined;
@@ -636,9 +648,9 @@ declare namespace API {
         customAttributes?: CustomAttributeData[] | undefined;
         isCollectible?: boolean | undefined;
         metadataToken?: number | undefined;
-        attributes?: MethodAttributes | undefined;
-        methodImplementationFlags?: MethodImplAttributes | undefined;
-        callingConvention?: CallingConventions | undefined;
+        attributes?: Enum.MethodAttributes | undefined;
+        methodImplementationFlags?: Enum.MethodImplAttributes | undefined;
+        callingConvention?: Enum.CallingConventions | undefined;
         isAbstract?: boolean | undefined;
         isConstructor?: boolean | undefined;
         isFinal?: boolean | undefined;
@@ -663,7 +675,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type MethodInfo = {
         name?: string | undefined;
@@ -673,9 +685,9 @@ declare namespace API {
         customAttributes?: CustomAttributeData[] | undefined;
         isCollectible?: boolean | undefined;
         metadataToken?: number | undefined;
-        attributes?: MethodAttributes | undefined;
-        methodImplementationFlags?: MethodImplAttributes | undefined;
-        callingConvention?: CallingConventions | undefined;
+        attributes?: Enum.MethodAttributes | undefined;
+        methodImplementationFlags?: Enum.MethodImplAttributes | undefined;
+        callingConvention?: Enum.CallingConventions | undefined;
         isAbstract?: boolean | undefined;
         isConstructor?: boolean | undefined;
         isFinal?: boolean | undefined;
@@ -697,14 +709,14 @@ declare namespace API {
         isSecurityCritical?: boolean | undefined;
         isSecuritySafeCritical?: boolean | undefined;
         isSecurityTransparent?: boolean | undefined;
-        memberType?: MemberTypes | undefined;
+        memberType?: Enum.MemberTypes | undefined;
         returnParameter?: ParameterInfo | undefined;
         returnType?: Type | undefined;
         returnTypeCustomAttributes?: ICustomAttributeProvider | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type MethodParameterApiDescriptionModel = {
         name?: string | undefined;
@@ -716,7 +728,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type Module = {
         assembly?: Assembly | undefined;
@@ -731,38 +743,38 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ModuleApiDescriptionModel = {
         rootPath?: string | undefined;
         remoteServiceName?: string | undefined;
-        controllers?: object | undefined;
+        controllers?: Record<any, ControllerApiDescriptionModel> | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ModuleExtension = {
-        entities?: object | undefined;
-        configuration?: object | undefined;
+        entities?: Record<any, EntityExtension> | undefined;
+        configuration?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ModuleHandle = {
         mdStreamVersion?: number | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type MultiTenancyInfo = {
         isEnabled?: boolean | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type NameValue = {
         name?: string | undefined;
@@ -770,15 +782,15 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ObjectExtensions = {
-        modules?: object | undefined;
-        enums?: object | undefined;
+        modules?: Record<any, ModuleExtension> | undefined;
+        enums?: Record<any, ExtensionEnum> | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ParameterApiDescriptionModel = {
         nameOnMethod?: string | undefined;
@@ -794,10 +806,10 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ParameterInfo = {
-        attributes?: ParameterAttributes | undefined;
+        attributes?: Enum.ParameterAttributes | undefined;
         member?: MemberInfo | undefined;
         name?: string | undefined;
         parameterType?: Type | undefined;
@@ -815,7 +827,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type PropertyApiDescriptionModel = {
         name?: string | undefined;
@@ -826,7 +838,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type PropertyInfo = {
         name?: string | undefined;
@@ -836,9 +848,9 @@ declare namespace API {
         customAttributes?: CustomAttributeData[] | undefined;
         isCollectible?: boolean | undefined;
         metadataToken?: number | undefined;
-        memberType?: MemberTypes | undefined;
+        memberType?: Enum.MemberTypes | undefined;
         propertyType?: Type | undefined;
-        attributes?: PropertyAttributes | undefined;
+        attributes?: Enum.PropertyAttributes | undefined;
         isSpecialName?: boolean | undefined;
         canRead?: boolean | undefined;
         canWrite?: boolean | undefined;
@@ -847,25 +859,25 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type RemoteServiceErrorInfo = {
         code?: string | undefined;
         message?: string | undefined;
         details?: string | undefined;
-        data?: object | undefined;
+        data?: any | undefined;
         validationErrors?: RemoteServiceValidationErrorInfo[] | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type RemoteServiceErrorResponse = {
         error?: RemoteServiceErrorInfo | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type RemoteServiceValidationErrorInfo = {
         message?: string | undefined;
@@ -873,7 +885,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ReturnValueApiDescriptionModel = {
         type?: string | undefined;
@@ -881,28 +893,28 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type RuntimeFieldHandle = {
         value?: IntPtr | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type RuntimeMethodHandle = {
         value?: IntPtr | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type RuntimeTypeHandle = {
         value?: IntPtr | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type ScheduledActivity = {
         activityId?: string | undefined;
@@ -910,26 +922,26 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type SimpleException = {
         type?: Type | undefined;
         message?: string | undefined;
         stackTrace?: string | undefined;
         innerException?: SimpleException | undefined;
-        data?: object | undefined;
+        data?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type StructLayoutAttribute = {
         typeId?: any | undefined;
-        value?: LayoutKind | undefined;
+        value?: Enum.LayoutKind | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type TimeZone = {
         iana?: IanaTimeZone | undefined;
@@ -937,14 +949,14 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type Timing = {
         timeZone?: TimeZone | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type Type = {
         name?: string | undefined;
@@ -952,7 +964,7 @@ declare namespace API {
         isCollectible?: boolean | undefined;
         metadataToken?: number | undefined;
         isInterface?: boolean | undefined;
-        memberType?: MemberTypes | undefined;
+        memberType?: Enum.MemberTypes | undefined;
         namespace?: string | undefined;
         assemblyQualifiedName?: string | undefined;
         fullName?: string | undefined;
@@ -979,8 +991,8 @@ declare namespace API {
         hasElementType?: boolean | undefined;
         genericTypeArguments?: Type[] | undefined;
         genericParameterPosition?: number | undefined;
-        genericParameterAttributes?: GenericParameterAttributes | undefined;
-        attributes?: TypeAttributes | undefined;
+        genericParameterAttributes?: Enum.GenericParameterAttributes | undefined;
+        attributes?: Enum.TypeAttributes | undefined;
         isAbstract?: boolean | undefined;
         isImport?: boolean | undefined;
         isSealed?: boolean | undefined;
@@ -1021,7 +1033,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type TypeApiDescriptionModel = {
         baseType?: string | undefined;
@@ -1033,7 +1045,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type TypeInfo = {
         name?: string | undefined;
@@ -1041,7 +1053,7 @@ declare namespace API {
         isCollectible?: boolean | undefined;
         metadataToken?: number | undefined;
         isInterface?: boolean | undefined;
-        memberType?: MemberTypes | undefined;
+        memberType?: Enum.MemberTypes | undefined;
         namespace?: string | undefined;
         assemblyQualifiedName?: string | undefined;
         fullName?: string | undefined;
@@ -1068,8 +1080,8 @@ declare namespace API {
         hasElementType?: boolean | undefined;
         genericTypeArguments?: Type[] | undefined;
         genericParameterPosition?: number | undefined;
-        genericParameterAttributes?: GenericParameterAttributes | undefined;
-        attributes?: TypeAttributes | undefined;
+        genericParameterAttributes?: Enum.GenericParameterAttributes | undefined;
+        attributes?: Enum.TypeAttributes | undefined;
         isAbstract?: boolean | undefined;
         isImport?: boolean | undefined;
         isSealed?: boolean | undefined;
@@ -1119,14 +1131,14 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type Variables = {
-        data?: object | undefined;
+        data?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowDefinitionPagedResult = {
         items?: WorkflowDefinition[] | undefined;
@@ -1134,7 +1146,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowDefinitionVersionListItemPagedResult = {
         items?: WorkflowDefinitionVersionListItem[] | undefined;
@@ -1142,14 +1154,14 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowExecutionLogListResult = {
         items?: WorkflowExecutionLog[] | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowExecutionLogPagedResult = {
         items?: WorkflowExecutionLog[] | undefined;
@@ -1157,7 +1169,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowInstanceBasicPagedResult = {
         items?: WorkflowInstanceBasic[] | undefined;
@@ -1165,29 +1177,29 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowStorageProviderInfoListResult = {
         items?: WorkflowStorageProviderInfo[] | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WindowsTimeZone = {
         timeZoneId?: string | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowContextOptions = {
         contextType?: Type | undefined;
-        contextFidelity?: WorkflowContextFidelity | undefined;
+        contextFidelity?: Enum.WorkflowContextFidelity | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowDefinition = {
         id?: string | undefined;
@@ -1205,14 +1217,14 @@ declare namespace API {
         deleteCompletedInstances?: boolean | undefined;
         channel?: string | undefined;
         tag?: string | undefined;
-        persistenceBehavior?: WorkflowPersistenceBehavior | undefined;
+        persistenceBehavior?: Enum.WorkflowPersistenceBehavior | undefined;
         contextOptions?: WorkflowContextOptions | undefined;
-        variables?: object | undefined;
-        customAttributes?: object | undefined;
+        variables?: any | undefined;
+        customAttributes?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowDefinitionCreateOrUpdate = {
         name: string;
@@ -1222,13 +1234,13 @@ declare namespace API {
         deleteCompletedInstances?: boolean | undefined;
         channel?: string | undefined;
         tag?: string | undefined;
-        persistenceBehavior?: WorkflowPersistenceBehavior | undefined;
+        persistenceBehavior?: Enum.WorkflowPersistenceBehavior | undefined;
         contextOptions?: WorkflowContextOptions | undefined;
-        variables?: object | undefined;
+        variables?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowDefinitionDispatchRequest = {
         activityId?: string | undefined;
@@ -1238,14 +1250,14 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowDefinitionDispatchResult = {
         workflowInstanceId?: string | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowDefinitionExecuteRequest = {
         activityId?: string | undefined;
@@ -1255,7 +1267,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowDefinitionVersion = {
         id?: string | undefined;
@@ -1272,7 +1284,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowDefinitionVersionCreateOrUpdate = {
         definition: WorkflowDefinitionCreateOrUpdate;
@@ -1282,7 +1294,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowDefinitionVersionListItem = {
         id?: string | undefined;
@@ -1296,10 +1308,10 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowExecutionLog = {
-        id?: number | undefined;
+        id?: string | undefined;
         creationTime?: string | undefined;
         creatorId?: string | undefined;
         workflowInstanceId?: string | undefined;
@@ -1309,11 +1321,11 @@ declare namespace API {
         eventName?: string | undefined;
         message?: string | undefined;
         source?: string | undefined;
-        data?: object | undefined;
+        data?: Record<any, JToken> | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowFault = {
         exception?: SimpleException | undefined;
@@ -1324,7 +1336,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowInput = {
         input?: any | undefined;
@@ -1332,14 +1344,14 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowInputReference = {
         providerName?: string | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowInstance = {
         id?: string | undefined;
@@ -1347,8 +1359,8 @@ declare namespace API {
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
-        definitionId?: string | undefined;
-        definitionVersionId?: string | undefined;
+        workflowDefinitionId?: string | undefined;
+        workflowDefinitionVersionId?: string | undefined;
         name?: string | undefined;
         version?: number | undefined;
         workflowStatus?: number | undefined;
@@ -1359,7 +1371,7 @@ declare namespace API {
         finishedTime?: string | undefined;
         cancelledTime?: string | undefined;
         faultedTime?: string | undefined;
-        variables?: object | undefined;
+        variables?: any | undefined;
         input?: WorkflowInputReference | undefined;
         output?: WorkflowOutputReference | undefined;
         fault?: WorkflowFault | undefined;
@@ -1368,12 +1380,12 @@ declare namespace API {
         scopes?: ActivityScope[] | undefined;
         currentActivity?: ScheduledActivity | undefined;
         lastExecutedActivityId?: string | undefined;
-        activityData?: object | undefined;
-        metadata?: object | undefined;
+        activityData?: any | undefined;
+        metadata?: any | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowInstanceBasic = {
         id?: string | undefined;
@@ -1381,8 +1393,8 @@ declare namespace API {
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
-        definitionId?: string | undefined;
-        definitionVersionId?: string | undefined;
+        workflowDefinitionId?: string | undefined;
+        workflowDefinitionVersionId?: string | undefined;
         name?: string | undefined;
         version?: number | undefined;
         workflowStatus?: number | undefined;
@@ -1397,7 +1409,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowInstanceDispatchRequest = {
         activityId?: string | undefined;
@@ -1405,7 +1417,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowInstanceExecuteRequest = {
         activityId?: string | undefined;
@@ -1413,21 +1425,21 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowInstanceRetryRequest = {
         runImmediately?: boolean | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowInstancesBatchDeleteRequest = {
         ids?: string[] | undefined;
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowOutputReference = {
         providerName?: string | undefined;
@@ -1435,7 +1447,7 @@ declare namespace API {
     };
 
     /**
-     *  *TODO*
+     * *TODO*
      **/
     type WorkflowStorageProviderInfo = {
         name?: string | undefined;

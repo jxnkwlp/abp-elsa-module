@@ -1,15 +1,15 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 2
  **/
 // @ts-ignore
 /* eslint-disable */
+import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /signals/dispatch/{token}
- * 
+ * *TODO* GET /signals/dispatch/{token} 
  **/
 export async function dispatchEndpointHandleGET(
     token: string,
@@ -23,8 +23,7 @@ export async function dispatchEndpointHandleGET(
 }
 
 /**
- * *TODO* POST /signals/dispatch/{token}
- * 
+ * *TODO* POST /signals/dispatch/{token} 
  **/
 export async function dispatchEndpointHandlePOST(
     token: string,

@@ -1,4 +1,5 @@
 import { WorkflowStatus } from '@/services/enums';
+import type { API } from '@/services/typings';
 import { getWorkflowDefinitionVersion } from '@/services/WorkflowDefinition';
 import { getWorkflowInstance, getWorkflowInstanceExecutionLogs } from '@/services/WorkflowInstance';
 import { ClockCircleOutlined } from '@ant-design/icons';
@@ -79,7 +80,7 @@ const Index: React.FC = () => {
             return;
         }
 
-        await loadWorkflowDefinition(result.definitionId!, result.version!);
+        await loadWorkflowDefinition(result.workflowDefinitionId!, result.version!);
 
         setLoading(false);
     };

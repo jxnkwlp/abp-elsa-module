@@ -1,15 +1,15 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 2
  **/
 // @ts-ignore
 /* eslint-disable */
+import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/designer/activity-types
- * 
+ * *TODO* GET /api/designer/activity-types 
  **/
 export async function getDesignerActivityTypes(
     options?: { [key: string]: any }
@@ -21,8 +21,7 @@ export async function getDesignerActivityTypes(
 }
 
 /**
- * *TODO* GET /api/designer/script-type-definitions/{id}
- * 
+ * *TODO* GET /api/designer/script-type-definitions/{id} 
  **/
 export async function getDesignerScriptTypeDefinition(
     id: string,

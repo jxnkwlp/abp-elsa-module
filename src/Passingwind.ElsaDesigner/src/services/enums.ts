@@ -1,11 +1,11 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json 
  **/
+//
+// enum types
+//
 /**
- * enum types
-* */
-/**
- *  *TODO*
+ * *TODO*
  **/
 export enum ActivityTraits {
     Action = 1,
@@ -14,7 +14,7 @@ export enum ActivityTraits {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum CallingConventions {
     Standard = 1,
@@ -25,7 +25,7 @@ export enum CallingConventions {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum EventAttributes {
     None = 0,
@@ -34,7 +34,7 @@ export enum EventAttributes {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum FieldAttributes {
     PrivateScope = 0,
@@ -59,7 +59,7 @@ export enum FieldAttributes {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum GenericParameterAttributes {
     None = 0,
@@ -73,7 +73,7 @@ export enum GenericParameterAttributes {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum LayoutKind {
     Sequential = 0,
@@ -82,7 +82,7 @@ export enum LayoutKind {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum MemberTypes {
     Constructor = 1,
@@ -97,7 +97,7 @@ export enum MemberTypes {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum MethodAttributes {
     ReuseSlot = 0,
@@ -125,7 +125,7 @@ export enum MethodAttributes {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum MethodImplAttributes {
     IL = 0,
@@ -145,7 +145,7 @@ export enum MethodImplAttributes {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum ParameterAttributes {
     None = 0,
@@ -162,7 +162,7 @@ export enum ParameterAttributes {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum PropertyAttributes {
     None = 0,
@@ -176,7 +176,7 @@ export enum PropertyAttributes {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum SecurityRuleSet {
     None = 0,
@@ -185,7 +185,7 @@ export enum SecurityRuleSet {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum TypeAttributes {
     NotPublic = 0,
@@ -217,7 +217,7 @@ export enum TypeAttributes {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum WorkflowContextFidelity {
     Burst = 0,
@@ -225,7 +225,7 @@ export enum WorkflowContextFidelity {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum WorkflowPersistenceBehavior {
     Suspended = 0,
@@ -234,7 +234,7 @@ export enum WorkflowPersistenceBehavior {
 }
 
 /**
- *  *TODO*
+ * *TODO*
  **/
 export enum WorkflowStatus {
     Idle = 0,

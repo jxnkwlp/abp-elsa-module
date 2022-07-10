@@ -16,7 +16,6 @@ import { Button, Form, message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import { useHistory } from 'umi';
 import EditFormItems from './edit-form-items';
-import { useForm } from 'antd/lib/form/Form';
 
 const handleEdit = async (id: string, data: any) => {
     const response = await updateWorkflowDefinitionDefinition(id, data);

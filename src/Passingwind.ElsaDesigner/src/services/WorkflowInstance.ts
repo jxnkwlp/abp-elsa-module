@@ -1,15 +1,15 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 9
  **/
 // @ts-ignore
 /* eslint-disable */
+import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* DELETE /api/workflow-instances
- * 
+ * *TODO* DELETE /api/workflow-instances 
  **/
 export async function batchDeleteWorkflowInstance(
     payload: API.WorkflowInstancesBatchDeleteRequest,
@@ -24,8 +24,47 @@ export async function batchDeleteWorkflowInstance(
 }
 
 /**
- * *TODO* GET /api/workflow-instances
- * 
+ * *TODO* DELETE /api/workflow-instances/{id} 
+ **/
+export async function deleteWorkflowInstance(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/workflow-instances/${id}`, {
+        method: 'DELETE',
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/workflow-instances/{id} 
+ **/
+export async function getWorkflowInstance(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowInstance>(`/api/workflow-instances/${id}`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/workflow-instances/{id}/execution-logs 
+ **/
+export async function getWorkflowInstanceExecutionLogs(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowExecutionLogListResult>(`/api/workflow-instances/${id}/execution-logs`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/workflow-instances 
  **/
 export async function getWorkflowInstanceList(
     params: {
@@ -46,8 +85,7 @@ export async function getWorkflowInstanceList(
 }
 
 /**
- * *TODO* POST /api/workflow-instances/{id}/cancel
- * 
+ * *TODO* POST /api/workflow-instances/{id}/cancel 
  **/
 export async function workflowInstanceCancel(
     id: string,
@@ -61,37 +99,7 @@ export async function workflowInstanceCancel(
 }
 
 /**
- * *TODO* DELETE /api/workflow-instances/{id}
- * 
- **/
-export async function deleteWorkflowInstance(
-    id: string,
-    options?: { [key: string]: any }
-) {
-    return request<any>(`/api/workflow-instances/${id}`, {
-        method: 'DELETE',
-        getResponse: true,
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* GET /api/workflow-instances/{id}
- * 
- **/
-export async function getWorkflowInstance(
-    id: string,
-    options?: { [key: string]: any }
-) {
-    return request<API.WorkflowInstance>(`/api/workflow-instances/${id}`, {
-        method: 'GET',
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* POST /api/workflow-instances/{id}/dispatch
- * 
+ * *TODO* POST /api/workflow-instances/{id}/dispatch 
  **/
 export async function workflowInstanceDispatch(
     id: string,
@@ -107,8 +115,7 @@ export async function workflowInstanceDispatch(
 }
 
 /**
- * *TODO* POST /api/workflow-instances/{id}/execute
- * 
+ * *TODO* POST /api/workflow-instances/{id}/execute 
  **/
 export async function workflowInstanceExecute(
     id: string,
@@ -124,22 +131,7 @@ export async function workflowInstanceExecute(
 }
 
 /**
- * *TODO* GET /api/workflow-instances/{id}/execution-logs
- * 
- **/
-export async function getWorkflowInstanceExecutionLogs(
-    id: string,
-    options?: { [key: string]: any }
-) {
-    return request<API.WorkflowExecutionLogListResult>(`/api/workflow-instances/${id}/execution-logs`, {
-        method: 'GET',
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* POST /api/workflow-instances/{id}/retry
- * 
+ * *TODO* POST /api/workflow-instances/{id}/retry 
  **/
 export async function workflowInstanceRetry(
     id: string,
