@@ -1,4 +1,4 @@
-import { Settings as LayoutSettings } from '@ant-design/pro-layout';
+import { Settings as LayoutSettings } from '@ant-design/pro-components';
 
 const Settings: LayoutSettings & {
     pwa?: boolean;
@@ -12,7 +12,7 @@ const Settings: LayoutSettings & {
     fixedHeader: false,
     fixSiderbar: true,
     colorWeak: false,
-    title: 'Designer',
+    title: 'Elsa Workflow Demo',
     pwa: false,
     logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
     iconfontUrl: '',

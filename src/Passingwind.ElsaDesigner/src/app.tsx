@@ -1,12 +1,14 @@
 import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
-import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
-import { PageLoading, SettingDrawer } from '@ant-design/pro-layout';
+import { BookOutlined, LinkOutlined } from '@ant-design/icons';
+import type { Settings as LayoutSettings } from '@ant-design/pro-components';
+import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
 import { message, notification } from 'antd';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
-import { history } from 'umi';
+import { history, Link } from 'umi';
 import defaultSettings from '../config/defaultSettings';
 import { getAbpApplicationConfiguration } from './services/AbpApplicationConfiguration';
+import { API } from './services/typings';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/auth/login';
@@ -23,7 +25,7 @@ export async function getInitialState(): Promise<{
     settings?: Partial<LayoutSettings>;
     currentUser?: API.CurrentUser;
     loading?: boolean;
-    fetchData?: () => Promise<API.CurrentUser | undefined>;
+    fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
     const loadData = async () => {
         const result = await getAbpApplicationConfiguration();
@@ -39,7 +41,7 @@ export async function getInitialState(): Promise<{
                 surName: 'admin',
                 userName: 'admin',
             },
-            fetchData: loadData,
+            fetchUserInfo: loadData,
         };
     }
 
@@ -51,14 +53,14 @@ export async function getInitialState(): Promise<{
             settings: defaultSettings,
             currentUser: user,
             loading: true,
-            fetchData: loadData,
+            fetchUserInfo: loadData,
         };
     }
 
     return {
         settings: defaultSettings,
         currentUser: user,
-        fetchData: loadData,
+        fetchUserInfo: loadData,
     };
 }
 
@@ -67,20 +69,26 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     return {
         rightContentRender: () => <RightContent />,
         disableContentMargin: false,
-        // waterMarkProps: {
-        //     content: initialState?.currentUser?.name,
-        // },
         footerRender: () => <Footer />,
         onPageChange: () => {
             const { location } = history;
-            if (
-                !isDev &&
-                !initialState?.currentUser?.isAuthenticated &&
-                location.pathname !== loginPath
-            ) {
+            // 如果没有登录，重定向到 login
+            if (!initialState?.currentUser && location.pathname !== loginPath) {
                 history.push(loginPath);
             }
         },
+        links: isDev
+            ? [
+                  <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
+                      <LinkOutlined />
+                      <span>OpenAPI 文档</span>
+                  </Link>,
+                  <Link to="/~docs" key="docs">
+                      <BookOutlined />
+                      <span>业务组件文档</span>
+                  </Link>,
+              ]
+            : [],
         menuHeaderRender: undefined,
         // 自定义 403 页面
         // unAccessible: <div>unAccessible</div>,
@@ -92,6 +100,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
                     {children}
                     {isDev && !props.location?.pathname?.includes('/login') && (
                         <SettingDrawer
+                            disableUrlParams
                             enableDarkTheme
                             settings={initialState?.settings}
                             onSettingChange={(settings) => {

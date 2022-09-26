@@ -4,6 +4,8 @@ import { getWorkflowDefinitionVersion } from '@/services/WorkflowDefinition';
 import { getWorkflowInstance, getWorkflowInstanceExecutionLogs } from '@/services/WorkflowInstance';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
+import { ProCard } from '@ant-design/pro-card';
+import { ProDescriptions } from '@ant-design/pro-descriptions';
 import { Alert, Card, Col, Modal, Popover, Row, Tag, Timeline, Typography } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef } from 'react';
@@ -14,6 +16,15 @@ import { conventToGraphData } from '../designer/service';
 import type { IGraphData } from '../designer/type';
 
 import './detail.less';
+
+type ExecutionLog = {
+    activityId: string;
+    activityName: string;
+    status: string;
+    outcomes: string[];
+    inBound: any;
+    elapsed: number;
+};
 
 const Index: React.FC = () => {
     const history = useHistory();
@@ -29,6 +40,8 @@ const Index: React.FC = () => {
     const [graphData, setGraphData] = React.useState<IGraphData>();
 
     const [logs, setLogs] = React.useState<API.WorkflowExecutionLog[]>([]);
+
+    const [activityLogs, setActivityLogs] = React.useState<ExecutionLog[]>([]);
 
     const [tabKey, setTabKey] = React.useState<string>('logs');
 
@@ -85,23 +98,37 @@ const Index: React.FC = () => {
         setLoading(false);
     };
 
-    const updateGraphEdgeStatus = (targetNodeId: string) => {
-        graphData?.edges
-            ?.filter((x) => x.target?.cell == targetNodeId)
-            .forEach((x) => {
-                const nodeLogs = logs.filter((log) => log.activityId === x.source?.cell);
-                if (nodeLogs.findIndex((log) => log.eventName == 'Executed') >= 0) {
-                    flowAction.current?.setEdgeStyle(x.id!, 'success');
-                } else if (nodeLogs.findIndex((log) => log.eventName == 'Executing') >= 0) {
-                    flowAction.current?.setEdgeStyle(x.id!, 'processing');
-                } else if (nodeLogs.findIndex((log) => log.eventName == 'Faulted') >= 0) {
-                    flowAction.current?.setEdgeStyle(x.id!, 'error');
+    const updateGraphEdgeStatus = () => {
+        // graphData?.edges
+        //     ?.filter((x) => x.target?.cell == targetNodeId)
+        //     .forEach((x) => {
+        //         const nodeLogs = logs.filter((log) => log.activityId === x.source?.cell);
+        //         if (nodeLogs.findIndex((log) => log.eventName == 'Executed') >= 0) {
+        //             // flowAction.current?.setEdgeStyle(x.id!, 'success');
+        //             // nodeLogs.forEach(item=>{
+        //             //     if(item.data?.['Outcomes'])
+        //             // });
+        //         } else if (nodeLogs.findIndex((log) => log.eventName == 'Executing') >= 0) {
+        //             // flowAction.current?.setEdgeStyle(x.id!, 'processing');
+        //         } else if (nodeLogs.findIndex((log) => log.eventName == 'Faulted') >= 0) {
+        //             // flowAction.current?.setEdgeStyle(x.id!, 'error');
+        //         }
+        //     });
+
+        logs.forEach((log) => {
+            const outcomes: string[] = log.data?.['Outcomes'] ?? [];
+            outcomes.forEach((outcome) => {
+                // const node = graphData?.nodes.find(x=>x.id == log.activityId);
+                const edge = graphData?.edges.find((x) => x.target?.cell == log.activityId);
+                if (edge) {
+                    flowAction.current?.setEdgeStyle(edge.id!, 'success');
                 }
             });
+        });
     };
 
-    const updateGraphNodeStatus = (nodeId: string) => {
-        const nodeLogs = logs.filter((log) => log.activityId === nodeId);
+    const updateGraphNodeStatus = (nodeId: string, nodeLogs: API.WorkflowExecutionLog[]) => {
+        // const nodeLogs = logs.filter((log) => log.activityId === nodeId);
         if (nodeLogs.findIndex((log) => log.eventName == 'Executed') >= 0) {
             flowAction.current?.setNodeStyle(nodeId, 'success');
         } else if (nodeLogs.findIndex((log) => log.eventName == 'Executing') >= 0) {
@@ -109,7 +136,7 @@ const Index: React.FC = () => {
         } else if (nodeLogs.findIndex((log) => log.eventName == 'Faulted') >= 0) {
             flowAction.current?.setNodeStyle(nodeId, 'error');
         }
-        updateGraphEdgeStatus(nodeId);
+        // updateGraphEdgeStatus(nodeId);
     };
 
     useEffect(() => {
@@ -130,10 +157,12 @@ const Index: React.FC = () => {
             // loop
             for (const key in activityLogs) {
                 // const logs = activityLogs[key];
-                updateGraphNodeStatus(key);
+                updateGraphNodeStatus(key, activityLogs[key]);
             }
 
-            //
+            updateGraphEdgeStatus();
+
+            // processing
             if (data?.currentActivity?.activityId) {
                 flowAction.current?.setNodeStyle(data.currentActivity.activityId!, 'processing');
                 flowAction.current?.setNodeIncomingEdgesStyle(
@@ -142,15 +171,16 @@ const Index: React.FC = () => {
                 );
             }
 
-            //
-            if (data?.fault?.faultedActivityId) {
-                flowAction.current?.setNodeStyle(data.fault.faultedActivityId!, 'error');
-            }
-
+            // processing
             if (data?.blockingActivities) {
                 data.blockingActivities.forEach((item) => {
                     flowAction.current?.setNodeStyle(item.activityId!, 'processing');
                 });
+            }
+
+            // error
+            if (data?.fault?.faultedActivityId) {
+                flowAction.current?.setNodeStyle(data.fault.faultedActivityId!, 'error');
             }
         }
     }, [data, logs, graphInit, graphData]);
@@ -178,15 +208,59 @@ const Index: React.FC = () => {
                     style={{ marginBottom: 10 }}
                 />
             )}
+
+            <ProCard title="General" style={{ marginBottom: 16 }}>
+                <ProDescriptions
+                    dataSource={data}
+                    columns={[
+                        { title: 'Name', dataIndex: 'name', copyable: true },
+                        { title: 'Correlation Id', dataIndex: 'correlationId', copyable: true },
+                        { title: 'Version', dataIndex: 'version' },
+                        {
+                            title: 'Status',
+                            dataIndex: 'workflowStatus',
+                            valueEnum: {
+                                [WorkflowStatus.Idle]: {
+                                    text: WorkflowStatus[WorkflowStatus.Idle],
+                                    status: 'default',
+                                },
+                                [WorkflowStatus.Running]: {
+                                    text: WorkflowStatus[WorkflowStatus.Running],
+                                    status: 'processing',
+                                },
+                                [WorkflowStatus.Finished]: {
+                                    text: WorkflowStatus[WorkflowStatus.Finished],
+                                    status: 'success',
+                                },
+                                [WorkflowStatus.Suspended]: {
+                                    text: WorkflowStatus[WorkflowStatus.Suspended],
+                                    status: 'warning',
+                                },
+                                [WorkflowStatus.Faulted]: {
+                                    text: WorkflowStatus[WorkflowStatus.Faulted],
+                                    status: 'error',
+                                },
+                                [WorkflowStatus.Cancelled]: {
+                                    text: WorkflowStatus[WorkflowStatus.Cancelled],
+                                    status: 'default',
+                                },
+                            },
+                        },
+                        { title: 'Created', dataIndex: 'creationTime', valueType: 'dateTime' },
+                        { title: 'Finished', dataIndex: 'finishedTime', valueType: 'dateTime' },
+                        { title: 'Faulted', dataIndex: 'faultedTime', valueType: 'dateTime' },
+                        {
+                            title: 'Last Executed',
+                            dataIndex: 'lastExecutedTime',
+                            valueType: 'dateTime',
+                        },
+                    ]}
+                />
+            </ProCard>
+
             <Row gutter={16}>
                 <Col span={14}>
-                    <Card
-                        title={[
-                            'Graph ',
-                            <Tag key="2">{data?.version}</Tag>,
-                            <Tag key="3">{WorkflowStatus[data?.workflowStatus]}</Tag>,
-                        ]}
-                    >
+                    <Card title="Graph">
                         <Flow
                             readonly
                             actionRef={flowAction}
@@ -224,7 +298,7 @@ const Index: React.FC = () => {
                                     data?.workflowStatus == WorkflowStatus.Suspended
                                 }
                             >
-                                {logs.map((item) => {
+                                {/* {logs.map((item) => {
                                     return (
                                         <Timeline.Item
                                             key={item.id}
@@ -270,7 +344,7 @@ const Index: React.FC = () => {
                                             </Popover>
                                         </Timeline.Item>
                                     );
-                                })}
+                                })} */}
                             </Timeline>
                         )}
                         {tabKey === 'input' && (

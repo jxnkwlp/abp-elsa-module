@@ -1,6 +1,8 @@
 import { loginLogout } from '@/services/Login';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Spin } from 'antd';
+import type { ItemType } from 'antd/lib/menu/hooks/useItems';
+import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import { history, useModel } from 'umi';
@@ -11,8 +13,13 @@ export type GlobalHeaderRightProps = {
     menu?: boolean;
 };
 
+/**
+ * 退出登录，并且将当前的 url 保存
+ */
 const loginOut = async () => {
     await loginLogout();
+    const { query = {}, search, pathname } = history.location;
+    // Note: There may be security issues, please note
     if (window.location.pathname !== '/auth/login') {
         history.replace({
             pathname: '/auth/login',
@@ -58,34 +65,35 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         return loading;
     }
 
+    const menuItems: ItemType[] = [
+        ...(menu
+            ? [
+                  {
+                      key: 'center',
+                      icon: <UserOutlined />,
+                      label: '个人中心',
+                  },
+                  {
+                      key: 'settings',
+                      icon: <SettingOutlined />,
+                      label: '个人设置',
+                  },
+                  {
+                      type: 'divider' as const,
+                  },
+              ]
+            : []),
+        {
+            key: 'logout',
+            icon: <LogoutOutlined />,
+            label: '退出登录',
+        },
+    ];
+
     const menuHeaderDropdown = (
-        <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
-            {menu && (
-                <Menu.Item key="center">
-                    <UserOutlined />
-                    个人中心
-                </Menu.Item>
-            )}
-            {menu && (
-                <Menu.Item key="settings">
-                    <SettingOutlined />
-                    个人设置
-                </Menu.Item>
-            )}
-            {menu && <Menu.Divider />}
-
-            <Menu.Item key="changepassword">
-                <SettingOutlined />
-                修改密码
-            </Menu.Item>
-            <Menu.Divider />
-
-            <Menu.Item key="logout">
-                <LogoutOutlined />
-                退出登录
-            </Menu.Item>
-        </Menu>
+        <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick} items={menuItems} />
     );
+
     return (
         <HeaderDropdown overlay={menuHeaderDropdown}>
             <span className={`${styles.action} ${styles.account}`}>

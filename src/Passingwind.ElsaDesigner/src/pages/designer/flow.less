@@ -1,42 +1,43 @@
 .flow-container {
-    min-height: 100px;
-    display: flex;
     position: relative;
+    display: flex;
+    min-height: 100px;
     border: 1px solid #dfe3e8;
 
     .graph-container {
+        position: relative;
         flex: 1;
         height: 100%;
+        height: calc(100% - 40px);
         min-height: 500px;
-        position: relative;
         margin-top: 40px;
     }
 
     .dnd-box {
         position: relative;
-        width: 260px;
-        height: 100%;
-        border-right: 1px solid #dfe3e8;
-        overflow: hidden;
         display: flex;
         flex-direction: column;
+        width: 260px;
+        height: 100%;
+        overflow: hidden;
+        border-right: 1px solid #dfe3e8;
 
         .dnd-header {
-            height: 40px;
-            line-height: 40px;
             display: flex;
             justify-content: space-evenly;
+            height: 40px;
+            line-height: 40px;
             background: #fff;
             border-bottom: 1px solid #d9d9d9;
         }
 
         .dnd-body {
+            flex: 1;
+            height: 100%;
             padding: 0;
             overflow-x: hidden;
             overflow-y: auto;
             background: #f9f9f9;
-            height: 100%;
-            flex: 1;
 
             ul {
                 margin: 0;
@@ -47,18 +48,16 @@
                     cursor: move;
 
                     div {
-                        background: rgb(239, 244, 255);
-                        border: 1px solid rgb(95, 149, 255);
                         // width: 100px;
                         // height: 30px;
                         line-height: 30px;
                         text-align: center;
+                        background: rgb(239, 244, 255);
+                        border: 1px solid rgb(95, 149, 255);
                         border-radius: 4px;
-
                     }
                 }
             }
-
         }
 
         // .dnd-title {
@@ -79,8 +78,8 @@
 
     .minimap-container {
         position: absolute;
-        bottom: 10px;
         right: 10px;
+        bottom: 10px;
         z-index: 2;
         box-sizing: border-box;
         overflow: hidden;
@@ -97,19 +96,18 @@
     }
 
     .toolbar-container {
-        height: 40px;
-        line-height: 40px;
         position: absolute;
         top: 0;
         right: 0;
         left: 260px;
         z-index: 2;
         box-sizing: border-box;
+        height: 40px;
         overflow: hidden;
+        line-height: 40px;
         background: #fff;
         border-bottom: 1px solid #dfe3e8;
         // box-shadow: 0 0 10px 0 #00000026;
-
     }
 
     .x6-toolbar {
@@ -126,30 +124,30 @@
 .x6-node {
     &.default rect {
         fill: #f5f5f5;
-        stroke: #d5d5d5,
+        stroke: #d5d5d5;
     }
 
     &.processing rect {
         animation: ~'processing-line 30s infinite linear';
+        fill: #f5f5f5;
         stroke: #39ca74cc;
         stroke-width: 2px;
         stroke-dasharray: 8px, 2px;
-        fill: #f5f5f5;
     }
 
     &.success rect {
         fill: #f6ffed;
-        stroke: #b7eb8f,
+        stroke: #b7eb8f;
     }
 
     &.error rect {
         fill: #fff2f0;
-        stroke: #ffccc7,
+        stroke: #ffccc7;
     }
 
     &.x6-node-selected rect {
+        filter: drop-shadow(2px 1px 2px #5f95ff);
         stroke-width: 2px;
-        filter: drop-shadow(2px 1px 2px #5F95FF);
     }
 }
 
@@ -183,8 +181,8 @@
         stroke-width: 2px;
 
         path:nth-child(2) {
-            stroke-dasharray: none;
             stroke: #ffccc7;
+            stroke-dasharray: none;
             stroke-width: 2px;
         }
     }
@@ -213,9 +211,9 @@
 
     &.x6-edge-selected {
         path:nth-child(2) {
+            filter: drop-shadow(2px 3px 3px #5f95ff1a);
             stroke: #91d5ff;
             stroke-width: 2px;
-            filter: drop-shadow(2px 3px 3px #5F95FF1a);
         }
     }
 }

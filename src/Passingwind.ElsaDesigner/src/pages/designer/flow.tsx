@@ -690,14 +690,15 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
     const height = props.height ?? 600;
 
     return (
-        <div className="flow-container" style={{ height: height + 'px' }}>
+        <div className="flow-container">
             {(props.showNodeTypes ?? true) && <NodeTypesPanel key="types" onDrag={handleOnDrag} />}
             <div
                 id="container"
                 className="graph-container"
                 style={{
                     marginTop: props.showToolbar ?? true ? 40 : 0,
-                    height: props.showToolbar ?? true ? height - 40 + 'px' : height + 'px',
+                    height: props.showToolbar ?? true ? 'calc(100% - 40px)' : '100%',
+                    overflow: 'hidden',
                 }}
             />
             {(props.showMiniMap ?? true) && <div id="minimap" className="minimap-container" />}

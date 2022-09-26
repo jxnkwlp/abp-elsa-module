@@ -12,7 +12,6 @@ import { GlobalOutlined, SaveOutlined } from '@ant-design/icons';
 import { ModalForm } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
-import { DagreLayout } from '@antv/layout';
 import type { Node } from '@antv/x6';
 import {
     Button,
@@ -570,6 +569,7 @@ const Index: React.FC = () => {
                         console.log('ctrl+s');
                     }
                 }}
+                className="designer"
             >
                 <Spin spinning={loading}>
                     <Row style={{ marginBottom: 15 }}>
@@ -677,7 +677,6 @@ const Index: React.FC = () => {
                         actionRef={flowAction}
                         graphData={graphData}
                         onNodeDoubleClick={handleOnShowNodeEditForm}
-                        height={800}
                     />
                 </Spin>
             </Card>
