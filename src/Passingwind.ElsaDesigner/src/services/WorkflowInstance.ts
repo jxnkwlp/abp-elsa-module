@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 9
+ * Total count: 10
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -80,6 +80,19 @@ export async function getWorkflowInstanceList(
     return request<API.WorkflowInstanceBasicPagedResult>(`/api/workflow-instances`, {
         method: 'GET',
         params: params,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/workflow-instances/{id}/execution-logs/summary 
+ **/
+export async function getWorkflowInstanceLogSummary(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowInstanceExecutionLogSummary>(`/api/workflow-instances/${id}/execution-logs/summary`, {
+        method: 'GET',
         ...(options || {}),
     });
 }

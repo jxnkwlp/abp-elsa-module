@@ -287,7 +287,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             {
                 ActivityId = Guid.Parse(model.ActivityId),
                 ActivityType = model.ActivityType,
-                Data = model.Data?.ToString(),
+                Data = model.Data?.ToObject<Dictionary<string, object>>(),
                 EventName = model.EventName,
                 Message = model.Message,
                 Source = model.Source,
@@ -300,7 +300,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             entity.ActivityId = Guid.Parse(model.ActivityId);
             entity.ActivityType = model.ActivityType;
-            entity.Data = model.Data?.ToString();
+            entity.Data = model.Data?.ToObject<Dictionary<string, object>>();
             entity.EventName = model.EventName;
             entity.Message = model.Message;
             entity.Source = model.Source;
@@ -317,7 +317,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 Id = entity.Id.ToString(),
                 ActivityId = entity.ActivityId.ToString(),
                 ActivityType = entity.ActivityType,
-                Data = string.IsNullOrEmpty(entity.Data) ? null : JObject.Parse(entity.Data),
+                Data = entity.Data == null ? null : JObject.FromObject(entity.Data),
                 EventName = entity.EventName,
                 Message = entity.Message,
                 Source = entity.Source,
@@ -340,7 +340,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 FinishedTime = model.FinishedAt.HasValue ? ToDateTime(model.FinishedAt.Value) : null,
                 LastExecutedTime = model.LastExecutedAt.HasValue ? ToDateTime(model.LastExecutedAt.Value) : null,
 
-                ActivityData = (Dictionary<string, IDictionary<string, object>>)model.ActivityData,
+                ActivityData = model.ActivityData.ToDictionary(x => Guid.Parse(x.Key), x => x.Value),
                 BlockingActivities = model.BlockingActivities.ToList(),
                 ScheduledActivities = model.ScheduledActivities,
                 Scopes = model.Scopes,
@@ -375,7 +375,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             entity.FinishedTime = model.FinishedAt.HasValue ? ToDateTime(model.FinishedAt.Value) : null;
             entity.LastExecutedTime = model.LastExecutedAt.HasValue ? ToDateTime(model.LastExecutedAt.Value) : null;
 
-            entity.ActivityData = (Dictionary<string, IDictionary<string, object>>)model.ActivityData;
+            entity.ActivityData = model.ActivityData.ToDictionary(x => Guid.Parse(x.Key), x => x.Value);
             entity.BlockingActivities = model.BlockingActivities.ToList();
             entity.ScheduledActivities = model.ScheduledActivities;
             entity.Scopes = model.Scopes;
@@ -416,7 +416,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 FinishedAt = entity.FinishedTime == null ? null : ToInstant(entity.FinishedTime.Value),
                 LastExecutedAt = entity.LastExecutedTime == null ? null : ToInstant(entity.LastExecutedTime.Value),
 
-                ActivityData = entity.ActivityData,
+                ActivityData = entity.ActivityData.ToDictionary(x => x.Key.ToString(), x => x.Value),
                 BlockingActivities = entity.BlockingActivities.ToHashSet(),
                 ScheduledActivities = new Elsa.Models.SimpleStack<Elsa.Models.ScheduledActivity>(entity.ScheduledActivities),
                 Scopes = new Elsa.Models.SimpleStack<Elsa.Models.ActivityScope>(entity.Scopes),

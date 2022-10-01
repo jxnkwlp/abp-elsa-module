@@ -59,7 +59,7 @@ public class WorkflowInstance : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     public Guid? LastExecutedActivityId { get; set; }
 
-    public Dictionary<string, IDictionary<string, object>> ActivityData { get; set; } = new Dictionary<string, IDictionary<string, object>>();
+    public Dictionary<Guid, IDictionary<string, object>> ActivityData { get; set; } = new Dictionary<Guid, IDictionary<string, object>>();
 
     public Dictionary<string, object> Metadata { get; set; } = new Dictionary<string, object>();
 

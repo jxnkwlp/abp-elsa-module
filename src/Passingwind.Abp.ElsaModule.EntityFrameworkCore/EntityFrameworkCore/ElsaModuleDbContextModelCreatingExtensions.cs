@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using EcsShop.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -138,7 +139,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.BlockingActivities).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.BlockingActivity>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.BlockingActivity>), false));
             b.Property(x => x.Scopes).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.ActivityScope>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ActivityScope>), false));
             b.Property(x => x.CurrentActivity).HasConversion(new ElsaEFJsonValueConverter<Elsa.Models.ScheduledActivity>(), ValueComparer.CreateDefault(typeof(Elsa.Models.ScheduledActivity), false));
-            b.Property(x => x.ActivityData).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, IDictionary<string, object>>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, IDictionary<string, object>>), false));
+            b.Property(x => x.ActivityData).HasConversion(new ElsaEFJsonValueConverter<Dictionary<Guid, IDictionary<string, object>>>(), ValueComparer.CreateDefault(typeof(Dictionary<Guid, IDictionary<string, object>>), false));
             b.Property(x => x.Metadata).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
 
             // b.HasOne(x => x.Definition).WithOne().OnDelete(DeleteBehavior.SetNull);
@@ -153,11 +154,9 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.ActivityType).HasMaxLength(128);
             b.Property(x => x.EventName).HasMaxLength(128);
             b.Property(x => x.Source).HasMaxLength(128);
-            // b.Property(x => x.Data).HasConversion(new ElsaEFJsonValueConverter<JObject>(), ValueComparer.CreateDefault(typeof(JObject), false));
+            b.Property(x => x.Data).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
 
         });
-
-
 
     }
 

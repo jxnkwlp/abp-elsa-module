@@ -7,7 +7,7 @@ module.exports = {
     },
     rules: {
         'no-shadow': 'off',
-        '@typescript-eslint/no-shadow': ['warn'],
+        '@typescript-eslint/no-shadow': ['off'],
         '@typescript-eslint/no-unused-vars': ['warn'],
     },
 };

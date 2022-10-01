@@ -15,16 +15,18 @@ namespace Passingwind.Abp.ElsaModule.Common
     {
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IWorkflowInstanceRepository _workflowInstanceRepository;
+        private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
         private readonly IWorkflowExecutionLogRepository _workflowExecutionLogRepository;
         private readonly IStoreMapper _storeMapper;
         private readonly IWorkflowInstanceCanceller _workflowInstanceCanceller;
         private readonly IWorkflowReviver _workflowReviver;
         private readonly IWorkflowLaunchpad _workflowLaunchpad;
 
-        public WorkflowInstanceAppService(IJsonSerializer jsonSerializer, IWorkflowInstanceRepository workflowInstanceRepository, IWorkflowExecutionLogRepository workflowExecutionLogRepository, IStoreMapper storeMapper, IWorkflowInstanceCanceller workflowInstanceCanceller, IWorkflowReviver workflowReviver, IWorkflowLaunchpad workflowLaunchpad)
+        public WorkflowInstanceAppService(IJsonSerializer jsonSerializer, IWorkflowInstanceRepository workflowInstanceRepository, IWorkflowDefinitionRepository workflowDefinitionRepository, IWorkflowExecutionLogRepository workflowExecutionLogRepository, IStoreMapper storeMapper, IWorkflowInstanceCanceller workflowInstanceCanceller, IWorkflowReviver workflowReviver, IWorkflowLaunchpad workflowLaunchpad)
         {
             _jsonSerializer = jsonSerializer;
             _workflowInstanceRepository = workflowInstanceRepository;
+            _workflowDefinitionRepository = workflowDefinitionRepository;
             _workflowExecutionLogRepository = workflowExecutionLogRepository;
             _storeMapper = storeMapper;
             _workflowInstanceCanceller = workflowInstanceCanceller;
@@ -100,8 +102,8 @@ namespace Passingwind.Abp.ElsaModule.Common
 
         public async Task<PagedResultDto<WorkflowInstanceBasicDto>> GetListAsync(WorkflowInstanceListRequestDto input)
         {
-            var count = await _workflowInstanceRepository.GetCountAsync(name: input.Name, version: input.Version, status: input.WorkflowStatus, correlationId: input.CorrelationId);
-            var list = await _workflowInstanceRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, null, name: input.Name, version: input.Version, status: input.WorkflowStatus, correlationId: input.CorrelationId);
+            var count = await _workflowInstanceRepository.GetCountAsync(name: input.Name, definitionId: input.WorkflowDefinitionId, version: input.Version, status: input.WorkflowStatus, correlationId: input.CorrelationId);
+            var list = await _workflowInstanceRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, null, name: input.Name, definitionId: input.WorkflowDefinitionId, version: input.Version, status: input.WorkflowStatus, correlationId: input.CorrelationId);
 
             return new PagedResultDto<WorkflowInstanceBasicDto>(count, ObjectMapper.Map<List<WorkflowInstance>, List<WorkflowInstanceBasicDto>>(list));
         }
@@ -120,6 +122,54 @@ namespace Passingwind.Abp.ElsaModule.Common
                     await DeleteAsync(id);
                 }
             }
+        }
+
+        public async Task<WorkflowInstanceExecutionLogSummaryDto> GetLogSummaryAsync(Guid id)
+        {
+            var entity = await _workflowInstanceRepository.GetAsync(id);
+
+            var allLogs = await _workflowExecutionLogRepository.GetListAsync(workflowInstanceId: id);
+
+            var dto = new WorkflowInstanceExecutionLogSummaryDto()
+            {
+                Activities = new List<WorkflowInstanceExecutionLogSummaryActivityDto>()
+            };
+
+            var groupLogs = allLogs.GroupBy(x => x.ActivityId);
+
+            foreach (var itemLogs in groupLogs)
+            {
+                var logs = itemLogs.OrderByDescending(x => x.Timestamp);
+
+                var summary = new WorkflowInstanceExecutionLogSummaryActivityDto()
+                {
+                    ActivityId = itemLogs.Key,
+                    ActivityType = logs.First().ActivityType,
+
+                    StartTime = logs.Last().Timestamp,
+                    EndTime = logs.First().Timestamp,
+                    ExecutedCount = logs.Count(),
+                    Duration = (logs.First().Timestamp - logs.Last().Timestamp).TotalMilliseconds,
+
+                    IsExecuted = logs.Any(x => x.EventName == "Executed"),
+                    IsExecuting = !logs.Any(x => x.EventName == "Executed") && !logs.Any(x => x.EventName == "Faulted"),
+                    IsFaulted = logs.Any(x => x.EventName == "Faulted"),
+
+                    Outcomes = logs.Where(x => x.Data?.ContainsKey("Outcomes") == true).SelectMany(x => x.Data.SafeGetValue<string, object, string[]>("Outcomes")).ToArray(),
+
+                    StateData = entity.ActivityData.ContainsKey(itemLogs.Key) ? entity.ActivityData[itemLogs.Key] : default,
+                    JournalData = logs.First().Data.Where(x => x.Key != "Outcomes").ToDictionary(x => x.Key, x => x.Value),
+
+                    Message = logs.First().Message,
+                };
+
+                dto.Activities.Add(summary);
+            }
+
+            // reorder again
+            dto.Activities = dto.Activities.OrderByDescending(x => x.StartTime).ToList();
+
+            return dto;
         }
     }
 }

@@ -9,25 +9,26 @@ import {
     ZoomInOutlined,
     ZoomOutOutlined,
 } from '@ant-design/icons';
-import type { Edge, Node } from '@antv/x6';
-import { Addon, Graph, Shape } from '@antv/x6';
+import type { Edge, Graph, Node } from '@antv/x6';
+import { Addon } from '@antv/x6';
 import { Toolbar } from '@antv/x6-react-components';
 import '@antv/x6-react-components/es/menu/style/index.css';
 import '@antv/x6-react-components/es/toolbar/style/index.css';
 import type { Dnd } from '@antv/x6/lib/addon';
 import { message } from 'antd';
-import React, { useEffect, useImperativeHandle } from 'react';
+import React, { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import './flow.less';
 import { registerNodeTypes } from './node';
 import NodeTypesPanel from './node-types';
 import {
-    checkCanCreateEdge,
     compareOutputEdges,
-    createEdgeConfig,
+    createGraph,
     createNodeConfig,
-    getGraphOptions,
-    getNextEdgeName,
     getNodeTypeRawData,
+    graphCreateEdge,
+    graphValidateConnection,
+    graphValidateEdge,
+    graphValidateMagnet,
     toggleNodePortVisible,
 } from './service';
 import type { IGraphData, NodeTypeStyleName, NodeUpdateData, ToolBarGroupData } from './type';
@@ -50,6 +51,8 @@ type IFlowProps = {
     //
     onGraphInitial?: (graph: Graph) => void;
     onDataUpdate?: (graph: Graph) => void;
+    //
+    onBlankClick?: () => void;
 };
 
 export type FlowActionType = {
@@ -62,12 +65,13 @@ export type FlowActionType = {
     setAllEdgesStyle: (style: NodeTypeStyleName) => void;
     setNodeIncomingEdgesStyle: (id: string, style: NodeTypeStyleName) => void;
     setNodeOutgoingEdgesStyle: (id: string, style: NodeTypeStyleName) => void;
+    setNodeOutgoingEdgeStyle: (id: string, name: string, style: NodeTypeStyleName) => void;
 };
 
 const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
     const { actionRef, graphData } = props;
 
-    const [graphInstance, setGraphInstance] = React.useState<Graph | undefined>();
+    const graphInstance = useRef<Graph>();
 
     const [toolbarItemData, setToolbarItemData] = React.useState<ToolBarGroupData[]>([]);
 
@@ -75,13 +79,13 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
 
     useImperativeHandle(actionRef, () => ({
         getGraphData: async () => {
-            const cells = graphInstance?.toJSON().cells;
+            const cells = graphInstance.current?.toJSON().cells;
             const edges = cells?.filter((x) => x.shape == 'edge' || x.shape == 'bpmn-edge');
             const nodes = cells?.filter((x) => x.shape != 'edge' && x.shape != 'bpmn-edge');
             return { nodes, edges } as IGraphData;
         },
         updateNodeProperties: (id, values) => {
-            const node = graphInstance?.getNodes().find((x) => x.id == id);
+            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
             if (!node) {
                 message.error(`node id '${id}' not found`);
                 return;
@@ -103,15 +107,15 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                 const beRemoveEdges = compareOutputEdges(
                     node,
                     values.outcomes,
-                    graphInstance?.getOutgoingEdges(node) ?? [],
+                    graphInstance.current?.getOutgoingEdges(node) ?? [],
                 );
                 beRemoveEdges.forEach((item) => {
-                    graphInstance?.removeEdge(item);
+                    graphInstance.current?.removeEdge(item);
                 });
             }
         },
         updateNodeOutPorts: (id, values) => {
-            const node = graphInstance?.getNodes().find((x) => x.id == id);
+            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
             if (!node) {
                 message.error(`node id '${id}' not found`);
                 return;
@@ -122,56 +126,70 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             // setNodeOutPorts(node, outcomes);
         },
         setAllNodesStyle: (style) => {
-            const allNodes = graphInstance?.getNodes() ?? [];
+            const allNodes = graphInstance.current?.getNodes() ?? [];
             allNodes.forEach((node) => {
-                const view = graphInstance?.findViewByCell(node);
+                const view = graphInstance.current?.findViewByCell(node);
                 view?.removeClass(NodeTypeStyleNames);
                 view?.addClass(style);
             });
         },
         setNodeStyle: (id, style) => {
-            const node = graphInstance?.getNodes().find((x) => x.id == id);
+            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
             if (node) {
-                const view = node.findView(graphInstance!);
+                const view = node.findView(graphInstance.current!);
                 view?.removeClass(NodeTypeStyleNames);
                 view?.addClass(style);
             }
         },
         setAllEdgesStyle: (style) => {
-            const allEdges = graphInstance?.getEdges() ?? [];
+            const allEdges = graphInstance.current?.getEdges() ?? [];
             allEdges.forEach((edge) => {
-                const view = graphInstance?.findViewByCell(edge);
+                const view = graphInstance.current?.findViewByCell(edge);
                 view?.removeClass(NodeTypeStyleNames);
                 view?.addClass(style);
             });
         },
         setEdgeStyle: (id, style) => {
-            const edge = graphInstance?.getEdges().find((x) => x.id == id);
+            const edge = graphInstance.current?.getEdges().find((x) => x.id == id);
             if (edge) {
-                const view = edge.findView(graphInstance!);
+                const view = edge.findView(graphInstance.current!);
                 view?.removeClass(NodeTypeStyleNames);
                 view?.addClass(style);
             }
         },
         setNodeIncomingEdgesStyle: (id, style) => {
-            const node = graphInstance?.getNodes().find((x) => x.id == id);
+            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
             if (node) {
-                const edges = graphInstance?.getIncomingEdges(node);
+                const edges = graphInstance.current?.getIncomingEdges(node);
                 edges?.forEach((edge) => {
-                    const view = edge.findView(graphInstance!);
+                    const view = edge.findView(graphInstance.current!);
                     view?.removeClass(NodeTypeStyleNames);
                     view?.addClass(style);
                 });
             }
         },
         setNodeOutgoingEdgesStyle: (id, style) => {
-            const node = graphInstance?.getNodes().find((x) => x.id == id);
+            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
             if (node) {
-                const edges = graphInstance?.getOutgoingEdges(node);
+                const edges = graphInstance.current?.getOutgoingEdges(node);
                 edges?.forEach((edge) => {
-                    const view = edge.findView(graphInstance!);
+                    const view = edge.findView(graphInstance.current!);
                     view?.removeClass(NodeTypeStyleNames);
                     view?.addClass(style);
+                });
+            }
+        },
+        setNodeOutgoingEdgeStyle: (id, name, style) => {
+            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
+            if (node) {
+                const edges = graphInstance.current?.getOutgoingEdges(node);
+                edges?.forEach((edge) => {
+                    // console.log(edge.getProp('outcome'));
+                    if (edge.getProp('outcome') == name || edge.id == name) {
+                        const view = edge.findView(graphInstance.current!);
+                        view?.removeClass(NodeTypeStyleNames);
+                        view?.addClass(style);
+                    }
                 });
             }
         },
@@ -203,7 +221,6 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                     graph?.zoom(-0.1, { absolute: false });
                 }
                 break;
-
             case 'redo':
                 {
                     if (graph?.canRedo()) {
@@ -222,21 +239,18 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                     }
                 }
                 break;
-
             case 'center':
                 {
                     graph?.zoom(1, { absolute: true });
                     graph?.centerContent({ padding: 50 });
                 }
                 break;
-
             case 'compress':
                 {
                     graph?.scaleContentToFit();
                     graph?.centerContent({ padding: 50 });
                 }
                 break;
-
             case 'delete':
                 {
                     const cells = graph?.getSelectedCells() ?? [];
@@ -245,7 +259,6 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                     }
                 }
                 break;
-
             case 'copy':
                 {
                     const cells = graph?.getSelectedCells() ?? [];
@@ -255,7 +268,6 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                         return;
                     }
                     graph.cleanSelection();
-
                     graph?.copy(cells, { deep: false });
                     //
                     if (!graph?.isClipboardEmpty()) {
@@ -274,11 +286,21 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         }
     };
 
+    const handleOnNodeClick = useCallback((nodeConfig: Node.Properties, node: Node) => {
+        props?.onNodeClick?.(nodeConfig, node);
+    }, []);
+
     const loadGraphData = (data: IGraphData) => {
+        // console.log(graphInstance.current);
+        if (!graphInstance?.current) {
+            console.error('graph never initial.');
+            // message.error('');
+            return;
+        }
         // @ts-ignore
-        graphInstance?.fromJSON(data);
-        graphInstance?.centerContent({ padding: 50 });
-        props?.onDataUpdate?.(graphInstance!);
+        graphInstance?.current?.fromJSON(data);
+        graphInstance?.current?.centerContent({ padding: 50 });
+        props?.onDataUpdate?.(graphInstance.current!);
     };
 
     const handleOnDrag = async (type: string, e: any) => {
@@ -288,7 +310,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         //     label: type,
         // });
 
-        if (!graphInstance) {
+        if (!graphInstance.current) {
             return;
         }
 
@@ -308,9 +330,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             typeDescriptor: type,
         });
 
-        // graphInstance.addNode({ ...nodeConfig, x: 100, y: 100 });
-
-        const node = graphInstance.createNode(nodeConfig);
+        const node = graphInstance.current?.createNode(nodeConfig);
 
         if (node) dnd?.start(node!, e);
     };
@@ -318,280 +338,140 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
     const initial = async () => {
         const readonly = props.readonly ?? false;
 
-        if (!graphInstance) {
+        let graph: Graph;
+        if (!graphInstance.current) {
             console.debug('graph initial...');
 
             registerNodeTypes();
 
-            const graph = new Graph({
-                container: document.getElementById('container')!,
-                // height: props.height ?? 600,
-                // width: '100vm',
-                autoResize: true,
-                grid: {
-                    size: 10,
-                    visible: true,
-                },
-                history: {
-                    enabled: true,
-                    // ignoreChange: true,
-                    beforeAddCommand(event, args) {
-                        // @ts-ignore
-                        if (args?.key == 'tools') {
-                            return false;
-                        }
-                        return true;
-                    },
-                },
-                mousewheel: {
-                    enabled: true,
-                    zoomAtMousePosition: true,
-                    modifiers: ['ctrl'],
-                    minScale: 0.5,
-                    maxScale: 1.5,
-                },
-                scroller: {
-                    padding: 40,
-                },
-                panning: {
-                    enabled: true,
-                    // modifiers: 'ctrl',
-                },
-                minimap: {
-                    enabled: true,
-                    container: document.getElementById('minimap')!,
-                    width: 230,
-                    height: 180,
-                },
-                snapline: true,
-                keyboard: true,
-                selecting: {
-                    enabled: true,
-                    showNodeSelectionBox: false,
-                },
-                clipboard: {
-                    enabled: true,
-                    useLocalStorage: true,
-                },
-                translating: {
-                    restrict: true,
-                },
-                connecting: {
-                    router: {
-                        name: 'manhattan',
-                        args: {
-                            step: 10,
-                        },
-                    },
-                    connector: {
-                        name: 'rounded',
-                        args: {
-                            radius: 10,
-                        },
-                    },
-                    anchor: 'center',
-                    connectionPoint: 'anchor',
-                    allowBlank: false,
-                    allowMulti: 'withPort',
-                    snap: true,
-                    highlight: true,
-                    allowLoop: false,
-                    allowEdge: false,
-                    // 是否可以新增边
-                    validateMagnet({ cell, view, magnet }) {
-                        if (!magnet) return false;
+            // 创建 graph
+            graph = createGraph();
 
-                        if (cell.isNode())
-                            if (!checkCanCreateEdge(cell, graph.getOutgoingEdges(cell) ?? [])) {
-                                message.error(`No more outcomes.`);
-                                return false;
-                            }
+            // 是否可以新增边
+            graph.options.connecting.validateMagnet = (e) => graphValidateMagnet(graph, e);
+            // 边是否有效
+            graph.options.connecting.validateConnection = (e) => graphValidateConnection(graph, e);
+            // 边是否生效
+            graph.options.connecting.validateEdge = (e) => graphValidateEdge(graph, e);
+            // 创建边
+            graph.options.connecting.createEdge = (e) => graphCreateEdge(graph, e);
 
-                        //
-                        return true;
-                    },
-                    // 边是否有效
-                    validateConnection({ sourceCell, targetMagnet }) {
-                        if (!targetMagnet) {
-                            return false;
-                        }
-
-                        return true;
-                    },
-                    // 边是否生效
-                    validateEdge({ edge, type }) {
-                        console.log(edge, type);
-                        if (edge.getProp('shape') != 'bpmn-edge') {
-                            return false;
-                        }
-                        // if (edge.get) {
-                        //     const nextName = getNextEdgeName(
-                        //         sourceCell,
-                        //         graph.getOutgoingEdges(sourceCell) ?? [],
-                        //     );
-                        //     if (!nextName) {
-                        //         return false;
-                        //     }
-                        // }
-                        return true;
-                    },
-                    // 创建边
-                    createEdge: ({ sourceCell, sourceMagnet }) => {
-                        // const portName = sourceMagnet.getAttribute('port') ?? 'Done';
-                        // console.log(typeof sourceCell);
-                        if (sourceCell.isNode()) {
-                            const nextName = getNextEdgeName(
-                                sourceCell,
-                                graph.getOutgoingEdges(sourceCell) ?? [],
-                            );
-                            if (nextName) {
-                                return new Shape.Edge(
-                                    createEdgeConfig({ id: '', label: nextName }),
-                                );
-                            } else {
-                                message.error(`No more outcomes.`);
-                                return null;
-                            }
-                        } else return null;
-                    },
-                },
-                highlighting: {
-                    // 连线过程中，自动吸附到链接桩时被使用。
-                    magnetAdsorbed: {
-                        name: 'stroke',
-                        args: {
-                            attrs: {
-                                fill: '#fff',
-                                stroke: '#47C769',
-                                'stroke-width': 2,
-                            },
-                        },
-                    },
-                    magnetAvailable: {
-                        name: 'stroke',
-                        args: {
-                            attrs: {
-                                fill: '#fff',
-                                stroke: '#47C769',
-                                'stroke-width': 1,
-                            },
-                        },
-                    },
-                },
-
-                ...getGraphOptions(),
-            });
-
-            setGraphInstance(graph);
+            // set instance
+            graphInstance.current = graph;
             props?.onGraphInitial?.(graph);
-
-            if (readonly) {
-                graph.disableClipboard();
-                graph.disableHistory();
-                graph.disableSnapline();
-                graph.disableSelection();
-                graph.disableRubberband();
-                // @ts-ignore
-                graph.options.interacting.nodeMovable = false;
-            }
-
-            const dnd = new Addon.Dnd({
-                target: graph!,
-                scaled: false,
-                animation: true,
-                // getDragNode: (node) => node.clone({ keepId: true }),
-                // getDropNode: (node) => {
-                //     const node2 = node.clone({ keepId: true });
-                //     // updateNodePorts(node2);
-                //     return node2;
-                // },
-            });
-            setDnd(dnd);
-
-            graph.on('node:click', ({ node }) => {
-                console.debug(node);
-                node.toFront();
-                props.onNodeClick?.(node.getProp() as Node.Properties, node);
-            });
-
-            graph.on('node:dblclick', ({ node }) => {
-                props.onNodeDoubleClick?.(node.getProp() as Node.Properties, node);
-            });
-
-            graph.on('edge:click', ({ edge }) => {
-                console.debug(edge);
-                edge.toFront();
-                props.onEdgeClick?.({ ...edge });
-            });
-
-            graph.on('edge:dblclick', ({ edge }) => {
-                props.onEdgeDoubleClick?.({ ...edge });
-            });
-
-            graph.on('node:mouseenter', ({ node }) => {
-                if (!readonly) {
-                    node.addTools([
-                        {
-                            name: 'button-remove',
-                            args: { x: 98, y: 6 },
-                        },
-                    ]);
-
-                    toggleNodePortVisible(node, true);
-                }
-            });
-
-            graph.on('node:mouseleave', ({ node }) => {
-                node.removeTools();
-
-                toggleNodePortVisible(node, false);
-            });
-
-            graph.on('edge:mouseenter', ({ edge }) => {
-                if (!readonly) {
-                    edge.toFront();
-                    edge.addTools([
-                        {
-                            name: 'button-remove',
-                            args: { distance: -40 },
-                        },
-                    ]);
-                }
-            });
-
-            graph.on('edge:mouseleave', ({ edge }) => {
-                edge.removeTools();
-                edge.setZIndex(-1);
-            });
-
-            graph.on('blank:click', ({}) => {
-                (graph.getCells() ?? []).forEach((item) => {
-                    if (item.isNode()) {
-                        toggleNodePortVisible(item, false);
-                    }
-                    if (item.isEdge()) {
-                        item.setZIndex(-1);
-                        item.removeTools();
-                    }
-                });
-            });
+        } else {
+            graph = graphInstance.current!;
         }
+
+        if (readonly) {
+            graph.disableClipboard();
+            graph.disableHistory();
+            graph.disableSnapline();
+            // graph.disableSelection();
+            graph.disableRubberband();
+            // @ts-ignore
+            graph.options.interacting.nodeMovable = false;
+        }
+
+        const dnd = new Addon.Dnd({
+            target: graph!,
+            scaled: false,
+            animation: true,
+            // getDragNode: (node) => node.clone({ keepId: true }),
+            // getDropNode: (node) => {
+            //     const node2 = node.clone({ keepId: true });
+            //     // updateNodePorts(node2);
+            //     return node2;
+            // },
+        });
+        setDnd(dnd);
+
+        graph.on('node:click', ({ node }) => {
+            console.debug(node);
+            node.toFront();
+            handleOnNodeClick(node.getProp() as Node.Properties, node);
+        });
+
+        graph.on('node:dblclick', ({ node }) => {
+            props.onNodeDoubleClick?.(node.getProp() as Node.Properties, node);
+        });
+
+        graph.on('edge:click', ({ edge }) => {
+            console.debug(edge);
+            edge.toFront();
+            props.onEdgeClick?.({ ...edge });
+        });
+
+        graph.on('edge:dblclick', ({ edge }) => {
+            props.onEdgeDoubleClick?.({ ...edge });
+        });
+
+        graph.on('node:mouseenter', ({ node }) => {
+            if (!readonly) {
+                node.addTools([
+                    {
+                        name: 'button-remove',
+                        args: { x: 98, y: 6 },
+                    },
+                ]);
+
+                toggleNodePortVisible(node, true);
+            }
+        });
+
+        graph.on('node:mouseleave', ({ node }) => {
+            node.removeTools();
+
+            toggleNodePortVisible(node, false);
+        });
+
+        graph.on('edge:mouseenter', ({ edge }) => {
+            if (!readonly) {
+                edge.toFront();
+                edge.addTools([
+                    {
+                        name: 'button-remove',
+                        args: { distance: -40 },
+                    },
+                ]);
+            }
+        });
+
+        graph.on('edge:mouseleave', ({ edge }) => {
+            edge.removeTools();
+            edge.setZIndex(-1);
+        });
+
+        graph.on('blank:click', ({}) => {
+            (graph.getCells() ?? []).forEach((item) => {
+                if (item.isNode()) {
+                    toggleNodePortVisible(item, false);
+                }
+                if (item.isEdge()) {
+                    item.setZIndex(-1);
+                    item.removeTools();
+                }
+            });
+
+            // call
+            props?.onBlankClick?.();
+        });
     };
 
     useEffect(() => {
-        if (graphData && graphInstance) {
+        if (graphData && graphInstance.current) {
             console.debug('graph load: ', graphData);
             loadGraphData(graphData);
         }
-    }, [graphData, graphInstance]);
+    }, [graphData, graphInstance.current]);
 
     useEffect(() => {
         initial();
 
         return () => {
-            if (graphInstance) graphInstance.dispose();
+            if (graphInstance) graphInstance.current?.dispose();
         };
-    }, []);
+    }, [0]);
 
     useEffect(() => {
         if (!props.toolbars) {
@@ -685,15 +565,15 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         } else {
             setToolbarItemData(props.toolbars ?? []);
         }
-    }, []);
+    }, [0]);
 
-    const height = props.height ?? 600;
+    // const height = props.height ?? 600;
 
     return (
         <div className="flow-container">
             {(props.showNodeTypes ?? true) && <NodeTypesPanel key="types" onDrag={handleOnDrag} />}
             <div
-                id="container"
+                id="graphContainer"
                 className="graph-container"
                 style={{
                     marginTop: props.showToolbar ?? true ? 40 : 0,
@@ -720,7 +600,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                                                 tooltip={item2.tooltip}
                                                 icon={item2.icon}
                                                 onClick={() => {
-                                                    item2.onClick?.(graphInstance!);
+                                                    item2.onClick?.(graphInstance.current!);
                                                 }}
                                             />
                                         );
@@ -728,44 +608,6 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                                 </Toolbar.Group>
                             );
                         })}
-                        {/* <Toolbar.Group>
-                            <Toolbar.Item
-                                name="zoomIn"
-                                tooltip="Zoom In "
-                                icon={<ZoomInOutlined />}
-                            />
-                            <Toolbar.Item
-                                name="zoomOut"
-                                tooltip="Zoom Out"
-                                icon={<ZoomOutOutlined />}
-                            />
-                        </Toolbar.Group>
-                        <Toolbar.Group>
-                            <Toolbar.Item
-                                name="undo"
-                                tooltip="Undo"
-                                icon={<UndoOutlined />}
-                                disabled={graphInstance?.canUndo() ?? true}
-                            />
-                            <Toolbar.Item
-                                name="redo"
-                                tooltip="Redo"
-                                icon={<RedoOutlined />}
-                                disabled={graphInstance?.canRedo() ?? true}
-                            />
-                        </Toolbar.Group>
-                        <Toolbar.Group>
-                            <Toolbar.Item
-                                name="center"
-                                tooltip="Center"
-                                icon={<OneToOneOutlined />}
-                            />
-                            <Toolbar.Item
-                                name="compress"
-                                tooltip="Auto Size"
-                                icon={<CompressOutlined />}
-                            />
-                        </Toolbar.Group> */}
                     </Toolbar>
                 </div>
             )}

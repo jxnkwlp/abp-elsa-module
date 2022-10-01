@@ -585,19 +585,6 @@ const Index: React.FC = () => {
                             </Typography.Text>
                         </Col>
                         <Col>
-                            {/* <Button
-                            type="default"
-                            disabled={!basicData?.name}
-                            loading={submiting}
-                            style={{ marginLeft: 10 }}
-                            icon={<SettingOutlined />}
-                            onClick={async () => {
-                                setEditModalTitle('Edit');
-                                setEditModalVisible(true);
-                            }}
-                        >
-                            Settings
-                        </Button> */}
                             <Button
                                 type="default"
                                 disabled={!definition?.name}

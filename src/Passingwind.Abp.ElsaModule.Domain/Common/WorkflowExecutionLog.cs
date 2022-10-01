@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 
@@ -30,5 +31,5 @@ public class WorkflowExecutionLog : CreationAuditedAggregateRoot<Guid>, IMultiTe
 
     public string Source { get; set; }
 
-    public string Data { get; set; }
+    public Dictionary<string, object> Data { get; set; }
 }

@@ -40,6 +40,7 @@ public partial class ElsaModuleApplicationModule : AbpModule
             options.UnsupportedTypes.AddIfNotContains(typeof(ListResultDto<WorkflowExecutionLogDto>));
             options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowDefinitionVersionCreateOrUpdateDto));
             options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowDefinitionVersionDto));
+            options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowInstanceExecutionLogSummaryDto));
         });
 
     }

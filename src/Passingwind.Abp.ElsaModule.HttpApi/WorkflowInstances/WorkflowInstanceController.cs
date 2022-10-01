@@ -66,6 +66,12 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
             return _service.GetListAsync(input);
         }
 
+        [HttpGet("{id}/execution-logs/summary")]
+        public Task<WorkflowInstanceExecutionLogSummaryDto> GetLogSummaryAsync(Guid id)
+        {
+            return _service.GetLogSummaryAsync(id);
+        }
+
         [HttpPost("{id}/retry")]
         public Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input)
         {

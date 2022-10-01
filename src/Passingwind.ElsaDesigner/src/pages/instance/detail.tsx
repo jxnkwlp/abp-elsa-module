@@ -1,34 +1,47 @@
 import { WorkflowStatus } from '@/services/enums';
 import type { API } from '@/services/typings';
 import { getWorkflowDefinitionVersion } from '@/services/WorkflowDefinition';
-import { getWorkflowInstance, getWorkflowInstanceExecutionLogs } from '@/services/WorkflowInstance';
-import { ClockCircleOutlined } from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-layout';
+import {
+    getWorkflowInstance,
+    getWorkflowInstanceExecutionLogs,
+    getWorkflowInstanceLogSummary,
+} from '@/services/WorkflowInstance';
+import { ClockCircleOutlined, FieldTimeOutlined, FunctionOutlined } from '@ant-design/icons';
 import { ProCard } from '@ant-design/pro-card';
 import { ProDescriptions } from '@ant-design/pro-descriptions';
-import { Alert, Card, Col, Modal, Popover, Row, Tag, Timeline, Typography } from 'antd';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Alert, Card, Col, Modal, Row, Space, Tabs, Tag, Timeline } from 'antd';
 import moment from 'moment';
-import React, { useEffect, useRef } from 'react';
-import { useHistory, useLocation } from 'umi';
+import React, { useEffect, useRef, useState } from 'react';
+import MonacoEditor from 'react-monaco-editor';
+import { useHistory, useLocation, useParams } from 'umi';
 import type { FlowActionType } from '../designer/flow';
 import Flow from '../designer/flow';
 import { conventToGraphData } from '../designer/service';
 import type { IGraphData } from '../designer/type';
-
 import './detail.less';
+import { workflowStatusEnum } from './status';
+import type { WorkflowInstanceActivitySummaryInfo } from './types';
 
-type ExecutionLog = {
-    activityId: string;
-    activityName: string;
-    status: string;
-    outcomes: string[];
-    inBound: any;
-    elapsed: number;
+const dataRender = (value: string) => {
+    return (
+        <MonacoEditor
+            value={value}
+            options={{
+                minimap: { enabled: false },
+                readOnly: true,
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+            }}
+            language="json"
+        />
+    );
 };
 
 const Index: React.FC = () => {
     const history = useHistory();
     const location = useLocation();
+    const params = useParams();
 
     const flowAction = useRef<FlowActionType>();
 
@@ -38,14 +51,85 @@ const Index: React.FC = () => {
     const [loading, setLoading] = React.useState<boolean>(false);
     const [definition, setDefinition] = React.useState<API.WorkflowDefinitionVersion>();
     const [graphData, setGraphData] = React.useState<IGraphData>();
-
     const [logs, setLogs] = React.useState<API.WorkflowExecutionLog[]>([]);
+    const [logSummary, setLogSummary] = useState<API.WorkflowInstanceExecutionLogSummary>();
 
-    const [activityLogs, setActivityLogs] = React.useState<ExecutionLog[]>([]);
+    const [activitiesSummary, setActivitiesSummary] = useState<
+        WorkflowInstanceActivitySummaryInfo[]
+    >([]);
 
     const [tabKey, setTabKey] = React.useState<string>('logs');
 
     const [graphInit, setGraphInit] = React.useState<boolean>(false);
+
+    const [selectActivityId, setSelectActivityId] = useState('');
+    const [selectActivityData, setSelectActivityData] =
+        useState<WorkflowInstanceActivitySummaryInfo>();
+
+    const getActivityTabItems = () => {
+        const list = [
+            {
+                key: 'general',
+                label: 'General',
+                children: (
+                    <ProDescriptions
+                        dataSource={selectActivityData}
+                        column={1}
+                        columns={[
+                            {
+                                title: 'Activity Id',
+                                dataIndex: 'activityId',
+                                copyable: true,
+                            },
+                            {
+                                title: 'Name',
+                                dataIndex: 'name',
+                                copyable: true,
+                            },
+                            {
+                                title: 'Display Name',
+                                dataIndex: 'displayName',
+                                copyable: true,
+                            },
+                            {
+                                title: 'Outcomes',
+                                dataIndex: 'outcomes',
+                                renderText: (_) => {
+                                    return (_ ?? []).length == 0
+                                        ? '-'
+                                        : (_ ?? []).map((x) => {
+                                              return <Tag key={x}>{x}</Tag>;
+                                          });
+                                },
+                            },
+                        ]}
+                    />
+                ),
+            },
+            {
+                key: 'stateData',
+                label: 'State',
+                children: (
+                    <div className="data-render-container">
+                        {dataRender(JSON.stringify(selectActivityData?.stateData ?? {}, null, 2))}
+                    </div>
+                ),
+            },
+            {
+                key: 'journalData',
+                label: 'Journal Data',
+                children: (
+                    <div className="data-render-container">
+                        {dataRender(JSON.stringify(selectActivityData?.journalData ?? {}, null, 2))}
+                    </div>
+                ),
+            },
+        ];
+
+        console.log(selectActivityData);
+
+        return list;
+    };
 
     const loadWorkflowDefinition = async (definitionId: string, version: number) => {
         const result = await getWorkflowDefinitionVersion(definitionId, version);
@@ -73,11 +157,15 @@ const Index: React.FC = () => {
         setLogs(result?.items ?? []);
     };
 
+    const loadLogsSummary = async (id: string) => {
+        const result = await getWorkflowInstanceLogSummary(id);
+
+        setLogSummary(result);
+    };
+
     const loadData = async (id: string) => {
         setLoading(true);
         const result = await getWorkflowInstance(id);
-
-        await loadLogs(id);
 
         if (result) {
             setData(result);
@@ -93,109 +181,96 @@ const Index: React.FC = () => {
             return;
         }
 
+        await loadLogs(id);
+        await loadLogsSummary(id);
         await loadWorkflowDefinition(result.workflowDefinitionId!, result.version!);
 
         setLoading(false);
     };
 
-    const updateGraphEdgeStatus = () => {
-        // graphData?.edges
-        //     ?.filter((x) => x.target?.cell == targetNodeId)
-        //     .forEach((x) => {
-        //         const nodeLogs = logs.filter((log) => log.activityId === x.source?.cell);
-        //         if (nodeLogs.findIndex((log) => log.eventName == 'Executed') >= 0) {
-        //             // flowAction.current?.setEdgeStyle(x.id!, 'success');
-        //             // nodeLogs.forEach(item=>{
-        //             //     if(item.data?.['Outcomes'])
-        //             // });
-        //         } else if (nodeLogs.findIndex((log) => log.eventName == 'Executing') >= 0) {
-        //             // flowAction.current?.setEdgeStyle(x.id!, 'processing');
-        //         } else if (nodeLogs.findIndex((log) => log.eventName == 'Faulted') >= 0) {
-        //             // flowAction.current?.setEdgeStyle(x.id!, 'error');
-        //         }
-        //     });
-
-        logs.forEach((log) => {
-            const outcomes: string[] = log.data?.['Outcomes'] ?? [];
-            outcomes.forEach((outcome) => {
-                // const node = graphData?.nodes.find(x=>x.id == log.activityId);
-                const edge = graphData?.edges.find((x) => x.target?.cell == log.activityId);
-                if (edge) {
-                    flowAction.current?.setEdgeStyle(edge.id!, 'success');
-                }
-            });
-        });
-    };
-
-    const updateGraphNodeStatus = (nodeId: string, nodeLogs: API.WorkflowExecutionLog[]) => {
-        // const nodeLogs = logs.filter((log) => log.activityId === nodeId);
-        if (nodeLogs.findIndex((log) => log.eventName == 'Executed') >= 0) {
-            flowAction.current?.setNodeStyle(nodeId, 'success');
-        } else if (nodeLogs.findIndex((log) => log.eventName == 'Executing') >= 0) {
-            flowAction.current?.setNodeStyle(nodeId, 'processing');
-        } else if (nodeLogs.findIndex((log) => log.eventName == 'Faulted') >= 0) {
-            flowAction.current?.setNodeStyle(nodeId, 'error');
-        }
-        // updateGraphEdgeStatus(nodeId);
-    };
-
     useEffect(() => {
-        if (logs && graphInit && graphData) {
-            flowAction.current?.setAllNodesStyle('default');
-            flowAction.current?.setAllEdgesStyle('default');
-            //
-            const activityLogs = {} as Record<string, API.WorkflowExecutionLog[]>;
-            // group
-            (logs ?? []).forEach((item) => {
-                const item2 = activityLogs[item.activityId!];
-                if (item2) {
-                    item2.push(item);
-                } else {
-                    activityLogs[item.activityId!] = [item];
-                }
-            });
-            // loop
-            for (const key in activityLogs) {
-                // const logs = activityLogs[key];
-                updateGraphNodeStatus(key, activityLogs[key]);
+        if (selectActivityId) {
+            const item = activitiesSummary?.find((x) => x.activityId == selectActivityId);
+            console.log(item);
+            if (item) {
+                setSelectActivityData(item ?? undefined);
+                setTabKey('activityState');
+            } else {
+                setTabKey('logs');
+                // message.warning('Unactivity');
+            }
+        }
+    }, [selectActivityId]);
+
+    const updateGraphNodeStatus = async () => {
+        const list = (logSummary?.activities ?? []).map((x) => {
+            const nodeDefintion = definition?.activities?.find((d) => d.activityId == x.activityId);
+            return {
+                ...x,
+                name: nodeDefintion?.name ?? '',
+                displayName: nodeDefintion?.displayName ?? '',
+            } as WorkflowInstanceActivitySummaryInfo;
+        });
+        setActivitiesSummary(list);
+        console.log(list);
+
+        list.forEach((item) => {
+            if (item.isFaulted) {
+                flowAction.current?.setNodeStyle(item.activityId!, 'error');
+            } else if (item.isExecuted) {
+                flowAction.current?.setNodeStyle(item.activityId!, 'success');
+            } else if (item.isExecuting) {
+                flowAction.current?.setNodeStyle(item.activityId!, 'processing');
             }
 
-            updateGraphEdgeStatus();
-
-            // processing
-            if (data?.currentActivity?.activityId) {
-                flowAction.current?.setNodeStyle(data.currentActivity.activityId!, 'processing');
-                flowAction.current?.setNodeIncomingEdgesStyle(
-                    data.currentActivity.activityId!,
-                    'processing',
-                );
-            }
-
-            // processing
-            if (data?.blockingActivities) {
-                data.blockingActivities.forEach((item) => {
-                    flowAction.current?.setNodeStyle(item.activityId!, 'processing');
+            if ((item.outcomes ?? []).length > 0) {
+                (item.outcomes ?? []).forEach((outcome) => {
+                    const edge = definition?.connections?.find(
+                        (x) => x.outcome == outcome && x.sourceId == item.activityId,
+                    );
+                    if (edge) {
+                        flowAction.current?.setNodeOutgoingEdgeStyle(
+                            item.activityId!,
+                            outcome,
+                            'success',
+                        );
+                    }
                 });
             }
+        });
 
-            // error
-            if (data?.fault?.faultedActivityId) {
-                flowAction.current?.setNodeStyle(data.fault.faultedActivityId!, 'error');
-            }
+        // processing
+        if (data?.blockingActivities) {
+            data.blockingActivities.forEach((item) => {
+                flowAction.current?.setNodeStyle(item.activityId!, 'processing');
+            });
         }
-    }, [data, logs, graphInit, graphData]);
+
+        // error
+        if (data?.fault?.faultedActivityId) {
+            flowAction.current?.setNodeStyle(data.fault.faultedActivityId!, 'error');
+        }
+    };
 
     useEffect(() => {
-        const sid = location?.state?.id ?? '';
+        if (graphInit && data) {
+            flowAction.current?.setAllNodesStyle('default');
+            flowAction.current?.setAllEdgesStyle('default');
+
+            updateGraphNodeStatus();
+        }
+    }, [graphInit, data, definition, logs, logSummary]);
+
+    useEffect(() => {
+        const sid = params.id ?? '';
         if (!sid) {
             history.goBack();
             return;
         }
 
         setId(sid);
-
         loadData(sid);
-    }, []);
+    }, [0]);
 
     return (
         <PageContainer title={title} loading={loading}>
@@ -215,36 +290,11 @@ const Index: React.FC = () => {
                     columns={[
                         { title: 'Name', dataIndex: 'name', copyable: true },
                         { title: 'Correlation Id', dataIndex: 'correlationId', copyable: true },
-                        { title: 'Version', dataIndex: 'version' },
+                        { title: 'Version', dataIndex: 'version', copyable: true },
                         {
                             title: 'Status',
                             dataIndex: 'workflowStatus',
-                            valueEnum: {
-                                [WorkflowStatus.Idle]: {
-                                    text: WorkflowStatus[WorkflowStatus.Idle],
-                                    status: 'default',
-                                },
-                                [WorkflowStatus.Running]: {
-                                    text: WorkflowStatus[WorkflowStatus.Running],
-                                    status: 'processing',
-                                },
-                                [WorkflowStatus.Finished]: {
-                                    text: WorkflowStatus[WorkflowStatus.Finished],
-                                    status: 'success',
-                                },
-                                [WorkflowStatus.Suspended]: {
-                                    text: WorkflowStatus[WorkflowStatus.Suspended],
-                                    status: 'warning',
-                                },
-                                [WorkflowStatus.Faulted]: {
-                                    text: WorkflowStatus[WorkflowStatus.Faulted],
-                                    status: 'error',
-                                },
-                                [WorkflowStatus.Cancelled]: {
-                                    text: WorkflowStatus[WorkflowStatus.Cancelled],
-                                    status: 'default',
-                                },
-                            },
+                            valueEnum: workflowStatusEnum,
                         },
                         { title: 'Created', dataIndex: 'creationTime', valueType: 'dateTime' },
                         { title: 'Finished', dataIndex: 'finishedTime', valueType: 'dateTime' },
@@ -271,6 +321,13 @@ const Index: React.FC = () => {
                             onDataUpdate={(g) => {
                                 setGraphInit(true);
                             }}
+                            onNodeClick={(c, node) => {
+                                setSelectActivityId(node.id!);
+                            }}
+                            onBlankClick={() => {
+                                setSelectActivityId('');
+                                setTabKey('logs');
+                            }}
                         />
                     </Card>
                 </Col>
@@ -280,9 +337,10 @@ const Index: React.FC = () => {
                         tabProps={{}}
                         activeTabKey={tabKey}
                         tabList={[
-                            { key: 'logs', tab: 'Logs' },
+                            { key: 'activityState', tab: 'Activity State' },
+                            { key: 'logs', tab: 'Timeline' },
                             { key: 'input', tab: 'Input' },
-                            { key: 'fault', tab: 'Fault' },
+                            { key: 'fault', tab: 'Exception' },
                             { key: 'variables', tab: 'Variables' },
                             { key: 'data', tab: 'Data' },
                         ]}
@@ -290,6 +348,14 @@ const Index: React.FC = () => {
                             setTabKey(key);
                         }}
                     >
+                        {tabKey == 'activityState' && (
+                            <div>
+                                {!selectActivityId && (
+                                    <Alert message="Please select an node first." />
+                                )}
+                                {selectActivityId && <Tabs items={getActivityTabItems()} />}
+                            </div>
+                        )}
                         {tabKey === 'logs' && (
                             <Timeline
                                 mode="left"
@@ -297,75 +363,70 @@ const Index: React.FC = () => {
                                     data?.workflowStatus == WorkflowStatus.Running ||
                                     data?.workflowStatus == WorkflowStatus.Suspended
                                 }
+                                reverse
                             >
-                                {/* {logs.map((item) => {
+                                {(activitiesSummary ?? []).map((item) => {
                                     return (
                                         <Timeline.Item
-                                            key={item.id}
+                                            key={item.activityId}
                                             color={
-                                                item.eventName == 'Executing'
+                                                item.isExecuting
                                                     ? 'gray'
-                                                    : item.eventName == 'Faulted'
+                                                    : item.isFaulted
                                                     ? 'red'
                                                     : 'green'
                                             }
                                             dot={
-                                                item.eventName == 'Executing' ? (
+                                                item.isExecuting ? (
                                                     <ClockCircleOutlined
                                                         style={{ fontSize: '12px' }}
                                                     />
                                                 ) : null
                                             }
+                                            // label={moment(item.startTime).format(
+                                            //     'YYYY-MM-DD HH:mm:ss',
+                                            // )}
                                         >
-                                            <Popover
-                                                title="Data"
-                                                placement="left"
-                                                content={
-                                                    <Typography.Paragraph
-                                                        style={{
-                                                            display: 'block',
-                                                            maxWidth: 500,
-                                                            overflow: 'hidden',
-                                                            wordWrap: 'break-word',
-                                                        }}
-                                                        copyable
-                                                    >
-                                                        {JSON.stringify(item.data ?? {})}
-                                                    </Typography.Paragraph>
-                                                }
-                                            >
-                                                {item.eventName} <Tag>{item.activityType}</Tag>
+                                            <Space>
+                                                <span style={{ fontSize: 16 }}>
+                                                    {item.displayName}
+                                                </span>
                                                 <Tag>
-                                                    {moment(item.timestamp).format(
+                                                    <FieldTimeOutlined />{' '}
+                                                    {moment(item.startTime).format(
                                                         'YYYY-MM-DD HH:mm:ss',
                                                     )}
                                                 </Tag>
-                                                <p>{item.message}</p>
-                                            </Popover>
+                                                <Tag>
+                                                    <FunctionOutlined /> {item.activityType}
+                                                </Tag>
+                                            </Space>
+                                            {/* {item.status}  */}
+                                            {item.message && <p>{item.message}</p>}
                                         </Timeline.Item>
                                     );
-                                })} */}
+                                })}
                             </Timeline>
                         )}
                         {tabKey === 'input' && (
-                            <Typography.Paragraph copyable>
-                                {JSON.stringify(data?.input ?? {})}
-                            </Typography.Paragraph>
+                            <div className="data-render-container">
+                                {dataRender(JSON.stringify(data?.input ?? {}, null, 2))}
+                            </div>
                         )}
                         {tabKey === 'fault' && (
-                            <Typography.Paragraph copyable>
-                                {JSON.stringify(data?.fault ?? {})}
-                            </Typography.Paragraph>
+                            <div className="data-render-container">
+                                {dataRender(JSON.stringify(data?.fault ?? {}, null, 2))}
+                            </div>
                         )}
                         {tabKey === 'variables' && (
-                            <Typography.Paragraph copyable>
-                                {JSON.stringify(data?.variables ?? {})}
-                            </Typography.Paragraph>
+                            <div className="data-render-container">
+                                {dataRender(JSON.stringify(data?.variables ?? {}, null, 2))}
+                            </div>
                         )}
                         {tabKey === 'data' && (
-                            <Typography.Paragraph copyable>
-                                {JSON.stringify(data?.activityData ?? {})}
-                            </Typography.Paragraph>
+                            <div className="data-render-container">
+                                {dataRender(JSON.stringify(data?.activityData ?? {}, null, 2))}
+                            </div>
                         )}
                     </Card>
                 </Col>

@@ -57,6 +57,13 @@
         hideInMenu: true,
         component: './profile/changepassword',
     },
+    // //
+    // {
+    //     path: '/test',
+    //     name: 'test page',
+    //     icon: 'smile',
+    //     component: './test',
+    // },
 
     //
     {

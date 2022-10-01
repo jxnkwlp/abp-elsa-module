@@ -1,4 +1,6 @@
 import { WorkflowStatus } from '@/services/enums';
+import { API } from '@/services/typings';
+import { getWorkflowDefinitionList } from '@/services/WorkflowDefinition';
 import {
     deleteWorkflowInstance,
     getWorkflowInstanceList,
@@ -11,6 +13,7 @@ import ProTable from '@ant-design/pro-table';
 import { message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import { Link, useHistory } from 'umi';
+import { workflowStatusEnum } from './status';
 
 const Index: React.FC = () => {
     const actionRef = useRef<ActionType>();
@@ -26,6 +29,26 @@ const Index: React.FC = () => {
 
     const columns: ProColumnType<API.WorkflowInstance>[] = [
         {
+            dataIndex: 'workflowDefinitionId',
+            title: 'Definition',
+            hideInTable: true,
+            valueType: 'select',
+            request: async (p) => {
+                console.log(p);
+                const list = await getWorkflowDefinitionList({
+                    filter: p.keyWords ?? '',
+                    maxResultCount: 100,
+                });
+                return (list.items ?? []).map((x) => {
+                    return {
+                        label: `${x.displayName}(${x.name})`,
+                        value: x.id,
+                    };
+                });
+            },
+            fieldProps: { showSearch: true },
+        },
+        {
             dataIndex: 'name',
             title: 'Name',
             render: (_, record) => {
@@ -33,9 +56,6 @@ const Index: React.FC = () => {
                     <Link
                         to={{
                             pathname: `/instances/${record.id}`,
-                            state: {
-                                id: record.id,
-                            },
                         }}
                     >
                         {_}
@@ -43,10 +63,6 @@ const Index: React.FC = () => {
                 );
             },
         },
-        // {
-        //     dataIndex: 'definitionId',
-        //     title: 'Definition Id',
-        // },
         {
             dataIndex: 'version',
             title: 'Version',
@@ -55,33 +71,7 @@ const Index: React.FC = () => {
         {
             dataIndex: 'workflowStatus',
             title: 'Status',
-            // valueEnum: enumToStatus(WorkflowStatus),
-            valueEnum: {
-                [WorkflowStatus.Idle]: {
-                    text: WorkflowStatus[WorkflowStatus.Idle],
-                    status: 'default',
-                },
-                [WorkflowStatus.Running]: {
-                    text: WorkflowStatus[WorkflowStatus.Running],
-                    status: 'processing',
-                },
-                [WorkflowStatus.Finished]: {
-                    text: WorkflowStatus[WorkflowStatus.Finished],
-                    status: 'success',
-                },
-                [WorkflowStatus.Suspended]: {
-                    text: WorkflowStatus[WorkflowStatus.Suspended],
-                    status: 'warning',
-                },
-                [WorkflowStatus.Faulted]: {
-                    text: WorkflowStatus[WorkflowStatus.Faulted],
-                    status: 'error',
-                },
-                [WorkflowStatus.Cancelled]: {
-                    text: WorkflowStatus[WorkflowStatus.Cancelled],
-                    status: 'default',
-                },
-            },
+            valueEnum: workflowStatusEnum,
         },
         {
             title: 'Creation Time',
@@ -108,7 +98,7 @@ const Index: React.FC = () => {
             search: false,
         },
         {
-            title: 'CorrelationId',
+            title: 'Correlation Id',
             dataIndex: 'correlationId',
         },
         {
@@ -201,6 +191,7 @@ const Index: React.FC = () => {
             <ProTable<API.WorkflowInstance>
                 columns={columns}
                 actionRef={actionRef}
+                search={{ labelWidth: 120 }}
                 rowKey="id"
                 request={async (params) => {
                     const { current, pageSize } = params;

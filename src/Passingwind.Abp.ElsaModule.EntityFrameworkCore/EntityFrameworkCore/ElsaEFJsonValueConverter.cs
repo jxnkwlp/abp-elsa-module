@@ -20,7 +20,7 @@ namespace EcsShop.EntityFrameworkCore
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver() { NamingStrategy = new CamelCaseNamingStrategy(false, false) },
                     NullValueHandling = NullValueHandling.Ignore,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                     TypeNameHandling = TypeNameHandling.Auto,
                     TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                     PreserveReferencesHandling = PreserveReferencesHandling.Objects,
@@ -44,7 +44,7 @@ namespace EcsShop.EntityFrameworkCore
         private static string Serialize<T>(T value)
         {
             var settings = Create();
-            return JsonConvert.SerializeObject(value, settings);
+            return JsonConvert.SerializeObject(value, Formatting.None, settings);
         }
 
         private static T Deserialize<T>(string json)

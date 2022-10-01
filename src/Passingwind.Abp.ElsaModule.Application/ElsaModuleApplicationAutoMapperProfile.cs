@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Elsa.Metadata;
-using Newtonsoft.Json.Linq;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Designer;
 using Passingwind.Abp.ElsaModule.Workflow;
@@ -65,8 +64,7 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
         CreateMap<WorkflowInstance, WorkflowInstanceDto>();
         CreateMap<WorkflowInstance, WorkflowInstanceBasicDto>();
 
-        CreateMap<WorkflowExecutionLog, WorkflowExecutionLogDto>()
-            .ForMember(x => x.Data, x => x.MapFrom(s => string.IsNullOrEmpty(s.Data) ? default : JObject.Parse(s.Data)));
+        CreateMap<WorkflowExecutionLog, WorkflowExecutionLogDto>();
 
     }
 }

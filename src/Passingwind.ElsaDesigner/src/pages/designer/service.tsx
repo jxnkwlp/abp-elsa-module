@@ -1,8 +1,10 @@
 import { getDesignerActivityTypes, getDesignerScriptTypeDefinition } from '@/services/Designer';
+import { API } from '@/services/typings';
 import { randString } from '@/services/utils';
-import type { Edge, Node } from '@antv/x6';
+import { CellView, Edge, Graph, Node, Shape } from '@antv/x6';
 import type { PortManager } from '@antv/x6/lib/model/port';
 import { uuid } from '@antv/x6/lib/util/string/uuid';
+import { message } from 'antd';
 import type { IGraphData, NodePropertySyntax, NodeTypeGroup, NodeTypeProperty } from './type';
 
 // export const getTestData = () => {
@@ -51,10 +53,6 @@ import type { IGraphData, NodePropertySyntax, NodeTypeGroup, NodeTypeProperty } 
 //         ],
 //     };
 // };
-
-export const getGraphOptions = () => {
-    return {};
-};
 
 export const toggleNodePortVisible = (node: Node, visible: boolean) => {
     node.getPorts().forEach((item) => {
@@ -467,4 +465,168 @@ export const conventToGraphData = async (
 export const getEditorScriptDefinitonsContent = async (id: string) => {
     const result = await getDesignerScriptTypeDefinition(id);
     return await result?.response?.text();
+};
+
+export const graphValidateMagnet = (graph: Graph, args: any) => {
+    const { cell, view, magnet } = args;
+
+    if (!magnet) return false;
+
+    if (cell.isNode())
+        if (!checkCanCreateEdge(cell, graph.getOutgoingEdges(cell) ?? [])) {
+            message.error(`No more outcomes.`);
+            return false;
+        }
+
+    //
+    return true;
+};
+
+export const graphValidateConnection = (graph: Graph, args: any) => {
+    const { targetMagnet } = args;
+
+    if (!targetMagnet) {
+        return false;
+    }
+
+    return true;
+};
+
+export const graphValidateEdge = (graph: Graph, args: any) => {
+    const { edge, type } = args;
+
+    if (edge.getProp('shape') != 'bpmn-edge') {
+        return false;
+    }
+    // if (edge.get) {
+    //     const nextName = getNextEdgeName(
+    //         sourceCell,
+    //         graph.getOutgoingEdges(sourceCell) ?? [],
+    //     );
+    //     if (!nextName) {
+    //         return false;
+    //     }
+    // }
+    return true;
+};
+
+export const graphCreateEdge = (graph: Graph, args: any) => {
+    const { sourceCell, sourceMagnet } = args;
+
+    //
+    if (sourceCell.isNode()) {
+        const nextName = getNextEdgeName(sourceCell, graph.getOutgoingEdges(sourceCell) ?? []);
+        if (nextName) {
+            return new Shape.Edge(createEdgeConfig({ id: '', label: nextName }));
+        } else {
+            message.error(`No more outcomes.`);
+            return null;
+        }
+    } else return null;
+};
+
+export const createGraph = (options?: any) => {
+    return new Graph({
+        container: document.getElementById('graphContainer')!,
+        autoResize: true,
+        grid: {
+            size: 10,
+            visible: true,
+        },
+        history: {
+            enabled: true,
+            // ignoreChange: true,
+            beforeAddCommand(event, args) {
+                // @ts-ignore
+                if (args?.key == 'tools') {
+                    return false;
+                }
+                return true;
+            },
+        },
+        mousewheel: {
+            enabled: true,
+            zoomAtMousePosition: true,
+            modifiers: ['ctrl'],
+            minScale: 0.5,
+            maxScale: 1.5,
+        },
+        scroller: {
+            padding: 40,
+        },
+        panning: {
+            enabled: true,
+            modifiers: 'ctrl',
+        },
+        minimap: {
+            enabled: true,
+            container: document.getElementById('minimap')!,
+            width: 230,
+            height: 180,
+        },
+        snapline: true,
+        keyboard: true,
+        selecting: {
+            enabled: true,
+            showNodeSelectionBox: false,
+        },
+        clipboard: {
+            enabled: true,
+            useLocalStorage: true,
+        },
+        translating: {
+            restrict: true,
+        },
+        connecting: {
+            router: {
+                name: 'manhattan',
+                args: {
+                    step: 10,
+                },
+            },
+            connector: {
+                name: 'rounded',
+                args: {
+                    radius: 10,
+                },
+            },
+            anchor: 'center',
+            connectionPoint: 'anchor',
+            allowBlank: false,
+            allowMulti: 'withPort',
+            snap: true,
+            highlight: true,
+            allowLoop: false,
+            allowEdge: false,
+        },
+        highlighting: {
+            // 连线过程中，自动吸附到链接桩时被使用。
+            magnetAdsorbed: {
+                name: 'stroke',
+                args: {
+                    attrs: {
+                        fill: '#fff',
+                        stroke: '#47C769',
+                        'stroke-width': 2,
+                    },
+                },
+            },
+            magnetAvailable: {
+                name: 'stroke',
+                args: {
+                    attrs: {
+                        fill: '#fff',
+                        stroke: '#47C769',
+                        'stroke-width': 1,
+                    },
+                },
+            },
+        },
+
+        ...options,
+    });
+};
+
+export const getGraphOptions = () => {
+    return {};
 };

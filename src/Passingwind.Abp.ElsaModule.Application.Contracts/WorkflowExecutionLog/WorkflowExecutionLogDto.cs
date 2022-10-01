@@ -1,5 +1,5 @@
 using System;
-using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Common
@@ -13,6 +13,6 @@ namespace Passingwind.Abp.ElsaModule.Common
         public string EventName { get; set; }
         public string Message { get; set; }
         public string Source { get; set; }
-        public JObject Data { get; set; }
+        public Dictionary<string, object> Data { get; set; }
     }
 }
