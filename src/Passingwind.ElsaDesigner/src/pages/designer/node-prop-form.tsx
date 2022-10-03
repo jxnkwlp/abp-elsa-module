@@ -427,7 +427,10 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                 }),
                             )}
                         />
-                        <Divider style={{ marginTop: 0 }} />
+                        {(props.properties ?? []).length > 0 ? (
+                            <Divider style={{ marginTop: 0 }} />
+                        ) : null}
+
                         {(props.properties ?? []).map((item) => {
                             return (
                                 <ProFormSelect
