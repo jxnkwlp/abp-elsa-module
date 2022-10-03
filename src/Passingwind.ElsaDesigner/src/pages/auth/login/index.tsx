@@ -30,14 +30,13 @@ const LoginMessage: React.FC<{
 );
 
 const Login: React.FC = () => {
-    const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
     const [type, setType] = useState<string>('account');
     const { initialState, setInitialState } = useModel('@@initialState');
 
     const intl = useIntl();
 
     const fetchUserInfo = async () => {
-        const userInfo = await initialState?.fetchData?.();
+        const userInfo = await initialState?.fetchUserInfo?.();
         if (userInfo) {
             await setInitialState((s) => ({
                 ...s,
@@ -46,10 +45,10 @@ const Login: React.FC = () => {
         }
     };
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values: any) => {
         try {
             // 登录
-            const msg = await loginLogin(values as API.UserLoginInfo);
+            const msg = await loginLogin(values);
             if (msg.result === 1) {
                 const defaultLoginSuccessMessage = intl.formatMessage({
                     id: 'pages.login.success',
@@ -76,7 +75,6 @@ const Login: React.FC = () => {
             message.error(defaultLoginFailureMessage);
         }
     };
-    const { status, type: loginType } = userLoginState;
 
     return (
         <div className={styles.container}>
@@ -86,7 +84,7 @@ const Login: React.FC = () => {
             <div className={styles.content}>
                 <LoginForm
                     logo={<img alt="logo" src="/logo.svg" />}
-                    title="Elsa Demo"
+                    title="Workflow"
                     subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
                     initialValues={{
                         autoLogin: true,

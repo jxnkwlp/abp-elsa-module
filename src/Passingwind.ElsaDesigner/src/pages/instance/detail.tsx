@@ -14,7 +14,7 @@ import { Alert, Card, Col, Modal, Row, Space, Tabs, Tag, Timeline } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import { useHistory, useLocation, useParams } from 'umi';
+import { useHistory, useIntl, useParams } from 'umi';
 import type { FlowActionType } from '../designer/flow';
 import Flow from '../designer/flow';
 import { conventToGraphData } from '../designer/service';
@@ -40,8 +40,8 @@ const dataRender = (value: string) => {
 
 const Index: React.FC = () => {
     const history = useHistory();
-    const location = useLocation();
     const params = useParams();
+    const intl = useIntl();
 
     const flowAction = useRef<FlowActionType>();
 
@@ -70,29 +70,31 @@ const Index: React.FC = () => {
         const list = [
             {
                 key: 'general',
-                label: 'General',
+                label: intl.formatMessage({ id: 'page.instance.general' }),
                 children: (
                     <ProDescriptions
                         dataSource={selectActivityData}
                         column={1}
                         columns={[
                             {
-                                title: 'Activity Id',
+                                title: intl.formatMessage({ id: 'page.instance.activityId' }),
                                 dataIndex: 'activityId',
                                 copyable: true,
                             },
                             {
-                                title: 'Name',
+                                title: intl.formatMessage({ id: 'page.definition.field.name' }),
                                 dataIndex: 'name',
                                 copyable: true,
                             },
                             {
-                                title: 'Display Name',
+                                title: intl.formatMessage({
+                                    id: 'page.definition.field.displayName',
+                                }),
                                 dataIndex: 'displayName',
                                 copyable: true,
                             },
                             {
-                                title: 'Outcomes',
+                                title: intl.formatMessage({ id: 'page.instance.outcomes' }),
                                 dataIndex: 'outcomes',
                                 renderText: (_) => {
                                     return (_ ?? []).length == 0
@@ -108,25 +110,23 @@ const Index: React.FC = () => {
             },
             {
                 key: 'stateData',
-                label: 'State',
+                label: intl.formatMessage({ id: 'page.instance.stateData' }),
                 children: (
-                    <div className="data-render-container">
+                    <div className="activity-data-render-container ">
                         {dataRender(JSON.stringify(selectActivityData?.stateData ?? {}, null, 2))}
                     </div>
                 ),
             },
             {
                 key: 'journalData',
-                label: 'Journal Data',
+                label: intl.formatMessage({ id: 'page.instance.journalData' }),
                 children: (
-                    <div className="data-render-container">
+                    <div className="activity-data-render-container ">
                         {dataRender(JSON.stringify(selectActivityData?.journalData ?? {}, null, 2))}
                     </div>
                 ),
             },
         ];
-
-        console.log(selectActivityData);
 
         return list;
     };
@@ -191,7 +191,7 @@ const Index: React.FC = () => {
     useEffect(() => {
         if (selectActivityId) {
             const item = activitiesSummary?.find((x) => x.activityId == selectActivityId);
-            console.log(item);
+
             if (item) {
                 setSelectActivityData(item ?? undefined);
                 setTabKey('activityState');
@@ -212,7 +212,6 @@ const Index: React.FC = () => {
             } as WorkflowInstanceActivitySummaryInfo;
         });
         setActivitiesSummary(list);
-        console.log(list);
 
         list.forEach((item) => {
             if (item.isFaulted) {
@@ -284,23 +283,52 @@ const Index: React.FC = () => {
                 />
             )}
 
-            <ProCard title="General" style={{ marginBottom: 16 }}>
+            <ProCard
+                title={intl.formatMessage({ id: 'page.instance.general' })}
+                style={{ marginBottom: 16 }}
+            >
                 <ProDescriptions
                     dataSource={data}
                     columns={[
-                        { title: 'Name', dataIndex: 'name', copyable: true },
-                        { title: 'Correlation Id', dataIndex: 'correlationId', copyable: true },
-                        { title: 'Version', dataIndex: 'version', copyable: true },
                         {
-                            title: 'Status',
+                            title: intl.formatMessage({ id: 'page.instance.field.name' }),
+                            dataIndex: 'name',
+                            copyable: true,
+                        },
+                        {
+                            title: intl.formatMessage({ id: 'page.instance.field.correlationId' }),
+                            dataIndex: 'correlationId',
+                            copyable: true,
+                        },
+                        {
+                            title: intl.formatMessage({ id: 'page.instance.field.version' }),
+                            dataIndex: 'version',
+                            copyable: true,
+                        },
+                        {
+                            title: intl.formatMessage({ id: 'page.instance.field.workflowStatus' }),
                             dataIndex: 'workflowStatus',
                             valueEnum: workflowStatusEnum,
                         },
-                        { title: 'Created', dataIndex: 'creationTime', valueType: 'dateTime' },
-                        { title: 'Finished', dataIndex: 'finishedTime', valueType: 'dateTime' },
-                        { title: 'Faulted', dataIndex: 'faultedTime', valueType: 'dateTime' },
                         {
-                            title: 'Last Executed',
+                            title: intl.formatMessage({ id: 'common.dict.creationTime' }),
+                            dataIndex: 'creationTime',
+                            valueType: 'dateTime',
+                        },
+                        {
+                            title: intl.formatMessage({ id: 'page.instance.field.finishedTime' }),
+                            dataIndex: 'finishedTime',
+                            valueType: 'dateTime',
+                        },
+                        {
+                            title: intl.formatMessage({ id: 'page.instance.field.faultedTime' }),
+                            dataIndex: 'faultedTime',
+                            valueType: 'dateTime',
+                        },
+                        {
+                            title: intl.formatMessage({
+                                id: 'page.instance.field.lastExecutedTime',
+                            }),
                             dataIndex: 'lastExecutedTime',
                             valueType: 'dateTime',
                         },
@@ -310,7 +338,7 @@ const Index: React.FC = () => {
 
             <Row gutter={16}>
                 <Col span={14}>
-                    <Card title="Graph">
+                    <Card title={intl.formatMessage({ id: 'page.instance.graph' })}>
                         <Flow
                             readonly
                             actionRef={flowAction}
@@ -318,7 +346,7 @@ const Index: React.FC = () => {
                             showNodeTypes={false}
                             showToolbar={false}
                             graphData={graphData}
-                            onDataUpdate={(g) => {
+                            onDataUpdate={() => {
                                 setGraphInit(true);
                             }}
                             onNodeClick={(c, node) => {
@@ -334,15 +362,44 @@ const Index: React.FC = () => {
                 <Col span={10}>
                     <Card
                         title=""
-                        tabProps={{}}
                         activeTabKey={tabKey}
                         tabList={[
-                            { key: 'activityState', tab: 'Activity State' },
-                            { key: 'logs', tab: 'Timeline' },
-                            { key: 'input', tab: 'Input' },
-                            { key: 'fault', tab: 'Exception' },
-                            { key: 'variables', tab: 'Variables' },
-                            { key: 'data', tab: 'Data' },
+                            {
+                                key: 'activityState',
+                                tab: intl.formatMessage({
+                                    id: 'page.instance.activityState',
+                                }),
+                            },
+                            {
+                                key: 'logs',
+                                tab: intl.formatMessage({
+                                    id: 'page.instance.timeline',
+                                }),
+                            },
+                            {
+                                key: 'input',
+                                tab: intl.formatMessage({
+                                    id: 'page.instance.input',
+                                }),
+                            },
+                            {
+                                key: 'fault',
+                                tab: intl.formatMessage({
+                                    id: 'page.instance.exception',
+                                }),
+                            },
+                            {
+                                key: 'variables',
+                                tab: intl.formatMessage({
+                                    id: 'page.instance.variables',
+                                }),
+                            },
+                            // {
+                            //     key: 'data',
+                            //     tab: intl.formatMessage({
+                            //         id: 'page.instance.data',
+                            //     }),
+                            // },
                         ]}
                         onTabChange={(key) => {
                             setTabKey(key);
@@ -351,7 +408,12 @@ const Index: React.FC = () => {
                         {tabKey == 'activityState' && (
                             <div>
                                 {!selectActivityId && (
-                                    <Alert message="Please select an node first." />
+                                    <Alert
+                                        message={intl.formatMessage({
+                                            id: 'page.instance.node.select.tips',
+                                        })}
+                                        showIcon
+                                    />
                                 )}
                                 {selectActivityId && <Tabs items={getActivityTabItems()} />}
                             </div>

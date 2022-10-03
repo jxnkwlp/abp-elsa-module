@@ -17,6 +17,7 @@ import '@antv/x6-react-components/es/toolbar/style/index.css';
 import type { Dnd } from '@antv/x6/lib/addon';
 import { message } from 'antd';
 import React, { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { useIntl } from 'umi';
 import './flow.less';
 import { registerNodeTypes } from './node';
 import NodeTypesPanel from './node-types';
@@ -70,6 +71,7 @@ export type FlowActionType = {
 
 const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
     const { actionRef, graphData } = props;
+    const intl = useIntl();
 
     const graphInstance = useRef<Graph>();
 
@@ -286,9 +288,9 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         }
     };
 
-    const handleOnNodeClick = useCallback((nodeConfig: Node.Properties, node: Node) => {
-        props?.onNodeClick?.(nodeConfig, node);
-    }, []);
+    // const handleOnNodeClick = useCallback((nodeConfig: Node.Properties, node: Node) => {
+    //     props?.onNodeClick?.(nodeConfig, node);
+    // }, []);
 
     const loadGraphData = (data: IGraphData) => {
         // console.log(graphInstance.current);
@@ -389,7 +391,8 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         graph.on('node:click', ({ node }) => {
             console.debug(node);
             node.toFront();
-            handleOnNodeClick(node.getProp() as Node.Properties, node);
+            // handleOnNodeClick(node.getProp() as Node.Properties, node);
+            props?.onNodeClick?.(node.getProp() as Node.Properties, node);
         });
 
         graph.on('node:dblclick', ({ node }) => {
@@ -481,7 +484,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                     items: [
                         {
                             name: 'zoomIn',
-                            tooltip: 'Zoom In',
+                            tooltip: intl.formatMessage({ id: 'page.designer.toolbar.zoomIn' }),
                             icon: <ZoomInOutlined />,
                             onClick: (g) => {
                                 handleToolbarClick(g, 'zoomIn');
@@ -489,7 +492,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                         },
                         {
                             name: 'zoomOut',
-                            tooltip: 'Zoom Out',
+                            tooltip: intl.formatMessage({ id: 'page.designer.toolbar.zoomOut' }),
                             icon: <ZoomOutOutlined />,
                             onClick: (g) => {
                                 handleToolbarClick(g, 'zoomOut');
@@ -502,7 +505,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                     items: [
                         {
                             name: 'undo',
-                            tooltip: 'Undo',
+                            tooltip: intl.formatMessage({ id: 'page.designer.toolbar.undo' }),
                             icon: <UndoOutlined />,
                             onClick: (g) => {
                                 handleToolbarClick(g, 'undo');
@@ -510,7 +513,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                         },
                         {
                             name: 'redo',
-                            tooltip: 'Redo',
+                            tooltip: intl.formatMessage({ id: 'page.designer.toolbar.redo' }),
                             icon: <RedoOutlined />,
                             onClick: (g) => {
                                 handleToolbarClick(g, 'redo');
@@ -523,7 +526,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                     items: [
                         {
                             name: 'center',
-                            tooltip: 'Center',
+                            tooltip: intl.formatMessage({ id: 'page.designer.toolbar.center' }),
                             icon: <OneToOneOutlined />,
                             onClick: (g) => {
                                 handleToolbarClick(g, 'center');
@@ -531,7 +534,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                         },
                         {
                             name: 'compress',
-                            tooltip: 'Auto Size',
+                            tooltip: intl.formatMessage({ id: 'page.designer.toolbar.autoSize' }),
                             icon: <CompressOutlined />,
                             onClick: (g) => {
                                 handleToolbarClick(g, 'compress');
@@ -544,7 +547,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                     items: [
                         {
                             name: 'copy',
-                            tooltip: 'Copy Selected',
+                            tooltip: intl.formatMessage({ id: 'page.designer.toolbar.copy' }),
                             icon: <CopyOutlined />,
                             onClick: (g) => {
                                 handleToolbarClick(g, 'copy');
@@ -552,7 +555,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                         },
                         {
                             name: 'delete',
-                            tooltip: 'Delete Selected',
+                            tooltip: intl.formatMessage({ id: 'page.designer.toolbar.delete' }),
                             icon: <DeleteOutlined />,
                             onClick: (g) => {
                                 handleToolbarClick(g, 'delete');

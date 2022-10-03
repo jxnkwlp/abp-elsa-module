@@ -7,7 +7,6 @@ using Elsa.Services;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.Domain.Repositories;
 
 namespace Passingwind.Abp.ElsaModule.Common
 {
@@ -112,8 +111,8 @@ namespace Passingwind.Abp.ElsaModule.Common
 
         public virtual async Task<PagedResultDto<WorkflowDefinitionDto>> GetListAsync(WorkflowDefinitionListRequestDto input)
         {
-            var count = await _workflowDefinitionRepository.CountAsync();
-            var list = await _workflowDefinitionRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, "id desc");
+            var count = await _workflowDefinitionRepository.CountAsync(name: input.Filter);
+            var list = await _workflowDefinitionRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, name: input.Filter);
 
             return new PagedResultDto<WorkflowDefinitionDto>(count, ObjectMapper.Map<List<WorkflowDefinition>, List<WorkflowDefinitionDto>>(list));
         }

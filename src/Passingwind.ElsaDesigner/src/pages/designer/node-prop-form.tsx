@@ -11,6 +11,7 @@ import ProForm, {
 import { Col, Divider, Row, Tabs } from 'antd';
 import type { NamePath } from 'antd/lib/form/interface';
 import React, { useEffect, useMemo } from 'react';
+import { useIntl } from 'umi';
 import CaseEditorInput from './form-input/case-editor-builder-input';
 import MonacorEditorInput from './form-input/monacor-editor-input';
 import {
@@ -35,12 +36,14 @@ type NodePropFormProps = {
 const NodePropForm: React.FC<NodePropFormProps> = (props) => {
     const { properties } = props;
 
-    const [tabKey, setTabKey] = React.useState<string>('1');
+    const intl = useIntl();
+
+    const [tabKey, setTabKey] = React.useState<string>('properties');
     const [storageProviders, setStorageProviders] = React.useState<any[]>([]);
 
     useEffect(() => {
         if (properties.length > 0) {
-            setTabKey('2');
+            setTabKey('common');
         }
     }, []);
 
@@ -240,7 +243,15 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
             if (propSyntax.editor) {
                 syntaxeList = [{ label: propSyntax.editor, key: propSyntax.editor ?? 'Literal' }];
             } else if (propItem.defaultSyntax != 'Switch') {
-                syntaxeList = [{ label: 'Default', key: 'Default' }, ...syntaxeList];
+                syntaxeList = [
+                    {
+                        label: intl.formatMessage({
+                            id: 'common.dict.default',
+                        }),
+                        key: 'Default',
+                    },
+                    ...syntaxeList,
+                ];
             } else {
                 // no-op
             }
@@ -302,72 +313,115 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
         [props.properties, renderFormItems],
     );
 
-    useEffect(() => {
-        loadStorageProviders();
-    }, []);
+    const getTabItems = () => {
+        const items = [];
 
-    return (
-        <>
-            <Tabs defaultActiveKey={tabKey} type="line" style={{ width: '100%', flex: 1 }}>
-                {properties.length > 0 && (
-                    <Tabs.TabPane tab="Properties" key="1">
-                        <Row>{renderFormItemMemo}</Row>
-                    </Tabs.TabPane>
-                )}
+        if (properties.length > 0) {
+            items.push({
+                key: 'properties',
+                label: intl.formatMessage({ id: 'page.designer.settings.properties' }),
+                children: <Row>{renderFormItemMemo}</Row>,
+            });
+        }
 
-                <Tabs.TabPane tab="Common" key="2">
+        items.push(
+            {
+                key: 'common',
+                label: intl.formatMessage({ id: 'page.designer.settings.common' }),
+                children: (
                     <Row>
                         <ProFormText
-                            label="Name"
+                            label={intl.formatMessage({ id: 'page.designer.settings.field.name' })}
                             name="name"
                             rules={[
                                 { required: true },
                                 { max: 32 },
                                 { pattern: /^\w+$/, message: 'Invalid characters' },
                             ]}
-                            placeholder="The technical name of the activity."
+                            placeholder={intl.formatMessage({
+                                id: 'page.designer.settings.field.name.tips',
+                            })}
                         />
                         <ProFormText
-                            label="Display Name"
+                            label={intl.formatMessage({
+                                id: 'page.designer.settings.field.displayName',
+                            })}
                             name="displayName"
                             rules={[{ required: true }, { max: 32 }]}
-                            placeholder="The friendly name of the activity."
+                            placeholder={intl.formatMessage({
+                                id: 'page.designer.settings.field.displayName.tips',
+                            })}
                         />
                         <ProFormTextArea
-                            label="Description"
+                            label={intl.formatMessage({
+                                id: 'page.designer.settings.field.description',
+                            })}
                             name="description"
                             rules={[{ max: 128 }]}
                             fieldProps={{ autoSize: { minRows: 2, maxRows: 10 } }}
-                            placeholder="A custom description for this activity."
+                            placeholder={intl.formatMessage({
+                                id: 'page.designer.settings.field.description.tips',
+                            })}
                         />
                     </Row>
-                </Tabs.TabPane>
-                <Tabs.TabPane tab="Storage" key="3">
+                ),
+            },
+            {
+                key: 'storage',
+                label: intl.formatMessage({ id: 'page.designer.settings.storage' }),
+                children: (
                     <Row>
                         <ProFormSwitch
                             name="loadWorkflowContext"
-                            label="Load Workflow Context"
-                            extra="When enabled, this will load the workflow context into memory before executing this activity."
+                            label={intl.formatMessage({
+                                id: 'page.designer.settings.field.loadWorkflowContext',
+                            })}
+                            extra={intl.formatMessage({
+                                id: 'page.designer.settings.field.loadWorkflowContext.tips',
+                            })}
                         />
                         <ProFormSwitch
                             name="saveWorkflowContext"
-                            label="Save Workflow Context"
-                            extra="When enabled, this will save the workflow context back into storage after executing this activity."
+                            label={intl.formatMessage({
+                                id: 'page.designer.settings.field.saveWorkflowContext',
+                            })}
+                            extra={intl.formatMessage({
+                                id: 'page.designer.settings.field.saveWorkflowContext.tips',
+                            })}
                         />
                         <ProFormSwitch
                             name="persistWorkflow"
-                            label="Save Workflow Instance"
-                            extra="When enabled, this will save the workflow instance back into storage right after executing this activity."
+                            label={intl.formatMessage({
+                                id: 'page.designer.settings.field.persistWorkflow',
+                            })}
+                            extra={intl.formatMessage({
+                                id: 'page.designer.settings.field.persistWorkflow.tips',
+                            })}
                         />
                     </Row>
-                </Tabs.TabPane>
-                <Tabs.TabPane tab="Activity Output" key="4">
+                ),
+            },
+            {
+                key: 'activityOutput',
+                label: intl.formatMessage({ id: 'page.designer.settings.activityOutput' }),
+                children: (
                     <Row>
                         <ProFormSelect
                             name={['propertyStorageProviders', 'Output']}
-                            label="Default Storage Provider"
-                            extra="Configure the desired storage for each output property of this activity."
-                            options={[{ label: 'Default', value: '' }].concat(
+                            label={intl.formatMessage({
+                                id: 'page.designer.settings.field.propertyStorageProviders.output',
+                            })}
+                            extra={intl.formatMessage({
+                                id: 'page.designer.settings.field.propertyStorageProviders.output.tips',
+                            })}
+                            options={[
+                                {
+                                    label: intl.formatMessage({
+                                        id: 'common.dict.default',
+                                    }),
+                                    value: '',
+                                },
+                            ].concat(
                                 storageProviders.map((x: any) => {
                                     return { label: x.displayName, value: x.name };
                                 }),
@@ -380,7 +434,14 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                     key={'propertyStorageProviders_' + item.name}
                                     name={['propertyStorageProviders', item.name]}
                                     label={item.name}
-                                    options={[{ label: 'Default', value: '' }].concat(
+                                    options={[
+                                        {
+                                            label: intl.formatMessage({
+                                                id: 'common.dict.default',
+                                            }),
+                                            value: '',
+                                        },
+                                    ].concat(
                                         storageProviders.map((x: any) => {
                                             return { label: x.displayName, value: x.name };
                                         }),
@@ -389,10 +450,25 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                             );
                         })}
                     </Row>
-                </Tabs.TabPane>
-            </Tabs>
+                ),
+            },
+        );
 
-            {/*  */}
+        return items;
+    };
+
+    useEffect(() => {
+        loadStorageProviders();
+    }, []);
+
+    return (
+        <>
+            <Tabs
+                defaultActiveKey={tabKey}
+                type="line"
+                style={{ width: '100%', flex: 1 }}
+                items={getTabItems()}
+            />
         </>
     );
 };

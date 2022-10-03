@@ -1,28 +1,29 @@
 import { WorkflowStatus } from "@/services/enums";
+import { formatMessage, useIntl } from "umi";
 
 export const workflowStatusEnum = {
     [WorkflowStatus.Idle]: {
-        text: WorkflowStatus[WorkflowStatus.Idle],
+        text: formatMessage({ id: 'page.instance.status.idle' }),
         status: 'default',
     },
     [WorkflowStatus.Running]: {
-        text: WorkflowStatus[WorkflowStatus.Running],
+        text: formatMessage({ id: 'page.instance.status.running' }),
         status: 'processing',
     },
     [WorkflowStatus.Finished]: {
-        text: WorkflowStatus[WorkflowStatus.Finished],
+        text: formatMessage({ id: 'page.instance.status.finished' }),
         status: 'success',
     },
     [WorkflowStatus.Suspended]: {
-        text: WorkflowStatus[WorkflowStatus.Suspended],
+        text: formatMessage({ id: 'page.instance.status.suspended' }),
         status: 'warning',
     },
     [WorkflowStatus.Faulted]: {
-        text: WorkflowStatus[WorkflowStatus.Faulted],
+        text: formatMessage({ id: 'page.instance.status.faulted' }),
         status: 'error',
     },
     [WorkflowStatus.Cancelled]: {
-        text: WorkflowStatus[WorkflowStatus.Cancelled],
+        text: formatMessage({ id: 'page.instance.status.cancelled' }),
         status: 'default',
     },
 }

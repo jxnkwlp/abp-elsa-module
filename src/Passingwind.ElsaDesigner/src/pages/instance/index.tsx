@@ -1,5 +1,5 @@
 import { WorkflowStatus } from '@/services/enums';
-import { API } from '@/services/typings';
+import type { API } from '@/services/typings';
 import { getWorkflowDefinitionList } from '@/services/WorkflowDefinition';
 import {
     deleteWorkflowInstance,
@@ -11,30 +11,21 @@ import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { message, Modal } from 'antd';
-import React, { useRef, useState } from 'react';
-import { Link, useHistory } from 'umi';
+import React, { useRef } from 'react';
+import { Link, useIntl } from 'umi';
 import { workflowStatusEnum } from './status';
 
 const Index: React.FC = () => {
     const actionRef = useRef<ActionType>();
-
-    const history = useHistory();
-
-    // const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
-    // const [editModalTitle, setEditModalTitle] = useState<string>('');
-    // const [editModalData, setEditModalData] = useState<API.WorkflowInstance>();
-    // const [editModalDataId, setEditModalDataId] = useState<string>();
-
-    // const [searchKey, setSearchKey] = useState<string>();
+    const intl = useIntl();
 
     const columns: ProColumnType<API.WorkflowInstance>[] = [
         {
             dataIndex: 'workflowDefinitionId',
-            title: 'Definition',
+            title: intl.formatMessage({ id: 'page.instance.field.definition' }),
             hideInTable: true,
             valueType: 'select',
             request: async (p) => {
-                console.log(p);
                 const list = await getWorkflowDefinitionList({
                     filter: p.keyWords ?? '',
                     maxResultCount: 100,
@@ -50,7 +41,8 @@ const Index: React.FC = () => {
         },
         {
             dataIndex: 'name',
-            title: 'Name',
+            title: intl.formatMessage({ id: 'page.instance.field.name' }),
+            copyable: true,
             render: (_, record) => {
                 return (
                     <Link
@@ -65,46 +57,51 @@ const Index: React.FC = () => {
         },
         {
             dataIndex: 'version',
-            title: 'Version',
+            title: intl.formatMessage({ id: 'page.instance.field.version' }),
             valueType: 'digit',
+            width: 80,
         },
         {
             dataIndex: 'workflowStatus',
-            title: 'Status',
+            title: intl.formatMessage({ id: 'page.instance.field.workflowStatus' }),
             valueEnum: workflowStatusEnum,
+            // valueEnum: getWorkflowStatusEnum(),
         },
         {
-            title: 'Creation Time',
             dataIndex: 'creationTime',
+            title: intl.formatMessage({ id: 'common.dict.creationTime' }),
             valueType: 'dateTime',
             search: false,
         },
         {
-            title: 'Finished Time',
             dataIndex: 'finishedTime',
+            title: intl.formatMessage({ id: 'page.instance.field.finishedTime' }),
             valueType: 'dateTime',
             search: false,
         },
         {
-            title: 'Last Executed Time',
             dataIndex: 'lastExecutedTime',
+            title: intl.formatMessage({ id: 'page.instance.field.lastExecutedTime' }),
             valueType: 'dateTime',
             search: false,
         },
         {
-            title: 'Faulted Time',
             dataIndex: 'faultedTime',
+            title: intl.formatMessage({ id: 'page.instance.field.faultedTime' }),
             valueType: 'dateTime',
             search: false,
         },
         {
-            title: 'Correlation Id',
             dataIndex: 'correlationId',
+            title: intl.formatMessage({ id: 'page.instance.field.correlationId' }),
+            width: 150,
+            ellipsis: true,
+            copyable: true,
         },
         {
-            title: 'Action',
+            title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
-            width: 200,
+            width: 170,
             align: 'center',
             render: (text, record, _, action) => {
                 const menus = [];
@@ -119,20 +116,27 @@ const Index: React.FC = () => {
                             key="cancel"
                             onClick={() => {
                                 Modal.confirm({
-                                    title: 'Are you sure to cancel this instance?',
-                                    content:
-                                        'This operation will cancel the instance and all the tasks in it.',
+                                    title: intl.formatMessage({
+                                        id: 'page.instance.cancel.confirm.title',
+                                    }),
+                                    content: intl.formatMessage({
+                                        id: 'page.instance.cancel.confirm.content',
+                                    }),
                                     onOk: async () => {
                                         const result = await workflowInstanceCancel(record.id!);
                                         if (result?.response?.ok) {
-                                            message.success('Canceled successfully');
+                                            message.success(
+                                                intl.formatMessage({
+                                                    id: 'page.instance.cancel.confirm.success',
+                                                }),
+                                            );
                                             action?.reload();
                                         }
                                     },
                                 });
                             }}
                         >
-                            <span>Cancel</span>
+                            {intl.formatMessage({ id: 'page.instance.cancel' })}
                         </a>,
                     );
                 }
@@ -143,19 +147,27 @@ const Index: React.FC = () => {
                             key="retry"
                             onClick={() => {
                                 Modal.confirm({
-                                    title: 'Are you sure to retry this instance?',
-                                    content: 'This operation will retry the instance.',
+                                    title: intl.formatMessage({
+                                        id: 'page.instance.retry.confirm.title',
+                                    }),
+                                    content: intl.formatMessage({
+                                        id: 'page.instance.retry.confirm.content',
+                                    }),
                                     onOk: async () => {
                                         const result = await workflowInstanceRetry(record.id!, {});
                                         if (result?.response?.ok) {
-                                            message.success('Retried successfully');
+                                            message.success(
+                                                intl.formatMessage({
+                                                    id: 'page.instance.retry.confirm.success',
+                                                }),
+                                            );
                                             action?.reload();
                                         }
                                     },
                                 });
                             }}
                         >
-                            <span>Retry</span>
+                            {intl.formatMessage({ id: 'page.instance.retry' })}
                         </a>,
                     );
                 }
@@ -165,19 +177,27 @@ const Index: React.FC = () => {
                         key="delete"
                         onClick={() => {
                             Modal.confirm({
-                                title: 'Are you sure to delete this instance?',
-                                content: 'This operation will delete the instance.',
+                                title: intl.formatMessage({
+                                    id: 'common.dict.delete.confirm',
+                                }),
+                                content: intl.formatMessage({
+                                    id: 'page.instance.delete.confirm.content',
+                                }),
                                 onOk: async () => {
                                     const result = await deleteWorkflowInstance(record.id!);
                                     if (result?.response?.ok) {
-                                        message.success('Deleted successfully');
+                                        message.success(
+                                            intl.formatMessage({
+                                                id: 'common.dict.delete.success',
+                                            }),
+                                        );
                                         action?.reload();
                                     }
                                 },
                             });
                         }}
                     >
-                        <span>Delete</span>
+                        {intl.formatMessage({ id: 'common.dict.delete' })}
                     </a>,
                 );
 

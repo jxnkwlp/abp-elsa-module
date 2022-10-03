@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,19 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
     {
         public WorkflowDefinitionRepository(IDbContextProvider<IElsaModuleDbContext> dbContextProvider) : base(dbContextProvider)
         {
+        }
+
+        public async Task<long> CountAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, CancellationToken cancellationToken = default)
+        {
+            var dbset = await GetDbSetAsync();
+
+            return await dbset
+                  .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
+                  .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel.Contains(name))
+                  .WhereIf(!string.IsNullOrEmpty(tag), x => x.Channel.Contains(tag))
+                  .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
+                  .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
+                  .LongCountAsync();
         }
 
         public async Task<Guid> GetIdByNameAsync(string name, CancellationToken cancellationToken = default)
@@ -44,5 +58,32 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore.Repositories
             return await dbset.Where(x => tags.Contains(x.Tag)).Select(x => x.Id).ToArrayAsync();
         }
 
+        public async Task<List<WorkflowDefinition>> GetListAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, CancellationToken cancellationToken = default)
+        {
+            var dbset = await GetDbSetAsync();
+
+            return await dbset
+                  .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
+                  .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel.Contains(name))
+                  .WhereIf(!string.IsNullOrEmpty(tag), x => x.Channel.Contains(tag))
+                  .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
+                  .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
+                  .ToListAsync(cancellationToken);
+        }
+
+        public async Task<List<WorkflowDefinition>> GetPagedListAsync(int skipCount, int maxResultCount, string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, string ordering = null, CancellationToken cancellationToken = default)
+        {
+            var dbset = await GetDbSetAsync();
+
+            return await dbset
+                  .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
+                  .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel.Contains(name))
+                  .WhereIf(!string.IsNullOrEmpty(tag), x => x.Channel.Contains(tag))
+                  .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
+                  .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
+                  .OrderBy(ordering ?? $"{nameof(WorkflowDefinition.CreationTime)} desc")
+                  .PageBy(skipCount, maxResultCount)
+                  .ToListAsync(cancellationToken);
+        }
     }
 }

@@ -9,7 +9,7 @@ import {
     getWorkflowDefinitionVersions,
     updateWorkflowDefinition,
 } from '@/services/WorkflowDefinition';
-import { GlobalOutlined, SaveOutlined } from '@ant-design/icons';
+import { GlobalOutlined, SaveOutlined, SettingOutlined } from '@ant-design/icons';
 import { ModalForm } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
@@ -26,6 +26,7 @@ import {
     Modal,
     Popconfirm,
     Row,
+    Space,
     Spin,
     Tag,
     Typography,
@@ -35,7 +36,7 @@ import type { RcFile } from 'antd/lib/upload';
 import { isArray } from 'lodash';
 import React, { useEffect, useRef } from 'react';
 import { MonacoDiffEditor } from 'react-monaco-editor';
-import { useHistory, useLocation } from 'umi';
+import { useHistory, useIntl, useLocation } from 'umi';
 import EditFormItems from '../definition/edit-form-items';
 import type { FlowActionType } from './flow';
 import Flow from './flow';
@@ -58,6 +59,7 @@ import type {
 const Index: React.FC = () => {
     const location = useLocation();
     const history = useHistory();
+    const intl = useIntl();
 
     const flowAction = useRef<FlowActionType>();
 
@@ -76,7 +78,7 @@ const Index: React.FC = () => {
     const [editModalTitle, setEditModalTitle] = React.useState<string>();
     const [editModalVisible, setEditModalVisible] = React.useState<boolean>(false);
 
-    const [nodeTypePropFormTitle, setNodeTypePropFormTitle] = React.useState<string>('Property');
+    const [nodeTypePropFormTitle, setNodeTypePropFormTitle] = React.useState<React.ReactNode>('');
     const [nodeTypePropFormVisible, setNodeTypePropFormVisible] = React.useState<boolean>(false);
     const [nodeTypePropList, setNodeTypePropList] = React.useState<NodeTypeProperty[]>([]);
     const [nodeTypeDescriptor, setNodeTypeDescriptor] =
@@ -177,9 +179,15 @@ const Index: React.FC = () => {
     // show node edit form
     // 显示节点属性编辑表单
     const handleOnShowNodeEditForm = async (nodeConfig: Node.Properties, node: Node) => {
-        const loading2 = message.loading('Loading....');
+        const loading2 = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
         //
-        setNodeTypePropFormTitle(`Settings - ${nodeConfig.type} - ${nodeConfig.displayName} `);
+        setNodeTypePropFormTitle(
+            <Space>
+                {intl.formatMessage({ id: 'page.designer.settings.title' })}
+                <span>{` - ${nodeConfig.displayName}`}</span>
+                <small>({nodeConfig.type})</small>
+            </Space>,
+        );
 
         setEditNodeId(node.id);
 
@@ -470,9 +478,19 @@ const Index: React.FC = () => {
 
         if (result) {
             if (publish) {
-                message.success('Publish workflow success. version: ' + result.version);
+                message.success(
+                    intl.formatMessage(
+                        { id: 'page.definition.published.success' },
+                        { version: result.version },
+                    ),
+                );
             } else {
-                message.success('Save draft successed. version: ' + result.version);
+                message.success(
+                    intl.formatMessage(
+                        { id: 'page.definition.saved.success' },
+                        { version: result.version },
+                    ),
+                );
             }
             // new
             if (!id) {
@@ -491,7 +509,7 @@ const Index: React.FC = () => {
     };
 
     const showCreateModal = () => {
-        setEditModalTitle('Create');
+        setEditModalTitle(intl.formatMessage({ id: 'common.dict.create' }));
         setEditModalVisible(true);
     };
 
@@ -499,7 +517,7 @@ const Index: React.FC = () => {
         sourceVersionNumber: number,
         targetVersionNumber?: number,
     ) => {
-        const loading = message.loading('Loading ... ');
+        const loading = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
 
         const sourceVersion = await getWorkflowDefinitionVersion(id!, sourceVersionNumber);
         let targetVersion: API.WorkflowDefinitionVersion | undefined = undefined;
@@ -526,7 +544,14 @@ const Index: React.FC = () => {
                 2,
             ),
         });
-        setVersionDiffModalTitle(`Comparison ${sourceVersionNumber} and ${targetVersion.version}`);
+        setVersionDiffModalTitle(
+            intl.formatMessage(
+                {
+                    id: 'page.definition.versions.comparison.label',
+                },
+                { v1: sourceVersionNumber, v2: targetVersion.version },
+            ),
+        );
         setVersionDiffModalVisible(true);
         loading();
     };
@@ -572,96 +597,100 @@ const Index: React.FC = () => {
                     }
                 }}
                 className="designer"
+                title={
+                    <>
+                        <span style={{ fontSize: 18 }}>{definition?.name} </span>
+                        <Tag>
+                            {intl.formatMessage({ id: 'page.definition.latest' })}:{' '}
+                            {definition?.latestVersion ?? 1}
+                        </Tag>
+                        {definition?.publishedVersion && (
+                            <Tag>
+                                {intl.formatMessage({ id: 'page.definition.published' })}:{' '}
+                                {definition?.publishedVersion}
+                            </Tag>
+                        )}
+                    </>
+                }
+                extra={
+                    <Space>
+                        <Button
+                            type="default"
+                            disabled={!definition?.name}
+                            loading={submiting}
+                            icon={<SaveOutlined />}
+                            onClick={async () => {
+                                await handleSaveGraphData();
+                            }}
+                        >
+                            {intl.formatMessage({ id: 'common.dict.save' })}
+                        </Button>
+                        <Button
+                            type="default"
+                            disabled={!definition?.name}
+                            loading={submiting}
+                            icon={<GlobalOutlined />}
+                            onClick={async () => {
+                                await handleSaveGraphData(true);
+                            }}
+                        >
+                            {intl.formatMessage({ id: 'page.definition.publish' })}
+                        </Button>
+
+                        <Dropdown.Button
+                            disabled={submiting || !definition?.name}
+                            // icon={<SettingOutlined />}
+                            onClick={() => {
+                                setEditModalTitle(intl.formatMessage({ id: 'common.dict.edit' }));
+                                setDefinition({
+                                    ...definition,
+                                    // @ts-ignore
+                                    variablesString: JSON.stringify(definition.variables ?? {}),
+                                });
+                                setEditModalVisible(true);
+                            }}
+                            overlay={
+                                <Menu>
+                                    <Menu.Item
+                                        key="1"
+                                        onClick={() => {
+                                            setVersionListModalVisible(true);
+                                        }}
+                                        disabled={!id}
+                                    >
+                                        {intl.formatMessage({ id: 'page.definition.versions' })}
+                                    </Menu.Item>
+                                    <Menu.Divider />
+                                    <Menu.Item
+                                        key="2"
+                                        onClick={() => {
+                                            handleOnExport();
+                                        }}
+                                    >
+                                        {intl.formatMessage({ id: 'common.dict.export' })}
+                                    </Menu.Item>
+                                    <Menu.Item key="3">
+                                        <Upload
+                                            accept=".json"
+                                            showUploadList={false}
+                                            beforeUpload={(file) => {
+                                                handleOnImport(file);
+                                                return false;
+                                            }}
+                                        >
+                                            {intl.formatMessage({ id: 'common.dict.import' })}
+                                        </Upload>
+                                    </Menu.Item>
+                                </Menu>
+                            }
+                        >
+                            <SettingOutlined />
+                            {intl.formatMessage({ id: 'page.definition.settings' })}
+                        </Dropdown.Button>
+                    </Space>
+                }
             >
                 <Spin spinning={loading}>
-                    <Row style={{ marginBottom: 15 }}>
-                        <Col flex={1} className="title-bar">
-                            <Typography.Text>
-                                {definition?.name}{' '}
-                                <Tag>Draft :{definition?.latestVersion ?? 1}</Tag>
-                                {definition?.publishedVersion && (
-                                    <Tag> Published :{definition?.publishedVersion}</Tag>
-                                )}
-                            </Typography.Text>
-                        </Col>
-                        <Col>
-                            <Button
-                                type="default"
-                                disabled={!definition?.name}
-                                loading={submiting}
-                                style={{ marginLeft: 10 }}
-                                icon={<SaveOutlined />}
-                                onClick={async () => {
-                                    await handleSaveGraphData();
-                                }}
-                            >
-                                Save
-                            </Button>
-                            <Button
-                                type="default"
-                                disabled={!definition?.name}
-                                loading={submiting}
-                                style={{ marginLeft: 10 }}
-                                icon={<GlobalOutlined />}
-                                onClick={async () => {
-                                    await handleSaveGraphData(true);
-                                }}
-                            >
-                                Publish
-                            </Button>
-
-                            <Dropdown.Button
-                                disabled={submiting || !definition?.name}
-                                style={{ marginLeft: 10 }}
-                                // icon={<SettingOutlined />}
-                                onClick={() => {
-                                    setEditModalTitle('Edit');
-                                    setDefinition({
-                                        ...definition,
-                                        // @ts-ignore
-                                        variablesString: JSON.stringify(definition.variables ?? {}),
-                                    });
-                                    setEditModalVisible(true);
-                                }}
-                                overlay={
-                                    <Menu>
-                                        <Menu.Item
-                                            key="1"
-                                            onClick={() => {
-                                                setVersionListModalVisible(true);
-                                            }}
-                                            disabled={!id}
-                                        >
-                                            Versions
-                                        </Menu.Item>
-                                        <Menu.Divider />
-                                        <Menu.Item
-                                            key="2"
-                                            onClick={() => {
-                                                handleOnExport();
-                                            }}
-                                        >
-                                            Export
-                                        </Menu.Item>
-                                        <Menu.Item key="3">
-                                            <Upload
-                                                accept=".json"
-                                                showUploadList={false}
-                                                beforeUpload={(file) => {
-                                                    handleOnImport(file);
-                                                    return false;
-                                                }}
-                                            >
-                                                Import
-                                            </Upload>
-                                        </Menu.Item>
-                                    </Menu>
-                                }
-                            >
-                                Settings
-                            </Dropdown.Button>
-                        </Col>
-                    </Row>
                     <Flow
                         actionRef={flowAction}
                         graphData={graphData}
@@ -741,7 +770,7 @@ const Index: React.FC = () => {
             </ModalForm>
             {/*  */}
             <Modal
-                title="Version History"
+                title={intl.formatMessage({ id: 'page.definition.versions' })}
                 destroyOnClose
                 visible={versionListModalVisible}
                 onCancel={() => setVersionListModalVisible(false)}
@@ -749,10 +778,12 @@ const Index: React.FC = () => {
                 onOk={() => {
                     if (oldVersion) {
                         setVersionListModalVisible(false);
-                        message.loading('Loading...', 1);
+                        message.loading(intl.formatMessage({ id: 'common.dict.loading' }), 1);
                         loadData(id!, oldVersion);
                     } else {
-                        message.error('Please select a version');
+                        message.error(
+                            intl.formatMessage({ id: 'page.definition.versions.no-select' }),
+                        );
                     }
                 }}
             >
@@ -761,21 +792,26 @@ const Index: React.FC = () => {
                     toolBarRender={false}
                     rowKey="version"
                     columns={[
-                        { title: 'Version', dataIndex: 'version' },
                         {
-                            title: 'Latest',
+                            title: intl.formatMessage({ id: 'page.definition.field.version' }),
+                            dataIndex: 'version',
+                        },
+                        {
+                            title: intl.formatMessage({ id: 'page.definition.field.isLatest' }),
                             dataIndex: 'isLatest',
                             align: 'center',
                             valueEnum: { true: { text: 'Y' }, false: { text: '-' } },
                         },
                         {
-                            title: 'Published',
+                            title: intl.formatMessage({ id: 'page.definition.field.isPublished' }),
                             dataIndex: 'isPublished',
                             align: 'center',
                             valueEnum: { true: { text: 'Y' }, false: { text: '-' } },
                         },
                         {
-                            title: 'Modification Time',
+                            title: intl.formatMessage({
+                                id: 'page.definition.field.lastModificationTime',
+                            }),
                             dataIndex: 'creationTime',
                             valueType: 'dateTime',
                             width: 160,
@@ -785,7 +821,7 @@ const Index: React.FC = () => {
                             },
                         },
                         {
-                            title: 'Comparison',
+                            title: intl.formatMessage({ id: 'page.definition.field.comparison' }),
                             dataIndex: 'Comparison',
                             width: 120,
                             align: 'center',
@@ -797,7 +833,9 @@ const Index: React.FC = () => {
                                                 handleVersionComparison(record.version!, version);
                                             }}
                                         >
-                                            Latest
+                                            {intl.formatMessage({
+                                                id: 'page.definition.versions.comparison-latest',
+                                            })}
                                         </a>
                                         <br />
                                         <a
@@ -805,21 +843,25 @@ const Index: React.FC = () => {
                                                 handleVersionComparison(record.version!);
                                             }}
                                         >
-                                            Previous
+                                            {intl.formatMessage({
+                                                id: 'page.definition.versions.comparison-previous',
+                                            })}
                                         </a>
                                     </>
                                 );
                             },
                         },
                         {
-                            title: 'Action',
+                            title: intl.formatMessage({ id: 'common.dict.table-action' }),
                             valueType: 'option',
                             width: 80,
                             align: 'center',
                             render: (text, record, _, action) => {
                                 return (
                                     <Popconfirm
-                                        title="Are you sure?"
+                                        title={intl.formatMessage({
+                                            id: 'common.dict.delete.confirm',
+                                        })}
                                         onConfirm={async () => {
                                             if (record.isPublished || record.isLatest) {
                                                 message.error(
@@ -838,7 +880,7 @@ const Index: React.FC = () => {
                                             }
                                         }}
                                     >
-                                        <a>Delete</a>
+                                        <a>{intl.formatMessage({ id: 'common.dict.delete' })}</a>
                                     </Popconfirm>
                                 );
                             },
@@ -880,7 +922,7 @@ const Index: React.FC = () => {
                     }}
                 />
             </Modal>
-
+            {/*  */}
             <Modal
                 title={versionDiffModalTitle}
                 visible={versionDiffModalVisible}

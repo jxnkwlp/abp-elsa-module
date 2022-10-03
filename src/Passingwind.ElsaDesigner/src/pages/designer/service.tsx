@@ -94,6 +94,7 @@ export const getNodeTypeData = async (): Promise<NodeTypeGroup[]> => {
         const g = nodeData.find((x) => x.id === item.category);
         g?.children?.push({
             label: item.displayName,
+            description: item.description,
             // inherit: 'rect',
             // width: 100,
             // height: 60,

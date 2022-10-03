@@ -1,5 +1,6 @@
-import { Collapse } from 'antd';
+import { Collapse, Popover, Tooltip } from 'antd';
 import React, { useEffect } from 'react';
+import { useIntl } from 'umi';
 import { getNodeTypeData } from './service';
 import type { NodeTypeGroup } from './type';
 
@@ -9,6 +10,8 @@ type NodeTypesPanelProps = {
 
 const NodeTypesPanel: React.FC<NodeTypesPanelProps> = (props) => {
     const [data, setData] = React.useState<NodeTypeGroup[]>([]);
+
+    const intl = useIntl();
 
     const handleStartDrag = (e: { currentTarget: any; preventDefault: () => any }) => {
         const target = e.currentTarget;
@@ -37,7 +40,9 @@ const NodeTypesPanel: React.FC<NodeTypesPanelProps> = (props) => {
                 </Collapse.Panel>
             </Collapse> */}
 
-            <div className="dnd-header">组件列表</div>
+            <div className="dnd-header">
+                {intl.formatMessage({ id: 'page.designer.component' })}
+            </div>
             <Collapse key="groups" collapsible="header" ghost className="dnd-body">
                 {data.map((g, index) => {
                     return (
@@ -45,13 +50,19 @@ const NodeTypesPanel: React.FC<NodeTypesPanelProps> = (props) => {
                             <ul>
                                 {g.children.map((item, index2) => {
                                     return (
-                                        <li
+                                        <Tooltip
+                                            title={item.description ?? item.label}
+                                            placement="right"
                                             key={index2}
-                                            data-type={item.type}
-                                            onMouseDown={handleStartDrag}
                                         >
-                                            <div className="dnd-rect">{item.label}</div>
-                                        </li>
+                                            <li
+                                                key={index2}
+                                                data-type={item.type}
+                                                onMouseDown={handleStartDrag}
+                                            >
+                                                <div className="dnd-rect">{item.label}</div>
+                                            </li>
+                                        </Tooltip>
                                     );
                                 })}
                             </ul>

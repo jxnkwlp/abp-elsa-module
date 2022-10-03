@@ -14,13 +14,14 @@ import { TableDropdown } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Button, Form, message, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
-import { useHistory } from 'umi';
+import { formatMessage, useHistory, useIntl } from 'umi';
 import EditFormItems from './edit-form-items';
+import type { API } from '@/services/typings';
 
 const handleEdit = async (id: string, data: any) => {
     const response = await updateWorkflowDefinitionDefinition(id, data);
     if (response) {
-        message.success('Successfully modified');
+        message.success(formatMessage({ id: 'common.dict.modified.success' }));
         return true;
     }
     return false;
@@ -29,7 +30,7 @@ const handleEdit = async (id: string, data: any) => {
 const handleDelete = async (id: string) => {
     const response = await deleteWorkflowDefinition(id);
     if (response?.response?.ok) {
-        message.success('Delete successful');
+        message.success(formatMessage({ id: 'common.dict.deleted.success' }));
         return true;
     }
     return false;
@@ -37,6 +38,7 @@ const handleDelete = async (id: string) => {
 
 const Index: React.FC = () => {
     const actionRef = useRef<ActionType>();
+    const intl = useIntl();
 
     const history = useHistory();
 
@@ -56,49 +58,57 @@ const Index: React.FC = () => {
 
     const columns: ProColumnType<API.WorkflowDefinition>[] = [
         {
+            dataIndex: 'filter',
+            title: intl.formatMessage({ id: 'page.definition.field.name' }),
+            hideInTable: true,
+        },
+        {
             dataIndex: 'name',
-            title: 'Name',
+            title: intl.formatMessage({ id: 'page.definition.field.name' }),
             search: false,
+            copyable: true,
         },
         {
             dataIndex: 'displayName',
-            title: 'Display Name',
+            title: intl.formatMessage({ id: 'page.definition.field.displayName' }),
             search: false,
+            copyable: true,
         },
         {
             dataIndex: 'description',
-            title: 'Description',
+            title: intl.formatMessage({ id: 'page.definition.field.description' }),
             search: false,
         },
         {
             dataIndex: 'latestVersion',
-            title: 'Latest Version',
+            title: intl.formatMessage({ id: 'page.definition.field.latestVersion' }),
             search: false,
         },
         {
             dataIndex: 'publishedVersion',
-            title: 'Published Version',
+            title: intl.formatMessage({ id: 'page.definition.field.publishedVersion' }),
             search: false,
         },
-        // {
-        //     dataIndex: 'isSingleton',
-        //     title: 'Singleton',
-        //     search: false,
-        //     valueEnum: {
-        //         true: { text: 'Yes' },
-        //         false: { text: 'No' },
-        //     },
-        // },
         {
-            title: 'Modification Time',
+            dataIndex: 'isSingleton',
+            title: intl.formatMessage({ id: 'page.definition.field.isSingleton' }),
+            search: false,
+            valueEnum: {
+                true: { text: 'Y' },
+                false: { text: 'N' },
+            },
+        },
+        {
             dataIndex: 'creationTime',
+            title: intl.formatMessage({ id: 'common.dict.lastModificationTime' }),
             valueType: 'dateTime',
+            search: false,
             renderText: (_, record) => {
                 return record.lastModificationTime ?? record.creationTime;
             },
         },
         {
-            title: 'Action',
+            title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
             width: 200,
             align: 'center',
@@ -111,7 +121,9 @@ const Index: React.FC = () => {
                         setDispatchFormVisible(true);
                     }}
                 >
-                    Dispatch
+                    {intl.formatMessage({
+                        id: 'page.definition.dispatch',
+                    })}
                 </a>,
                 <a
                     key="edit"
@@ -123,10 +135,12 @@ const Index: React.FC = () => {
                         );
                         setEditModalDataId(record.id);
                         setEditModalVisible(true);
-                        setEditModalTitle(`Edit ${record.name}`);
+                        setEditModalTitle(
+                            `${intl.formatMessage({ id: 'common.dict.edit' })} ${record.name}`,
+                        );
                     }}
                 >
-                    Edit
+                    {intl.formatMessage({ id: 'page.definition.settings' })}
                 </a>,
                 <a
                     key="designer"
@@ -134,7 +148,9 @@ const Index: React.FC = () => {
                         history.push('/designer?id=' + record.id);
                     }}
                 >
-                    Designer
+                    {intl.formatMessage({
+                        id: 'page.definition.designer',
+                    })}
                 </a>,
                 <TableDropdown
                     key="actionGroup"
@@ -161,28 +177,17 @@ const Index: React.FC = () => {
                     menus={[
                         {
                             key: 'publish',
-                            name: 'Publish',
+                            name: intl.formatMessage({ id: 'page.definition.publish' }),
                             disabled: record.publishedVersion != null,
                         },
                         {
                             key: 'unpublish',
-                            name: 'Unpublish',
+                            name: intl.formatMessage({ id: 'page.definition.unpublish' }),
                             disabled: record.publishedVersion == null,
                         },
-                        { key: 'delete', name: 'Delete' },
+                        { key: 'delete', name: intl.formatMessage({ id: 'common.dict.delete' }) },
                     ]}
                 />,
-                // <Popconfirm
-                //     key="delete"
-                //     title="Confirm?"
-                //     onConfirm={async () => {
-                //         if (await handleDelete(record.id!)) {
-                //             action?.reload();
-                //         }
-                //     }}
-                // >
-                //     <a>Delete</a>
-                // </Popconfirm>,
             ],
         },
     ];
@@ -201,16 +206,17 @@ const Index: React.FC = () => {
                             history.push('/designer');
                         }}
                     >
-                        添加
+                        {intl.formatMessage({ id: 'common.dict.create' })}
                     </Button>,
                 ]}
-                search={false}
+                search={{ labelWidth: 120 }}
                 request={async (params) => {
                     const { current, pageSize } = params;
                     delete params.current;
                     delete params.pageSize;
                     const skipCount = (current! - 1) * pageSize!;
                     const result = await getWorkflowDefinitionList({
+                        ...params,
                         skipCount,
                         maxResultCount: pageSize,
                     });
@@ -275,7 +281,9 @@ const Index: React.FC = () => {
                 labelCol={{ span: 5 }}
                 width={600}
                 labelWrap
-                title={'Dispatch'}
+                title={intl.formatMessage({
+                    id: 'page.definition.dispatch',
+                })}
                 visible={dispatchFormVisible}
                 modalProps={{ destroyOnClose: true, maskClosable: false }}
                 onVisibleChange={setDispatchFormVisible}
@@ -283,7 +291,12 @@ const Index: React.FC = () => {
                     const result = await workflowDefinitionDispatch(dispatchId!, value);
                     if (result?.workflowInstanceId) {
                         message.success(
-                            'Dispatch success. Instance Id: ' + result.workflowInstanceId,
+                            intl.formatMessage(
+                                {
+                                    id: 'page.definition.dispatch.success',
+                                },
+                                { id: result.workflowInstanceId },
+                            ),
                         );
                         return true;
                     }
@@ -291,7 +304,7 @@ const Index: React.FC = () => {
                 }}
             >
                 <ProFormSelect
-                    label="Activity"
+                    label={intl.formatMessage({ id: 'page.definition.dispatch.activityId' })}
                     name="activityId"
                     request={async () => {
                         const result = await getWorkflowDefinitionVersion(
@@ -306,10 +319,18 @@ const Index: React.FC = () => {
                         });
                     }}
                 />
-                <ProFormText label="Correlation Id" name="correlationId" rules={[{ max: 36 }]} />
-                <ProFormText label="Context Id" name="contextId" rules={[{ max: 36 }]} />
+                <ProFormText
+                    label={intl.formatMessage({ id: 'page.definition.dispatch.correlationId' })}
+                    name="correlationId"
+                    rules={[{ max: 36 }]}
+                />
+                <ProFormText
+                    label={intl.formatMessage({ id: 'page.definition.dispatch.contextId' })}
+                    name="contextId"
+                    rules={[{ max: 36 }]}
+                />
                 <ProFormTextArea
-                    label="Input"
+                    label={intl.formatMessage({ id: 'page.definition.dispatch.input' })}
                     name="input"
                     fieldProps={{
                         autoSize: {
