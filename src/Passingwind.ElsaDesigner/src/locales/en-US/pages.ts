@@ -31,6 +31,13 @@ export default {
     'pages.admin.subPage.alertMessage':
         'Umi ui is now released, welcome to use npm run ui to start the experience.',
     //
+    'page.change-password.title': 'Change Password',
+    'page.change-password.field.currentPassword': 'Current Password',
+    'page.change-password.field.newPassword': 'New Password',
+    'page.change-password.field.confirmPassword': 'Confirm Password',
+    'page.change-password.field.2passwordnotmatch': '2 passwords entered do not match',
+    'page.change-password.submit': 'Change',
+    'page.change-password.submit.success': 'Password changed successfully, please log in again',
     //
     'page.definition.edit.basic': 'Basic',
     'page.definition.edit.variables': 'Variables',

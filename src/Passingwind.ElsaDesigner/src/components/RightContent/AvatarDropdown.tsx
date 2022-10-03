@@ -1,11 +1,11 @@
 import { loginLogout } from '@/services/Login';
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { LockOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Spin } from 'antd';
 import type { ItemType } from 'antd/lib/menu/hooks/useItems';
 import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
-import { history, useModel } from 'umi';
+import { history, useIntl, useModel } from 'umi';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 
@@ -29,6 +29,7 @@ const loginOut = async () => {
 
 const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
     const { initialState, setInitialState } = useModel('@@initialState');
+    const intl = useIntl();
 
     const onMenuClick = useCallback(
         (event: MenuInfo) => {
@@ -84,9 +85,14 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
               ]
             : []),
         {
+            key: 'change-password',
+            icon: <LockOutlined />,
+            label: intl.formatMessage({ id: 'app.changepassword' }),
+        },
+        {
             key: 'logout',
             icon: <LogoutOutlined />,
-            label: '退出登录',
+            label: intl.formatMessage({ id: 'app.logout' }),
         },
     ];
 

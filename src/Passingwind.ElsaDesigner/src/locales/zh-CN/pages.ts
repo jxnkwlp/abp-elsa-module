@@ -29,6 +29,14 @@ export default {
     'pages.admin.subPage.title': ' 这个页面只有 admin 权限才能查看',
     'pages.admin.subPage.alertMessage': 'umi ui 现已发布，欢迎使用 npm run ui 启动体验。',
     //
+    'page.change-password.title': '修改密码',
+    'page.change-password.field.currentPassword': '当前密码',
+    'page.change-password.field.newPassword': '新密码',
+    'page.change-password.field.confirmPassword': '确认密码',
+    'page.change-password.field.2passwordnotmatch': '2次密码输入不一致',
+    'page.change-password.submit': '修改',
+    'page.change-password.submit.success': '修改密码成功，请重新登录',
+    //
     'page.definition.edit.basic': '基本信息',
     'page.definition.edit.variables': '变量',
     'page.definition.edit.workflowContext': '上下文',

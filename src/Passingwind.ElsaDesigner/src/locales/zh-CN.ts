@@ -16,6 +16,8 @@ export default {
     'app.preview.down.block': '下载此页面到本地项目',
     'app.welcome.link.fetch-blocks': '获取全部区块',
     'app.welcome.link.block-list': '基于 block 开发，快速构建标准页面',
+    'app.logout': '退出登录',
+    'app.changepassword': '修改密码',
     'common.dict.create': '添加',
     'common.dict.edit': '编辑',
     'common.dict.delete': '删除',

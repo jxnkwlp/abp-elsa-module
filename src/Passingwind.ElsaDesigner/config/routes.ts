@@ -51,7 +51,7 @@
     },
     //
     {
-        path: '/account/changepassword',
+        path: '/account/change-password',
         name: 'Change Password',
         icon: 'smile',
         hideInMenu: true,
