@@ -15,5 +15,7 @@ public interface IWorkflowInstanceRepository : IRepository<WorkflowInstance, Gui
 
     Task<List<WorkflowInstance>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting, string name = null, Guid? definitionId = null, Guid? definitionVersionId = null, int? version = null, WorkflowStatus? status = null, string correlationId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
+    Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(WorkflowStatus workflowStatus, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
+
 }
 

@@ -37,6 +37,8 @@ export default {
     'page.change-password.submit': '修改',
     'page.change-password.submit.success': '修改密码成功，请重新登录',
     //
+    'page.dashboard.statistics.7datecount.title': '7日内流程实例计数统计',
+    //
     'page.definition.edit.basic': '基本信息',
     'page.definition.edit.variables': '变量',
     'page.definition.edit.workflowContext': '上下文',

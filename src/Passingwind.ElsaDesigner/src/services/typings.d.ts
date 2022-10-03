@@ -1,6 +1,6 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
- * Total count: 107
+ * Total count: 109
  **/
 import * as Enum from "./enums";
 
@@ -890,6 +890,22 @@ declare namespace API {
         cancelledTime?: string | undefined;
         faultedTime?: string | undefined;
         fault?: WorkflowFault | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowInstanceDateCountStatistic = {
+        date?: string | undefined;
+        finishedCount?: number | undefined;
+        failedCount?: number | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowInstanceDateCountStatisticsResult = {
+        items?: WorkflowInstanceDateCountStatistic[] | undefined;
     };
 
     /**

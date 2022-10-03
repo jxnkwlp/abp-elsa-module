@@ -62,5 +62,19 @@ namespace Passingwind.Abp.ElsaModule.MongoDB.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(Elsa.Models.WorkflowStatus workflowStatus, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+        {
+            var query = await GetMongoQueryableAsync(cancellationToken);
+
+            var list = await query
+                       .Where(x => x.WorkflowStatus == workflowStatus && x.CreationTime.Date >= startDate.Date && x.CreationTime.Date <= endDate.Date)
+                       .Select(x => new { x.Id, x.CreationTime })
+                       .ToListAsync(cancellationToken);
+
+            return list
+                    .GroupBy(x => x.CreationTime.Date)
+                    .ToDictionary(x => x.Key.Date, x => x.Count());
+        }
+
     }
 }

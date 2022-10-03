@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 10
+ * Total count: 11
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -72,6 +72,7 @@ export async function getWorkflowInstanceList(
         version?: number | undefined,
         workflowStatus?: any | undefined,
         correlationId?: string | undefined,
+        workflowDefinitionId?: string | undefined,
         skipCount?: number | undefined,
         maxResultCount?: number | undefined
     },
@@ -93,6 +94,22 @@ export async function getWorkflowInstanceLogSummary(
 ) {
     return request<API.WorkflowInstanceExecutionLogSummary>(`/api/workflow-instances/${id}/execution-logs/summary`, {
         method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/workflow-instances/statistics/count-date 
+ **/
+export async function getWorkflowInstanceStatusDateCountStatistics(
+    params: {
+        datePeriod?: number | undefined
+    },
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowInstanceDateCountStatisticsResult>(`/api/workflow-instances/statistics/count-date`, {
+        method: 'GET',
+        params: params,
         ...(options || {}),
     });
 }

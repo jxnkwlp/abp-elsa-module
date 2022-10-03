@@ -20,5 +20,8 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input);
         Task DispatchAsync(Guid id, WorkflowInstanceDispatchRequestDto input);
         Task ExecuteAsync(Guid id, WorkflowInstanceExecuteRequestDto input);
+
+        Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(int datePeriod = 7);
+
     }
 }

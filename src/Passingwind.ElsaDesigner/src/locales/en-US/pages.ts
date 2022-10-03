@@ -39,6 +39,8 @@ export default {
     'page.change-password.submit': 'Change',
     'page.change-password.submit.success': 'Password changed successfully, please log in again',
     //
+    'page.dashboard.statistics.7datecount.title': 'Process instance count statistics within 7 days',
+    //
     'page.definition.edit.basic': 'Basic',
     'page.definition.edit.variables': 'Variables',
     'page.definition.edit.workflowContext': 'Workflow Context',
@@ -116,11 +118,11 @@ export default {
     'page.instance.outcomes': 'Outcomes',
     'page.instance.activityId': 'Activity ID',
     'page.instance.node.select.tips': 'Please select an node first.',
-    'page.instance.status.Idle': 'Idle',
-    'page.instance.status.Running': 'Running',
-    'page.instance.status.Finished': 'Finished',
-    'page.instance.status.Suspended': 'Suspended',
-    'page.instance.status.Faulted': 'Faulted',
-    'page.instance.status.Cancelled': 'Cancelled',
+    'page.instance.status.idle': 'Idle',
+    'page.instance.status.running': 'Running',
+    'page.instance.status.finished': 'Finished',
+    'page.instance.status.suspended': 'Suspended',
+    'page.instance.status.faulted': 'Faulted',
+    'page.instance.status.cancelled': 'Cancelled',
     //
 };

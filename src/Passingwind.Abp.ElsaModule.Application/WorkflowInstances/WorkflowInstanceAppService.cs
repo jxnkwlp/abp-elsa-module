@@ -7,6 +7,7 @@ using Passingwind.Abp.ElsaModule.Stores;
 using Passingwind.Abp.ElsaModule.WorkflowInstances;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Caching;
 using Volo.Abp.Json;
 
 namespace Passingwind.Abp.ElsaModule.Common
@@ -21,8 +22,9 @@ namespace Passingwind.Abp.ElsaModule.Common
         private readonly IWorkflowInstanceCanceller _workflowInstanceCanceller;
         private readonly IWorkflowReviver _workflowReviver;
         private readonly IWorkflowLaunchpad _workflowLaunchpad;
+        private readonly IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> _workflowInstanceDateCountStatisticsDistributedCache;
 
-        public WorkflowInstanceAppService(IJsonSerializer jsonSerializer, IWorkflowInstanceRepository workflowInstanceRepository, IWorkflowDefinitionRepository workflowDefinitionRepository, IWorkflowExecutionLogRepository workflowExecutionLogRepository, IStoreMapper storeMapper, IWorkflowInstanceCanceller workflowInstanceCanceller, IWorkflowReviver workflowReviver, IWorkflowLaunchpad workflowLaunchpad)
+        public WorkflowInstanceAppService(IJsonSerializer jsonSerializer, IWorkflowInstanceRepository workflowInstanceRepository, IWorkflowDefinitionRepository workflowDefinitionRepository, IWorkflowExecutionLogRepository workflowExecutionLogRepository, IStoreMapper storeMapper, IWorkflowInstanceCanceller workflowInstanceCanceller, IWorkflowReviver workflowReviver, IWorkflowLaunchpad workflowLaunchpad, IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> workflowInstanceDateCountStatisticsDistributedCache)
         {
             _jsonSerializer = jsonSerializer;
             _workflowInstanceRepository = workflowInstanceRepository;
@@ -32,6 +34,7 @@ namespace Passingwind.Abp.ElsaModule.Common
             _workflowInstanceCanceller = workflowInstanceCanceller;
             _workflowReviver = workflowReviver;
             _workflowLaunchpad = workflowLaunchpad;
+            _workflowInstanceDateCountStatisticsDistributedCache = workflowInstanceDateCountStatisticsDistributedCache;
         }
 
         public async Task CancelAsync(Guid id)
@@ -168,6 +171,41 @@ namespace Passingwind.Abp.ElsaModule.Common
 
             // reorder again
             dto.Activities = dto.Activities.OrderByDescending(x => x.StartTime).ToList();
+
+            return dto;
+        }
+
+        public async Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(int datePeriod = 7)
+        {
+            if (datePeriod <= 0)
+                throw new ArgumentOutOfRangeException("datePeriod must > 0");
+
+            var endDate = Clock.Now.Date;
+            var startDate = Clock.Now.Date.AddDays(-datePeriod);
+
+            var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync("StatusDateCountStatistics", async () =>
+              {
+                  var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(Elsa.Models.WorkflowStatus.Finished, startDate, endDate);
+                  var faulted = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(Elsa.Models.WorkflowStatus.Faulted, startDate, endDate);
+
+                  var dto = new WorkflowInstanceDateCountStatisticsResultDto();
+
+                  for (int i = 1; i <= datePeriod; i++)
+                  {
+                      var date = startDate.AddDays(i);
+                      dto.Items.Add(new WorkflowInstanceDateCountStatisticDto
+                      {
+                          Date = date,
+                          FailedCount = faulted.ContainsKey(date.Date) ? faulted[date.Date] : 0,
+                          FinishedCount = finished.ContainsKey(date.Date) ? finished[date.Date] : 0,
+                      });
+                  }
+
+                  return dto;
+              }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
+              {
+                  AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(5),
+              });
 
             return dto;
         }

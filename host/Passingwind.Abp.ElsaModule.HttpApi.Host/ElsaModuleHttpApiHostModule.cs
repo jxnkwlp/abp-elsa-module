@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Any;
@@ -202,7 +203,7 @@ public class ElsaModuleHttpApiHostModule : AbpModule
         });
 
         var dataProtectionBuilder = context.Services.AddDataProtection().SetApplicationName("ElsaModule");
-        if (!hostingEnvironment.IsDevelopment())
+        if (!hostingEnvironment.IsDevelopment() && configuration.GetValue<bool>("Redis:IsEnabled", false))
         {
             var redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
             dataProtectionBuilder.PersistKeysToStackExchangeRedis(redis, "ElsaModule-Protection-Keys");
