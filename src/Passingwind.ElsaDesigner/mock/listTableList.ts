@@ -21,8 +21,8 @@ const genList = (current: number, pageSize: number) => {
       desc: '这是一段描述',
       callNo: Math.floor(Math.random() * 1000),
       status: Math.floor(Math.random() * 10) % 4,
-      updatedAt: moment().format('YYYY-MM-DD'),
-      createdAt: moment().format('YYYY-MM-DD'),
+      updatedAt: moment(),
+      createdAt: moment(),
       progress: Math.ceil(Math.random() * 100),
     });
   }
@@ -132,8 +132,8 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
           desc,
           callNo: Math.floor(Math.random() * 1000),
           status: Math.floor(Math.random() * 10) % 2,
-          updatedAt: moment().format('YYYY-MM-DD'),
-          createdAt: moment().format('YYYY-MM-DD'),
+          updatedAt: moment(),
+          createdAt: moment(),
           progress: Math.ceil(Math.random() * 100),
         };
         tableListDataSource.unshift(newRule);

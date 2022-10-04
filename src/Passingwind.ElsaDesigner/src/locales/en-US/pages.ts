@@ -39,6 +39,24 @@ export default {
     'page.change-password.submit': 'Change',
     'page.change-password.submit.success': 'Password changed successfully, please log in again',
     //
+    'page.user.role': 'Roles',
+    'page.user.role.update': 'Update Roles',
+    'page.user.filter': 'Filter',
+    'page.user.field.userName': 'User Name',
+    'page.user.field.email': 'Email',
+    'page.user.field.surname': 'Surname',
+    'page.user.field.name': 'Name',
+    'page.user.field.phoneNumber': 'Phone Number',
+    'page.user.field.isActive': 'Active',
+    'page.user.field.lockoutEnabled': 'Lockout',
+    'page.user.field.password': 'Password',
+    //
+    'page.role.permissions': 'Permissions',
+    'page.role.field.name': 'Name',
+    'page.role.field.isDefault': 'Default',
+    'page.role.field.isPublic': 'Public',
+    'page.role.field.isStatic': 'Static',
+    //
     'page.dashboard.statistics.7datecount.title': 'Process instance count statistics within 7 days',
     //
     'page.definition.edit.basic': 'Basic',

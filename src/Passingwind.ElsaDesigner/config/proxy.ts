@@ -9,8 +9,8 @@
 export default {
     dev: {
         '/api/': {
-            // 要代理的地址
-            target: 'https://localhost:44324',
+            // target: 'https://localhost:44324',
+            target: 'https://localhost:44315',
             changeOrigin: true,
             secure: false,
         },

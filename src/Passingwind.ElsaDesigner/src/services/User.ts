@@ -1,45 +1,29 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 10
  **/
 // @ts-ignore
 /* eslint-disable */
+import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/identity/users/{id}
- * 
+ * *TODO* POST /api/identity/users 
  **/
-export async function getUser(
-    id: string,
+export async function createUser(
+    payload: API.IdentityUserCreate,
     options?: { [key: string]: any }
 ) {
-    return request<API.IdentityUser>(`/api/identity/users/${id}`, {
-        method: 'GET',
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* PUT /api/identity/users/{id}
- * 
- **/
-export async function updateUser(
-    id: string,
-    payload: API.IdentityUserUpdate,
-    options?: { [key: string]: any }
-) {
-    return request<API.IdentityUser>(`/api/identity/users/${id}`, {
-        method: 'PUT',
+    return request<API.IdentityUser>(`/api/identity/users`, {
+        method: 'POST',
         data: payload,
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* DELETE /api/identity/users/{id}
- * 
+ * *TODO* DELETE /api/identity/users/{id} 
  **/
 export async function deleteUser(
     id: string,
@@ -53,8 +37,32 @@ export async function deleteUser(
 }
 
 /**
- * *TODO* GET /api/identity/users
- * 
+ * *TODO* GET /api/identity/users/{id} 
+ **/
+export async function getUser(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<API.IdentityUser>(`/api/identity/users/${id}`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/identity/users/assignable-roles 
+ **/
+export async function getUserAssignableRoles(
+    options?: { [key: string]: any }
+) {
+    return request<API.IdentityRoleListResult>(`/api/identity/users/assignable-roles`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/identity/users 
  **/
 export async function getUserList(
     params: {
@@ -73,23 +81,7 @@ export async function getUserList(
 }
 
 /**
- * *TODO* POST /api/identity/users
- * 
- **/
-export async function createUser(
-    payload: API.IdentityUserCreate,
-    options?: { [key: string]: any }
-) {
-    return request<API.IdentityUser>(`/api/identity/users`, {
-        method: 'POST',
-        data: payload,
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* GET /api/identity/users/{id}/roles
- * 
+ * *TODO* GET /api/identity/users/{id}/roles 
  **/
 export async function getUserRoles(
     id: string,
@@ -102,8 +94,22 @@ export async function getUserRoles(
 }
 
 /**
- * *TODO* PUT /api/identity/users/{id}/roles
- * 
+ * *TODO* PUT /api/identity/users/{id} 
+ **/
+export async function updateUser(
+    id: string,
+    payload: API.IdentityUserUpdate,
+    options?: { [key: string]: any }
+) {
+    return request<API.IdentityUser>(`/api/identity/users/${id}`, {
+        method: 'PUT',
+        data: payload,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* PUT /api/identity/users/{id}/roles 
  **/
 export async function updateUserRoles(
     id: string,
@@ -119,41 +125,26 @@ export async function updateUserRoles(
 }
 
 /**
- * *TODO* GET /api/identity/users/assignable-roles
- * 
- **/
-export async function getUserAssignableRoles(
-    options?: { [key: string]: any }
-) {
-    return request<API.IdentityRoleListResult>(`/api/identity/users/assignable-roles`, {
-        method: 'GET',
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* GET /api/identity/users/by-username/{userName}
- * 
- **/
-export async function userFindByUsername(
-    userName: string,
-    options?: { [key: string]: any }
-) {
-    return request<API.IdentityUser>(`/api/identity/users/by-username/${userName}`, {
-        method: 'GET',
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* GET /api/identity/users/by-email/{email}
- * 
+ * *TODO* GET /api/identity/users/by-email/{email} 
  **/
 export async function userFindByEmail(
     email: string,
     options?: { [key: string]: any }
 ) {
     return request<API.IdentityUser>(`/api/identity/users/by-email/${email}`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/identity/users/by-username/{userName} 
+ **/
+export async function userFindByUsername(
+    userName: string,
+    options?: { [key: string]: any }
+) {
+    return request<API.IdentityUser>(`/api/identity/users/by-username/${userName}`, {
         method: 'GET',
         ...(options || {}),
     });

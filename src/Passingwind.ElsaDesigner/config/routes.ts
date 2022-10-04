@@ -20,32 +20,31 @@
     //
     {
         name: 'Dashboard',
-        icon: 'table',
+        icon: 'DashboardOutlined',
         path: '/dashboard',
         component: './dashboard',
     },
     {
         name: 'Instances',
-        icon: 'table',
+        icon: 'NodeIndex',
         path: '/instances',
         component: './instance',
     },
     {
         name: 'Instance Detail',
-        icon: 'table',
         path: '/instances/:id',
         component: './instance/detail',
         hideInMenu: true,
     },
     {
         name: 'Definitions',
-        icon: 'table',
+        icon: 'BarsOutlined',
         path: '/definitions',
         component: './definition',
     },
     {
         name: 'Designer',
-        icon: 'table',
+        icon: 'DeploymentUnitOutlined',
         path: '/designer',
         component: './designer',
     },
@@ -53,10 +52,32 @@
     {
         path: '/account/change-password',
         name: 'Change Password',
-        icon: 'smile',
         hideInMenu: true,
         component: './profile/changepassword',
     },
+    //
+    {
+        path: '/system',
+        name: 'system',
+        icon: 'SettingOutlined',
+        hideInBreadcrumb: true,
+        routes: [
+            {
+                path: 'users',
+                name: 'users',
+                component: './user',
+            },
+            {
+                path: 'roles',
+                name: 'roles',
+                component: './role',
+            },
+            {
+                component: './404',
+            },
+        ],
+    },
+
     // //
     // {
     //     path: '/test',

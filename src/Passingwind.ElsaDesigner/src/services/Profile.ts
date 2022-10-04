@@ -1,15 +1,15 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 3
  **/
 // @ts-ignore
 /* eslint-disable */
+import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/account/my-profile
- * 
+ * *TODO* GET /api/account/my-profile 
  **/
 export async function getProfile(
     options?: { [key: string]: any }
@@ -21,23 +21,7 @@ export async function getProfile(
 }
 
 /**
- * *TODO* PUT /api/account/my-profile
- * 
- **/
-export async function updateProfile(
-    payload: API.UpdateProfile,
-    options?: { [key: string]: any }
-) {
-    return request<API.Profile>(`/api/account/my-profile`, {
-        method: 'PUT',
-        data: payload,
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* POST /api/account/my-profile/change-password
- * 
+ * *TODO* POST /api/account/my-profile/change-password 
  **/
 export async function profileChangePassword(
     payload: API.ChangePasswordInput,
@@ -47,6 +31,20 @@ export async function profileChangePassword(
         method: 'POST',
         data: payload,
         getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* PUT /api/account/my-profile 
+ **/
+export async function updateProfile(
+    payload: API.UpdateProfile,
+    options?: { [key: string]: any }
+) {
+    return request<API.Profile>(`/api/account/my-profile`, {
+        method: 'PUT',
+        data: payload,
         ...(options || {}),
     });
 }

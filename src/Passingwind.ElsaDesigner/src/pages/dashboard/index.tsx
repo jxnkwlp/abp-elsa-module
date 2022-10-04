@@ -16,7 +16,7 @@ const Index: React.FC = () => {
             const result = await getWorkflowInstanceStatusDateCountStatistics({});
             const list = (result?.items ?? []).map((x) => {
                 return {
-                    date: moment(x.date).format('YYYY-MM-DD'),
+                    date: moment(x.date),
                     count: x.finishedCount,
                     type: 'Finished',
                 };
@@ -24,7 +24,7 @@ const Index: React.FC = () => {
             list.push(
                 ...(result?.items ?? []).map((x) => {
                     return {
-                        date: moment(x.date).format('YYYY-MM-DD'),
+                        date: moment(x.date),
                         count: x.failedCount,
                         type: 'Failed',
                     };

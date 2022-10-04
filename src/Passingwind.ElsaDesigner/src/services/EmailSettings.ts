@@ -1,15 +1,15 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 2
  **/
 // @ts-ignore
 /* eslint-disable */
+import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/setting-management/emailing
- * 
+ * *TODO* GET /api/setting-management/emailing 
  **/
 export async function getEmailSettings(
     options?: { [key: string]: any }
@@ -21,8 +21,7 @@ export async function getEmailSettings(
 }
 
 /**
- * *TODO* POST /api/setting-management/emailing
- * 
+ * *TODO* POST /api/setting-management/emailing 
  **/
 export async function updateEmailSettings(
     payload: API.UpdateEmailSettings,

@@ -1,15 +1,15 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 2
  **/
 // @ts-ignore
 /* eslint-disable */
+import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/permission-management/permissions
- * 
+ * *TODO* GET /api/permission-management/permissions 
  **/
 export async function getPermissions(
     params: {
@@ -26,8 +26,7 @@ export async function getPermissions(
 }
 
 /**
- * *TODO* PUT /api/permission-management/permissions
- * 
+ * *TODO* PUT /api/permission-management/permissions 
  **/
 export async function updatePermissions(
     params: {

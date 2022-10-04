@@ -37,6 +37,24 @@ export default {
     'page.change-password.submit': '修改',
     'page.change-password.submit.success': '修改密码成功，请重新登录',
     //
+    'page.user.role': '角色',
+    'page.user.role.update': '更新角色',
+    'page.user.filter': '过滤',
+    'page.user.field.userName': '用户名',
+    'page.user.field.email': 'Email',
+    'page.user.field.surname': '姓',
+    'page.user.field.name': '名称',
+    'page.user.field.phoneNumber': '电话号码',
+    'page.user.field.isActive': '激活',
+    'page.user.field.lockoutEnabled': '锁定',
+    'page.user.field.password': '密码',
+    //
+    'page.role.permissions': '权限',
+    'page.role.field.name': '名称',
+    'page.role.field.isDefault': '默认',
+    'page.role.field.isPublic': '公开',
+    'page.role.field.isStatic': '静态',
+    //
     'page.dashboard.statistics.7datecount.title': '7日内流程实例计数统计',
     //
     'page.definition.edit.basic': '基本信息',

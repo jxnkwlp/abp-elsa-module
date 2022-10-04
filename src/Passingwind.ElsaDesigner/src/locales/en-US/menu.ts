@@ -55,4 +55,7 @@ export default {
     'menu.Definitions': 'Definitions',
     'menu.Designer': 'Designer',
     'menu.Change Password': 'Change Password',
+    'menu.system': 'System',
+    'menu.system.users': 'Users',
+    'menu.system.roles': 'Roles',
 };

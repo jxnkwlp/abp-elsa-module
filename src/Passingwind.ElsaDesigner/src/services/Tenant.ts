@@ -1,45 +1,29 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 8
  **/
 // @ts-ignore
 /* eslint-disable */
+import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/multi-tenancy/tenants/{id}
- * 
+ * *TODO* POST /api/multi-tenancy/tenants 
  **/
-export async function getTenant(
-    id: string,
+export async function createTenant(
+    payload: API.TenantCreate,
     options?: { [key: string]: any }
 ) {
-    return request<API.Tenant>(`/api/multi-tenancy/tenants/${id}`, {
-        method: 'GET',
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* PUT /api/multi-tenancy/tenants/{id}
- * 
- **/
-export async function updateTenant(
-    id: string,
-    payload: API.TenantUpdate,
-    options?: { [key: string]: any }
-) {
-    return request<API.Tenant>(`/api/multi-tenancy/tenants/${id}`, {
-        method: 'PUT',
+    return request<API.Tenant>(`/api/multi-tenancy/tenants`, {
+        method: 'POST',
         data: payload,
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* DELETE /api/multi-tenancy/tenants/{id}
- * 
+ * *TODO* DELETE /api/multi-tenancy/tenants/{id} 
  **/
 export async function deleteTenant(
     id: string,
@@ -53,8 +37,48 @@ export async function deleteTenant(
 }
 
 /**
- * *TODO* GET /api/multi-tenancy/tenants
- * 
+ * *TODO* DELETE /api/multi-tenancy/tenants/{id}/default-connection-string 
+ **/
+export async function deleteTenantDefaultConnectionString(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/multi-tenancy/tenants/${id}/default-connection-string`, {
+        method: 'DELETE',
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/multi-tenancy/tenants/{id} 
+ **/
+export async function getTenant(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<API.Tenant>(`/api/multi-tenancy/tenants/${id}`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/multi-tenancy/tenants/{id}/default-connection-string 
+ **/
+export async function getTenantDefaultConnectionString(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/multi-tenancy/tenants/${id}/default-connection-string`, {
+        method: 'GET',
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/multi-tenancy/tenants 
  **/
 export async function getTenantList(
     params: {
@@ -73,38 +97,22 @@ export async function getTenantList(
 }
 
 /**
- * *TODO* POST /api/multi-tenancy/tenants
- * 
+ * *TODO* PUT /api/multi-tenancy/tenants/{id} 
  **/
-export async function createTenant(
-    payload: API.TenantCreate,
+export async function updateTenant(
+    id: string,
+    payload: API.TenantUpdate,
     options?: { [key: string]: any }
 ) {
-    return request<API.Tenant>(`/api/multi-tenancy/tenants`, {
-        method: 'POST',
+    return request<API.Tenant>(`/api/multi-tenancy/tenants/${id}`, {
+        method: 'PUT',
         data: payload,
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* GET /api/multi-tenancy/tenants/{id}/default-connection-string
- * 
- **/
-export async function getTenantDefaultConnectionString(
-    id: string,
-    options?: { [key: string]: any }
-) {
-    return request<any>(`/api/multi-tenancy/tenants/${id}/default-connection-string`, {
-        method: 'GET',
-        getResponse: true,
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* PUT /api/multi-tenancy/tenants/{id}/default-connection-string
- * 
+ * *TODO* PUT /api/multi-tenancy/tenants/{id}/default-connection-string 
  **/
 export async function updateTenantDefaultConnectionString(
     id: string,
@@ -116,21 +124,6 @@ export async function updateTenantDefaultConnectionString(
     return request<any>(`/api/multi-tenancy/tenants/${id}/default-connection-string`, {
         method: 'PUT',
         params: params,
-        getResponse: true,
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* DELETE /api/multi-tenancy/tenants/{id}/default-connection-string
- * 
- **/
-export async function deleteTenantDefaultConnectionString(
-    id: string,
-    options?: { [key: string]: any }
-) {
-    return request<any>(`/api/multi-tenancy/tenants/${id}/default-connection-string`, {
-        method: 'DELETE',
         getResponse: true,
         ...(options || {}),
     });

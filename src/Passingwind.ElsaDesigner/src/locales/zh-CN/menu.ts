@@ -55,4 +55,7 @@ export default {
     'menu.Definitions': '流程定义',
     'menu.Designer': '流程设计器',
     'menu.Change Password': '修改密码',
+    'menu.system': '系统',
+    'menu.system.users': '用户',
+    'menu.system.roles': '角色',
 };

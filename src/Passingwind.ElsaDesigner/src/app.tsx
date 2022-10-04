@@ -4,14 +4,18 @@ import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
 import { message, notification } from 'antd';
+import moment from 'moment';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
 import { history, Link } from 'umi';
 import defaultSettings from '../config/defaultSettings';
 import { getAbpApplicationConfiguration } from './services/AbpApplicationConfiguration';
-import { API } from './services/typings';
+import type { API } from './services/typings';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/auth/login';
+
+moment.defaultFormat = 'YYYY-MM-DD HH:mm:SS';
+moment.defaultFormatUtc = 'YYYY-MM-DD HH:mm:SS(+0)';
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -33,6 +37,7 @@ export async function getInitialState(): Promise<{
     };
 
     if (isDev) {
+        // mock user
         return {
             settings: defaultSettings,
             currentUser: {

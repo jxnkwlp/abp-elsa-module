@@ -1,20 +1,13 @@
-import {
-    AlipayCircleOutlined,
-    LockOutlined,
-    MobileOutlined,
-    TaobaoCircleOutlined,
-    UserOutlined,
-    WeiboCircleOutlined,
-} from '@ant-design/icons';
+import Footer from '@/components/Footer';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { LoginForm, ProFormText } from '@ant-design/pro-form';
 import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
-import { ProFormCaptcha, ProFormCheckbox, ProFormText, LoginForm } from '@ant-design/pro-form';
-import { useIntl, history, FormattedMessage, SelectLang, useModel } from 'umi';
-import Footer from '@/components/Footer';
+import { FormattedMessage, history, SelectLang, useIntl, useModel } from 'umi';
 
-import styles from './index.less';
 import { loginLogin } from '@/services/Login';
 import type { API } from '@/services/typings';
+import styles from './index.less';
 
 const LoginMessage: React.FC<{
     content: string;
@@ -50,11 +43,11 @@ const Login: React.FC = () => {
             // 登录
             const msg = await loginLogin(values);
             if (msg.result === 1) {
-                const defaultLoginSuccessMessage = intl.formatMessage({
-                    id: 'pages.login.success',
-                    defaultMessage: '登录成功！',
-                });
-                message.success(defaultLoginSuccessMessage);
+                // const defaultLoginSuccessMessage = intl.formatMessage({
+                //     id: 'pages.login.success',
+                //     defaultMessage: '登录成功！',
+                // });
+                // message.success(defaultLoginSuccessMessage);
                 await fetchUserInfo();
                 if (!history) return;
                 history.push('/');
@@ -90,7 +83,7 @@ const Login: React.FC = () => {
                         autoLogin: true,
                     }}
                     onFinish={async (values) => {
-                        await handleSubmit(values as API.LoginParams);
+                        await handleSubmit(values);
                     }}
                 >
                     <Tabs activeKey={type} onChange={setType}>

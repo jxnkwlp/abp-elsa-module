@@ -1,15 +1,32 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 4
  **/
 // @ts-ignore
 /* eslint-disable */
+import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/identity/users/lookup/{id}
- * 
+ * *TODO* GET /api/identity/users/lookup/count 
+ **/
+export async function getUserLookupCount(
+    params: {
+        filter?: string | undefined
+    },
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/identity/users/lookup/count`, {
+        method: 'GET',
+        params: params,
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/identity/users/lookup/{id} 
  **/
 export async function userLookupFindById(
     id: string,
@@ -22,8 +39,7 @@ export async function userLookupFindById(
 }
 
 /**
- * *TODO* GET /api/identity/users/lookup/by-username/{userName}
- * 
+ * *TODO* GET /api/identity/users/lookup/by-username/{userName} 
  **/
 export async function userLookupFindByUserName(
     userName: string,
@@ -36,8 +52,7 @@ export async function userLookupFindByUserName(
 }
 
 /**
- * *TODO* GET /api/identity/users/lookup/search
- * 
+ * *TODO* GET /api/identity/users/lookup/search 
  **/
 export async function userLookupSearch(
     params: {
@@ -51,24 +66,6 @@ export async function userLookupSearch(
     return request<API.UserDataListResult>(`/api/identity/users/lookup/search`, {
         method: 'GET',
         params: params,
-        ...(options || {}),
-    });
-}
-
-/**
- * *TODO* GET /api/identity/users/lookup/count
- * 
- **/
-export async function getUserLookupCount(
-    params: {
-        filter?: string | undefined
-    },
-    options?: { [key: string]: any }
-) {
-    return request<any>(`/api/identity/users/lookup/count`, {
-        method: 'GET',
-        params: params,
-        getResponse: true,
         ...(options || {}),
     });
 }

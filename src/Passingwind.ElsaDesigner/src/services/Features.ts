@@ -1,15 +1,15 @@
-/**
+﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 2
  **/
 // @ts-ignore
 /* eslint-disable */
+import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/feature-management/features
- * 
+ * *TODO* GET /api/feature-management/features 
  **/
 export async function getFeatures(
     params: {
@@ -26,8 +26,7 @@ export async function getFeatures(
 }
 
 /**
- * *TODO* PUT /api/feature-management/features
- * 
+ * *TODO* PUT /api/feature-management/features 
  **/
 export async function updateFeatures(
     params: {
