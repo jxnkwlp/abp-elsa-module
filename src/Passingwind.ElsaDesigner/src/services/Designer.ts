@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 2
+ * Total count: 3
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -21,13 +21,27 @@ export async function getDesignerActivityTypes(
 }
 
 /**
- * *TODO* GET /api/designer/script-type-definitions/{id} 
+ * *TODO* POST /api/designer/runtime-select-list 
+ **/
+export async function getDesignerRuntimeSelectListItems(
+    payload: API.RuntimeSelectListContext,
+    options?: { [key: string]: any }
+) {
+    return request<API.RuntimeSelectListResult>(`/api/designer/runtime-select-list`, {
+        method: 'POST',
+        data: payload,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/designer/scripting/javascript/type-definitions/{id} 
  **/
 export async function getDesignerScriptTypeDefinition(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/designer/script-type-definitions/${id}`, {
+    return request<any>(`/api/designer/scripting/javascript/type-definitions/${id}`, {
         method: 'GET',
         getResponse: true,
         ...(options || {}),

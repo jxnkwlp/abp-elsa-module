@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Elsa.Metadata;
 
-namespace Passingwind.Abp.ElsaModule.Designer
+namespace Passingwind.Abp.ElsaModule.Workflow
 {
     public class ActivityTypeDescriptorDto
     {

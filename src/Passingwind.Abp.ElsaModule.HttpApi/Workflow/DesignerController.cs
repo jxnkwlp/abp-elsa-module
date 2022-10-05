@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 using Volo.Abp.Content;
 
-namespace Passingwind.Abp.ElsaModule.Designer
+namespace Passingwind.Abp.ElsaModule.Workflow
 {
     [RemoteService]
     [Route("api/designer")]
@@ -23,7 +23,13 @@ namespace Passingwind.Abp.ElsaModule.Designer
             return _service.GetActivityTypesAsync();
         }
 
-        [HttpGet("script-type-definitions/{id}")]
+        [HttpPost("runtime-select-list")]
+        public Task<RuntimeSelectListResultDto> GetRuntimeSelectListItems(RuntimeSelectListContextDto input)
+        {
+            return _service.GetRuntimeSelectListItems(input);
+        }
+
+        [HttpGet("scripting/javascript/type-definitions/{id}")]
         public Task<IRemoteStreamContent> GetScriptTypeDefinitionAsync(Guid id)
         {
             return _service.GetScriptTypeDefinitionAsync(id);

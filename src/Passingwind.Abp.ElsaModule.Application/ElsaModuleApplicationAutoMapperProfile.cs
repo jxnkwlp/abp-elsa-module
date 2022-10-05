@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Elsa.Metadata;
 using Passingwind.Abp.ElsaModule.Common;
-using Passingwind.Abp.ElsaModule.Designer;
 using Passingwind.Abp.ElsaModule.Workflow;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Passingwind.Abp.ElsaModule.WorkflowInstances;

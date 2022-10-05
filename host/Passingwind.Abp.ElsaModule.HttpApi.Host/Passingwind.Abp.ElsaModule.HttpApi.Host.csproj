@@ -31,9 +31,14 @@
         <PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="5.3.1" />
         <PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="5.3.1" />
         <PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.Account.Application" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.Account.HttpApi" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.Account.Application" Version="5.2.1" />
+        <PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" Version="5.2.1" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\src\Passingwind.Abp.ElsaModule.Activities\Passingwind.Abp.ElsaModule.Activities.csproj" />
         <ProjectReference Include="..\..\src\Passingwind.Abp.ElsaModule.EntityFrameworkCore\Passingwind.Abp.ElsaModule.EntityFrameworkCore.csproj" />
         <ProjectReference Include="..\..\src\Passingwind.Abp.ElsaModule.HttpApi\Passingwind.Abp.ElsaModule.HttpApi.csproj" />
         <ProjectReference Include="..\..\src\Passingwind.Abp.ElsaModule.Application\Passingwind.Abp.ElsaModule.Application.csproj" />

@@ -16,6 +16,12 @@ namespace Passingwind.Abp.ElsaModule.Workflow
             _service = service;
         }
 
+        [HttpGet("providers")]
+        public Task<ListResultDto<WorkflowProviderDescriptorDto>> GetProvidersAsync()
+        {
+            return _service.GetProvidersAsync();
+        }
+
         [HttpGet("storage-providers")]
         public virtual Task<ListResultDto<WorkflowStorageProviderInfoDto>> GetStorageProvidersAsync()
         {

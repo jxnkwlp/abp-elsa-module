@@ -145,6 +145,7 @@ const Index: React.FC = () => {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
             align: 'center',
+            width: 160,
             render: (text, record, _, action) => [
                 <a
                     key="edit"
@@ -332,8 +333,8 @@ const Index: React.FC = () => {
                 modalProps={{ destroyOnClose: true, maskClosable: false }}
                 preserve={false}
                 onFinish={async (values) => {
-                    const result = await updateUserRoles(editModalDataId, {
-                        roleNames: values.roleNames,
+                    const result = await updateUserRoles(editModalDataId!, {
+                        roleNames: values.roleNames as string[],
                     });
 
                     if (result?.response?.ok) {

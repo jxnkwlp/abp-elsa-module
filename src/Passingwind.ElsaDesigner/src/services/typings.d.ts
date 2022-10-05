@@ -1,6 +1,6 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json
- * Total count: 109
+ * Total count: 139
  **/
 import * as Enum from "./enums";
 
@@ -227,6 +227,14 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type ChangePasswordInput = {
+        currentPassword?: string | undefined;
+        newPassword: string;
+    };
+
+    /**
+     * *TODO*
+     **/
     type Clock = {
         kind?: string | undefined;
     };
@@ -440,6 +448,107 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type IdentityRole = {
+        extraProperties?: any | undefined;
+        id?: string | undefined;
+        name?: string | undefined;
+        isDefault?: boolean | undefined;
+        isStatic?: boolean | undefined;
+        isPublic?: boolean | undefined;
+        concurrencyStamp?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type IdentityRoleCreate = {
+        extraProperties?: any | undefined;
+        name: string;
+        isDefault?: boolean | undefined;
+        isPublic?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type IdentityRoleUpdate = {
+        extraProperties?: any | undefined;
+        name: string;
+        isDefault?: boolean | undefined;
+        isPublic?: boolean | undefined;
+        concurrencyStamp?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type IdentityUser = {
+        extraProperties?: any | undefined;
+        id?: string | undefined;
+        creationTime?: string | undefined;
+        creatorId?: string | undefined;
+        lastModificationTime?: string | undefined;
+        lastModifierId?: string | undefined;
+        isDeleted?: boolean | undefined;
+        deleterId?: string | undefined;
+        deletionTime?: string | undefined;
+        tenantId?: string | undefined;
+        userName?: string | undefined;
+        name?: string | undefined;
+        surname?: string | undefined;
+        email?: string | undefined;
+        emailConfirmed?: boolean | undefined;
+        phoneNumber?: string | undefined;
+        phoneNumberConfirmed?: boolean | undefined;
+        isActive?: boolean | undefined;
+        lockoutEnabled?: boolean | undefined;
+        lockoutEnd?: string | undefined;
+        concurrencyStamp?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type IdentityUserCreate = {
+        extraProperties?: any | undefined;
+        userName: string;
+        name?: string | undefined;
+        surname?: string | undefined;
+        email: string;
+        phoneNumber?: string | undefined;
+        isActive?: boolean | undefined;
+        lockoutEnabled?: boolean | undefined;
+        roleNames?: string[] | undefined;
+        password: string;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type IdentityUserUpdate = {
+        extraProperties?: any | undefined;
+        userName: string;
+        name?: string | undefined;
+        surname?: string | undefined;
+        email: string;
+        phoneNumber?: string | undefined;
+        isActive?: boolean | undefined;
+        lockoutEnabled?: boolean | undefined;
+        roleNames?: string[] | undefined;
+        password?: string | undefined;
+        concurrencyStamp?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type IdentityUserUpdateRoles = {
+        roleNames: string[];
+    };
+
+    /**
+     * *TODO*
+     **/
     type LanguageInfo = {
         cultureName?: string | undefined;
         uiCultureName?: string | undefined;
@@ -526,12 +635,38 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type Profile = {
+        extraProperties?: any | undefined;
+        userName?: string | undefined;
+        email?: string | undefined;
+        name?: string | undefined;
+        surname?: string | undefined;
+        phoneNumber?: string | undefined;
+        isExternal?: boolean | undefined;
+        hasPassword?: boolean | undefined;
+        concurrencyStamp?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type PropertyApiDescriptionModel = {
         name?: string | undefined;
         jsonName?: string | undefined;
         type?: string | undefined;
         typeSimple?: string | undefined;
         isRequired?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type Register = {
+        extraProperties?: any | undefined;
+        userName: string;
+        emailAddress: string;
+        password: string;
+        appName: string;
     };
 
     /**
@@ -563,6 +698,15 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type ResetPassword = {
+        userId?: string | undefined;
+        resetToken: string;
+        password: string;
+    };
+
+    /**
+     * *TODO*
+     **/
     type ReturnValueApiDescriptionModel = {
         type?: string | undefined;
         typeSimple?: string | undefined;
@@ -571,9 +715,50 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type RuntimeSelectListContext = {
+        providerTypeName?: string | undefined;
+        context?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type RuntimeSelectListResult = {
+        selectList?: SelectList | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type ScheduledActivity = {
         activityId?: string | undefined;
         input?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type SelectList = {
+        isFlagsEnum?: boolean | undefined;
+        items?: SelectListItem[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type SelectListItem = {
+        text?: string | undefined;
+        value?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type SendPasswordResetCode = {
+        email: string;
+        appName: string;
+        returnUrl?: string | undefined;
+        returnUrlHash?: string | undefined;
     };
 
     /**
@@ -617,8 +802,73 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type UpdateProfile = {
+        extraProperties?: any | undefined;
+        userName?: string | undefined;
+        email?: string | undefined;
+        name?: string | undefined;
+        surname?: string | undefined;
+        phoneNumber?: string | undefined;
+        concurrencyStamp?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type UserData = {
+        id?: string | undefined;
+        tenantId?: string | undefined;
+        userName?: string | undefined;
+        name?: string | undefined;
+        surname?: string | undefined;
+        email?: string | undefined;
+        emailConfirmed?: boolean | undefined;
+        phoneNumber?: string | undefined;
+        phoneNumberConfirmed?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type Variables = {
         data?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type IdentityRoleListResult = {
+        items?: IdentityRole[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type IdentityRolePagedResult = {
+        items?: IdentityRole[] | undefined;
+        totalCount?: number | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type IdentityUserPagedResult = {
+        items?: IdentityUser[] | undefined;
+        totalCount?: number | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type StringListResult = {
+        items?: string[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type UserDataListResult = {
+        items?: UserData[] | undefined;
     };
 
     /**
@@ -658,6 +908,13 @@ declare namespace API {
     type WorkflowInstanceBasicPagedResult = {
         items?: WorkflowInstanceBasic[] | undefined;
         totalCount?: number | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowProviderDescriptorListResult = {
+        items?: WorkflowProviderDescriptor[] | undefined;
     };
 
     /**
@@ -969,6 +1226,54 @@ declare namespace API {
      **/
     type WorkflowOutputReference = {
         providerName?: string | undefined;
+        activityId?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowProviderDescriptor = {
+        name?: string | undefined;
+        type?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowSignalDispatchRequest = {
+        workflowInstanceId?: string | undefined;
+        correlationId?: string | undefined;
+        input?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowSignalDispatchResult = {
+        startedWorkflows?: WorkflowSignalResult[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowSignalExecuteRequest = {
+        workflowInstanceId?: string | undefined;
+        correlationId?: string | undefined;
+        input?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowSignalExecuteResult = {
+        startedWorkflows?: WorkflowSignalResult[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowSignalResult = {
+        workflowInstanceId?: string | undefined;
         activityId?: string | undefined;
     };
 

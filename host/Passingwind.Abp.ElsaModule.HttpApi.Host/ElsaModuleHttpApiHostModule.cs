@@ -20,11 +20,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using Passingwind.Abp.ElsaModule.Activities;
 using Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 using Passingwind.Abp.ElsaModule.MultiTenancy;
+using Passingwind.Abp.ElsaModule.Services;
 using StackExchange.Redis;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Volo.Abp;
+using Volo.Abp.Account;
 using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 using Volo.Abp.AspNetCore.Mvc.UI.MultiTenancy;
 using Volo.Abp.AspNetCore.Serilog;
@@ -34,6 +37,8 @@ using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.SqlServer;
+using Volo.Abp.Identity;
+using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.Json;
 using Volo.Abp.Json.Newtonsoft;
 using Volo.Abp.Json.SystemTextJson;
@@ -49,6 +54,10 @@ using Volo.Abp.VirtualFileSystem;
 namespace Passingwind.Abp.ElsaModule;
 
 [DependsOn(
+    typeof(AbpAccountApplicationModule),
+    typeof(AbpAccountHttpApiModule),
+    typeof(AbpIdentityHttpApiModule),
+    typeof(AbpIdentityEntityFrameworkCoreModule),
     typeof(ElsaModuleApplicationModule),
     typeof(ElsaModuleEntityFrameworkCoreModule),
     //typeof(ElsaModuleMongoDbModule),
@@ -64,6 +73,7 @@ namespace Passingwind.Abp.ElsaModule;
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule)
     )]
+[DependsOn(typeof(ElsaModuleActivitiesModule))]
 public class ElsaModuleHttpApiHostModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -242,27 +252,25 @@ public class ElsaModuleHttpApiHostModule : AbpModule
         });
         context.Services.AddHangfireServer();
 
-        context.Services
-           .AddElsa(elsa =>
-           {
-               elsa.UseStore();
 
-               // elsa.AddWorkflow<HelloWorldWorkflow>();
-
-               elsa
-                .AddConsoleActivities()
-                .AddHttpActivities()
-                .AddEmailActivities()
-                .AddJavaScriptActivities()
-                .AddUserTaskActivities()
-                // .AddBlobStorageActivities()
-                // .AddEntityActivities()
-                // .AddFileActivities()
-                .AddHangfireTemporalActivities()
-                ;
-           }
-         );
         // context.Services.AddElsaApiEndpoints();
+        context.Services.AddAbpElsa(configure =>
+        {
+            configure
+               .AddConsoleActivities()
+               .AddHttpActivities()
+               .AddEmailActivities()
+               .AddJavaScriptActivities()
+               .AddUserTaskActivities()
+               // .AddBlobStorageActivities()
+               // .AddEntityActivities()
+               // .AddFileActivities()
+               .AddHangfireTemporalActivities()
+               ;
+        });
+
+        context.Services.AddTransient<IUserLookupService, UserLookupService>();
+        context.Services.AddTransient<IRoleLookupService, RoleLookupService>();
 
         context.Services.AddAbpApiVersioning(c => { });
 

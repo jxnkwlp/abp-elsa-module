@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Passingwind.Abp.ElsaModule.Common;
-using Passingwind.Abp.ElsaModule.Designer;
+using Passingwind.Abp.ElsaModule.Workflow;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Passingwind.Abp.ElsaModule.WorkflowInstances;
 using Volo.Abp.Application;
@@ -22,6 +22,14 @@ namespace Passingwind.Abp.ElsaModule;
     )]
 public partial class ElsaModuleApplicationModule : AbpModule
 {
+    //public override void PreConfigureServices(ServiceConfigurationContext context)
+    //{
+    //    PreConfigure<ElsaModuleOptions>(configure =>
+    //    {
+    //        configure.Builder.AddActivitiesFrom(typeof(ElsaModuleApplicationModule));
+    //    });
+    //}
+
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         context.Services.AddAutoMapperObjectMapper<ElsaModuleApplicationModule>();
@@ -41,7 +49,9 @@ public partial class ElsaModuleApplicationModule : AbpModule
             options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowDefinitionVersionCreateOrUpdateDto));
             options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowDefinitionVersionDto));
             options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowInstanceExecutionLogSummaryDto));
+            options.UnsupportedTypes.AddIfNotContains(typeof(RuntimeSelectListContextDto));
         });
+
 
     }
 }

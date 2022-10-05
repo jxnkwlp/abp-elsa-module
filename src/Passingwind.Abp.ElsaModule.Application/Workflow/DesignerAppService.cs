@@ -4,14 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Elsa.Design;
 using Elsa.Metadata;
+using Elsa.Options;
 using Elsa.Scripting.JavaScript.Services;
 using Elsa.Services;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Stores;
 using Volo.Abp.Content;
 
-namespace Passingwind.Abp.ElsaModule.Designer
+namespace Passingwind.Abp.ElsaModule.Workflow
 {
     public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
     {
@@ -20,14 +22,16 @@ namespace Passingwind.Abp.ElsaModule.Designer
         private readonly IStoreMapper _storeMapper;
         private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
         private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
+        private readonly ElsaOptions _elsaOptions;
 
-        public DesignerAppService(IActivityTypeService activityTypeService, ITypeScriptDefinitionService typeScriptDefinitionService, IStoreMapper storeMapper, IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository, IWorkflowDefinitionRepository workflowDefinitionRepository)
+        public DesignerAppService(IActivityTypeService activityTypeService, ITypeScriptDefinitionService typeScriptDefinitionService, IStoreMapper storeMapper, IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository, IWorkflowDefinitionRepository workflowDefinitionRepository, ElsaOptions elsaOptions)
         {
             _activityTypeService = activityTypeService;
             _typeScriptDefinitionService = typeScriptDefinitionService;
             _storeMapper = storeMapper;
             _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
             _workflowDefinitionRepository = workflowDefinitionRepository;
+            _elsaOptions = elsaOptions;
         }
 
         public async Task<ActivityTypeDescriptorListResultDto> GetActivityTypesAsync()
@@ -44,6 +48,32 @@ namespace Passingwind.Abp.ElsaModule.Designer
             {
                 Categories = categories,
                 Items = ObjectMapper.Map<List<ActivityDescriptor>, List<ActivityTypeDescriptorDto>>(descriptors.ToList())
+            };
+        }
+
+        public async Task<RuntimeSelectListResultDto> GetRuntimeSelectListItems(RuntimeSelectListContextDto input)
+        { 
+            // LazyServiceProvider.LazyGetRequiredService()
+            var type = Type.GetType(input.ProviderTypeName)!;
+            var provider = LazyServiceProvider.LazyGetRequiredService(type);
+            var context = input.Context;
+
+            if (provider is IRuntimeSelectListProvider newProvider)
+            {
+                var selectList = await newProvider.GetSelectListAsync(context, default);
+
+                return new RuntimeSelectListResultDto
+                {
+                    SelectList = selectList,
+                };
+            }
+#pragma warning disable CS0618
+            var items = await ((IRuntimeSelectListItemsProvider)provider).GetItemsAsync(context, default);
+#pragma warning restore CS0618
+
+            return new RuntimeSelectListResultDto
+            {
+                SelectList = new SelectList(items.ToArray())
             };
         }
 

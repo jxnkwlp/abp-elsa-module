@@ -38,6 +38,9 @@ export type NodeTypePropertyOption = {
     items?: [];
     editorHeight?: string;
     syntax?: string;
+    runtimeSelectListProviderType?: string;
+    context?: any;
+    remoteUri?: string;
 };
 
 export type NodeUpdateData = {

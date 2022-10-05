@@ -83,7 +83,7 @@ const Index: React.FC = () => {
         const result = await getPermissions({ providerKey: name, providerName: 'R' });
         setPermissionEditData(result);
         //
-        const permissions = (result.groups ?? [])
+        const permissions = (result?.groups ?? [])
             .map((x) => {
                 return (x.permissions ?? []).map((p) => {
                     return {
@@ -159,7 +159,7 @@ const Index: React.FC = () => {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
             align: 'center',
-            width: 150,
+            width: 160,
             render: (text, record, _, action) => [
                 !record.isStatic && (
                     <a

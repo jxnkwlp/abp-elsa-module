@@ -1,6 +1,6 @@
 ﻿using Volo.Abp.Application.Dtos;
 
-namespace Passingwind.Abp.ElsaModule.Designer
+namespace Passingwind.Abp.ElsaModule.Workflow
 {
     public class ActivityTypeDescriptorListResultDto : ListResultDto<ActivityTypeDescriptorDto>
     {

@@ -1,3 +1,5 @@
+import { getDesignerRuntimeSelectListItems } from '@/services/Designer';
+import { API } from '@/services/typings';
 import { getWorkflowStorageProviders } from '@/services/Workflow';
 import ProForm, {
     ProFormCheckbox,
@@ -10,7 +12,7 @@ import ProForm, {
 } from '@ant-design/pro-form';
 import { Col, Divider, Row, Tabs } from 'antd';
 import type { NamePath } from 'antd/lib/form/interface';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'umi';
 import CaseEditorInput from './form-input/case-editor-builder-input';
 import MonacorEditorInput from './form-input/monacor-editor-input';
@@ -64,7 +66,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
         uiEditor: string,
         propItem: NodeTypeProperty,
         inputProps: any,
-        options: any,
+        optionList: any,
     ) => {
         if (uiEditor == 'Default') {
             switch (propItem.uiHint) {
@@ -73,7 +75,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         <ProFormCheckbox.Group
                             {...inputProps}
                             name={inputName}
-                            options={options}
+                            options={optionList}
                             extra={propItem.hint}
                             rules={[{ required: propItem.isRequired }]}
                         />
@@ -92,7 +94,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         <ProFormSelect
                             {...inputProps}
                             name={inputName}
-                            options={options}
+                            options={optionList}
                             rules={[{ required: propItem.isRequired }]}
                         />
                     );
@@ -101,7 +103,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         <ProFormSelect
                             {...inputProps}
                             name={inputName}
-                            options={options}
+                            options={optionList}
                             fieldProps={{ mode: 'tags' }}
                             rules={[{ required: propItem.isRequired }]}
                         />
@@ -215,8 +217,11 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
     };
 
     const renderFormItems = () => {
-        return (properties ?? []).map((propItem) => {
-            const options = Array.isArray(propItem.options)
+        const formItems: React.ReactNode[] = [];
+
+        (properties ?? []).forEach(async (propItem) => {
+            // get field static options
+            const fieldOptionItems = Array.isArray(propItem.options)
                 ? propItem.options.map((o: any) => {
                       return { label: o.text, value: o.value };
                   })
@@ -224,7 +229,11 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                 ? propItem.options?.items.map((o: any) => {
                       return { label: o.text, value: o.value };
                   })
-                : null;
+                : [];
+
+            const isDynamicOptionItems =
+                propItem.options?.runtimeSelectListProviderType && propItem.options?.context;
+
             const inputProps = {
                 // key: propItem.name,
                 label: propItem.label,
@@ -235,6 +244,24 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                 // initialValue: propItem.defaultValue,
                 required: propItem.isRequired,
             };
+            if (isDynamicOptionItems) {
+                // provider request configure if 'runtimeSelectListProviderType' set.
+                inputProps.request = async () => {
+                    if (!isDynamicOptionItems) return fieldOptionItems;
+                    //
+                    const result = await getDesignerRuntimeSelectListItems({
+                        providerTypeName: propItem.options?.runtimeSelectListProviderType,
+                        context: propItem.options?.context,
+                    });
+
+                    return (result?.selectList?.items ?? []).map((x) => {
+                        return {
+                            label: x.text,
+                            value: x.value,
+                        };
+                    });
+                };
+            }
 
             const propSyntax = getPropertySyntaxes(propItem);
             let syntaxeList = (propSyntax.supports ?? []).map((x) => {
@@ -256,7 +283,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                 // no-op
             }
 
-            return (
+            formItems.push(
                 <ProFormGroup key={propItem.name}>
                     {propSyntax.editor ? (
                         renderItemInput(
@@ -270,7 +297,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                             propSyntax.editor,
                             propItem,
                             inputProps,
-                            options,
+                            fieldOptionItems,
                         )
                     ) : (
                         <>
@@ -283,7 +310,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                         syntax,
                                         propItem,
                                         inputProps,
-                                        options,
+                                        fieldOptionItems,
                                     );
                                 }}
                             </ProFormDependency>
@@ -303,15 +330,14 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         allowClear={false}
                         colProps={{ span: defaultSyntaxSpan }}
                     />
-                </ProFormGroup>
+                </ProFormGroup>,
             );
         });
+
+        return formItems;
     };
 
-    const renderFormItemMemo = useMemo(
-        () => renderFormItems(),
-        [props.properties, renderFormItems],
-    );
+    const renderFormItemMemo = useMemo(() => renderFormItems(), [properties]);
 
     const getTabItems = () => {
         const items = [];
@@ -459,6 +485,8 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
 
         return items;
     };
+
+    useEffect(() => {}, []);
 
     useEffect(() => {
         loadStorageProviders();
