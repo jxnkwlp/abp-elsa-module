@@ -448,6 +448,7 @@ const Index: React.FC = () => {
     };
 
     const handleSaveGraphData = async (publish: boolean = false) => {
+        if (submiting) return;
         setSubmiting(true);
         const gdata = await flowAction.current?.getGraphData();
 
@@ -589,11 +590,14 @@ const Index: React.FC = () => {
     return (
         <PageContainer>
             <Card
-                onKeyDown={(e) => {
+                onKeyDown={async (e) => {
                     e.preventDefault();
                     const charCode = String.fromCharCode(e.which).toLowerCase();
                     if ((e.ctrlKey || e.metaKey) && charCode === 's') {
                         console.log('ctrl+s');
+                        if (definition?.name) {
+                            await handleSaveGraphData();
+                        }
                     }
                 }}
                 className="designer"
