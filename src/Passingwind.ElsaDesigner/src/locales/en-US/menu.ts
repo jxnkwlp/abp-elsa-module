@@ -58,4 +58,5 @@ export default {
     'menu.system': 'System',
     'menu.system.users': 'Users',
     'menu.system.roles': 'Roles',
+    'menu.system.settings': 'Settings',
 };

@@ -141,5 +141,15 @@ export default {
     'page.instance.status.faulted': '已失败',
     'page.instance.status.cancelled': '已取消',
     //
-
+    'page.settings.email.smtpHost': '主机',
+    'page.settings.email.smtpPort': '端口',
+    'page.settings.email.smtpUserName': '用户名',
+    'page.settings.email.smtpPassword': '密码',
+    'page.settings.email.smtpDomain': '域',
+    'page.settings.email.smtpEnableSsl': '启用SSL',
+    'page.settings.email.smtpUseDefaultCredentials': '使用默认凭据',
+    'page.settings.email.defaultFromAddress': '默认发件人地址',
+    'page.settings.email.defaultFromDisplayName': '默认发件人名字',
+    'page.settings.email.testToAddress': '测试接收人地址',
+    'page.settings.email.testSend': '发送',
 };

@@ -73,6 +73,11 @@
                 component: './role',
             },
             {
+                path: 'settings',
+                name: 'settings',
+                component: './setting',
+            },
+            {
                 component: './404',
             },
         ],

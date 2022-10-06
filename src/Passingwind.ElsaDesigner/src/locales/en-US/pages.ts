@@ -143,4 +143,15 @@ export default {
     'page.instance.status.faulted': 'Faulted',
     'page.instance.status.cancelled': 'Cancelled',
     //
+    'page.settings.email.smtpHost': 'Host',
+    'page.settings.email.smtpPort': 'Port',
+    'page.settings.email.smtpUserName': 'User Name',
+    'page.settings.email.smtpPassword': 'Password',
+    'page.settings.email.smtpDomain': 'Domain',
+    'page.settings.email.smtpEnableSsl': 'Enable SSL',
+    'page.settings.email.smtpUseDefaultCredentials': 'Use Default Credentials',
+    'page.settings.email.defaultFromAddress': 'Default From Address',
+    'page.settings.email.defaultFromDisplayName': 'Default From Display Name',
+    'page.settings.email.testToAddress': 'Test to Address',
+    'page.settings.email.testSend': 'Send',
 };
