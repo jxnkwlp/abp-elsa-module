@@ -215,11 +215,11 @@ const Index: React.FC = () => {
 
         list.forEach((item) => {
             if (item.isFaulted) {
-                flowAction.current?.setNodeStyle(item.activityId!, 'error');
+                flowAction.current?.setNodeStatus(item.activityId!, 'failed');
             } else if (item.isExecuted) {
-                flowAction.current?.setNodeStyle(item.activityId!, 'success');
+                flowAction.current?.setNodeStatus(item.activityId!, 'success');
             } else if (item.isExecuting) {
-                flowAction.current?.setNodeStyle(item.activityId!, 'processing');
+                flowAction.current?.setNodeStatus(item.activityId!, 'running');
             }
 
             if ((item.outcomes ?? []).length > 0) {
@@ -241,20 +241,20 @@ const Index: React.FC = () => {
         // processing
         if (data?.blockingActivities) {
             data.blockingActivities.forEach((item) => {
-                flowAction.current?.setNodeStyle(item.activityId!, 'processing');
+                flowAction.current?.setNodeStatus(item.activityId!, 'running');
             });
         }
 
         // error
         if (data?.fault?.faultedActivityId) {
-            flowAction.current?.setNodeStyle(data.fault.faultedActivityId!, 'error');
+            flowAction.current?.setNodeStatus(data.fault.faultedActivityId!, 'failed');
         }
     };
 
     useEffect(() => {
         if (graphInit && data) {
-            flowAction.current?.setAllNodesStyle('default');
-            flowAction.current?.setAllEdgesStyle('default');
+            flowAction.current?.setAllNodeStatus('inactive');
+            flowAction.current?.setAllEdgesStyle('inactive');
 
             updateGraphNodeStatus();
         }

@@ -13,7 +13,7 @@ export const randString = (prefix: string = '', length: number = 5) => {
     return result;
 };
 
-export const ShowDownloadJsonFile = (fileName: string, json: string) => {
+export const showDownloadJsonFile = (fileName: string, json: string) => {
     const blob = new Blob([json], { type: 'application/json' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');

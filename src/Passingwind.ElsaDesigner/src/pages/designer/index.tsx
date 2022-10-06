@@ -1,5 +1,5 @@
 import type { API } from '@/services/typings';
-import { ShowDownloadJsonFile } from '@/services/utils';
+import { showDownloadJsonFile } from '@/services/utils';
 import {
     createWorkflowDefinition,
     deleteWorkflowDefinitionVersion,
@@ -134,7 +134,7 @@ const Index: React.FC = () => {
         const result = await flowAction.current?.getGraphData();
         if (result) {
             const result2 = conventToServerData(result);
-            ShowDownloadJsonFile(
+            showDownloadJsonFile(
                 `${definition.name}-${version}.json`,
                 JSON.stringify(
                     {

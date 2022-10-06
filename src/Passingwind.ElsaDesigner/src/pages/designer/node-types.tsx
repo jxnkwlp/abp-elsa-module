@@ -1,7 +1,8 @@
-import { Collapse, Popover, Tooltip } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
+import { Collapse, Tooltip } from 'antd';
 import React, { useEffect } from 'react';
 import { useIntl } from 'umi';
-import { getNodeTypeData } from './service';
+import { getNodeIconByType, getNodeTypeData } from './service';
 import type { NodeTypeGroup } from './type';
 
 type NodeTypesPanelProps = {
@@ -60,7 +61,16 @@ const NodeTypesPanel: React.FC<NodeTypesPanelProps> = (props) => {
                                                 data-type={item.type}
                                                 onMouseDown={handleStartDrag}
                                             >
-                                                <div className="dnd-rect">{item.label}</div>
+                                                <div className="dnd-rect">
+                                                    <div className={`node default`}>
+                                                        <span className="icon">
+                                                            {getNodeIconByType(item.type) ?? (
+                                                                <SettingOutlined />
+                                                            )}
+                                                        </span>
+                                                        <span className="label">{item.label}</span>
+                                                    </div>
+                                                </div>
                                             </li>
                                         </Tooltip>
                                     );

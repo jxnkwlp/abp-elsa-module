@@ -59,7 +59,6 @@ const Login: React.FC = () => {
                 });
                 message.error(msg.description ?? defaultLoginFailureMessage);
             }
-            console.log(msg);
         } catch (error) {
             const defaultLoginFailureMessage = intl.formatMessage({
                 id: 'pages.login.failure',

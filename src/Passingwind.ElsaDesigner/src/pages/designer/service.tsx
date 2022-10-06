@@ -1,58 +1,47 @@
 import { getDesignerActivityTypes, getDesignerScriptTypeDefinition } from '@/services/Designer';
-import { API } from '@/services/typings';
+import type { API } from '@/services/typings';
 import { randString } from '@/services/utils';
-import { CellView, Edge, Graph, Node, Shape } from '@antv/x6';
+import { CloseCircleOutlined, ForkOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
+import type { Edge, Node } from '@antv/x6';
+import { Graph, Shape } from '@antv/x6';
 import type { PortManager } from '@antv/x6/lib/model/port';
 import { uuid } from '@antv/x6/lib/util/string/uuid';
 import { message } from 'antd';
-import type { IGraphData, NodePropertySyntax, NodeTypeGroup, NodeTypeProperty } from './type';
+import { formatMessage } from 'umi';
+import { edgeDefaultConfig, edgeShapeName, nodeShapeName } from './node';
+import type {
+    IGraphData,
+    NodePropertySyntax,
+    NodeStatus,
+    NodeTypeGroup,
+    NodeTypeProperty,
+} from './type';
 
-// export const getTestData = () => {
-//     const id1 = genrateId();
-//     const id2 = genrateId();
-//     const id3 = genrateId();
-//     return {
-//         // 节点
-//         nodes: [
-//             {
-//                 id: id1, // String，可选，节点的唯一标识
-//                 x: 18, // Number，必选，节点位置的 x 值
-//                 y: 10, // Number，必选，节点位置的 y 值
-//                 // width: 80, // Number，可选，节点大小的 width 值
-//                 // height: 40, // Number，可选，节点大小的 height 值
-//                 label: 'activity', // String，节点标签
-//                 shape: 'activity',
-//                 type: 'activity',
-//                 name: 'activity',
-//             },
-//             {
-//                 id: id2, // String，节点的唯一标识
-//                 x: 300, // Number，必选，节点位置的 x 值
-//                 y: 180, // Number，必选，节点位置的 y 值
-//                 // width: 80, // Number，可选，节点大小的 width 值
-//                 // height: 40, // Number，可选，节点大小的 height 值
-//                 label: 'event', // String，节点标签
-//                 shape: 'event',
-//             },
-//             {
-//                 id: id3, // String，节点的唯一标识
-//                 x: 0, // Number，必选，节点位置的 x 值
-//                 y: 300, // Number，必选，节点位置的 y 值
-//                 // width: 80, // Number，可选，节点大小的 width 值
-//                 // height: 40, // Number，可选，节点大小的 height 值
-//                 label: 'gateway', // String，节点标签
-//                 shape: 'gateway',
-//             },
-//         ],
-//         // 边
-//         edges: [
-//             {
-//                 source: id1, // String，必须，起始节点 id
-//                 target: id2, // String，必须，目标节点 id
-//             },
-//         ],
-//     };
-// };
+export const getNodeIconByType = (type: string) => {
+    const dict = {
+        CurrentUser: <UserOutlined />,
+        Fork: <ForkOutlined />,
+        SendEmail: <MailOutlined />,
+        Fault: <CloseCircleOutlined />,
+        // TODO
+    };
+    return dict[type] ?? null;
+};
+
+export const updateEdgeStatus = (edge: Edge, status: NodeStatus) => {
+    if (status == 'failed') {
+        edge.attr('line/strokeDasharray', '');
+        edge.attr('line/stroke', '#f00');
+    } else if (status == 'success') {
+        edge.attr('line/strokeDasharray', '');
+        edge.attr('line/stroke', '#52c41a');
+    } else if (status == 'running') {
+        edge.attr('line/strokeDasharray', 5);
+        edge.attr('line/style/animation', 'running-line 30s infinite linear');
+    } else if (status == 'inactive') {
+        edge.attr('line/strokeDasharray', 5);
+    }
+};
 
 export const toggleNodePortVisible = (node: Node, visible: boolean) => {
     node.getPorts().forEach((item) => {
@@ -95,31 +84,6 @@ export const getNodeTypeData = async (): Promise<NodeTypeGroup[]> => {
         g?.children?.push({
             label: item.displayName,
             description: item.description,
-            // inherit: 'rect',
-            // width: 100,
-            // height: 60,
-            // attrs: {
-            //     body: {
-            //         rx: 6,
-            //         ry: 6,
-            //         stroke: '#5F95FF',
-            //         fill: '#EFF4FF',
-            //         strokeWidth: 1,
-            //     },
-            //     // img: {
-            //     //     x: 6,
-            //     //     y: 6,
-            //     //     width: 16,
-            //     //     height: 16,
-            //     //     'xlink:href':
-            //     //         'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*pwLpRr7QPGwAAAAAAAAAAAAAARQnAQ',
-            //     // },
-            //     label: {
-            //         fontSize: 12,
-            //         fill: '#262626',
-            //     },
-            // },
-            // typeDescriptor: item,
             type: item.type,
             outcomes: item.outcomes ?? [],
         });
@@ -304,13 +268,21 @@ export const createNodeConfig = (config: Node.Metadata): Node.Metadata => {
     const { id, label, name, type, displayName } = config;
     const nodeId = id || uuid();
     const nodeLabel = label ?? type;
-    return {
-        shape: 'activity',
-        ...config,
+    const nodeConfig = {
         id: nodeId,
         label: nodeLabel,
         displayName: displayName ?? nodeLabel,
         name: name ?? randString(type),
+        icon: getNodeIconByType(type),
+    };
+    return {
+        // ...nodeDefaultConfig,
+        shape: nodeShapeName,
+        ...config,
+        ...nodeConfig,
+        data: {
+            ...nodeConfig,
+        },
     };
 };
 
@@ -323,19 +295,8 @@ export const createEdgeConfig = (config: Edge.Metadata): Edge.Metadata => {
     const edgeName = label ?? name ?? 'Done';
 
     return {
-        shape: 'bpmn-edge',
-        attrs: {
-            line: {
-                stroke: '#A2B1C3',
-                strokeWidth: 2,
-                targetMarker: {
-                    name: 'block',
-                    width: 12,
-                    height: 8,
-                },
-            },
-        },
-        zIndex: 0,
+        ...edgeDefaultConfig,
+        shape: edgeShapeName,
         ...config,
         id: edgeId,
         name: edgeName,
@@ -401,7 +362,7 @@ export const conventToGraphData = async (
         nodes.push(
             createNodeConfig({
                 data: item,
-                shape: 'activity', // TODO
+                // shape: 'elsa-node', // TODO
                 id: item.activityId,
                 // @ts-ignore
                 x: parseInt(item.attributes?.x ?? 0),
@@ -475,7 +436,7 @@ export const graphValidateMagnet = (graph: Graph, args: any) => {
 
     if (cell.isNode())
         if (!checkCanCreateEdge(cell, graph.getOutgoingEdges(cell) ?? [])) {
-            message.error(`No more outcomes.`);
+            message.error(formatMessage({ id: 'page.designer.noMoreOutcomes' }));
             return false;
         }
 
@@ -496,7 +457,7 @@ export const graphValidateConnection = (graph: Graph, args: any) => {
 export const graphValidateEdge = (graph: Graph, args: any) => {
     const { edge, type } = args;
 
-    if (edge.getProp('shape') != 'bpmn-edge') {
+    if (edge.getProp('shape') != 'elsa-edge') {
         return false;
     }
     // if (edge.get) {
@@ -520,7 +481,7 @@ export const graphCreateEdge = (graph: Graph, args: any) => {
         if (nextName) {
             return new Shape.Edge(createEdgeConfig({ id: '', label: nextName }));
         } else {
-            message.error(`No more outcomes.`);
+            message.error(formatMessage({ id: 'page.designer.noMoreOutcomes' }));
             return null;
         }
     } else return null;
@@ -569,7 +530,8 @@ export const createGraph = (options?: any) => {
         keyboard: true,
         selecting: {
             enabled: true,
-            showNodeSelectionBox: false,
+            multiple: true,
+            rubberband: true,
         },
         clipboard: {
             enabled: true,
@@ -601,24 +563,25 @@ export const createGraph = (options?: any) => {
             allowEdge: false,
         },
         highlighting: {
-            // 连线过程中，自动吸附到链接桩时被使用。
+            magnetAvailable: {
+                name: 'stroke',
+                args: {
+                    padding: 4,
+                    attrs: {
+                        // strokeWidth: 1,
+                        'stroke-width': 1,
+                        stroke: '#47C769',
+                        fill: '#ffffff',
+                    },
+                },
+            },
             magnetAdsorbed: {
                 name: 'stroke',
                 args: {
                     attrs: {
-                        fill: '#fff',
+                        // 'stroke-width': 2,
                         stroke: '#47C769',
-                        'stroke-width': 2,
-                    },
-                },
-            },
-            magnetAvailable: {
-                name: 'stroke',
-                args: {
-                    attrs: {
-                        fill: '#fff',
-                        stroke: '#47C769',
-                        'stroke-width': 1,
+                        fill: '#47C769',
                     },
                 },
             },

@@ -1,4 +1,5 @@
 import type { Edge, Graph, Node } from '@antv/x6';
+import React from 'react';
 
 export interface IGraphData {
     nodes: Node.Properties[];
@@ -61,6 +62,16 @@ export type NodeUpdatePropData = {
     expressions?: Record<string, string>;
 };
 
+export type NodeStatus = 'default' | 'success' | 'failed' | 'running' | 'inactive';
+
+export type NodeData = {
+    id: string;
+    name: string;
+    displayName: string;
+    status: NodeStatus,
+    icon?: React.ReactDOM
+}
+
 /**
  *  表单数据类型
  */
@@ -96,22 +107,22 @@ export type ToolBarItemData = {
     onClick: (graph: Graph) => void;
 };
 
-export type NodeTypeStyleName =
-    | 'normal'
-    | 'default'
-    | 'success'
-    | 'error'
-    | 'processing'
-    | 'warning';
+// export type NodeTypeStyleName =
+//     | 'normal'
+//     | 'default'
+//     | 'success'
+//     | 'error'
+//     | 'processing'
+//     | 'warning';
 
-export const NodeTypeStyleNames = [
-    'normal',
-    'default',
-    'success',
-    'error',
-    'processing',
-    'warning',
-];
+// export const NodeTypeStyleNames = [
+//     'normal',
+//     'default',
+//     'success',
+//     'error',
+//     'processing',
+//     'warning',
+// ];
 
 export type NodePropertySyntax = {
     /** 支持的列表，可以空 */

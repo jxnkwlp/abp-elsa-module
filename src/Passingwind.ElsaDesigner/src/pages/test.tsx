@@ -4,11 +4,14 @@ import { Card, Alert, Typography, Form } from 'antd';
 import { useIntl, FormattedMessage } from 'umi';
 import MonacorEditorInput from './designer/form-input/monacor-editor-input';
 import { Graph } from '@antv/x6';
+import { registerNodeTypes } from './designer/node';
 
 const Test: React.FC = () => {
     const intl = useIntl();
-
     useEffect(() => {
+        //
+        registerNodeTypes();
+        //
         const graph = new Graph({
             // container: containerEleRef.current,
             container: document.getElementById('graphContainer')!,
@@ -25,6 +28,7 @@ const Test: React.FC = () => {
             // 节点
             nodes: [
                 {
+                    shape: 'elsa-node',
                     id: 'node1', // String，可选，节点的唯一标识
                     x: 40, // Number，必选，节点位置的 x 值
                     y: 40, // Number，必选，节点位置的 y 值

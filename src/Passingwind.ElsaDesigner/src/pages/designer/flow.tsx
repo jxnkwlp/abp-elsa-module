@@ -16,7 +16,7 @@ import '@antv/x6-react-components/es/menu/style/index.css';
 import '@antv/x6-react-components/es/toolbar/style/index.css';
 import type { Dnd } from '@antv/x6/lib/addon';
 import { message } from 'antd';
-import React, { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useRef } from 'react';
 import { useIntl } from 'umi';
 import './flow.less';
 import { registerNodeTypes } from './node';
@@ -31,9 +31,9 @@ import {
     graphValidateEdge,
     graphValidateMagnet,
     toggleNodePortVisible,
+    updateEdgeStatus,
 } from './service';
-import type { IGraphData, NodeTypeStyleName, NodeUpdateData, ToolBarGroupData } from './type';
-import { NodeTypeStyleNames } from './type';
+import type { IGraphData, NodeStatus, NodeUpdateData, ToolBarGroupData } from './type';
 
 type IFlowProps = {
     height?: number;
@@ -60,13 +60,15 @@ export type FlowActionType = {
     getGraphData: () => Promise<IGraphData>;
     updateNodeProperties: (id: string, value: NodeUpdateData) => void;
     updateNodeOutPorts: (id: string, outNames: string[]) => void;
-    setNodeStyle: (id: string, style: NodeTypeStyleName) => void;
-    setAllNodesStyle: (style: NodeTypeStyleName) => void;
-    setEdgeStyle: (id: string, style: NodeTypeStyleName) => void;
-    setAllEdgesStyle: (style: NodeTypeStyleName) => void;
-    setNodeIncomingEdgesStyle: (id: string, style: NodeTypeStyleName) => void;
-    setNodeOutgoingEdgesStyle: (id: string, style: NodeTypeStyleName) => void;
-    setNodeOutgoingEdgeStyle: (id: string, name: string, style: NodeTypeStyleName) => void;
+    //
+    setNodeStatus: (id: string, status: NodeStatus) => void;
+    setAllNodeStatus: (status: NodeStatus) => void;
+    setEdgeStyle: (id: string, status: NodeStatus) => void;
+    setAllEdgesStyle: (status: NodeStatus) => void;
+    //
+    // setNodeIncomingEdgesStyle: (id: string, status: NodeStatus) => void;
+    // setNodeOutgoingEdgesStyle: (id: string, status: NodeStatus) => void;
+    setNodeOutgoingEdgeStyle: (id: string, edgeId: string, status: NodeStatus) => void;
 };
 
 const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
@@ -82,8 +84,8 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
     useImperativeHandle(actionRef, () => ({
         getGraphData: async () => {
             const cells = graphInstance.current?.toJSON().cells;
-            const edges = cells?.filter((x) => x.shape == 'edge' || x.shape == 'bpmn-edge');
-            const nodes = cells?.filter((x) => x.shape != 'edge' && x.shape != 'bpmn-edge');
+            const edges = cells?.filter((x) => x.shape == 'edge' || x.shape == 'elsa-edge');
+            const nodes = cells?.filter((x) => x.shape != 'edge' && x.shape != 'elsa-edge');
             return { nodes, edges } as IGraphData;
         },
         updateNodeProperties: (id, values) => {
@@ -94,7 +96,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             }
             if (node) {
                 //
-                node.attr('label', { text: values.displayName });
+                // node.attr('label', { text: values.displayName });
                 //
                 node.prop('name', values.name);
                 node.prop('displayName', values.displayName);
@@ -127,70 +129,62 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             // node.addPort({ group: 'bottom' });
             // setNodeOutPorts(node, outcomes);
         },
-        setAllNodesStyle: (style) => {
+        //
+        setAllNodeStatus: (status) => {
             const allNodes = graphInstance.current?.getNodes() ?? [];
             allNodes.forEach((node) => {
-                const view = graphInstance.current?.findViewByCell(node);
-                view?.removeClass(NodeTypeStyleNames);
-                view?.addClass(style);
+                node?.updateData({ status: status });
             });
         },
-        setNodeStyle: (id, style) => {
+        setNodeStatus: (id, status) => {
             const node = graphInstance.current?.getNodes().find((x) => x.id == id);
-            if (node) {
-                const view = node.findView(graphInstance.current!);
-                view?.removeClass(NodeTypeStyleNames);
-                view?.addClass(style);
-            }
+            node?.updateData({ status: status });
         },
-        setAllEdgesStyle: (style) => {
+        setAllEdgesStyle: (status) => {
             const allEdges = graphInstance.current?.getEdges() ?? [];
             allEdges.forEach((edge) => {
-                const view = graphInstance.current?.findViewByCell(edge);
-                view?.removeClass(NodeTypeStyleNames);
-                view?.addClass(style);
+                edge?.updateData({ status: status });
+                updateEdgeStatus(edge, status);
             });
         },
-        setEdgeStyle: (id, style) => {
+        setEdgeStyle: (id, status) => {
             const edge = graphInstance.current?.getEdges().find((x) => x.id == id);
             if (edge) {
-                const view = edge.findView(graphInstance.current!);
-                view?.removeClass(NodeTypeStyleNames);
-                view?.addClass(style);
+                edge?.updateData({ status: status });
+                updateEdgeStatus(edge!, status);
             }
         },
-        setNodeIncomingEdgesStyle: (id, style) => {
-            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
-            if (node) {
-                const edges = graphInstance.current?.getIncomingEdges(node);
-                edges?.forEach((edge) => {
-                    const view = edge.findView(graphInstance.current!);
-                    view?.removeClass(NodeTypeStyleNames);
-                    view?.addClass(style);
-                });
-            }
-        },
-        setNodeOutgoingEdgesStyle: (id, style) => {
+        //
+        // setNodeIncomingEdgesStyle: (id, status) => {
+        //     const node = graphInstance.current?.getNodes().find((x) => x.id == id);
+        //     if (node) {
+        //         const edges = graphInstance.current?.getIncomingEdges(node);
+        //         edges?.forEach((edge) => {
+        //             const view = edge.findView(graphInstance.current!);
+        //             view?.removeClass(NodeTypeStyleNames);
+        //             view?.addClass(style);
+        //         });
+        //     }
+        // },
+        // setNodeOutgoingEdgesStyle: (id, style) => {
+        //     const node = graphInstance.current?.getNodes().find((x) => x.id == id);
+        //     if (node) {
+        //         const edges = graphInstance.current?.getOutgoingEdges(node);
+        //         edges?.forEach((edge) => {
+        //             const view = edge.findView(graphInstance.current!);
+        //             view?.removeClass(NodeTypeStyleNames);
+        //             view?.addClass(style);
+        //         });
+        //     }
+        // },
+        setNodeOutgoingEdgeStyle: (id, edgeId, status) => {
             const node = graphInstance.current?.getNodes().find((x) => x.id == id);
             if (node) {
                 const edges = graphInstance.current?.getOutgoingEdges(node);
                 edges?.forEach((edge) => {
-                    const view = edge.findView(graphInstance.current!);
-                    view?.removeClass(NodeTypeStyleNames);
-                    view?.addClass(style);
-                });
-            }
-        },
-        setNodeOutgoingEdgeStyle: (id, name, style) => {
-            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
-            if (node) {
-                const edges = graphInstance.current?.getOutgoingEdges(node);
-                edges?.forEach((edge) => {
-                    // console.log(edge.getProp('outcome'));
-                    if (edge.getProp('outcome') == name || edge.id == name) {
-                        const view = edge.findView(graphInstance.current!);
-                        view?.removeClass(NodeTypeStyleNames);
-                        view?.addClass(style);
+                    if (edge.getProp('outcome') == edgeId || edge.id == edgeId) {
+                        edge?.updateData({ status: status });
+                        updateEdgeStatus(edge!, status);
                     }
                 });
             }
@@ -414,7 +408,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                 node.addTools([
                     {
                         name: 'button-remove',
-                        args: { x: 98, y: 6 },
+                        args: { x: '100%', y: 0, offset: { x: -5, y: 5 } },
                     },
                 ]);
 

@@ -29,4 +29,5 @@ export default {
     'page.designer.toolbar.autoSize': 'Auto Size',
     'page.designer.toolbar.copy': 'Copy selected',
     'page.designer.toolbar.delete': 'Delete selected',
+    'page.designer.noMoreOutcomes': 'No more outcomes.',
 }
