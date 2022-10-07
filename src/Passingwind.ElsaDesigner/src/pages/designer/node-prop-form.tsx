@@ -429,7 +429,9 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
             },
             {
                 key: 'activityOutput',
-                label: intl.formatMessage({ id: 'page.designer.settings.activityOutput' }),
+                label: intl.formatMessage({
+                    id: 'page.designer.settings.activityOutputStorageProvider',
+                }),
                 children: (
                     <Row>
                         <ProFormSelect

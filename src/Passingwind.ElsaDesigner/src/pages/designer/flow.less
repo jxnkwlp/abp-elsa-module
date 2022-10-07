@@ -48,14 +48,14 @@
                     cursor: move;
 
                     div {
+                        // width: 100px;
+                        height: 36px;
                         // text-align: center;
                         // background: #e6f7ff;
                         // border: 1px solid #91d5ff;
                         // border-radius: 4px;
                         font-size: 14px;
-                        // width: 100px;
-                        // height: 30px;
-                        line-height: 34px;
+                        line-height: 36px;
                     }
                 }
             }
@@ -198,8 +198,13 @@
         flex-shrink: 0;
         width: 114px;
         margin: 0 8px;
+        // line-height: 1.2;
+        overflow: hidden;
         color: #666;
         font-size: 12px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        word-wrap: break-word;
     }
 
     .status {

@@ -9,6 +9,7 @@ import Icon, {
     SettingOutlined,
 } from '@ant-design/icons';
 import type { NodeData } from './type';
+import { Tooltip } from 'antd';
 
 // 节点内容
 export class ElsaNode extends React.Component<{ node?: Node }> {

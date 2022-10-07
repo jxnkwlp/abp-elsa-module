@@ -335,7 +335,7 @@ export const conventToServerData = (data: IGraphData) => {
             activityId: item.id as string,
             type: item.type,
             name: item.name ?? randString(item.type),
-            displayName: item.label ?? item.displayName,
+            displayName: item.displayName ?? item.label ?? item.type,
             description: item.description,
             properties: item.properties,
             attributes: {
@@ -370,17 +370,9 @@ export const conventToGraphData = async (
                 y: parseInt(item.attributes?.y ?? 0),
                 outcomes: item.attributes?.outcomes ?? [],
                 label: item.displayName ?? item.type,
-                //
-                // data: {
-                //     name: item.name,
-                //     type: item.type,
-                //     displayName: item.displayName,
-                //     description: item.description,
-                //     properties: item.properties,
-                // },
+                displayName: item.displayName,
                 name: item.name,
                 type: item.type,
-                displayName: item.displayName,
                 description: item.description,
                 properties: item.properties,
             }) as Node.Properties,
