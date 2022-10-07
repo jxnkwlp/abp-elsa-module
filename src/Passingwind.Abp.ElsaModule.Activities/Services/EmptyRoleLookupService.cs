@@ -7,7 +7,7 @@ namespace Passingwind.Abp.ElsaModule.Services
 {
     public class EmptyRoleLookupService : IRoleLookupService
     {
-        public Task<List<RoleLookupResultItem>> SearchAsync(string filter = null, CancellationToken cancellationToken = default)
+        public Task<List<RoleLookupResultItem>> GetListAsync(string filter = null, CancellationToken cancellationToken = default)
         {
             return Task.FromResult<List<RoleLookupResultItem>>(Enumerable.Empty<RoleLookupResultItem>().ToList());
         }

@@ -15,13 +15,41 @@ namespace Passingwind.Abp.ElsaModule.Services
             _identityUserRepository = identityUserRepository;
         }
 
-        public async Task<List<UserLookupResultItem>> SearchAsync(string filter = null, CancellationToken cancellationToken = default)
+        public async Task<UserLookupResultItem> FindByUserNameAsync(string userName, CancellationToken cancellationToken = default)
+        {
+            var item = await _identityUserRepository.FindByNormalizedUserNameAsync(userName);
+
+            if (item == null)
+                return null;
+
+            return new UserLookupResultItem
+            {
+                UserName = item.UserName,
+                DisplayName = item.UserName,
+                Email = item.Email,
+            };
+        }
+
+        public async Task<List<UserLookupResultItem>> GetListAsync(string filter = null, CancellationToken cancellationToken = default)
         {
             var list = await _identityUserRepository.GetListAsync();
             return list.Select(x => new UserLookupResultItem
             {
                 UserName = x.UserName,
                 DisplayName = x.UserName,
+                Email = x.Email,
+            }).ToList();
+        }
+
+        public async Task<List<UserLookupResultItem>> GetListByRoleNameAsync(string roleName, CancellationToken cancellationToken = default)
+        {
+            var users = await _identityUserRepository.GetListByNormalizedRoleNameAsync(roleName);
+
+            return users.Select(x => new UserLookupResultItem
+            {
+                UserName = x.UserName,
+                DisplayName = x.UserName,
+                Email = x.Email,
             }).ToList();
         }
     }
@@ -35,7 +63,7 @@ namespace Passingwind.Abp.ElsaModule.Services
             _identityRoleRepository = identityRoleRepository;
         }
 
-        public async Task<List<RoleLookupResultItem>> SearchAsync(string filter = null, CancellationToken cancellationToken = default)
+        public async Task<List<RoleLookupResultItem>> GetListAsync(string filter = null, CancellationToken cancellationToken = default)
         {
             var list = await _identityRoleRepository.GetListAsync();
             return list.Select(x => new RoleLookupResultItem

@@ -21,6 +21,8 @@ namespace Passingwind.Abp.ElsaModule.MongoDB
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
             };
+            // ignore error
+            _settings.Error += JsonErrorHandle;
             _settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
             _settings.Converters.Add(new TypeJsonConverter());
             _settings.Converters.Add(new FlagEnumConverter(new DefaultNamingStrategy()));
@@ -34,6 +36,12 @@ namespace Passingwind.Abp.ElsaModule.MongoDB
         public static void Update(JsonSerializerSettings settings)
         {
             _settings = settings;
+        }
+
+        private static void JsonErrorHandle(object sender, ErrorEventArgs e)
+        {
+            // ignore error.
+            e.ErrorContext.Handled = true;
         }
     }
 }

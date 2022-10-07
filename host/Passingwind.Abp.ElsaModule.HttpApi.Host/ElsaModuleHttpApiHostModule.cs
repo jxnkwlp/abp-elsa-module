@@ -4,7 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Elsa;
+using Elsa.Activities.Http.JavaScript;
+using Elsa.Activities.Http.Scripting.JavaScript;
 using Elsa.Activities.UserTask.Extensions;
+using Elsa.Scripting.JavaScript.Providers;
 using Elsa.Serialization.Converters;
 using Hangfire;
 using Hangfire.MemoryStorage;
@@ -272,8 +275,10 @@ public class ElsaModuleHttpApiHostModule : AbpModule
         context.Services.AddTransient<IUserLookupService, UserLookupService>();
         context.Services.AddTransient<IRoleLookupService, RoleLookupService>();
 
-        context.Services.AddAbpApiVersioning(c => { });
+        context.Services.AddJavaScriptTypeDefinitionProvider<HttpTypeDefinitionProviderFix>();
+        context.Services.AddSingleton<IActivityTypeDefinitionRenderer, HttpEndpointTypeDefinitionRendererFix>();
 
+        context.Services.AddAbpApiVersioning(c => { });
 
         Configure<MvcNewtonsoftJsonOptions>((options) =>
         {
@@ -283,8 +288,7 @@ public class ElsaModuleHttpApiHostModule : AbpModule
         });
 
         Configure<AbpSystemTextJsonSerializerOptions>(options =>
-        {
-
+        { 
         });
 
         Configure<AbpNewtonsoftJsonSerializerOptions>(options =>
@@ -301,6 +305,12 @@ public class ElsaModuleHttpApiHostModule : AbpModule
             options.AutoValidate = false;
         });
 
+    }
+
+    public override void PostConfigureServices(ServiceConfigurationContext context)
+    {
+        context.Services.RemoveAll(x => x.ImplementationType == typeof(HttpTypeDefinitionProvider));
+        context.Services.RemoveAll(x => x.ImplementationType == typeof(HttpEndpointTypeDefinitionRenderer));
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)

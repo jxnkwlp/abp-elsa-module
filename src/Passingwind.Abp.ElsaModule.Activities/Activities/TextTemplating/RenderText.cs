@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Passingwind.Abp.ElsaModule.Activities
+namespace Passingwind.Abp.ElsaModule.Activities.TextTemplating
 {
-    public class Configuration
+    public class RenderText
     {
 
     }

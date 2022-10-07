@@ -6,6 +6,10 @@ namespace Passingwind.Abp.ElsaModule.Services
 {
     public interface IUserLookupService
     {
-        Task<List<UserLookupResultItem>> SearchAsync(string filter = null, CancellationToken cancellationToken = default);
+        Task<List<UserLookupResultItem>> GetListAsync(string filter = null, CancellationToken cancellationToken = default);
+
+        Task<UserLookupResultItem> FindByUserNameAsync(string userName, CancellationToken cancellationToken = default);
+
+        Task<List<UserLookupResultItem>> GetListByRoleNameAsync(string roleName, CancellationToken cancellationToken = default);
     }
 }

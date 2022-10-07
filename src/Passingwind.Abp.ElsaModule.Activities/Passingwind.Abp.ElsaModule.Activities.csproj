@@ -6,11 +6,12 @@
         <RootNamespace>Passingwind.Abp.ElsaModule</RootNamespace>
     </PropertyGroup>
 
-    <ItemGroup> 
-        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.*" /> 
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.*" />
         <PackageReference Include="Volo.Abp.EventBus" Version="5.3.1" />
         <PackageReference Include="Volo.Abp.Emailing" Version="5.3.1" />
         <PackageReference Include="Elsa.Activities.Email" Version="2.8.2" />
+        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>

@@ -8,7 +8,7 @@ using Volo.Abp.Users;
 
 namespace Passingwind.Abp.ElsaModule.Activities
 {
-    [Action(
+    [Activity(
         Category = "Abp",
         DisplayName = "Current User",
         Description = "Get current user info",
@@ -17,7 +17,7 @@ namespace Passingwind.Abp.ElsaModule.Activities
     public class CurrentUser : Activity
     {
         [ActivityOutput(Hint = "The current user info.")]
-        public CurrentUserModel Output { get; set; }
+        public CurrentUserOutputModel Output { get; set; }
 
         public readonly ICurrentUser _currentUser;
 
@@ -28,7 +28,12 @@ namespace Passingwind.Abp.ElsaModule.Activities
 
         protected override IActivityExecutionResult OnExecute(ActivityExecutionContext context)
         {
-            var model = new CurrentUserModel()
+            return Execute();
+        }
+         
+        private IActivityExecutionResult Execute()
+        {
+            var model = new CurrentUserOutputModel()
             {
                 IsAuthenticated = _currentUser.IsAuthenticated,
                 Id = _currentUser.Id,
@@ -49,7 +54,7 @@ namespace Passingwind.Abp.ElsaModule.Activities
         }
     }
 
-    public class CurrentUserModel
+    public class CurrentUserOutputModel
     {
         public bool IsAuthenticated { get; set; }
 

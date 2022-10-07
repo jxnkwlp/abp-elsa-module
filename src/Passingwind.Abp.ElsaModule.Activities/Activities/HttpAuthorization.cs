@@ -22,7 +22,7 @@ namespace Passingwind.Abp.ElsaModule.Activities
     [Activity(
         Category = "HTTP",
         DisplayName = "HTTP Authorization",
-        Description = "Check incoming request authorization",
+        Description = "Check incoming request authorization.",
         Outcomes = new[] { OutcomeNames.Done, FailedOutcome }
     )]
     public class HttpAuthorization : Activity, IActivityPropertyOptionsProvider, IRuntimeSelectListProvider
@@ -102,12 +102,12 @@ namespace Passingwind.Abp.ElsaModule.Activities
             {
                 if (context2.Name == "Users")
                 {
-                    var list = await _userLookupService.SearchAsync();
+                    var list = await _userLookupService.GetListAsync();
                     return new SelectList(list?.Select(x => new SelectListItem(x.DisplayName, x.UserName)).ToArray());
                 }
                 else if (context2.Name == "Roles")
                 {
-                    var list = await _roleLookupService.SearchAsync();
+                    var list = await _roleLookupService.GetListAsync();
                     return new SelectList(list?.Select(x => new SelectListItem(x.Name, x.Name)).ToArray());
                 }
             }
@@ -116,6 +116,11 @@ namespace Passingwind.Abp.ElsaModule.Activities
         }
 
         protected override async ValueTask<IActivityExecutionResult> OnExecuteAsync(ActivityExecutionContext context)
+        {
+            return await ExecuteAsync();
+        }
+
+        private async Task<IActivityExecutionResult> ExecuteAsync()
         {
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext.User?.Identity?.IsAuthenticated != true)

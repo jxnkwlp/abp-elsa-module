@@ -6,6 +6,6 @@ namespace Passingwind.Abp.ElsaModule.Services
 {
     public interface IRoleLookupService
     {
-        Task<List<RoleLookupResultItem>> SearchAsync(string filter = null, CancellationToken cancellationToken = default);
+        Task<List<RoleLookupResultItem>> GetListAsync(string filter = null, CancellationToken cancellationToken = default);
     }
 }

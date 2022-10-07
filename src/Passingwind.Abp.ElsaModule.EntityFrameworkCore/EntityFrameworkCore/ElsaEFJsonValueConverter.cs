@@ -25,6 +25,8 @@ namespace EcsShop.EntityFrameworkCore
                     TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                     PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 };
+                // ignore error
+                settings.Error += JsonErrorHandle;
                 settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
                 settings.Converters.Add(new TypeJsonConverter());
                 settings.Converters.Add(new FlagEnumConverter(new DefaultNamingStrategy()));
@@ -36,6 +38,11 @@ namespace EcsShop.EntityFrameworkCore
             };
         }
 
+        private static void JsonErrorHandle(object sender, ErrorEventArgs e)
+        {
+            // ignore error.
+            e.ErrorContext.Handled = true;
+        }
 
         public ElsaEFJsonValueConverter() : base(s => Serialize(s), x => Deserialize<TModel>(x))
         {

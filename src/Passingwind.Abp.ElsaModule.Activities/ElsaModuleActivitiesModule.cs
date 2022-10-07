@@ -1,5 +1,6 @@
 ﻿using Elsa.Activities.Email.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Passingwind.Abp.ElsaModule.Scripting.JavaScript;
 using Passingwind.Abp.ElsaModule.Services;
 using Volo.Abp.Emailing;
 using Volo.Abp.EventBus;
@@ -17,7 +18,9 @@ namespace Passingwind.Abp.ElsaModule.Activities
         {
             PreConfigure<ElsaModuleOptions>(configure =>
             {
-                configure.Builder.AddActivitiesFrom(typeof(ElsaModuleActivitiesModule));
+                configure.Builder
+                    .AddActivitiesFrom(typeof(ElsaModuleActivitiesModule))
+                    ;
             });
         }
 
@@ -28,6 +31,11 @@ namespace Passingwind.Abp.ElsaModule.Activities
             context.Services.AddTransient<IUserLookupService, EmptyUserLookupService>();
             context.Services.AddTransient<IRoleLookupService, EmptyRoleLookupService>();
 
+            context.Services
+                .AddJavaScriptTypeDefinitionProvider<CurrentUserTypeDefinitionProvider>()
+                .AddJavaScriptTypeDefinitionProvider<CurrentTenantTypeDefinitionProvider>()
+                .AddJavaScriptTypeDefinitionProvider<ClockTypeDefinitionProvider>()
+                ;
         }
     }
 }
