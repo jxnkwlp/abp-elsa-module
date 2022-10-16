@@ -430,7 +430,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 Metadata = entity.GetMetadata(),
                 Variables = new Elsa.Models.Variables(entity.GetVariables()),
                 ActivityData = entity.ActivityData?.ToDictionary(x => x.ActivityId.ToString(), x => (IDictionary<string, object>)x.Data) ?? new Dictionary<string, IDictionary<string, object>>(),
-                BlockingActivities = entity.BlockingActivities?.Select(x => new BlockingActivity(x.ActivityType, x.ActivityType) { Tag = x.Tag })?.ToHashSet() ?? new HashSet<BlockingActivity>(),
+                BlockingActivities = entity.BlockingActivities?.Select(x => new BlockingActivity(x.ActivityId.ToString(), x.ActivityType) { Tag = x.Tag })?.ToHashSet() ?? new HashSet<BlockingActivity>(),
                 ScheduledActivities = new Elsa.Models.SimpleStack<Elsa.Models.ScheduledActivity>(entity.ScheduledActivities?.Select(x => new Elsa.Models.ScheduledActivity(x.ActivityId.ToString(), x.Input)) ?? new List<Elsa.Models.ScheduledActivity>()),
                 Scopes = new Elsa.Models.SimpleStack<Elsa.Models.ActivityScope>(entity.ActivityScopes?.Select(x => new Elsa.Models.ActivityScope() { ActivityId = x.ActivityId.ToString(), Variables = new Elsa.Models.Variables(x.Variables) })?.ToList() ?? new List<Elsa.Models.ActivityScope>()),
 
