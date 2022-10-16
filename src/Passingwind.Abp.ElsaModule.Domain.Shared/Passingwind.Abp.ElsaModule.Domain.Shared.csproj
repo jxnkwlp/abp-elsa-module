@@ -1,25 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\common.props" />
+    <Import Project="..\..\common.props" />
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Passingwind.Abp.ElsaModule</RootNamespace>
-    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>Passingwind.Abp.ElsaModule</RootNamespace>
+        <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta1" />
-    <PackageReference Include="Volo.Abp.Validation" Version="5.3.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Volo.Abp.Validation" Version="5.3.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="6.0.5" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="7.0.0-preview.5.22303.8" />
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Localization\ElsaModule\*.json" />
+        <Content Remove="Localization\ElsaModule\*.json" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Localization\ElsaModule\*.json" />
-    <Content Remove="Localization\ElsaModule\*.json" />
-  </ItemGroup>
-  
 </Project>
