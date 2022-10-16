@@ -19,6 +19,14 @@ public class ElsaModuleEntityFrameworkCoreModule : AbpModule
             options.AddDefaultRepositories();
 
             options.Entity<WorkflowDefinitionVersion>(x => x.DefaultWithDetailsFunc = q => q.Include(c => c.Activities).Include(c => c.Connections));
+            options.Entity<WorkflowInstance>(x => x.DefaultWithDetailsFunc = q => q
+                                                                                .Include(c => c.ActivityData)
+                                                                                .Include(c => c.ActivityScopes)
+                                                                                .Include(c => c.BlockingActivities)
+                                                                                .Include(c => c.ScheduledActivities)
+                                                                                .Include(c => c.Metadata)
+                                                                                .Include(c => c.Variables)
+                                                                                );
         });
 
     }

@@ -41,7 +41,7 @@ namespace Passingwind.Abp.ElsaModule.Common
         {
             var entity = await _workflowInstanceRepository.GetAsync(id);
 
-            if (entity.WorkflowStatus == Elsa.Models.WorkflowStatus.Idle || entity.WorkflowStatus == Elsa.Models.WorkflowStatus.Running || entity.WorkflowStatus == Elsa.Models.WorkflowStatus.Suspended)
+            if (entity.WorkflowStatus == WorkflowInstanceStatus.Idle || entity.WorkflowStatus == WorkflowInstanceStatus.Running || entity.WorkflowStatus == WorkflowInstanceStatus.Suspended)
             {
                 var result = await _workflowInstanceCanceller.CancelAsync(id.ToString());
 
@@ -160,7 +160,7 @@ namespace Passingwind.Abp.ElsaModule.Common
 
                     Outcomes = logs.Where(x => x.Data?.ContainsKey("Outcomes") == true).SelectMany(x => x.Data.SafeGetValue<string, object, string[]>("Outcomes")).ToArray(),
 
-                    StateData = entity.ActivityData.ContainsKey(itemLogs.Key) ? entity.ActivityData[itemLogs.Key] : default,
+                    StateData = entity.ActivityData.FirstOrDefault(x => x.ActivityId == itemLogs.Key)?.Data ?? default,
                     JournalData = logs.First().Data.Where(x => x.Key != "Outcomes").ToDictionary(x => x.Key, x => x.Value),
 
                     Message = logs.First().Message,
@@ -185,8 +185,8 @@ namespace Passingwind.Abp.ElsaModule.Common
 
             var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync("StatusDateCountStatistics", async () =>
               {
-                  var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(Elsa.Models.WorkflowStatus.Finished, startDate, endDate);
-                  var faulted = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(Elsa.Models.WorkflowStatus.Faulted, startDate, endDate);
+                  var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Finished, startDate, endDate);
+                  var faulted = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Faulted, startDate, endDate);
 
                   var dto = new WorkflowInstanceDateCountStatisticsResultDto();
 

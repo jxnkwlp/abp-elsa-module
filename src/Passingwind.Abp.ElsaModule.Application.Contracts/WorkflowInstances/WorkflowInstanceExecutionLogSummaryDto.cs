@@ -22,8 +22,8 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         public DateTime EndTime { get; set; }
         public double Duration { get; set; }
         public string[] Outcomes { get; set; }
-        public IDictionary<string, object> StateData { get; set; }
-        public IDictionary<string, object> JournalData { get; set; }
+        public Dictionary<string, object> StateData { get; set; }
+        public Dictionary<string, object> JournalData { get; set; }
         public string Message { get; set; }
     }
 }

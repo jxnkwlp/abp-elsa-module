@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using NodaTime;
 using Passingwind.Abp.ElsaModule.Common;
 using ActivityDefinition = Elsa.Models.ActivityDefinition;
+using BlockingActivity = Elsa.Models.BlockingActivity;
 using BookmarkModel = Elsa.Models.Bookmark;
 using ConnectionDefinitionModel = Elsa.Models.ConnectionDefinition;
 using TriggerModel = Elsa.Models.Trigger;
@@ -333,22 +334,18 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 Name = model.Name,
 
                 Version = model.Version,
-                WorkflowStatus = model.WorkflowStatus,
+                WorkflowStatus = (WorkflowInstanceStatus)(int)model.WorkflowStatus,
 
                 CancelledTime = model.CancelledAt.HasValue ? ToDateTime(model.CancelledAt.Value) : null,
                 FaultedTime = model.FaultedAt.HasValue ? ToDateTime(model.FaultedAt.Value) : null,
                 FinishedTime = model.FinishedAt.HasValue ? ToDateTime(model.FinishedAt.Value) : null,
                 LastExecutedTime = model.LastExecutedAt.HasValue ? ToDateTime(model.LastExecutedAt.Value) : null,
 
-                ActivityData = model.ActivityData.ToDictionary(x => Guid.Parse(x.Key), x => x.Value),
-                BlockingActivities = model.BlockingActivities.ToList(),
-                ScheduledActivities = model.ScheduledActivities,
-                Scopes = model.Scopes,
-
                 ContextId = model.ContextId,
                 ContextType = model.ContextType,
                 CorrelationId = model.CorrelationId,
-                CurrentActivity = model.CurrentActivity,
+                CurrentActivity = model.CurrentActivity == null ? default : new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(model.CurrentActivity.ActivityId), Input = model.CurrentActivity.Input },
+                LastExecutedActivityId = string.IsNullOrEmpty(model.LastExecutedActivityId) ? null : Guid.Parse(model.LastExecutedActivityId),
 
                 WorkflowDefinitionId = Guid.Parse(model.DefinitionId),
                 WorkflowDefinitionVersionId = Guid.Parse(model.DefinitionVersionId),
@@ -356,9 +353,13 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 Fault = model.Fault,
                 Input = model.Input,
                 Output = model.Output,
-                LastExecutedActivityId = string.IsNullOrEmpty(model.LastExecutedActivityId) ? null : Guid.Parse(model.LastExecutedActivityId),
-                Metadata = (System.Collections.Generic.Dictionary<string, object>)model.Metadata,
-                Variables = model.Variables?.Data?.ToDictionary(x => x.Key, x => x.Value),
+
+                Metadata = model.Metadata.Select(x => new WorkflowInstanceMetadata { Key = x.Key, Value = x.Value }).ToList(),
+                Variables = model.Variables.Data.Select(x => new WorkflowInstanceVariable { Key = x.Key, Value = x.Value }).ToList(),
+                ActivityData = model.ActivityData.ToList().Select(x => new WorkflowInstanceActivityData() { ActivityId = Guid.Parse(x.Key), Data = (Dictionary<string, object>)x.Value }).ToList(),
+                BlockingActivities = model.BlockingActivities.Select(x => new WorkflowInstanceBlockingActivity { ActivityId = Guid.Parse(x.ActivityId), ActivityType = x.ActivityType, Tag = x.Tag, }).ToList(),
+                ScheduledActivities = model.ScheduledActivities.Select(x => new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(x.ActivityId), Input = x.Input, }).ToList(),
+                ActivityScopes = model.Scopes.Select(x => new WorkflowInstanceActivityScope { ActivityId = Guid.Parse(x.ActivityId), Variables = (Dictionary<string, object>)x.Variables.Data, }).ToList(),
             };
         }
 
@@ -368,32 +369,29 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 entity.Name = model.Name;
 
             entity.Version = model.Version;
-            entity.WorkflowStatus = model.WorkflowStatus;
+            entity.WorkflowStatus = (WorkflowInstanceStatus)(int)model.WorkflowStatus;
 
             entity.CancelledTime = model.CancelledAt.HasValue ? ToDateTime(model.CancelledAt.Value) : null;
             entity.FaultedTime = model.FaultedAt.HasValue ? ToDateTime(model.FaultedAt.Value) : null;
             entity.FinishedTime = model.FinishedAt.HasValue ? ToDateTime(model.FinishedAt.Value) : null;
             entity.LastExecutedTime = model.LastExecutedAt.HasValue ? ToDateTime(model.LastExecutedAt.Value) : null;
 
-            entity.ActivityData = model.ActivityData.ToDictionary(x => Guid.Parse(x.Key), x => x.Value);
-            entity.BlockingActivities = model.BlockingActivities.ToList();
-            entity.ScheduledActivities = model.ScheduledActivities;
-            entity.Scopes = model.Scopes;
-
             entity.ContextId = model.ContextId;
             entity.ContextType = model.ContextType;
             entity.CorrelationId = model.CorrelationId;
-            entity.CurrentActivity = model.CurrentActivity;
-
-            //entity.DefinitionId = Guid.Parse(model.DefinitionId);
-            //entity.DefinitionVersionId = Guid.Parse(model.DefinitionVersionId);
+            entity.CurrentActivity = model.CurrentActivity == null ? default : new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(model.CurrentActivity.ActivityId), Input = model.CurrentActivity.Input };
+            entity.LastExecutedActivityId = string.IsNullOrEmpty(model.LastExecutedActivityId) ? null : Guid.Parse(model.LastExecutedActivityId);
 
             entity.Fault = model.Fault;
             entity.Input = model.Input;
             entity.Output = model.Output;
-            entity.LastExecutedActivityId = string.IsNullOrEmpty(model.LastExecutedActivityId) ? null : Guid.Parse(model.LastExecutedActivityId);
-            entity.Metadata = model.Metadata as Dictionary<string, object>;
-            entity.Variables = model.Variables?.Data as Dictionary<string, object>;
+            // TODO
+            entity.Metadata = model.Metadata.Select(x => new WorkflowInstanceMetadata { Key = x.Key, Value = x.Value }).ToList();
+            entity.Variables = model.Variables.Data.Select(x => new WorkflowInstanceVariable { Key = x.Key, Value = x.Value }).ToList();
+            entity.ActivityData = model.ActivityData.ToList().Select(x => new WorkflowInstanceActivityData() { ActivityId = Guid.Parse(x.Key), Data = (Dictionary<string, object>)x.Value }).ToList();
+            entity.BlockingActivities = model.BlockingActivities.Select(x => new WorkflowInstanceBlockingActivity { ActivityId = Guid.Parse(x.ActivityId), ActivityType = x.ActivityType, Tag = x.Tag, }).ToList();
+            entity.ScheduledActivities = model.ScheduledActivities.Select(x => new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(x.ActivityId), Input = x.Input, }).ToList();
+            entity.ActivityScopes = model.Scopes.Select(x => new WorkflowInstanceActivityScope { ActivityId = Guid.Parse(x.ActivityId), Variables = (Dictionary<string, object>)x.Variables.Data, }).ToList();
 
             return entity;
         }
@@ -405,10 +403,13 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 Id = entity.Id.ToString(),
                 Name = entity.Name,
 
+                DefinitionId = entity.WorkflowDefinitionId.ToString(),
+                DefinitionVersionId = entity.WorkflowDefinitionVersionId.ToString(),
+
                 TenantId = entity.TenantId?.ToString(),
 
                 Version = entity.Version,
-                WorkflowStatus = entity.WorkflowStatus,
+                WorkflowStatus = (Elsa.Models.WorkflowStatus)(int)entity.WorkflowStatus,
 
                 CreatedAt = ToInstant(entity.CreationTime),
                 CancelledAt = entity.CancelledTime == null ? null : ToInstant(entity.CancelledTime.Value),
@@ -416,25 +417,23 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 FinishedAt = entity.FinishedTime == null ? null : ToInstant(entity.FinishedTime.Value),
                 LastExecutedAt = entity.LastExecutedTime == null ? null : ToInstant(entity.LastExecutedTime.Value),
 
-                ActivityData = entity.ActivityData.ToDictionary(x => x.Key.ToString(), x => x.Value),
-                BlockingActivities = entity.BlockingActivities.ToHashSet(),
-                ScheduledActivities = new Elsa.Models.SimpleStack<Elsa.Models.ScheduledActivity>(entity.ScheduledActivities),
-                Scopes = new Elsa.Models.SimpleStack<Elsa.Models.ActivityScope>(entity.Scopes),
-
                 ContextId = entity.ContextId,
                 ContextType = entity.ContextType,
                 CorrelationId = entity.CorrelationId,
-                CurrentActivity = entity.CurrentActivity,
-
-                DefinitionId = entity.WorkflowDefinitionId.ToString(),
-                DefinitionVersionId = entity.WorkflowDefinitionVersionId.ToString(),
+                CurrentActivity = entity.CurrentActivity == null ? default : new Elsa.Models.ScheduledActivity(entity.CurrentActivity.ActivityId.ToString(), entity.CurrentActivity.Input),
+                LastExecutedActivityId = entity.LastExecutedActivityId?.ToString(),
 
                 Fault = entity.Fault,
                 Input = entity.Input,
                 Output = entity.Output,
-                LastExecutedActivityId = entity.LastExecutedActivityId?.ToString(),
-                Metadata = entity.Metadata,
-                Variables = new Elsa.Models.Variables(entity.Variables ?? new Dictionary<string, object>()),
+
+                Metadata = entity.GetMetadata(),
+                Variables = new Elsa.Models.Variables(entity.GetVariables()),
+                ActivityData = entity.ActivityData?.ToDictionary(x => x.ActivityId.ToString(), x => (IDictionary<string, object>)x.Data) ?? new Dictionary<string, IDictionary<string, object>>(),
+                BlockingActivities = entity.BlockingActivities?.Select(x => new BlockingActivity(x.ActivityType, x.ActivityType) { Tag = x.Tag })?.ToHashSet() ?? new HashSet<BlockingActivity>(),
+                ScheduledActivities = new Elsa.Models.SimpleStack<Elsa.Models.ScheduledActivity>(entity.ScheduledActivities?.Select(x => new Elsa.Models.ScheduledActivity(x.ActivityId.ToString(), x.Input)) ?? new List<Elsa.Models.ScheduledActivity>()),
+                Scopes = new Elsa.Models.SimpleStack<Elsa.Models.ActivityScope>(entity.ActivityScopes?.Select(x => new Elsa.Models.ActivityScope() { ActivityId = x.ActivityId.ToString(), Variables = new Elsa.Models.Variables(x.Variables) })?.ToList() ?? new List<Elsa.Models.ActivityScope>()),
+
             };
         }
 

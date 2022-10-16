@@ -27,7 +27,7 @@ public class WorkflowInstance : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     public int Version { get; set; }
 
-    public WorkflowStatus WorkflowStatus { get; set; } = WorkflowStatus.Idle;
+    public WorkflowInstanceStatus WorkflowStatus { get; set; } = WorkflowInstanceStatus.Idle;
 
     public string CorrelationId { get; set; }
 
@@ -39,9 +39,7 @@ public class WorkflowInstance : FullAuditedAggregateRoot<Guid>, IMultiTenant
     public DateTime? FinishedTime { get; set; }
     public DateTime? CancelledTime { get; set; }
     public DateTime? FaultedTime { get; set; }
-
-
-    public Dictionary<string, object> Variables { get; set; } = new Dictionary<string, object>();
+    public Guid? LastExecutedActivityId { get; set; }
 
     public WorkflowInputReference Input { get; set; }
 
@@ -49,18 +47,38 @@ public class WorkflowInstance : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     public WorkflowFault Fault { get; set; }
 
-    public List<ScheduledActivity> ScheduledActivities { get; set; } = new List<ScheduledActivity>();
+    public WorkflowInstanceScheduledActivity CurrentActivity { get; set; }
 
-    public List<BlockingActivity> BlockingActivities { get; set; } = new List<BlockingActivity>();
+    public List<WorkflowInstanceVariable> Variables { get; set; } = new List<WorkflowInstanceVariable>();
 
-    public List<ActivityScope> Scopes { get; set; } = new List<ActivityScope>();
+    public List<WorkflowInstanceMetadata> Metadata { get; set; } = new List<WorkflowInstanceMetadata>();
 
-    public ScheduledActivity CurrentActivity { get; set; }
+    public List<WorkflowInstanceScheduledActivity> ScheduledActivities { get; set; } = new List<WorkflowInstanceScheduledActivity>();
 
-    public Guid? LastExecutedActivityId { get; set; }
+    public List<WorkflowInstanceBlockingActivity> BlockingActivities { get; set; } = new List<WorkflowInstanceBlockingActivity>();
 
-    public Dictionary<Guid, IDictionary<string, object>> ActivityData { get; set; } = new Dictionary<Guid, IDictionary<string, object>>();
+    public List<WorkflowInstanceActivityScope> ActivityScopes { get; set; } = new List<WorkflowInstanceActivityScope>();
 
-    public Dictionary<string, object> Metadata { get; set; } = new Dictionary<string, object>();
+    public List<WorkflowInstanceActivityData> ActivityData { get; set; } = new List<WorkflowInstanceActivityData>();
 
+
+    public IDictionary<string, object> GetMetadata()
+    {
+        var dict = new Dictionary<string, object>();
+        foreach (var item in Metadata)
+        {
+            dict[item.Key] = item.Value;
+        }
+        return dict;
+    }
+
+    public IDictionary<string, object> GetVariables()
+    {
+        var dict = new Dictionary<string, object>();
+        foreach (var item in Variables)
+        {
+            dict[item.Key] = item.Value;
+        }
+        return dict;
+    }
 }

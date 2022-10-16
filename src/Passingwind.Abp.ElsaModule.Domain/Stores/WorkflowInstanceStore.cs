@@ -11,7 +11,6 @@ using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Linq;
 using Volo.Abp.Timing;
 using WorkflowInstanceModel = Elsa.Models.WorkflowInstance;
-using WorkflowStatus = Elsa.Models.WorkflowStatus;
 
 namespace Passingwind.Abp.ElsaModule.Stores
 {
@@ -34,6 +33,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
             var workflowDefinition = await _workflowDefinitionRepository.GetAsync(entity.WorkflowDefinitionId);
 
+            // add default name format.
             entity.Name = $"{workflowDefinition.Name}-{_clock.Now.ToString("yyyyMMddHHmmss")}";
 
             return entity;
@@ -62,7 +62,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             }
             else if (specification is UnfinishedWorkflowSpecification unfinishedWorkflowSpecification)
             {
-                return x => x.WorkflowStatus == WorkflowStatus.Idle || x.WorkflowStatus == WorkflowStatus.Running || x.WorkflowStatus == WorkflowStatus.Suspended;
+                return x => x.WorkflowStatus == WorkflowInstanceStatus.Idle || x.WorkflowStatus == WorkflowInstanceStatus.Running || x.WorkflowStatus == WorkflowInstanceStatus.Suspended;
             }
             else if (specification is WorkflowCreatedBeforeSpecification workflowCreatedBeforeSpecification)
             {
@@ -80,7 +80,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             }
             else if (specification is WorkflowFinishedStatusSpecification workflowFinishedStatusSpecification)
             {
-                return x => x.WorkflowStatus == WorkflowStatus.Cancelled || x.WorkflowStatus == WorkflowStatus.Faulted || x.WorkflowStatus == WorkflowStatus.Finished;
+                return x => x.WorkflowStatus == WorkflowInstanceStatus.Cancelled || x.WorkflowStatus == WorkflowInstanceStatus.Faulted || x.WorkflowStatus == WorkflowInstanceStatus.Finished;
             }
             else if (specification is WorkflowInstanceContextIdMatchSpecification workflowInstanceContextIdMatchSpecification)
             {
@@ -109,7 +109,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             }
             else if (specification is WorkflowIsAlreadyExecutingSpecification workflowIsAlreadyExecutingSpecification)
             {
-                return x => x.WorkflowStatus == WorkflowStatus.Running || x.WorkflowStatus == WorkflowStatus.Suspended || x.WorkflowStatus == WorkflowStatus.Idle;
+                return x => x.WorkflowStatus == WorkflowInstanceStatus.Running || x.WorkflowStatus == WorkflowInstanceStatus.Suspended || x.WorkflowStatus == WorkflowInstanceStatus.Idle;
             }
             else if (specification is WorkflowSearchTermSpecification workflowSearchTermSpecification)
             {
@@ -117,11 +117,12 @@ namespace Passingwind.Abp.ElsaModule.Stores
             }
             else if (specification is WorkflowStatusSpecification workflowStatusSpecification)
             {
-                return x => x.WorkflowStatus == workflowStatusSpecification.WorkflowStatus;
+                var status = (int)workflowStatusSpecification.WorkflowStatus;
+                return x => (int)x.WorkflowStatus == status;
             }
             else if (specification is WorkflowUnfinishedStatusSpecification workflowUnfinishedStatusSpecification)
             {
-                return x => x.WorkflowStatus == WorkflowStatus.Idle || x.WorkflowStatus == WorkflowStatus.Running || x.WorkflowStatus == WorkflowStatus.Suspended;
+                return x => x.WorkflowStatus == WorkflowInstanceStatus.Idle || x.WorkflowStatus == WorkflowInstanceStatus.Running || x.WorkflowStatus == WorkflowInstanceStatus.Suspended;
             }
             else if (specification is CorrelationIdSpecification<WorkflowInstanceModel> correlationIdSpecification)
             {

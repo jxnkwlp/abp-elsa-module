@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using EcsShop.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -131,19 +130,84 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.ContextType).HasMaxLength(128);
             b.Property(x => x.ContextId).HasMaxLength(128);
 
-            b.Property(x => x.Variables).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
             b.Property(x => x.Input).HasConversion(new ElsaEFJsonValueConverter<Elsa.Services.Models.WorkflowInputReference>(), ValueComparer.CreateDefault(typeof(Elsa.Services.Models.WorkflowInputReference), false));
             b.Property(x => x.Output).HasConversion(new ElsaEFJsonValueConverter<Elsa.Services.Models.WorkflowOutputReference>(), ValueComparer.CreateDefault(typeof(Elsa.Services.Models.WorkflowOutputReference), false));
             b.Property(x => x.Fault).HasConversion(new ElsaEFJsonValueConverter<Elsa.Models.WorkflowFault>(), ValueComparer.CreateDefault(typeof(Elsa.Models.WorkflowFault), false));
-            b.Property(x => x.ScheduledActivities).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.ScheduledActivity>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ScheduledActivity>), false));
-            b.Property(x => x.BlockingActivities).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.BlockingActivity>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.BlockingActivity>), false));
-            b.Property(x => x.Scopes).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.ActivityScope>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ActivityScope>), false));
-            b.Property(x => x.CurrentActivity).HasConversion(new ElsaEFJsonValueConverter<Elsa.Models.ScheduledActivity>(), ValueComparer.CreateDefault(typeof(Elsa.Models.ScheduledActivity), false));
-            b.Property(x => x.ActivityData).HasConversion(new ElsaEFJsonValueConverter<Dictionary<Guid, IDictionary<string, object>>>(), ValueComparer.CreateDefault(typeof(Dictionary<Guid, IDictionary<string, object>>), false));
-            b.Property(x => x.Metadata).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            b.Property(x => x.CurrentActivity).HasConversion(new ElsaEFJsonValueConverter<WorkflowInstanceScheduledActivity>(), ValueComparer.CreateDefault(typeof(WorkflowInstanceScheduledActivity), false));
+
+            //b.Property(x => x.ScheduledActivities).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.ScheduledActivity>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ScheduledActivity>), false));
+            //b.Property(x => x.BlockingActivities).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.BlockingActivity>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.BlockingActivity>), false));
+            //b.Property(x => x.ActivityScopes).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.ActivityScope>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ActivityScope>), false));
+            // b.Property(x => x.ActivityData).HasConversion(new ElsaEFJsonValueConverter<Dictionary<Guid, IDictionary<string, object>>>(), ValueComparer.CreateDefault(typeof(Dictionary<Guid, IDictionary<string, object>>), false));
+            //b.Property(x => x.Variables).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            //b.Property(x => x.Metadata).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
 
             // b.HasOne(x => x.Definition).WithOne().OnDelete(DeleteBehavior.SetNull);
             // b.HasOne(x => x.DefinitionVersion).WithOne();
+        });
+
+        builder.Entity<WorkflowInstanceActivityData>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceActivityData", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
+
+            b.Property(x => x.Data).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+        });
+
+        builder.Entity<WorkflowInstanceBlockingActivity>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceBlockingActivities", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
+
+            b.Property(x => x.ActivityType).HasMaxLength(256).IsRequired();
+        });
+
+        builder.Entity<WorkflowInstanceScheduledActivity>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceScheduledActivities", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
+
+            b.Property(x => x.Input).HasConversion(new ElsaEFJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
+        });
+
+        builder.Entity<WorkflowInstanceMetadata>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceMetadata", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.HasKey(x => new { x.WorkflowInstanceId, x.Key });
+
+            b.Property(x => x.Key).HasMaxLength(256).IsRequired();
+
+            b.Property(x => x.Value).HasConversion(new ElsaEFJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
+        });
+
+        builder.Entity<WorkflowInstanceActivityScope>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceScopes", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
+
+            b.Property(x => x.Variables).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+        });
+
+        builder.Entity<WorkflowInstanceVariable>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceVariables", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.HasKey(x => new { x.WorkflowInstanceId, x.Key });
+
+            b.Property(x => x.Key).HasMaxLength(256).IsRequired();
+
+            b.Property(x => x.Value).HasConversion(new ElsaEFJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
         });
 
         builder.Entity<WorkflowExecutionLog>(b =>
@@ -151,7 +215,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowExecutionLogs", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
 
-            b.Property(x => x.ActivityType).HasMaxLength(128);
+            b.Property(x => x.ActivityType).HasMaxLength(256);
             b.Property(x => x.EventName).HasMaxLength(128);
             b.Property(x => x.Source).HasMaxLength(128);
             b.Property(x => x.Data).HasConversion(new ElsaEFJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));

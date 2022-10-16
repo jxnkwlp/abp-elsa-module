@@ -17,7 +17,7 @@ public class ElsaModuleHttpApiHostMigrationsDbContext : AbpDbContext<ElsaModuleH
         base.OnModelCreating(modelBuilder);
 
 
-        modelBuilder.ConfigureIdentity();
+        // modelBuilder.ConfigureIdentity();
 
         modelBuilder.ConfigureElsaModule();
     }

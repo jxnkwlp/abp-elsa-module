@@ -60,8 +60,16 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
 
         CreateMap<ActivityDescriptor, ActivityTypeDescriptorDto>();
 
-        CreateMap<WorkflowInstance, WorkflowInstanceDto>();
+        CreateMap<WorkflowInstance, WorkflowInstanceDto>()
+            .ForMember(x => x.Variables, x => x.MapFrom(f => f.GetVariables()))
+            .ForMember(x => x.Metadata, x => x.MapFrom(f => f.GetMetadata()))
+            ;
         CreateMap<WorkflowInstance, WorkflowInstanceBasicDto>();
+        CreateMap<WorkflowInstanceActivityData, WorkflowInstanceActivityDataDto>();
+        CreateMap<WorkflowInstanceScheduledActivity, WorkflowInstanceScheduledActivityDto>();
+        CreateMap<WorkflowInstanceBlockingActivity, WorkflowInstanceBlockingActivityDto>();
+        CreateMap<WorkflowInstanceActivityScope, WorkflowInstanceActivityScopeDto>();
+        CreateMap<WorkflowInstanceActivityData, WorkflowInstanceActivityDataDto>();
 
         CreateMap<WorkflowExecutionLog, WorkflowExecutionLogDto>();
 

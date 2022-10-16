@@ -52,7 +52,7 @@ namespace Passingwind.Abp.ElsaModule.Workflow
         }
 
         public async Task<RuntimeSelectListResultDto> GetRuntimeSelectListItems(RuntimeSelectListContextDto input)
-        { 
+        {
             // LazyServiceProvider.LazyGetRequiredService()
             var type = Type.GetType(input.ProviderTypeName)!;
             var provider = LazyServiceProvider.LazyGetRequiredService(type);

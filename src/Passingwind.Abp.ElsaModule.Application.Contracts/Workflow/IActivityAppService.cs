@@ -5,6 +5,6 @@
 //    public interface IActivityAppService
 //    {
 //        Task<ActivityTypeDescriptorListResultDto> GetTypesAsync();
-         
+
 //    }
 //}

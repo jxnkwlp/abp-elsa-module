@@ -8,6 +8,6 @@ namespace Passingwind.Abp.ElsaModule.Workflow
     {
         Task<ListResultDto<WorkflowProviderDescriptorDto>> GetProvidersAsync();
         Task<ListResultDto<WorkflowStorageProviderInfoDto>> GetStorageProvidersAsync();
-         
+
     }
 }
