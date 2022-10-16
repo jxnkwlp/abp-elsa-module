@@ -383,7 +383,8 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         setDnd(dnd);
 
         graph.on('node:click', ({ node }) => {
-            console.debug(node);
+            console.debug('node', node);
+            console.debug('node data', node.getData());
             node.toFront();
             // handleOnNodeClick(node.getProp() as Node.Properties, node);
             props?.onNodeClick?.(node.getProp() as Node.Properties, node);

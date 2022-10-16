@@ -276,11 +276,14 @@ const Index: React.FC = () => {
         sourceProperties.forEach((item) => {
             const syntax = !item.syntax ? 'Default' : item.syntax;
             let syntaxValue: any = undefined;
-            let expressionValue: string = '';
+            let expressionValue: string = item.expressions?.[syntax] ?? '';
 
             // load syntax value
-            let valueSyntax = '';
-            if (Object.keys(item.expressions ?? {}).filter((x) => x != '$id').length > 0) {
+            let valueSyntax = syntax;
+            if (
+                Object.keys(item.expressions ?? {}).indexOf(syntax) == -1 &&
+                Object.keys(item.expressions ?? {}).filter((x) => x != '$id').length > 0
+            ) {
                 valueSyntax = Object.keys(item.expressions ?? {}).filter((x) => x != '$id')[0];
                 expressionValue = item.expressions![valueSyntax];
             }

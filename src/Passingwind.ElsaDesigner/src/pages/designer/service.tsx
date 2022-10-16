@@ -314,6 +314,8 @@ export const conventToServerData = (data: IGraphData) => {
         return {
             sourceId: item.source.cell,
             targetId: item.target.cell,
+            sourceActivityId: item.source.cell,
+            targetActivityId: item.target.cell,
             outcome: item.name ?? item.outcome ?? 'Done',
             attributes: {
                 sourcePort: item.source.port,
