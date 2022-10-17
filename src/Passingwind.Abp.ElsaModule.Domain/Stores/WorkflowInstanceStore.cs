@@ -34,7 +34,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             var workflowDefinition = await _workflowDefinitionRepository.GetAsync(entity.WorkflowDefinitionId);
 
             // add default name format.
-            entity.Name = $"{workflowDefinition.Name}-{_clock.Now.ToString("yyyyMMddHHmmss")}";
+            entity.Name = $"{workflowDefinition.Name}-{_clock.Now.ToLocalTime().ToString("yyyyMMddHHmmss")}";
 
             return entity;
         }

@@ -5,13 +5,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Demo.EntityFrameworkCore;
 using Demo.MultiTenancy;
+using Demo.Services;
 using Elsa;
 using Elsa.Activities.Http.OpenApi;
+using Elsa.Activities.Http.Services;
 using Elsa.Activities.Sql.Extensions;
 using Elsa.Activities.UserTask.Extensions;
+using Elsa.Scripting.JavaScript.Options;
+using Elsa.Scripting.JavaScript.Providers;
 using Hangfire;
 using Hangfire.MemoryStorage;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection;
@@ -27,6 +30,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Passingwind.Abp.ElsaModule;
 using Passingwind.Abp.ElsaModule.Activities;
+using Passingwind.Abp.ElsaModule.Services;
 using StackExchange.Redis;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Volo.Abp;
@@ -41,6 +45,7 @@ using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Json;
 using Volo.Abp.Localization;
+using Volo.Abp.MailKit;
 using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.Timing;
@@ -59,7 +64,8 @@ namespace Demo;
     typeof(DemoApplicationModule),
     typeof(DemoEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(AbpMailKitModule)
 )]
 public class DemoHttpApiHostModule : AbpModule
 {
@@ -134,7 +140,13 @@ public class DemoHttpApiHostModule : AbpModule
         {
             configure
                 .AddConsoleActivities()
-                .AddHttpActivities()
+                .AddHttpActivities(http =>
+                {
+                    http.HttpEndpointAuthorizationHandlerFactory = ActivatorUtilities.GetServiceOrCreateInstance<AuthenticationBasedHttpEndpointAuthorizationHandler>;
+                }, builder =>
+                {
+                    builder.ConfigureHttpClient(client => { client.Timeout = TimeSpan.FromMinutes(10); });
+                })
                 .AddEmailActivities()
                 .AddJavaScriptActivities()
                 .AddUserTaskActivities()
@@ -148,6 +160,16 @@ public class DemoHttpApiHostModule : AbpModule
         });
         // context.Services.AddElsaApiEndpoints();
 
+        Configure<ScriptOptions>(o =>
+        {
+            o.AllowClr = true;
+        });
+
+        context.Services.AddTransient<IUserLookupService, UserAndRoleLookupService>();
+        context.Services.AddTransient<IRoleLookupService, UserAndRoleLookupService>();
+
+        context.Services.AddJavaScriptTypeDefinitionProvider<HttpTypeDefinitionProviderFix>();
+        context.Services.AddSingleton<IActivityTypeDefinitionRenderer, HttpEndpointTypeDefinitionRendererFix>();
     }
 
     private void ConfigureCache(IConfiguration configuration)
@@ -217,7 +239,7 @@ public class DemoHttpApiHostModule : AbpModule
                 options.DocInclusionPredicate((docName, description) => true);
                 options.CustomSchemaIds(type => type.FullName);
                 // 
-                options.DocumentFilter<HttpEndpointDocumentFilter>(); 
+                options.DocumentFilter<HttpEndpointDocumentFilter>();
                 options.SchemaFilter<SwaggerEnumDescriptions>();
                 // 
                 options.CustomSchemaIds(type =>

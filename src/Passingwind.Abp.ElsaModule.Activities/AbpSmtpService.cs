@@ -30,24 +30,24 @@ namespace Passingwind.Abp.ElsaModule
             };
 
             if (message.From.Any())
-                mailMessage.From = new MailAddress(message.From[0].Name);
+                mailMessage.From = new MailAddress(((MailboxAddress)message.From[0]).Address);
 
             if (message.To.Any())
                 foreach (var item in message.To)
                 {
-                    mailMessage.To.Add(item.Name);
+                    mailMessage.To.Add(((MailboxAddress)item).Address);
                 }
 
             if (message.Cc.Any())
                 foreach (var item in message.Cc)
                 {
-                    mailMessage.CC.Add(item.Name);
+                    mailMessage.CC.Add(((MailboxAddress)item).Address);
                 }
 
             if (message.Bcc.Any())
                 foreach (var item in message.Bcc)
                 {
-                    mailMessage.Bcc.Add(item.Name);
+                    mailMessage.Bcc.Add(((MailboxAddress)item).Address);
                 }
 
             if (message.Attachments.Any())

@@ -26,8 +26,6 @@ namespace Passingwind.Abp.ElsaModule.Activities
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services.Replace<ISmtpService, AbpSmtpService>(ServiceLifetime.Transient);
-
             context.Services.AddTransient<IUserLookupService, EmptyUserLookupService>();
             context.Services.AddTransient<IRoleLookupService, EmptyRoleLookupService>();
 
@@ -36,6 +34,11 @@ namespace Passingwind.Abp.ElsaModule.Activities
                 .AddJavaScriptTypeDefinitionProvider<CurrentTenantTypeDefinitionProvider>()
                 .AddJavaScriptTypeDefinitionProvider<ClockTypeDefinitionProvider>()
                 ;
+        }
+
+        public override void PostConfigureServices(ServiceConfigurationContext context)
+        {
+            context.Services.Replace<ISmtpService, AbpSmtpService>(ServiceLifetime.Singleton);
         }
     }
 }

@@ -79,7 +79,7 @@ jobs:
         if: steps.changes.outputs.src == 'true'
         run: |
           cd ${{github.workspace}}/src/Passingwind.ElsaDesigner
-          zip ${{github.workspace}}/pack_output/designer.zip -r ./dist/*
+          zip ${{github.workspace}}/pack_output/workflow-dashboard.zip -r ./dist/*
 
       - name: Push package
         if: steps.changes.outputs.src == 'true'
