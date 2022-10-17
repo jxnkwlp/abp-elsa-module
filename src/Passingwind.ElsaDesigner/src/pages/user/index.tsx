@@ -121,7 +121,7 @@ const Index: React.FC = () => {
             //     false: { text: 'N' },
             // },
             renderText: (_, record) => {
-                if (_)
+                if (_ && record.lockoutEnd)
                     return (
                         <>
                             <span>Y</span>
@@ -293,10 +293,10 @@ const Index: React.FC = () => {
                     name="isActive"
                     label={intl.formatMessage({ id: 'page.user.field.isActive' })}
                 />
-                <ProFormSwitch
+                {/* <ProFormSwitch
                     name="lockoutEnabled"
                     label={intl.formatMessage({ id: 'page.user.field.lockoutEnabled' })}
-                />
+                /> */}
                 <ProFormText
                     rules={[{ required: !editModalDataId }, { max: 32 }, { min: 6 }]}
                     name="password"

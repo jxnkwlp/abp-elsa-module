@@ -36,19 +36,19 @@ export async function getInitialState(): Promise<{
         return result?.currentUser;
     };
 
-    if (isDev) {
-        // mock user
-        return {
-            settings: defaultSettings,
-            currentUser: {
-                isAuthenticated: true,
-                name: 'admin',
-                surName: 'admin',
-                userName: 'admin',
-            },
-            fetchUserInfo: loadData,
-        };
-    }
+    // if (isDev) {
+    //     // mock user
+    //     return {
+    //         settings: defaultSettings,
+    //         currentUser: {
+    //             isAuthenticated: true,
+    //             name: 'admin',
+    //             surName: 'admin',
+    //             userName: 'admin',
+    //         },
+    //         fetchUserInfo: loadData,
+    //     };
+    // }
 
     const user = await loadData();
 
