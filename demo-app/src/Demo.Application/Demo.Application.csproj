@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\common.props" />
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <RootNamespace>Demo</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.Application\Passingwind.Abp.ElsaModule.Application.csproj" />
+        <ProjectReference Include="..\Demo.Domain\Demo.Domain.csproj" />
+        <ProjectReference Include="..\Demo.Application.Contracts\Demo.Application.Contracts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Volo.Abp.Account.Application" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.Identity.Application" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.PermissionManagement.Application" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.TenantManagement.Application" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.FeatureManagement.Application" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.SettingManagement.Application" Version="5.3.4" /> 
+    </ItemGroup>
+
+</Project>

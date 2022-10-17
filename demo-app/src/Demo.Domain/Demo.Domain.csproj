@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\common.props" />
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <RootNamespace>Demo</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.Domain\Passingwind.Abp.ElsaModule.Domain.csproj" />
+        <ProjectReference Include="..\Demo.Domain.Shared\Demo.Domain.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Volo.Abp.Emailing" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.Identity.Domain" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.BackgroundJobs.Domain" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.AuditLogging.Domain" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.FeatureManagement.Domain" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.SettingManagement.Domain" Version="5.3.4" />
+    </ItemGroup>
+
+</Project>

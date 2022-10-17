@@ -251,10 +251,7 @@ paket-files/
 .idea/
 *.sln.iml
 
-# ElsaModule
-host/Passingwind.Abp.ElsaModule.IdentityServer/Logs/logs.txt
-host/Passingwind.Abp.ElsaModule.HttpApi.Host/Logs/logs.txt
-host/Passingwind.Abp.ElsaModule.Web.Host/Logs/logs.txt
-host/Passingwind.Abp.ElsaModule.Web.Unified/Logs/logs.txt
-host/Passingwind.Abp.ElsaModule.Blazor.Server.Host/Logs/logs.txt
-/host/Passingwind.Abp.ElsaModule.HttpApi.Host/appsettings.development.json
+# 
+/host/**/Logs/*
+/demo-app/**/Logs/*
+**/appsettings.*.json
