@@ -194,7 +194,7 @@ public class DemoDbMigrationService : ITransientDependency
             throw new Exception("Solution folder not found!");
         }
 
-        var srcDirectoryPath = Path.Combine(slnDirectoryPath, "src");
+        var srcDirectoryPath = Path.Combine(slnDirectoryPath, "demo-app");
 
         return Directory.GetDirectories(srcDirectoryPath)
             .FirstOrDefault(d => d.EndsWith(".EntityFrameworkCore"));

@@ -50,13 +50,18 @@ internal class WorkflowInstanceDataSender : ITransientDependency, IDataSeedContr
 
         var querySql = "select Id, Variables, Metadata, ScheduledActivities, BlockingActivities, Scopes, ActivityData from ElsaWorkflowInstances where ActivityData <> ''";
 
+        _logger.LogInformation($"Query workflow instance ...");
+
         var list = connection.Query<WorkflowInstance>(querySql).ToArray();
+
+        _logger.LogInformation($"Get instance Count: {list.Count()}");
 
         foreach (var instance in list)
         {
+            _logger.LogInformation($"  instance {instance.Id} ...");
+
             try
             {
-
                 if (!string.IsNullOrWhiteSpace(instance.Variables))
                 {
                     foreach (var item in JObject.Parse(instance.Variables))
@@ -112,6 +117,11 @@ internal class WorkflowInstanceDataSender : ITransientDependency, IDataSeedContr
                         activityData.Add(new WorkflowInstanceActivityData() { WorkflowInstanceId = instance.Id, ActivityId = Guid.Parse(item.Key), Data = item.Value.ToObject<Dictionary<string, object>>(), });
                     }
                 }
+
+                await db.SaveChangesAsync();
+
+                // 
+                await connection.ExecuteAsync("UPDATE [dbo].[ElsaWorkflowInstances] SET ActivityData = NULL ");
             }
             catch (Exception ex)
             {
@@ -119,8 +129,6 @@ internal class WorkflowInstanceDataSender : ITransientDependency, IDataSeedContr
                 _logger.LogError(ex, "Migration workflow instance error.");
             }
         }
-
-        await db.SaveChangesAsync();
 
         // clear workflowinstance table 
         await connection.ExecuteAsync("ALTER TABLE [dbo].[ElsaWorkflowInstances] DROP COLUMN [Variables], COLUMN [Metadata], COLUMN [ScheduledActivities], COLUMN [BlockingActivities], COLUMN [Scopes], COLUMN [ActivityData]");

@@ -7,7 +7,9 @@ using Demo.EntityFrameworkCore;
 using Demo.MultiTenancy;
 using Demo.Services;
 using Elsa;
+using Elsa.Activities.Http.JavaScript;
 using Elsa.Activities.Http.OpenApi;
+using Elsa.Activities.Http.Scripting.JavaScript;
 using Elsa.Activities.Http.Services;
 using Elsa.Activities.Sql.Extensions;
 using Elsa.Activities.UserTask.Extensions;
@@ -134,6 +136,13 @@ public class DemoHttpApiHostModule : AbpModule
         });
     }
 
+    public override void PostConfigureServices(ServiceConfigurationContext context)
+    {
+        // elsa issue fix
+        context.Services.RemoveAll(x => x.ImplementationType == typeof(HttpTypeDefinitionProvider));
+        context.Services.RemoveAll(x => x.ImplementationType == typeof(HttpEndpointTypeDefinitionRenderer));
+    }
+
     private void ConfigureElsa(ServiceConfigurationContext context, IConfiguration configuration)
     {
         context.Services.AddAbpElsa(configure =>
@@ -168,6 +177,7 @@ public class DemoHttpApiHostModule : AbpModule
         context.Services.AddTransient<IUserLookupService, UserAndRoleLookupService>();
         context.Services.AddTransient<IRoleLookupService, UserAndRoleLookupService>();
 
+        // elsa issue fix
         context.Services.AddJavaScriptTypeDefinitionProvider<HttpTypeDefinitionProviderFix>();
         context.Services.AddSingleton<IActivityTypeDefinitionRenderer, HttpEndpointTypeDefinitionRendererFix>();
     }
