@@ -232,7 +232,27 @@ public class DemoHttpApiHostModule : AbpModule
                 options.Authority = configuration["AuthServer:Authority"];
                 options.RequireHttpsMetadata = Convert.ToBoolean(configuration["AuthServer:RequireHttpsMetadata"]);
                 options.Audience = "Demo";
-            });
+            })
+            ;
+        context.Services.ConfigureApplicationCookie(optopns =>
+        {
+            optopns.Events.OnRedirectToLogin = (context) =>
+            {
+                if (context.Request.Path.StartsWithSegments("/api"))
+                {
+                    context.Response.StatusCode = 401;
+                }
+                return Task.CompletedTask;
+            };
+            optopns.Events.OnRedirectToAccessDenied = (context) =>
+            {
+                if (context.Request.Path.StartsWithSegments("/api"))
+                {
+                    context.Response.StatusCode = 403;
+                }
+                return Task.CompletedTask;
+            };
+        });
     }
 
     private static void ConfigureSwaggerServices(ServiceConfigurationContext context, IConfiguration configuration)
