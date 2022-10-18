@@ -20,15 +20,15 @@ export interface NodeTypeGroup {
 export type NodeTypeProperty = {
     name: string;
     type: string;
-    uiHint: NodePropertySyntaxNames;
+    uiHint: NodePropertyUiHints;
     label: string;
     hint: string;
     options?: NodeTypePropertyOption;
     category: string;
     order: number;
     defaultValue?: any;
-    defaultSyntax?: string;
-    supportedSyntaxes?: string[];
+    defaultSyntax?: NodePropertySyntaxNames;
+    supportedSyntaxes?: NodePropertySyntaxNames[];
     isReadOnly: boolean;
     isRequired: boolean;
     considerValuesAsOutcomes: boolean;
@@ -133,8 +133,8 @@ export type NodePropertySyntax = {
     editor: string | undefined;
 };
 
-// https://github1s.com/elsa-workflows/elsa-core/blob/HEAD/src/core/Elsa.Abstractions/Design/ActivityPropertyUIHints.cs
-export type NodePropertySyntaxNames =
+// https://github1s.com/elsa-workflows/elsa-core/blob/HEAD/src/core/Elsa.Abstractions/Design/ActivityInputUIHints.cs
+export type NodePropertyUiHints =
     | 'single-line'
     | 'multi-line'
     | 'checkbox'
@@ -143,6 +143,11 @@ export type NodePropertySyntaxNames =
     | 'dropdown'
     | 'multi-text'
     | 'code-editor'
-    | 'dynamic-list'
+    | 'dictionary'
     | 'json'
-    | 'switch-case-builder';
+    // obsolete
+    | 'dynamic-list'
+    | 'switch-case-builder'
+    | 'cron-expression'
+
+export type NodePropertySyntaxNames = 'Literal' | 'Json' | 'JavaScript' | 'Liquid' | 'C#' | 'Variable' | 'SQL' | 'Switch'

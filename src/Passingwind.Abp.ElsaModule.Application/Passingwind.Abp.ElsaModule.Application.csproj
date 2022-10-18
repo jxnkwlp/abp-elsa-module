@@ -18,8 +18,4 @@
         <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Domain\Passingwind.Abp.ElsaModule.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Activities\" />
-    </ItemGroup>
-
 </Project>

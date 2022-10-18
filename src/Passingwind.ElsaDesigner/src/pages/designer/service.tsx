@@ -12,6 +12,8 @@ import { edgeDefaultConfig, edgeShapeName, nodeShapeName } from './node';
 import type {
     IGraphData,
     NodePropertySyntax,
+    NodePropertySyntaxNames,
+    NodePropertyUiHints,
     NodeStatus,
     NodeTypeGroup,
     NodeTypeProperty,
@@ -91,14 +93,16 @@ export const getNodeTypeData = async (): Promise<NodeTypeGroup[]> => {
     return nodeData;
 };
 
-export const getEditorLanguage = (syntax: string) => {
+export const getEditorLanguage = (syntax: string): string => {
     switch (syntax) {
         case 'JavaScript':
             return 'javascript';
         case 'Json':
             return 'json';
         case 'Liquid':
-            return 'handlebars';
+            return 'liquid';
+        case 'SQL':
+            return 'sql';
         case 'Literal':
         default:
             return 'plaintext';
@@ -106,43 +110,46 @@ export const getEditorLanguage = (syntax: string) => {
 };
 
 /**
- *  获取属性值配置
+ *  获取属性值语法配置
  */
 export const getPropertySyntaxes = (property: NodeTypeProperty): NodePropertySyntax => {
     let syntaxes = (property.supportedSyntaxes ?? []).map((x) => {
         return x;
     });
-    let defaultSyntax: string | undefined = property.defaultSyntax ?? undefined;
+    // set default 'Literal'
+    let defaultSyntax: NodePropertySyntaxNames = property.defaultSyntax ?? 'Literal';
     let editorSyntax = '';
     //
     if (defaultSyntax && syntaxes.length == 0) {
         syntaxes.push(defaultSyntax);
     }
 
-    // if (property.uiHint != 'switch-case-builder' && syntaxes.indexOf('Literal') == -1) {
-    //     syntaxes = ['Literal', ...syntaxes];
-    // }
-    if (defaultSyntax == 'Switch') {
+    if (defaultSyntax == 'Switch' && syntaxes.indexOf('Json') == -1) {
         syntaxes.push('Json');
     }
-    // if (!defaultSyntax && syntaxes.length > 0) {
-    //     defaultSyntax = syntaxes[0];
-    // }
+
     if (property.options?.syntax) {
         // syntaxes = [property.options?.syntax];
         syntaxes = [];
         defaultSyntax = 'Literal';
         editorSyntax = property.options?.syntax;
     }
+
     if (
-        (property.uiHint === 'single-line' ||
-            property.uiHint === 'multi-line' ||
-            property.uiHint === 'dropdown' ||
-            property.uiHint === 'checkbox') &&
+        property.uiHint != 'check-list' &&
+        property.uiHint != 'radio-list' &&
+        property.uiHint != 'code-editor' &&
+        property.uiHint != 'dictionary' &&
+        property.uiHint != 'dynamic-list' &&
+        property.uiHint != 'multi-text' &&
+        property.uiHint != 'switch-case-builder' &&
         syntaxes.indexOf('Literal') == -1
     ) {
         syntaxes = ['Literal', ...syntaxes];
     }
+
+    // push 'Variable'
+    // syntaxes.push('Variable');
 
     // end
     if (syntaxes.length > 0) defaultSyntax = syntaxes[0];

@@ -127,7 +127,7 @@ export default {
     'page.instance.timeline': '时间线',
     'page.instance.input': '输入',
     'page.instance.exception': '异常',
-    'page.instance.variables': '全局变量',
+    'page.instance.variables': '变量',
     'page.instance.data': '相关数据',
     'page.instance.stateData': '状态数据',
     'page.instance.journalData': '期刊数据',

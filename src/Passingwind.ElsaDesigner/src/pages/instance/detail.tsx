@@ -353,6 +353,7 @@ const Index: React.FC = () => {
                                 setSelectActivityId(node.id!);
                             }}
                             onBlankClick={() => {
+                                setSelectActivityData(undefined);
                                 setSelectActivityId('');
                                 setTabKey('logs');
                             }}
@@ -415,7 +416,9 @@ const Index: React.FC = () => {
                                         showIcon
                                     />
                                 )}
-                                {selectActivityId && <Tabs items={getActivityTabItems()} />}
+                                {selectActivityId && selectActivityData && (
+                                    <Tabs items={getActivityTabItems()} />
+                                )}
                             </div>
                         )}
                         {tabKey === 'logs' && (

@@ -1,4 +1,4 @@
-import { SettingOutlined } from '@ant-design/icons';
+import { ApiOutlined, SettingOutlined } from '@ant-design/icons';
 import { Collapse, Tooltip } from 'antd';
 import React, { useEffect } from 'react';
 import { useIntl } from 'umi';
@@ -65,7 +65,7 @@ const NodeTypesPanel: React.FC<NodeTypesPanelProps> = (props) => {
                                                     <div className={`node default`}>
                                                         <span className="icon">
                                                             {getNodeIconByType(item.type) ?? (
-                                                                <SettingOutlined />
+                                                                <ApiOutlined />
                                                             )}
                                                         </span>
                                                         <span className="label">{item.label}</span>

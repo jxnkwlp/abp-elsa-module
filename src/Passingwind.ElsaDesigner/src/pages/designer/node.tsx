@@ -3,6 +3,7 @@ import { Edge, Graph, Node } from '@antv/x6';
 import React from 'react';
 import '@antv/x6-react-shape';
 import Icon, {
+    ApiOutlined,
     CheckCircleOutlined,
     CloseCircleOutlined,
     ReloadOutlined,
@@ -32,7 +33,7 @@ export class ElsaNode extends React.Component<{ node?: Node }> {
 
         return (
             <div className={`node ${status}`}>
-                <span className="icon">{icon ? { ...icon } : <SettingOutlined />}</span>
+                <span className="icon">{icon ? { ...icon } : <ApiOutlined />}</span>
                 <span className="label">{displayName}</span>
                 <span className="status">
                     {status == 'success' && <CheckCircleOutlined />}

@@ -393,7 +393,7 @@ const Index: React.FC = () => {
                     }
 
                     // end
-                    result.properties.push({
+                    const propItem = {
                         name: name,
                         syntax:
                             curObj.syntax == 'Default'
@@ -403,7 +403,12 @@ const Index: React.FC = () => {
                                 : undefined,
                         expressions: { [valueSyntaxName]: sytaxStringValue },
                         value: syntaxSourceValue,
-                    });
+                    };
+                    // clear value
+                    if (!sytaxStringValue) {
+                        propItem.expressions = {};
+                    }
+                    result.properties.push(propItem);
                 }
             }
         }
