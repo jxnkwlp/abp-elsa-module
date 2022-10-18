@@ -39,11 +39,14 @@ const Index: React.FC = () => {
     return (
         <PageContainer>
             <Card
-                title={intl.formatMessage({
-                    id: 'page.dashboard.statistics.7datecount.title',
-                })}
+                title={intl.formatMessage(
+                    {
+                        id: 'page.dashboard.statistics.datecount.title',
+                    },
+                    { d: 30 },
+                )}
             >
-                <div style={{ height: 300 }}>
+                <div style={{ height: 380 }}>
                     <Line
                         data={statusDateCountStatistics}
                         xField="date"
@@ -54,6 +57,7 @@ const Index: React.FC = () => {
                         seriesField="type"
                         smooth
                         padding="auto"
+                        color={['#52c41a', '#f00']}
                     />
                 </div>
             </Card>

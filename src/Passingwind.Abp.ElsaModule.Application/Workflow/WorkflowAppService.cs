@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using Elsa.Providers.Workflows;
 using Elsa.Services.WorkflowStorage;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Workflow
 {
+    [Authorize]
     public class WorkflowAppService : ElsaModuleAppService, IWorkflowAppService
     {
         private readonly IWorkflowStorageService _workflowStorageService;

@@ -250,7 +250,9 @@ const Index: React.FC = () => {
                 onValuesChange={(value) => {
                     if (value.displayName) {
                         editForm.setFieldsValue({
-                            name: value.displayName?.replaceAll(' ', '-'),
+                            name: (value.displayName as string)
+                                ?.replaceAll(' ', '-')
+                                ?.toLowerCase(),
                         });
                     }
                 }}

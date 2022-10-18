@@ -55,7 +55,7 @@ export default {
     'page.role.field.isPublic': '公开',
     'page.role.field.isStatic': '静态',
     //
-    'page.dashboard.statistics.7datecount.title': '7日内流程实例计数统计',
+    'page.dashboard.statistics.datecount.title': '{d}日内流程实例计数统计',
     //
     'page.definition.edit.basic': '基本信息',
     'page.definition.edit.variables': '变量',

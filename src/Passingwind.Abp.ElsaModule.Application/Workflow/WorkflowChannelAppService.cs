@@ -1,11 +1,13 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Elsa.Options;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Workflow
 {
+    [Authorize]
     public class WorkflowChannelAppService : ElsaModuleAppService, IWorkflowChannelAppService
     {
         private readonly ElsaOptions _elsaOptions;

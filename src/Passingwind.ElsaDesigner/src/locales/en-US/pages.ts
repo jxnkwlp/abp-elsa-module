@@ -57,7 +57,7 @@ export default {
     'page.role.field.isPublic': 'Public',
     'page.role.field.isStatic': 'Static',
     //
-    'page.dashboard.statistics.7datecount.title': 'Process instance count statistics within 7 days',
+    'page.dashboard.statistics.datecount.title': 'Process instance count statistics within {d} days',
     //
     'page.definition.edit.basic': 'Basic',
     'page.definition.edit.variables': 'Variables',

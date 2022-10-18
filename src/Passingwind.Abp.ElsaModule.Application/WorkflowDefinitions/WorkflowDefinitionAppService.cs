@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Elsa.Models;
 using Elsa.Services;
+using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Common
 {
+    [Authorize]
     public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefinitionAppService
     {
         private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Elsa.Services;
+using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Stores;
 using Passingwind.Abp.ElsaModule.WorkflowInstances;
 using Volo.Abp;
@@ -12,6 +13,7 @@ using Volo.Abp.Json;
 
 namespace Passingwind.Abp.ElsaModule.Common
 {
+    [Authorize]
     public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanceAppService
     {
         private readonly IJsonSerializer _jsonSerializer;
@@ -175,7 +177,7 @@ namespace Passingwind.Abp.ElsaModule.Common
             return dto;
         }
 
-        public async Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(int datePeriod = 7)
+        public async Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(int datePeriod = 30)
         {
             if (datePeriod <= 0)
                 throw new ArgumentOutOfRangeException("datePeriod must > 0");
@@ -183,29 +185,29 @@ namespace Passingwind.Abp.ElsaModule.Common
             var endDate = Clock.Now.Date;
             var startDate = Clock.Now.Date.AddDays(-datePeriod);
 
-            var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync("StatusDateCountStatistics", async () =>
-              {
-                  var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Finished, startDate, endDate);
-                  var faulted = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Faulted, startDate, endDate);
+            var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync($"StatusDateCountStatistics:{datePeriod}", async () =>
+            {
+                var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Finished, startDate, endDate);
+                var faulted = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Faulted, startDate, endDate);
 
-                  var dto = new WorkflowInstanceDateCountStatisticsResultDto();
+                var dto = new WorkflowInstanceDateCountStatisticsResultDto();
 
-                  for (int i = 1; i <= datePeriod; i++)
-                  {
-                      var date = startDate.AddDays(i);
-                      dto.Items.Add(new WorkflowInstanceDateCountStatisticDto
-                      {
-                          Date = date,
-                          FailedCount = faulted.ContainsKey(date.Date) ? faulted[date.Date] : 0,
-                          FinishedCount = finished.ContainsKey(date.Date) ? finished[date.Date] : 0,
-                      });
-                  }
+                for (int i = 1; i <= datePeriod; i++)
+                {
+                    var date = startDate.AddDays(i);
+                    dto.Items.Add(new WorkflowInstanceDateCountStatisticDto
+                    {
+                        Date = date,
+                        FailedCount = faulted.ContainsKey(date.Date) ? faulted[date.Date] : 0,
+                        FinishedCount = finished.ContainsKey(date.Date) ? finished[date.Date] : 0,
+                    });
+                }
 
-                  return dto;
-              }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
-              {
-                  AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(5),
-              });
+                return dto;
+            }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
+            {
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(15),
+            });
 
             return dto;
         }

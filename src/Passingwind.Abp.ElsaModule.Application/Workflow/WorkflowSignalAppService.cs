@@ -2,10 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Elsa.Activities.Signaling.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
 namespace Passingwind.Abp.ElsaModule.Workflow
 {
+    [AllowAnonymous]
     public class WorkflowSignalAppService : ElsaModuleAppService, IWorkflowSignalAppService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;

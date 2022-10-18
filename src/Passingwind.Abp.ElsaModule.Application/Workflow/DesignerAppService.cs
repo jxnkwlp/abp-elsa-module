@@ -9,12 +9,14 @@ using Elsa.Metadata;
 using Elsa.Options;
 using Elsa.Scripting.JavaScript.Services;
 using Elsa.Services;
+using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Stores;
 using Volo.Abp.Content;
 
 namespace Passingwind.Abp.ElsaModule.Workflow
 {
+    [Authorize]
     public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
     {
         private readonly IActivityTypeService _activityTypeService;
