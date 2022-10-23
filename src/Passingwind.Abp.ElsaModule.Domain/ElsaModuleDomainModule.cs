@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Passingwind.Abp.ElsaModule.Services;
 using Passingwind.Abp.ElsaModule.Stores;
 using Volo.Abp.Domain;
 using Volo.Abp.Json.SystemTextJson;
@@ -32,5 +33,7 @@ public class ElsaModuleDomainModule : AbpModule
     {
         context.Services.Replace<Elsa.Services.IIdGenerator, AbpElsaIdGenerator>(ServiceLifetime.Singleton);
         context.Services.Replace<Elsa.Services.ITenantAccessor, AbpElsaTenantAccessor>(ServiceLifetime.Singleton);
+        context.Services.Replace<Elsa.Services.IWorkflowFactory, NewWorkflowFactory>(ServiceLifetime.Transient);
+
     }
 }

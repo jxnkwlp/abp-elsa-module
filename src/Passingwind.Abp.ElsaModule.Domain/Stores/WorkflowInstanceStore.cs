@@ -27,16 +27,9 @@ namespace Passingwind.Abp.ElsaModule.Stores
             _clock = clock;
         }
 
-        protected override async Task<WorkflowInstance> MapToEntityAsync(WorkflowInstanceModel model)
+        protected override Task<WorkflowInstance> MapToEntityAsync(WorkflowInstanceModel model)
         {
-            var entity = _storeMapper.MapToEntity(model);
-
-            var workflowDefinition = await _workflowDefinitionRepository.GetAsync(entity.WorkflowDefinitionId);
-
-            // add default name format.
-            entity.Name = $"{workflowDefinition.Name}-{_clock.Now.ToLocalTime().ToString("yyyyMMddHHmmss")}";
-
-            return entity;
+            return Task.FromResult(_storeMapper.MapToEntity(model));
         }
 
         protected override Task<WorkflowInstance> MapToEntityAsync(WorkflowInstanceModel model, WorkflowInstance entity)
@@ -152,5 +145,6 @@ namespace Passingwind.Abp.ElsaModule.Stores
         {
             return Guid.Parse(value);
         }
+
     }
 }

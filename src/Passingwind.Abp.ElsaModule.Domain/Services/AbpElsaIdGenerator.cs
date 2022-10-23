@@ -1,7 +1,7 @@
 ﻿using Volo.Abp.DependencyInjection;
 using Volo.Abp.Guids;
 
-namespace Passingwind.Abp.ElsaModule;
+namespace Passingwind.Abp.ElsaModule.Services;
 
 public class AbpElsaIdGenerator : Elsa.Services.IIdGenerator, ISingletonDependency
 {

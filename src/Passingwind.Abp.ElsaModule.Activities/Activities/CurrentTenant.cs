@@ -30,7 +30,7 @@ namespace Passingwind.Abp.ElsaModule.Activities
         {
             return Execute();
         }
-         
+
         private IActivityExecutionResult Execute()
         {
             Output = new CurrentTenantOutputModel

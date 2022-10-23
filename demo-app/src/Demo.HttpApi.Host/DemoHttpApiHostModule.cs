@@ -15,8 +15,10 @@ using Elsa.Activities.Sql.Extensions;
 using Elsa.Activities.UserTask.Extensions;
 using Elsa.Scripting.JavaScript.Options;
 using Elsa.Scripting.JavaScript.Providers;
+using Elsa.Services;
 using Hangfire;
 using Hangfire.MemoryStorage;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection;
@@ -134,6 +136,9 @@ public class DemoHttpApiHostModule : AbpModule
         {
             options.RootPath = "wwwroot/dist";
         });
+
+        // Mediator.
+        context.Services.AddMediatR(typeof(Program).Assembly); 
     }
 
     public override void PostConfigureServices(ServiceConfigurationContext context)
@@ -408,6 +413,7 @@ public class DemoHttpApiHostModule : AbpModule
         app.UseForwardedHeaders();
         app.UseAbpRequestLocalization();
         app.UseCorrelationId();
+        app.UseStatusCodePages();
         app.UseStaticFiles();
         app.UseSpaStaticFiles();
         app.UseRouting();

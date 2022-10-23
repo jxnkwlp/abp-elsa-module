@@ -57,10 +57,11 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 // VersionId = entity.Id.ToString(), // same as id
                 Version = entity.Version,
                 Description = definition.Description,
+
                 DisplayName = definition.DisplayName,
+                Name = definition.Name,
 
                 IsSingleton = definition.IsSingleton,
-                Name = definition.Name,
                 DeleteCompletedInstances = definition.DeleteCompletedInstances,
                 Tag = definition.Tag,
                 TenantId = definition.TenantId?.ToString(),
