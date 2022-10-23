@@ -9,14 +9,14 @@ import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* POST /api/workflows/signals/dispatch/{signalName} 
+ * *TODO* POST /api/elsa/workflows/signals/dispatch/{signalName} 
  **/
 export async function workflowSignalDispatch(
     signalName: string,
     payload: API.WorkflowSignalDispatchRequest,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowSignalDispatchResult>(`/api/workflows/signals/dispatch/${signalName}`, {
+    return request<API.WorkflowSignalDispatchResult>(`/api/elsa/workflows/signals/dispatch/${signalName}`, {
         method: 'POST',
         data: payload,
         ...(options || {}),
@@ -24,14 +24,14 @@ export async function workflowSignalDispatch(
 }
 
 /**
- * *TODO* POST /api/workflows/signals/execute/{signalName} 
+ * *TODO* POST /api/elsa/workflows/signals/execute/{signalName} 
  **/
 export async function workflowSignalExecute(
     signalName: string,
     payload: API.WorkflowSignalExecuteRequest,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowSignalExecuteResult>(`/api/workflows/signals/execute/${signalName}`, {
+    return request<API.WorkflowSignalExecuteResult>(`/api/elsa/workflows/signals/execute/${signalName}`, {
         method: 'POST',
         data: payload,
         ...(options || {}),

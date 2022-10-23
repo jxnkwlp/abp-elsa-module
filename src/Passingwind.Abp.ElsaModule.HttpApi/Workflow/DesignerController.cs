@@ -7,7 +7,7 @@ using Volo.Abp.Content;
 namespace Passingwind.Abp.ElsaModule.Workflow
 {
     [RemoteService]
-    [Route("api/designer")]
+    [Route("api/elsa/designer")]
     public class DesignerController : ElsaModuleController, IDesignerAppService
     {
         private readonly IDesignerAppService _service;

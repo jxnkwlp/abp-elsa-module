@@ -9,13 +9,13 @@ import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* DELETE /api/workflow-instances 
+ * *TODO* DELETE /api/elsa/workflow/instances 
  **/
 export async function batchDeleteWorkflowInstance(
     payload: API.WorkflowInstancesBatchDeleteRequest,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-instances`, {
+    return request<any>(`/api/elsa/workflow/instances`, {
         method: 'DELETE',
         data: payload,
         getResponse: true,
@@ -24,13 +24,13 @@ export async function batchDeleteWorkflowInstance(
 }
 
 /**
- * *TODO* DELETE /api/workflow-instances/{id} 
+ * *TODO* DELETE /api/elsa/workflow/instances/{id} 
  **/
 export async function deleteWorkflowInstance(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-instances/${id}`, {
+    return request<any>(`/api/elsa/workflow/instances/${id}`, {
         method: 'DELETE',
         getResponse: true,
         ...(options || {}),
@@ -38,33 +38,33 @@ export async function deleteWorkflowInstance(
 }
 
 /**
- * *TODO* GET /api/workflow-instances/{id} 
+ * *TODO* GET /api/elsa/workflow/instances/{id} 
  **/
 export async function getWorkflowInstance(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowInstance>(`/api/workflow-instances/${id}`, {
+    return request<API.WorkflowInstance>(`/api/elsa/workflow/instances/${id}`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* GET /api/workflow-instances/{id}/execution-logs 
+ * *TODO* GET /api/elsa/workflow/instances/{id}/execution-logs 
  **/
 export async function getWorkflowInstanceExecutionLogs(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowExecutionLogListResult>(`/api/workflow-instances/${id}/execution-logs`, {
+    return request<API.WorkflowExecutionLogListResult>(`/api/elsa/workflow/instances/${id}/execution-logs`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* GET /api/workflow-instances 
+ * *TODO* GET /api/elsa/workflow/instances 
  **/
 export async function getWorkflowInstanceList(
     params: {
@@ -78,7 +78,7 @@ export async function getWorkflowInstanceList(
     },
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowInstanceBasicPagedResult>(`/api/workflow-instances`, {
+    return request<API.WorkflowInstanceBasicPagedResult>(`/api/elsa/workflow/instances`, {
         method: 'GET',
         params: params,
         ...(options || {}),
@@ -86,20 +86,20 @@ export async function getWorkflowInstanceList(
 }
 
 /**
- * *TODO* GET /api/workflow-instances/{id}/execution-logs/summary 
+ * *TODO* GET /api/elsa/workflow/instances/{id}/execution-logs/summary 
  **/
 export async function getWorkflowInstanceLogSummary(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowInstanceExecutionLogSummary>(`/api/workflow-instances/${id}/execution-logs/summary`, {
+    return request<API.WorkflowInstanceExecutionLogSummary>(`/api/elsa/workflow/instances/${id}/execution-logs/summary`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* GET /api/workflow-instances/statistics/count-date 
+ * *TODO* GET /api/elsa/workflow/instances/statistics/count-date 
  **/
 export async function getWorkflowInstanceStatusDateCountStatistics(
     params: {
@@ -107,7 +107,7 @@ export async function getWorkflowInstanceStatusDateCountStatistics(
     },
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowInstanceDateCountStatisticsResult>(`/api/workflow-instances/statistics/count-date`, {
+    return request<API.WorkflowInstanceDateCountStatisticsResult>(`/api/elsa/workflow/instances/statistics/count-date`, {
         method: 'GET',
         params: params,
         ...(options || {}),
@@ -115,13 +115,13 @@ export async function getWorkflowInstanceStatusDateCountStatistics(
 }
 
 /**
- * *TODO* POST /api/workflow-instances/{id}/cancel 
+ * *TODO* POST /api/elsa/workflow/instances/{id}/cancel 
  **/
 export async function workflowInstanceCancel(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-instances/${id}/cancel`, {
+    return request<any>(`/api/elsa/workflow/instances/${id}/cancel`, {
         method: 'POST',
         getResponse: true,
         ...(options || {}),
@@ -129,14 +129,14 @@ export async function workflowInstanceCancel(
 }
 
 /**
- * *TODO* POST /api/workflow-instances/{id}/dispatch 
+ * *TODO* POST /api/elsa/workflow/instances/{id}/dispatch 
  **/
 export async function workflowInstanceDispatch(
     id: string,
     payload: API.WorkflowInstanceDispatchRequest,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-instances/${id}/dispatch`, {
+    return request<any>(`/api/elsa/workflow/instances/${id}/dispatch`, {
         method: 'POST',
         data: payload,
         getResponse: true,
@@ -145,14 +145,14 @@ export async function workflowInstanceDispatch(
 }
 
 /**
- * *TODO* POST /api/workflow-instances/{id}/execute 
+ * *TODO* POST /api/elsa/workflow/instances/{id}/execute 
  **/
 export async function workflowInstanceExecute(
     id: string,
     payload: API.WorkflowInstanceExecuteRequest,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-instances/${id}/execute`, {
+    return request<any>(`/api/elsa/workflow/instances/${id}/execute`, {
         method: 'POST',
         data: payload,
         getResponse: true,
@@ -161,14 +161,14 @@ export async function workflowInstanceExecute(
 }
 
 /**
- * *TODO* POST /api/workflow-instances/{id}/retry 
+ * *TODO* POST /api/elsa/workflow/instances/{id}/retry 
  **/
 export async function workflowInstanceRetry(
     id: string,
     payload: API.WorkflowInstanceRetryRequest,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-instances/${id}/retry`, {
+    return request<any>(`/api/elsa/workflow/instances/${id}/retry`, {
         method: 'POST',
         data: payload,
         getResponse: true,

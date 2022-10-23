@@ -7,7 +7,7 @@ using Volo.Abp.Application.Dtos;
 namespace Passingwind.Abp.ElsaModule.Common
 {
     [RemoteService]
-    [Route("api/workflow-execution-logs")]
+    [Route("api/elsa/workflow/execution-logs")]
     public class WorkflowExecutionLogController : ElsaModuleController, IWorkflowExecutionLogAppService
     {
         private readonly IWorkflowExecutionLogAppService _service;

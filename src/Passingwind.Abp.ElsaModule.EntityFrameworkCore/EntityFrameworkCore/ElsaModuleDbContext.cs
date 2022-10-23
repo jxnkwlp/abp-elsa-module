@@ -20,6 +20,8 @@ public class ElsaModuleDbContext : AbpDbContext<ElsaModuleDbContext>, IElsaModul
 
     public DbSet<WorkflowInstance> WorkflowInstances { get; set; }
 
+    public DbSet<GlobalVariable> GlobalVariables { get; set; }
+
     public ElsaModuleDbContext(DbContextOptions<ElsaModuleDbContext> options)
         : base(options)
     {

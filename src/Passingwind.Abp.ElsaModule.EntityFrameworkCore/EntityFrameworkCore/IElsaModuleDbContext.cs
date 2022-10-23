@@ -14,4 +14,5 @@ public interface IElsaModuleDbContext : IEfCoreDbContext
     DbSet<WorkflowDefinitionVersion> WorkflowDefinitionVersions { get; }
     DbSet<WorkflowExecutionLog> WorkflowExecutionLogs { get; }
     DbSet<WorkflowInstance> WorkflowInstances { get; }
+    DbSet<GlobalVariable> GlobalVariables { get; }
 }

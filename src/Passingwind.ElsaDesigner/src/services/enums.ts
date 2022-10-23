@@ -1,5 +1,5 @@
 ﻿/**
- * Generate from swagger json url: https://localhost:44324/swagger/v1/swagger.json 
+ * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json 
  **/
 //
 // enum types
@@ -79,6 +79,17 @@ export enum LayoutKind {
     Sequential = 0,
     Explicit = 2,
     Auto = 3,
+}
+
+/**
+ * *TODO*
+ **/
+export enum LoginResultType {
+    Success = 1,
+    InvalidUserNameOrPassword = 2,
+    NotAllowed = 3,
+    LockedOut = 4,
+    RequiresTwoFactor = 5,
 }
 
 /**
@@ -227,21 +238,21 @@ export enum WorkflowContextFidelity {
 /**
  * *TODO*
  **/
-export enum WorkflowPersistenceBehavior {
-    Suspended = 0,
-    WorkflowBurst = 1,
-    ActivityExecuted = 2,
-}
-
-/**
- * *TODO*
- **/
-export enum WorkflowStatus {
+export enum WorkflowInstanceStatus {
     Idle = 0,
     Running = 1,
     Finished = 2,
     Suspended = 3,
     Faulted = 4,
     Cancelled = 5,
+}
+
+/**
+ * *TODO*
+ **/
+export enum WorkflowPersistenceBehavior {
+    Suspended = 0,
+    WorkflowBurst = 1,
+    ActivityExecuted = 2,
 }
 

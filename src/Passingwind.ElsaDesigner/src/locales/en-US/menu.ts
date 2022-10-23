@@ -54,6 +54,7 @@ export default {
     'menu.Instance Detail': 'Instance Detail',
     'menu.Definitions': 'Definitions',
     'menu.Designer': 'Designer',
+    'menu.Variables': 'Variables',
     'menu.Change Password': 'Change Password',
     'menu.system': 'System',
     'menu.system.users': 'Users',

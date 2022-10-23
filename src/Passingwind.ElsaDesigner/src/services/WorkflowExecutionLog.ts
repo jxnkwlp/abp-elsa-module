@@ -9,20 +9,20 @@ import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/workflow-execution-logs/{id} 
+ * *TODO* GET /api/elsa/workflow/execution-logs/{id} 
  **/
 export async function getWorkflowExecutionLog(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowExecutionLog>(`/api/workflow-execution-logs/${id}`, {
+    return request<API.WorkflowExecutionLog>(`/api/elsa/workflow/execution-logs/${id}`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* GET /api/workflow-execution-logs 
+ * *TODO* GET /api/elsa/workflow/execution-logs 
  **/
 export async function getWorkflowExecutionLogList(
     params: {
@@ -33,7 +33,7 @@ export async function getWorkflowExecutionLogList(
     },
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowExecutionLogPagedResult>(`/api/workflow-execution-logs`, {
+    return request<API.WorkflowExecutionLogPagedResult>(`/api/elsa/workflow/execution-logs`, {
         method: 'GET',
         params: params,
         ...(options || {}),

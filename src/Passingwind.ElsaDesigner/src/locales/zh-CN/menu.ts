@@ -54,6 +54,7 @@ export default {
     'menu.Instance Detail': '流程实例详细',
     'menu.Definitions': '流程定义',
     'menu.Designer': '流程设计器',
+    'menu.Variables': '变量',
     'menu.Change Password': '修改密码',
     'menu.system': '系统',
     'menu.system.users': '用户',

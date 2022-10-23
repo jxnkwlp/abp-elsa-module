@@ -9,24 +9,24 @@ import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/workflows/providers 
+ * *TODO* GET /api/elsa/workflow/providers 
  **/
 export async function getWorkflowProviders(
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowProviderDescriptorListResult>(`/api/workflows/providers`, {
+    return request<API.WorkflowProviderDescriptorListResult>(`/api/elsa/workflow/providers`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* GET /api/workflows/storage-providers 
+ * *TODO* GET /api/elsa/workflow/storage-providers 
  **/
 export async function getWorkflowStorageProviders(
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowStorageProviderInfoListResult>(`/api/workflows/storage-providers`, {
+    return request<API.WorkflowStorageProviderInfoListResult>(`/api/elsa/workflow/storage-providers`, {
         method: 'GET',
         ...(options || {}),
     });

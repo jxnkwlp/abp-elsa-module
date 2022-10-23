@@ -1,6 +1,6 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
- * Total count: 161
+ * Total count: 160
  **/
 import * as Enum from "./enums";
 
@@ -132,6 +132,27 @@ declare namespace API {
         message?: string | undefined;
         source?: string | undefined;
         data?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type GlobalVariable = {
+        id?: string | undefined;
+        creationTime?: string | undefined;
+        creatorId?: string | undefined;
+        lastModificationTime?: string | undefined;
+        lastModifierId?: string | undefined;
+        key?: string | undefined;
+        value?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type GlobalVariableCreateOrUpdate = {
+        key: string;
+        value?: string | undefined;
     };
 
     /**
@@ -640,6 +661,14 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type GlobalVariablePagedResult = {
+        items?: GlobalVariable[] | undefined;
+        totalCount?: number | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type IdentityRoleListResult = {
         items?: IdentityRole[] | undefined;
     };
@@ -665,14 +694,6 @@ declare namespace API {
      **/
     type StringListResult = {
         items?: string[] | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type TenantPagedResult = {
-        items?: Tenant[] | undefined;
-        totalCount?: number | undefined;
     };
 
     /**
@@ -1419,35 +1440,6 @@ declare namespace API {
         smtpUseDefaultCredentials?: boolean | undefined;
         defaultFromAddress: string;
         defaultFromDisplayName: string;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type Tenant = {
-        extraProperties?: any | undefined;
-        id?: string | undefined;
-        name?: string | undefined;
-        concurrencyStamp?: string | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type TenantCreate = {
-        extraProperties?: any | undefined;
-        name: string;
-        adminEmailAddress: string;
-        adminPassword: string;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type TenantUpdate = {
-        extraProperties?: any | undefined;
-        name: string;
-        concurrencyStamp?: string | undefined;
     };
 
     /**

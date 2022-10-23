@@ -9,13 +9,13 @@ import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* POST /api/workflow-definitions 
+ * *TODO* POST /api/elsa/workflow/definitions 
  **/
 export async function createWorkflowDefinition(
     payload: API.WorkflowDefinitionVersionCreateOrUpdate,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinitionVersion>(`/api/workflow-definitions`, {
+    return request<API.WorkflowDefinitionVersion>(`/api/elsa/workflow/definitions`, {
         method: 'POST',
         data: payload,
         ...(options || {}),
@@ -23,13 +23,13 @@ export async function createWorkflowDefinition(
 }
 
 /**
- * *TODO* DELETE /api/workflow-definitions/{id} 
+ * *TODO* DELETE /api/elsa/workflow/definitions/{id} 
  **/
 export async function deleteWorkflowDefinition(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-definitions/${id}`, {
+    return request<any>(`/api/elsa/workflow/definitions/${id}`, {
         method: 'DELETE',
         getResponse: true,
         ...(options || {}),
@@ -37,13 +37,13 @@ export async function deleteWorkflowDefinition(
 }
 
 /**
- * *TODO* DELETE /api/workflow-definitions/{id}/versions/{version} 
+ * *TODO* DELETE /api/elsa/workflow/definitions/{id}/versions/{version} 
  **/
 export async function deleteWorkflowDefinitionVersion(
     id: string,    version: number,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-definitions/${id}/versions/${version}`, {
+    return request<any>(`/api/elsa/workflow/definitions/${id}/versions/${version}`, {
         method: 'DELETE',
         getResponse: true,
         ...(options || {}),
@@ -51,33 +51,33 @@ export async function deleteWorkflowDefinitionVersion(
 }
 
 /**
- * *TODO* GET /api/workflow-definitions/{id} 
+ * *TODO* GET /api/elsa/workflow/definitions/{id} 
  **/
 export async function getWorkflowDefinition(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinitionVersion>(`/api/workflow-definitions/${id}`, {
+    return request<API.WorkflowDefinitionVersion>(`/api/elsa/workflow/definitions/${id}`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* GET /api/workflow-definitions/{id}/definition 
+ * *TODO* GET /api/elsa/workflow/definitions/{id}/definition 
  **/
 export async function getWorkflowDefinitionDefinition(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinition>(`/api/workflow-definitions/${id}/definition`, {
+    return request<API.WorkflowDefinition>(`/api/elsa/workflow/definitions/${id}/definition`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* GET /api/workflow-definitions 
+ * *TODO* GET /api/elsa/workflow/definitions 
  **/
 export async function getWorkflowDefinitionList(
     params: {
@@ -87,7 +87,7 @@ export async function getWorkflowDefinitionList(
     },
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinitionPagedResult>(`/api/workflow-definitions`, {
+    return request<API.WorkflowDefinitionPagedResult>(`/api/elsa/workflow/definitions`, {
         method: 'GET',
         params: params,
         ...(options || {}),
@@ -95,33 +95,33 @@ export async function getWorkflowDefinitionList(
 }
 
 /**
- * *TODO* GET /api/workflow-definitions/{id}/versions/{version}/previous-version 
+ * *TODO* GET /api/elsa/workflow/definitions/{id}/versions/{version}/previous-version 
  **/
 export async function getWorkflowDefinitionPreviousVersion(
     id: string,    version: number,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinitionVersion>(`/api/workflow-definitions/${id}/versions/${version}/previous-version`, {
+    return request<API.WorkflowDefinitionVersion>(`/api/elsa/workflow/definitions/${id}/versions/${version}/previous-version`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* GET /api/workflow-definitions/{id}/versions/{version} 
+ * *TODO* GET /api/elsa/workflow/definitions/{id}/versions/{version} 
  **/
 export async function getWorkflowDefinitionVersion(
     id: string,    version: number,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinitionVersion>(`/api/workflow-definitions/${id}/versions/${version}`, {
+    return request<API.WorkflowDefinitionVersion>(`/api/elsa/workflow/definitions/${id}/versions/${version}`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* GET /api/workflow-definitions/{id}/versions 
+ * *TODO* GET /api/elsa/workflow/definitions/{id}/versions 
  **/
 export async function getWorkflowDefinitionVersions(
     id: string,
@@ -131,7 +131,7 @@ export async function getWorkflowDefinitionVersions(
     },
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinitionVersionListItemPagedResult>(`/api/workflow-definitions/${id}/versions`, {
+    return request<API.WorkflowDefinitionVersionListItemPagedResult>(`/api/elsa/workflow/definitions/${id}/versions`, {
         method: 'GET',
         params: params,
         ...(options || {}),
@@ -139,14 +139,14 @@ export async function getWorkflowDefinitionVersions(
 }
 
 /**
- * *TODO* PUT /api/workflow-definitions/{id} 
+ * *TODO* PUT /api/elsa/workflow/definitions/{id} 
  **/
 export async function updateWorkflowDefinition(
     id: string,
     payload: API.WorkflowDefinitionVersionCreateOrUpdate,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinitionVersion>(`/api/workflow-definitions/${id}`, {
+    return request<API.WorkflowDefinitionVersion>(`/api/elsa/workflow/definitions/${id}`, {
         method: 'PUT',
         data: payload,
         ...(options || {}),
@@ -154,14 +154,14 @@ export async function updateWorkflowDefinition(
 }
 
 /**
- * *TODO* PUT /api/workflow-definitions/{id}/definition 
+ * *TODO* PUT /api/elsa/workflow/definitions/{id}/definition 
  **/
 export async function updateWorkflowDefinitionDefinition(
     id: string,
     payload: API.WorkflowDefinitionCreateOrUpdate,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinition>(`/api/workflow-definitions/${id}/definition`, {
+    return request<API.WorkflowDefinition>(`/api/elsa/workflow/definitions/${id}/definition`, {
         method: 'PUT',
         data: payload,
         ...(options || {}),
@@ -169,14 +169,14 @@ export async function updateWorkflowDefinitionDefinition(
 }
 
 /**
- * *TODO* POST /api/workflow-definitions/{id}/dispatch 
+ * *TODO* POST /api/elsa/workflow/definitions/{id}/dispatch 
  **/
 export async function workflowDefinitionDispatch(
     id: string,
     payload: API.WorkflowDefinitionDispatchRequest,
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinitionDispatchResult>(`/api/workflow-definitions/${id}/dispatch`, {
+    return request<API.WorkflowDefinitionDispatchResult>(`/api/elsa/workflow/definitions/${id}/dispatch`, {
         method: 'POST',
         data: payload,
         ...(options || {}),
@@ -184,14 +184,14 @@ export async function workflowDefinitionDispatch(
 }
 
 /**
- * *TODO* POST /api/workflow-definitions/{id}/execute 
+ * *TODO* POST /api/elsa/workflow/definitions/{id}/execute 
  **/
 export async function workflowDefinitionExecute(
     id: string,
     payload: API.WorkflowDefinitionExecuteRequest,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-definitions/${id}/execute`, {
+    return request<any>(`/api/elsa/workflow/definitions/${id}/execute`, {
         method: 'POST',
         data: payload,
         getResponse: true,
@@ -200,13 +200,13 @@ export async function workflowDefinitionExecute(
 }
 
 /**
- * *TODO* PUT /api/workflow-definitions/{id}/publish 
+ * *TODO* PUT /api/elsa/workflow/definitions/{id}/publish 
  **/
 export async function workflowDefinitionPublish(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-definitions/${id}/publish`, {
+    return request<any>(`/api/elsa/workflow/definitions/${id}/publish`, {
         method: 'PUT',
         getResponse: true,
         ...(options || {}),
@@ -214,13 +214,13 @@ export async function workflowDefinitionPublish(
 }
 
 /**
- * *TODO* PUT /api/workflow-definitions/{id}/unpublish 
+ * *TODO* PUT /api/elsa/workflow/definitions/{id}/unpublish 
  **/
 export async function workflowDefinitionUnPublish(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/workflow-definitions/${id}/unpublish`, {
+    return request<any>(`/api/elsa/workflow/definitions/${id}/unpublish`, {
         method: 'PUT',
         getResponse: true,
         ...(options || {}),

@@ -516,10 +516,11 @@ export const createGraph = (options?: any) => {
         },
         scroller: {
             padding: 40,
+            enabled: false,
         },
         panning: {
             enabled: true,
-            modifiers: 'ctrl',
+            // modifiers: 'ctrl',
         },
         minimap: {
             enabled: true,
@@ -533,6 +534,7 @@ export const createGraph = (options?: any) => {
             enabled: true,
             multiple: true,
             rubberband: true,
+            modifiers: 'ctrl',
         },
         clipboard: {
             enabled: true,

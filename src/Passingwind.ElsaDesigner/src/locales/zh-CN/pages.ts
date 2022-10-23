@@ -141,6 +141,9 @@ export default {
     'page.instance.status.faulted': '已失败',
     'page.instance.status.cancelled': '已取消',
     //
+    'page.variable.field.key': '名称',
+    'page.variable.field.value': '值',
+    //
     'page.settings.email.smtpHost': '主机',
     'page.settings.email.smtpPort': '端口',
     'page.settings.email.smtpUserName': '用户名',

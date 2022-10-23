@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Elsa.Metadata;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.GlobalVariables;
 using Passingwind.Abp.ElsaModule.Workflow;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Passingwind.Abp.ElsaModule.WorkflowInstances;
@@ -72,6 +73,8 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
         CreateMap<WorkflowInstanceActivityData, WorkflowInstanceActivityDataDto>();
 
         CreateMap<WorkflowExecutionLog, WorkflowExecutionLogDto>();
+
+        CreateMap<GlobalVariable, GlobalVariableDto>();
 
     }
 }

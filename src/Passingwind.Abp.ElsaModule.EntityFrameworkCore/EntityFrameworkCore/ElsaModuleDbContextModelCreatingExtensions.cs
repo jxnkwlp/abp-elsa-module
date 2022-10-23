@@ -222,6 +222,15 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
         });
 
+        builder.Entity<GlobalVariable>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "GlobalVariables", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.Property(x => x.Key).HasMaxLength(256).IsRequired();
+            b.HasIndex(x => x.Key);
+        });
+
     }
 
 }

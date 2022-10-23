@@ -26,7 +26,7 @@
     },
     {
         name: 'Instances',
-        icon: 'NodeIndex',
+        icon: 'ClusterOutlined',
         path: '/instances',
         component: './instance',
     },
@@ -38,9 +38,15 @@
     },
     {
         name: 'Definitions',
-        icon: 'BarsOutlined',
+        icon: 'BranchesOutlined',
         path: '/definitions',
         component: './definition',
+    },
+    {
+        name: 'Variables',
+        icon: 'KeyOutlined',
+        path: '/variables',
+        component: './variables',
     },
     {
         name: 'Designer',
@@ -48,6 +54,7 @@
         path: '/designer',
         component: './designer',
     },
+
     //
     {
         path: '/account/change-password',

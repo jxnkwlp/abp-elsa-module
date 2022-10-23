@@ -1,4 +1,4 @@
-import { WorkflowStatus } from '@/services/enums';
+import { WorkflowInstanceStatus } from '@/services/enums';
 import type { API } from '@/services/typings';
 import { getWorkflowDefinitionList } from '@/services/WorkflowDefinition';
 import {
@@ -107,9 +107,9 @@ const Index: React.FC = () => {
                 const menus = [];
 
                 if (
-                    record.workflowStatus == WorkflowStatus.Idle ||
-                    record.workflowStatus == WorkflowStatus.Running ||
-                    record.workflowStatus == WorkflowStatus.Suspended
+                    record.workflowStatus == WorkflowInstanceStatus.Idle ||
+                    record.workflowStatus == WorkflowInstanceStatus.Running ||
+                    record.workflowStatus == WorkflowInstanceStatus.Suspended
                 ) {
                     menus.push(
                         <a
@@ -141,7 +141,7 @@ const Index: React.FC = () => {
                     );
                 }
 
-                if (record.workflowStatus == WorkflowStatus.Faulted) {
+                if (record.workflowStatus == WorkflowInstanceStatus.Faulted) {
                     menus.push(
                         <a
                             key="retry"

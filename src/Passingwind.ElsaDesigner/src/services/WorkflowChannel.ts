@@ -9,12 +9,12 @@ import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/workflows/channels 
+ * *TODO* GET /api/elsa/workflow/channels 
  **/
 export async function getWorkflowChannelList(
     options?: { [key: string]: any }
 ) {
-    return request<API.StringListResult>(`/api/workflows/channels`, {
+    return request<API.StringListResult>(`/api/elsa/workflow/channels`, {
         method: 'GET',
         ...(options || {}),
     });

@@ -1,4 +1,4 @@
-import { WorkflowStatus } from '@/services/enums';
+import { WorkflowInstanceStatus } from '@/services/enums';
 import type { API } from '@/services/typings';
 import { getWorkflowDefinitionVersion } from '@/services/WorkflowDefinition';
 import {
@@ -425,8 +425,8 @@ const Index: React.FC = () => {
                             <Timeline
                                 mode="left"
                                 pending={
-                                    data?.workflowStatus == WorkflowStatus.Running ||
-                                    data?.workflowStatus == WorkflowStatus.Suspended
+                                    data?.workflowStatus == WorkflowInstanceStatus.Running ||
+                                    data?.workflowStatus == WorkflowInstanceStatus.Suspended
                                 }
                                 reverse
                             >

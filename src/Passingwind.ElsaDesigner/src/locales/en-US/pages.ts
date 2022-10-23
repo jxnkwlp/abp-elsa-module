@@ -143,6 +143,9 @@ export default {
     'page.instance.status.faulted': 'Faulted',
     'page.instance.status.cancelled': 'Cancelled',
     //
+    'page.variable.field.key': 'Key',
+    'page.variable.field.value': 'Value',
+    //
     'page.settings.email.smtpHost': 'Host',
     'page.settings.email.smtpPort': 'Port',
     'page.settings.email.smtpUserName': 'User Name',

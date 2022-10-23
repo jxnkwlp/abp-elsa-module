@@ -9,25 +9,25 @@ import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/designer/activity-types 
+ * *TODO* GET /api/elsa/designer/activity-types 
  **/
 export async function getDesignerActivityTypes(
     options?: { [key: string]: any }
 ) {
-    return request<API.ActivityTypeDescriptorListResult>(`/api/designer/activity-types`, {
+    return request<API.ActivityTypeDescriptorListResult>(`/api/elsa/designer/activity-types`, {
         method: 'GET',
         ...(options || {}),
     });
 }
 
 /**
- * *TODO* POST /api/designer/runtime-select-list 
+ * *TODO* POST /api/elsa/designer/runtime-select-list 
  **/
 export async function getDesignerRuntimeSelectListItems(
     payload: API.RuntimeSelectListContext,
     options?: { [key: string]: any }
 ) {
-    return request<API.RuntimeSelectListResult>(`/api/designer/runtime-select-list`, {
+    return request<API.RuntimeSelectListResult>(`/api/elsa/designer/runtime-select-list`, {
         method: 'POST',
         data: payload,
         ...(options || {}),
@@ -35,13 +35,13 @@ export async function getDesignerRuntimeSelectListItems(
 }
 
 /**
- * *TODO* GET /api/designer/scripting/javascript/type-definitions/{id} 
+ * *TODO* GET /api/elsa/designer/scripting/javascript/type-definitions/{id} 
  **/
 export async function getDesignerScriptTypeDefinition(
     id: string,
     options?: { [key: string]: any }
 ) {
-    return request<any>(`/api/designer/scripting/javascript/type-definitions/${id}`, {
+    return request<any>(`/api/elsa/designer/scripting/javascript/type-definitions/${id}`, {
         method: 'GET',
         getResponse: true,
         ...(options || {}),

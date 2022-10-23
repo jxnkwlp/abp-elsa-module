@@ -5,7 +5,7 @@ using Volo.Abp;
 namespace Passingwind.Abp.ElsaModule.Workflow
 {
     [RemoteService]
-    [Route("api/workflows/signals")]
+    [Route("api/elsa/workflows/signals")]
     public class WorkflowSignalController : ElsaModuleController, IWorkflowSignalAppService
     {
         private readonly IWorkflowSignalAppService _service;
