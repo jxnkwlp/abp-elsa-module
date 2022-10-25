@@ -37,6 +37,7 @@ namespace Passingwind.Abp.ElsaModule.Activities
                 .AddJavaScriptTypeDefinitionProvider<CurrentUserTypeDefinitionProvider>()
                 .AddJavaScriptTypeDefinitionProvider<CurrentTenantTypeDefinitionProvider>()
                 .AddJavaScriptTypeDefinitionProvider<ClockTypeDefinitionProvider>()
+                .AddJavaScriptTypeDefinitionProvider<WorkflowFaultedTypeDefinitionProvider>()
                 ;
 
             context.Services.AddBookmarkProvider<WorkflowFaultedBookmarkProvider>();

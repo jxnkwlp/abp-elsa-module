@@ -50,16 +50,20 @@ namespace Passingwind.Abp.ElsaModule.EventHanders
             if (!pendingWorkflows.Any())
                 return;
 
+            var faultedActivityId = instance.Fault.FaultedActivityId;
+            var faultedActivity = workflowBlueprint.Activities.FirstOrDefault(x => x.Id == faultedActivityId);
+
             var inputObj = new Activities.Workflows.WorkflowFaultedInput
             {
                 WorkflowId = instance.Id,
                 WorkflowName = instance.Name,
                 WorkflowVersion = instance.Version,
                 TenantId = instance.TenantId,
-                CurrentActivity = instance.CurrentActivity,
                 Fault = instance.Fault,
                 Input = instance.Input,
                 Variables = instance.Variables,
+                CurrentActivity = instance.CurrentActivity,
+                FaultedActivity = faultedActivity,
             };
 
             foreach (var workflow in pendingWorkflows)

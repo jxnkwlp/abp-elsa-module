@@ -69,8 +69,9 @@ namespace Passingwind.Abp.ElsaModule.Activities.Workflows
         public string TenantId { get; set; }
         public WorkflowInputReference Input { get; set; }
         public WorkflowFault Fault { get; set; }
-        public ScheduledActivity CurrentActivity { get; set; }
         public Variables Variables { get; set; }
+        public ScheduledActivity CurrentActivity { get; set; }
+        public IActivityBlueprint FaultedActivity { get; set; }
     }
 
 }
