@@ -52,14 +52,14 @@ jobs:
               - 'src/**'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore Passingwind.Abp.ElsaModule.sln
 
       - name: Build
-        run: dotnet build --no-restore -c Release
+        run: dotnet build --no-restore -c Release Passingwind.Abp.ElsaModule.sln
 
       - name: Pack
         if: steps.changes.outputs.src == 'true'
-        run: dotnet pack --no-build --no-restore -c Release /p:Version="${{env.GITCI_NEXT_VERSION}}" -o ./pack_output
+        run: dotnet pack --no-build --no-restore -c Release /p:Version="${{env.GITCI_NEXT_VERSION}}" -o ./pack_output  Passingwind.Abp.ElsaModule.sln
 
       - uses: actions/setup-node@v3
         with:
