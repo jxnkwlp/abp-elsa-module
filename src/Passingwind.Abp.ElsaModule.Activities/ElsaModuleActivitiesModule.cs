@@ -46,7 +46,7 @@ namespace Passingwind.Abp.ElsaModule.Activities
 
             context.Services.AddMediatR(typeof(ElsaModuleActivitiesModule).Assembly);
 
-            context.Services.AddOptions<CSharpOptions>("Elsa:CSharp");
+            context.Services.AddOptions<CSharpScriptOptions>("Elsa:CSharp");
         }
 
         public override void PostConfigureServices(ServiceConfigurationContext context)

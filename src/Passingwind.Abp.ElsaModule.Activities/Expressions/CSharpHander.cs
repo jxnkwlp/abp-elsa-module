@@ -13,9 +13,9 @@ namespace Passingwind.Abp.ElsaModule.Expressions
         public string Syntax => "C#";
 
         private readonly ICSharpEvaluator _iCSharpEvaluator;
-        private readonly IOptions<CSharpOptions> _options;
+        private readonly IOptions<CSharpScriptOptions> _options;
 
-        public CSharpHander(ICSharpEvaluator iCSharpEvaluator, IOptions<CSharpOptions> options)
+        public CSharpHander(ICSharpEvaluator iCSharpEvaluator, IOptions<CSharpScriptOptions> options)
         {
             _iCSharpEvaluator = iCSharpEvaluator;
             _options = options;
@@ -23,9 +23,7 @@ namespace Passingwind.Abp.ElsaModule.Expressions
 
         public async Task<object> EvaluateAsync(string expression, Type returnType, ActivityExecutionContext context, CancellationToken cancellationToken)
         {
-            var cSharpEvaluationContext = new CSharpEvaluationContext { Imports = _options.Value.Imports, };
-
-            return await _iCSharpEvaluator.EvaluateAsync(expression, returnType, cSharpEvaluationContext, context, (c) => { }, cancellationToken);
+            return await _iCSharpEvaluator.EvaluateAsync(expression, returnType, context, (c) => { }, cancellationToken);
         }
     }
 }

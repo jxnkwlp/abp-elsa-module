@@ -39,9 +39,9 @@ namespace Passingwind.Abp.ElsaModule.Activities.Scripting
 
 
         private readonly ICSharpEvaluator _iCSharpEvaluator;
-        private readonly IOptions<CSharpOptions> _options;
+        private readonly IOptions<CSharpScriptOptions> _options;
 
-        public RunCSharp(ICSharpEvaluator iCSharpEvaluator, IOptions<CSharpOptions> options)
+        public RunCSharp(ICSharpEvaluator iCSharpEvaluator, IOptions<CSharpScriptOptions> options)
         {
             _iCSharpEvaluator = iCSharpEvaluator;
             _options = options;
@@ -56,18 +56,16 @@ namespace Passingwind.Abp.ElsaModule.Activities.Scripting
 
             var outcomes = new List<string>();
 
-            var cSharpEvaluationContext = new CSharpEvaluationContext { Imports = _options.Value.Imports, };
-
             var setOutcome = (string value) => outcomes.Add(value);
             var setOutcomes = (IEnumerable<string> values) => outcomes.AddRange(values);
 
-            var output = await _iCSharpEvaluator.EvaluateAsync(script, typeof(object), cSharpEvaluationContext, context, (g) =>
+            var output = await _iCSharpEvaluator.EvaluateAsync(script, typeof(object), context, (configure) =>
             {
-                g.Dynamic.SetOutcome = setOutcome;
-                g.Dynamic.SetOutcomes = setOutcomes;
+                configure.EvaluationGlobal.Context.SetOutcome = setOutcome;
+                configure.EvaluationGlobal.Context.SetOutcomes = setOutcomes;
             }, context.CancellationToken);
 
-            if (!outcomes.Any())
+            if (outcomes.Count == 0)
                 outcomes.Add(OutcomeNames.Done);
 
             Output = output;
@@ -87,6 +85,5 @@ namespace Passingwind.Abp.ElsaModule.Activities.Scripting
                 Syntax = "C#",
             };
         }
-
     }
 }

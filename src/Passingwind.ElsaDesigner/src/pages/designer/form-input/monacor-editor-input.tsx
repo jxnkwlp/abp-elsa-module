@@ -14,6 +14,7 @@ type MonacorEditorInputProps = {
     height?: number;
     options?: monaco.editor.IStandaloneEditorConstructionOptions;
     getJavaScriptLibs?: () => Promise<{ content: string; filePath: string }[]>;
+    getCSharpLibs?: () => Promise<{ content: string; filePath: string }[]>;
 };
 
 const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
@@ -57,7 +58,27 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                     );
                 });
             }
+        } else if (props.getCSharpLibs) {
+            // const libs = await props.getCSharpLibs();
+            // if (libs?.length > 0) {
+            //     //monaco.languages.typescript.javascriptDefaults.setExtraLibs(libs ?? []);
+            //     libs.forEach((x) => {
+            //         const oldModel = monaco.editor.getModel(monaco.Uri.parse(x.filePath));
+            //         if (oldModel) oldModel.dispose();
+            //         monaco.editor.createModel(
+            //             x.content,
+            //             'typescript',
+            //             monaco.Uri.parse(x.filePath),
+            //         );
+            //     });
+            // }
         }
+
+        monaco.editor.createModel(
+            'public void add(int x,int y);',
+            'csharp',
+            monaco.Uri.parse('file://1.cs'),
+        );
     };
 
     useEffect(() => {

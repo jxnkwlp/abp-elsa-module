@@ -7,6 +7,6 @@ namespace Passingwind.Abp.ElsaModule.Services
 {
     public interface ICSharpEvaluator
     {
-        Task<object> EvaluateAsync(string expression, Type returnType, CSharpEvaluationContext evaluationContext, ActivityExecutionContext executionContext, Action<CSharpEvaluationGlobal> globalConfigure, CancellationToken cancellationToken = default);
+        Task<object> EvaluateAsync(string expression, Type returnType, ActivityExecutionContext executionContext, Action<CSharpEvaluationContext> configure, CancellationToken cancellationToken = default);
     }
 }

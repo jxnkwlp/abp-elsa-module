@@ -94,6 +94,7 @@ export const getNodeTypeData = async (): Promise<NodeTypeGroup[]> => {
 };
 
 export const getEditorLanguage = (syntax: string): string => {
+    console.log(syntax);
     switch (syntax) {
         case 'JavaScript':
             return 'javascript';
@@ -103,6 +104,8 @@ export const getEditorLanguage = (syntax: string): string => {
             return 'liquid';
         case 'SQL':
             return 'sql';
+        case 'C#':
+            return 'csharp';
         case 'Literal':
         default:
             return 'plaintext';

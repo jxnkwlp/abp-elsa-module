@@ -90,13 +90,13 @@
         ],
     },
 
-    // //
-    // {
-    //     path: '/test',
-    //     name: 'test page',
-    //     icon: 'smile',
-    //     component: './test',
-    // },
+    //
+    {
+        path: '/test',
+        name: 'test page',
+        icon: 'smile',
+        component: './test',
+    },
 
     //
     {

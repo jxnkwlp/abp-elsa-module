@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Elsa.Services.Models;
 using MediatR;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.Extensions.Options;
 
 // https://github.com/dotnet/roslyn/blob/main/docs/wiki/Scripting-API-Samples.md
 
@@ -15,31 +15,41 @@ namespace Passingwind.Abp.ElsaModule.Services
     public class CSharpEvaluator : ICSharpEvaluator
     {
         private readonly IMediator _mediator;
+        private readonly IOptions<CSharpScriptOptions> _options;
 
-        public CSharpEvaluator(IMediator mediator)
+        public CSharpEvaluator(IMediator mediator, IOptions<CSharpScriptOptions> options)
         {
             _mediator = mediator;
+            _options = options;
         }
 
-        public async Task<object> EvaluateAsync(string expression, Type returnType, CSharpEvaluationContext evaluationContext, ActivityExecutionContext executionContext, Action<CSharpEvaluationGlobal> globalConfigure, CancellationToken cancellationToken = default)
+        public async Task<object> EvaluateAsync(string expression, Type returnType, ActivityExecutionContext executionContext, Action<CSharpEvaluationContext> configure, CancellationToken cancellationToken = default)
         {
-            var options = CreateDefaultOptions();
-
-            if (evaluationContext.Imports?.Any() == true)
-                options.AddImports(evaluationContext.Imports);
-
             string programText = expression;
 
-            var input = new CSharpEvaluationGlobal
-            {
-                Context = executionContext
-            };
 
-            await _mediator.Publish(new CSharpEvaluattionEvent() { EvaluationContext = evaluationContext, ProgramText = programText });
+            var engineOptions = CreateDefaultOptions();
+            var context = new CSharpEvaluationContext(_options.Value, engineOptions, );
+
+            var notification = new CSharpEvaluationContextConfigureEventNotification();
+            await _mediator.Publish(notification);
+
+            var global = new CSharpEvaluationGlobal();
+
+            foreach (var item in notification.GlobalValues)
+            {
+                global.Context[item.Key] = item.Value;
+            }
 
             try
             {
-                var result = await CSharpScript.RunAsync(programText, options, globals: input, cancellationToken: cancellationToken);
+
+
+                var script =   CSharpScript.Create(programText, context.EngineOptions, context.EvaluationGlobal.GetType());
+
+                script.RunAsync(context.EvaluationGlobal);
+
+                var result = await CSharpScript.RunAsync(programText, context.EngineOptions, globals: context.EvaluationGlobal, cancellationToken: cancellationToken);
                 return result?.ReturnValue;
             }
             catch (CompilationErrorException e)
@@ -86,28 +96,5 @@ namespace Passingwind.Abp.ElsaModule.Services
 
             return options;
         }
-    }
-
-    public class CSharpEvaluationGlobal
-    {
-        public ActivityExecutionContext Context { get; set; }
-
-        public object GetVariable(string name) => Context.GetVariable(name);
-
-        public void SetVariable(string name, object value) => Context.SetVariable(name, value);
-
-        public dynamic Dynamic { get; set; }
-    }
-
-    public class CSharpEvaluationContext
-    {
-        public string[] Imports { get; set; }
-    }
-
-    public class CSharpEvaluattionEvent : INotification
-    {
-        public CSharpEvaluationContext EvaluationContext { get; set; }
-
-        public string ProgramText { get; set; }
     }
 }
