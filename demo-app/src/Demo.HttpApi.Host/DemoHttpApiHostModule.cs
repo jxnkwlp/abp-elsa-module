@@ -15,8 +15,9 @@ using Elsa.Activities.Sql.Extensions;
 using Elsa.Activities.UserTask.Extensions;
 using Elsa.Scripting.JavaScript.Options;
 using Elsa.Scripting.JavaScript.Providers;
-using Elsa.Services;
 using Hangfire;
+using Hangfire.Annotations;
+using Hangfire.Dashboard;
 using Hangfire.MemoryStorage;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -108,7 +109,11 @@ public class DemoHttpApiHostModule : AbpModule
                 config.UseMemoryStorage();
             }
         });
-        context.Services.AddHangfireServer();
+        context.Services.AddHangfireServer(options =>
+        {
+            // hangfire default
+            // options.SchedulePollingInterval = TimeSpan.FromSeconds(15);
+        });
 
         context.Services.AddAbpApiVersioning(c => { });
 
@@ -138,7 +143,7 @@ public class DemoHttpApiHostModule : AbpModule
         });
 
         // Mediator.
-        context.Services.AddMediatR(typeof(Program).Assembly); 
+        context.Services.AddMediatR(typeof(Program).Assembly);
     }
 
     public override void PostConfigureServices(ServiceConfigurationContext context)
@@ -419,6 +424,7 @@ public class DemoHttpApiHostModule : AbpModule
         app.UseRouting();
         app.UseCors();
         app.UseAuthentication();
+        app.UseHangfireDashboard(options: new DashboardOptions() { IgnoreAntiforgeryToken = true, Authorization = new[] { new HangfireDashboardAsyncAuthorizationFilter() } });
 
         if (MultiTenancyConsts.IsEnabled)
         {
@@ -495,6 +501,14 @@ public class DemoHttpApiHostModule : AbpModule
                     }
                 );
             }
+        }
+    }
+
+    private class HangfireDashboardAsyncAuthorizationFilter : IDashboardAuthorizationFilter
+    {
+        public bool Authorize([NotNull] DashboardContext context)
+        {
+            return context.GetHttpContext().User?.Identity?.IsAuthenticated ?? false;
         }
     }
 }

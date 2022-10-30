@@ -18,26 +18,24 @@ import type { Node } from '@antv/x6';
 import {
     Button,
     Card,
-    Col,
     Dropdown,
     Form,
     Menu,
     message,
     Modal,
     Popconfirm,
-    Row,
     Space,
     Spin,
     Tag,
-    Typography,
     Upload,
 } from 'antd';
 import type { RcFile } from 'antd/lib/upload';
 import { isArray } from 'lodash';
 import React, { useEffect, useRef } from 'react';
-import { MonacoDiffEditor } from 'react-monaco-editor';
+import MonacoEditor, { MonacoDiffEditor } from 'react-monaco-editor';
 import { useHistory, useIntl, useLocation } from 'umi';
 import EditFormItems from '../definition/edit-form-items';
+import definitionJsonSchema from './definition-json-schema';
 import type { FlowActionType } from './flow';
 import Flow from './flow';
 import './index.less';
@@ -98,6 +96,10 @@ const Index: React.FC = () => {
     const [versionDiffModalVisible, setVersionDiffModalVisible] = React.useState<boolean>(false);
     const [versionDiffData, setVersionDiffData] =
         React.useState<{ source: string; target: string }>();
+
+    const [jsonEditorVisible, setJsonEditorVisible] = React.useState<boolean>(false);
+    const [jsonEditorValue, setJsonEditorValue] = React.useState<string>('');
+    const jsonEditorRef = React.createRef<MonacoEditor>();
 
     const loadServerData = async (
         definiton: API.WorkflowDefinitionVersion,
@@ -529,7 +531,7 @@ const Index: React.FC = () => {
         const loading = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
 
         const sourceVersion = await getWorkflowDefinitionVersion(id!, sourceVersionNumber);
-        let targetVersion: API.WorkflowDefinitionVersion | undefined = undefined;
+        let targetVersion: API.WorkflowDefinitionVersion;
         if (targetVersionNumber) {
             targetVersion = await getWorkflowDefinitionVersion(id!, targetVersionNumber);
         } else {
@@ -541,28 +543,83 @@ const Index: React.FC = () => {
             return;
         }
 
-        setVersionDiffData({
-            source: JSON.stringify(
-                { activities: sourceVersion.activities, connections: sourceVersion.connections },
-                null,
-                2,
-            ),
-            target: JSON.stringify(
-                { activities: targetVersion.activities, connections: targetVersion.connections },
-                null,
-                2,
-            ),
-        });
-        setVersionDiffModalTitle(
-            intl.formatMessage(
-                {
-                    id: 'page.definition.versions.comparison.label',
-                },
-                { v1: sourceVersionNumber, v2: targetVersion.version },
-            ),
+        const sourceContent = JSON.stringify(
+            {
+                version: targetVersion.version,
+                activities: targetVersion.activities,
+                connections: targetVersion.connections,
+            },
+            null,
+            2,
         );
+        const targetContent = JSON.stringify(
+            {
+                version: sourceVersionNumber,
+                activities: sourceVersion.activities,
+                connections: sourceVersion.connections,
+            },
+            null,
+            2,
+        );
+
+        if (sourceVersionNumber > targetVersion.version!) {
+            setVersionDiffData({ source: sourceContent, target: targetContent });
+            setVersionDiffModalTitle(
+                intl.formatMessage(
+                    {
+                        id: 'page.definition.versions.comparison.label',
+                    },
+                    { v1: targetVersion.version, v2: sourceVersionNumber },
+                ),
+            );
+        } else {
+            setVersionDiffData({ source: targetContent, target: sourceContent });
+            setVersionDiffModalTitle(
+                intl.formatMessage(
+                    {
+                        id: 'page.definition.versions.comparison.label',
+                    },
+                    { v1: sourceVersionNumber, v2: targetVersion.version },
+                ),
+            );
+        }
+
         setVersionDiffModalVisible(true);
         loading();
+    };
+
+    const switchJsonEditor = async () => {
+        setLoading(true);
+        if (!jsonEditorVisible) {
+            const result = await flowAction.current?.getGraphData();
+            if (result) {
+                const result2 = conventToServerData(result);
+                setJsonEditorValue(JSON.stringify(result2, null, 2));
+                setJsonEditorVisible(true);
+            } else {
+                message.error('Get graph data failed');
+            }
+        } else {
+            setJsonEditorVisible(false);
+            try {
+                const data = JSON.parse(jsonEditorValue);
+                const data2 = { connections: [], activities: data.activities };
+                if (data?.connections) {
+                    data2.connections = data.connections?.map((x: any) => {
+                        return {
+                            sourceId: x.sourceId ?? x.sourceActivityId,
+                            targetId: x.targetId ?? x.targetActivityId,
+                            outcome: x.outcome,
+                        };
+                    });
+                }
+
+                await loadServerData(data2 as API.WorkflowDefinition, false);
+            } catch (error) {
+                message.error('Transform json failed');
+            }
+        }
+        setLoading(false);
     };
 
     const loadData = async (did: string, version?: number) => {
@@ -599,9 +656,9 @@ const Index: React.FC = () => {
         <PageContainer>
             <Card
                 onKeyDown={async (e) => {
-                    e.preventDefault();
                     const charCode = String.fromCharCode(e.which).toLowerCase();
                     if ((e.ctrlKey || e.metaKey) && charCode === 's') {
+                        e.preventDefault();
                         console.log('ctrl+s');
                         if (definition?.name) {
                             await handleSaveGraphData();
@@ -627,6 +684,17 @@ const Index: React.FC = () => {
                 extra={
                     <Space>
                         <Button
+                            type="primary"
+                            disabled={!definition?.name}
+                            loading={submiting}
+                            icon={<GlobalOutlined />}
+                            onClick={async () => {
+                                await handleSaveGraphData(true);
+                            }}
+                        >
+                            {intl.formatMessage({ id: 'page.definition.publish' })}
+                        </Button>
+                        <Button
                             type="default"
                             disabled={!definition?.name}
                             loading={submiting}
@@ -636,17 +704,6 @@ const Index: React.FC = () => {
                             }}
                         >
                             {intl.formatMessage({ id: 'common.dict.save' })}
-                        </Button>
-                        <Button
-                            type="default"
-                            disabled={!definition?.name}
-                            loading={submiting}
-                            icon={<GlobalOutlined />}
-                            onClick={async () => {
-                                await handleSaveGraphData(true);
-                            }}
-                        >
-                            {intl.formatMessage({ id: 'page.definition.publish' })}
                         </Button>
 
                         <Dropdown.Button
@@ -664,7 +721,7 @@ const Index: React.FC = () => {
                             overlay={
                                 <Menu>
                                     <Menu.Item
-                                        key="1"
+                                        key="versions"
                                         onClick={() => {
                                             setVersionListModalVisible(true);
                                         }}
@@ -674,14 +731,29 @@ const Index: React.FC = () => {
                                     </Menu.Item>
                                     <Menu.Divider />
                                     <Menu.Item
-                                        key="2"
+                                        key="jsoneditor"
+                                        onClick={async () => {
+                                            await switchJsonEditor();
+                                        }}
+                                    >
+                                        {jsonEditorVisible
+                                            ? intl.formatMessage({
+                                                  id: 'page.definition.hideJsoneditor',
+                                              })
+                                            : intl.formatMessage({
+                                                  id: 'page.definition.showJsoneditor',
+                                              })}
+                                    </Menu.Item>
+                                    <Menu.Divider />
+                                    <Menu.Item
+                                        key="export"
                                         onClick={() => {
                                             handleOnExport();
                                         }}
                                     >
                                         {intl.formatMessage({ id: 'common.dict.export' })}
                                     </Menu.Item>
-                                    <Menu.Item key="3">
+                                    <Menu.Item key="import">
                                         <Upload
                                             accept=".json"
                                             showUploadList={false}
@@ -703,11 +775,47 @@ const Index: React.FC = () => {
                 }
             >
                 <Spin spinning={loading}>
-                    <Flow
-                        actionRef={flowAction}
-                        graphData={graphData}
-                        onNodeDoubleClick={handleOnShowNodeEditForm}
-                    />
+                    {jsonEditorVisible ? (
+                        <div key="jsonEditorWapper" style={{ height: 'calc(100vh - 210px)' }}>
+                            <MonacoEditor
+                                ref={jsonEditorRef}
+                                language="json"
+                                defaultValue={jsonEditorValue}
+                                onChange={(value) => {
+                                    setJsonEditorValue(value);
+                                }}
+                                options={{
+                                    minimap: { enabled: true },
+                                    wordWrap: 'bounded',
+                                    wordWrapColumn: 1024,
+                                    automaticLayout: true,
+                                    autoIndent: 'full',
+                                    tabSize: 2,
+                                    autoClosingBrackets: 'languageDefined',
+                                    foldingStrategy: 'auto',
+                                    readOnly: false,
+                                }}
+                                editorDidMount={(e, m) => {
+                                    m.languages.json.jsonDefaults.setDiagnosticsOptions({
+                                        validate: true,
+                                        schemas: [
+                                            {
+                                                uri: 'http://myserver/definitionJsonSchema.json',
+                                                fileMatch: [e.getModel()!.uri?.toString()],
+                                                schema: definitionJsonSchema,
+                                            },
+                                        ],
+                                    });
+                                }}
+                            />
+                        </div>
+                    ) : (
+                        <Flow
+                            actionRef={flowAction}
+                            graphData={graphData}
+                            onNodeDoubleClick={handleOnShowNodeEditForm}
+                        />
+                    )}
                 </Spin>
             </Card>
             {/*  */}
@@ -943,18 +1051,19 @@ const Index: React.FC = () => {
                 width="90%"
                 destroyOnClose
             >
-                <MonacoDiffEditor
-                    height="600"
-                    language="json"
-                    original={versionDiffData?.source}
-                    value={versionDiffData?.target}
-                    options={{
-                        automaticLayout: true,
-                        autoIndent: 'keep',
-                        autoClosingBrackets: 'languageDefined',
-                        foldingStrategy: 'auto',
-                    }}
-                />
+                <div style={{ height: 'calc(100vh - 150px)' }}>
+                    <MonacoDiffEditor
+                        language="json"
+                        original={versionDiffData?.source}
+                        value={versionDiffData?.target}
+                        options={{
+                            automaticLayout: true,
+                            autoIndent: 'keep',
+                            autoClosingBrackets: 'languageDefined',
+                            foldingStrategy: 'auto',
+                        }}
+                    />
+                </div>
             </Modal>
         </PageContainer>
     );

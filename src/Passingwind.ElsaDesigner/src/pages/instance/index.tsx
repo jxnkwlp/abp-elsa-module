@@ -59,12 +59,13 @@ const Index: React.FC = () => {
             dataIndex: 'version',
             title: intl.formatMessage({ id: 'page.instance.field.version' }),
             valueType: 'digit',
-            width: 80,
+            width: 100,
         },
         {
             dataIndex: 'workflowStatus',
             title: intl.formatMessage({ id: 'page.instance.field.workflowStatus' }),
             valueEnum: workflowStatusEnum,
+            width: 150,
             // valueEnum: getWorkflowStatusEnum(),
         },
         {

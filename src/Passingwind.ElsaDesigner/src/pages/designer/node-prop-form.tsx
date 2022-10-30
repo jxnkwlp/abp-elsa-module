@@ -464,7 +464,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                 <ProFormSelect
                                     key={'propertyStorageProviders_' + item.name}
                                     name={['propertyStorageProviders', item.name]}
-                                    label={item.name}
+                                    label={item.label}
                                     options={[
                                         {
                                             label: intl.formatMessage({

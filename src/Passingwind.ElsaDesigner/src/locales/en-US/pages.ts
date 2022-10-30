@@ -75,6 +75,8 @@ export default {
     'page.definition.latest': 'Latest',
     'page.definition.published': 'Published',
     'page.definition.settings': 'Settings',
+    'page.definition.showJsoneditor': 'JSON Editor',
+    'page.definition.hideJsoneditor': 'Hide JSON Editor',
     'page.definition.versions': 'Versions',
     'page.definition.versions.no-select': 'Please select a version',
     'page.definition.versions.comparison-latest': 'Latest',

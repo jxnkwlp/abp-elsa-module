@@ -337,7 +337,7 @@ const Index: React.FC = () => {
             </ProCard>
 
             <Row gutter={16}>
-                <Col span={14}>
+                <Col span={14} md={14} sm={24}>
                     <Card title={intl.formatMessage({ id: 'page.instance.graph' })}>
                         <Flow
                             readonly
@@ -360,7 +360,7 @@ const Index: React.FC = () => {
                         />
                     </Card>
                 </Col>
-                <Col span={10}>
+                <Col span={10} md={10} sm={24}>
                     <Card
                         title=""
                         activeTabKey={tabKey}

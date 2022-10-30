@@ -19,8 +19,4 @@
         <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Domain\Passingwind.Abp.ElsaModule.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Bookmarks\" />
-    </ItemGroup>
-
 </Project>
