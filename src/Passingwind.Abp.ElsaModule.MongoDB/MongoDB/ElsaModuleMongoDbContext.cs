@@ -14,6 +14,7 @@ public class ElsaModuleMongoDbContext : AbpMongoDbContext, IElsaModuleMongoDbCon
     public IMongoCollection<WorkflowDefinitionVersion> WorkflowDefinitionVersions => Collection<WorkflowDefinitionVersion>();
     public IMongoCollection<WorkflowExecutionLog> WorkflowExecutionLogs => Collection<WorkflowExecutionLog>();
     public IMongoCollection<WorkflowInstance> WorkflowInstances => Collection<WorkflowInstance>();
+    public IMongoCollection<GlobalVariable> GlobalVariables => Collection<GlobalVariable>();
 
 
     protected override void CreateModel(IMongoModelBuilder modelBuilder)

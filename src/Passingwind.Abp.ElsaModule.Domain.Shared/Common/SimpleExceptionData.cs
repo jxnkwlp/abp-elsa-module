@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Passingwind.Abp.ElsaModule.Common
 {
     public class SimpleExceptionData
     {
-        public SimpleExceptionData(string type, string message, string stackTrace, Dictionary<string, object> data)
+        public SimpleExceptionData(Type type, string message, string stackTrace, Dictionary<string, object> data)
         {
             Type = type;
             Message = message;
@@ -12,7 +13,7 @@ namespace Passingwind.Abp.ElsaModule.Common
             Data = data;
         }
 
-        public string Type { get; set; }
+        public Type Type { get; set; }
         public string Message { get; set; }
         public string StackTrace { get; set; }
         public Dictionary<string, object> Data { get; set; }

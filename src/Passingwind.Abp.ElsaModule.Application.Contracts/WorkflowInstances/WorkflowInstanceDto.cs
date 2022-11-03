@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Elsa.Models;
 using Elsa.Services.Models;
 using Passingwind.Abp.ElsaModule.Common;
 using Volo.Abp.Application.Dtos;
@@ -31,7 +30,7 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         public WorkflowInputReference Input { get; set; }
         public WorkflowOutputReference Output { get; set; }
         public WorkflowInstanceScheduledActivityDto CurrentActivity { get; set; }
-        public WorkflowFault Fault { get; set; }
+        public List<WorkflowInstanceFaultDto> Faults { get; set; }
 
         public Dictionary<string, object> Variables { get; set; }
         public Dictionary<string, object> Metadata { get; set; }

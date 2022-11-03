@@ -35,6 +35,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Passingwind.Abp.ElsaModule;
 using Passingwind.Abp.ElsaModule.Activities;
+using Passingwind.Abp.ElsaModule.MongoDB;
 using Passingwind.Abp.ElsaModule.Services;
 using StackExchange.Redis;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -72,6 +73,7 @@ namespace Demo;
     typeof(AbpSwashbuckleModule),
     typeof(AbpMailKitModule)
 )]
+[DependsOn(typeof(ElsaModuleMongoDbModule))]
 public class DemoHttpApiHostModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)

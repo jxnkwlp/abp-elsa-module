@@ -51,6 +51,7 @@ declare namespace API {
         name?: string | undefined;
         type?: any | undefined;
         hint?: string | undefined;
+        isBrowsable?: boolean | undefined;
         defaultWorkflowStorageProvider?: string | undefined;
         disableWorkflowProviderSelection?: boolean | undefined;
     };
@@ -81,17 +82,6 @@ declare namespace API {
     type WorkflowContextOptions = {
         contextType?: any | undefined;
         contextFidelity?: Enum.WorkflowContextFidelity | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type WorkflowFault = {
-        exception?: SimpleException | undefined;
-        message?: string | undefined;
-        faultedActivityId?: string | undefined;
-        activityInput?: any | undefined;
-        resuming?: boolean | undefined;
     };
 
     /**
@@ -132,6 +122,18 @@ declare namespace API {
         message?: string | undefined;
         source?: string | undefined;
         data?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowInstanceFault = {
+        id?: string | undefined;
+        faultedActivityId?: string | undefined;
+        resuming?: boolean | undefined;
+        activityInput?: any | undefined;
+        message?: string | undefined;
+        exception?: SimpleException | undefined;
     };
 
     /**
@@ -437,7 +439,7 @@ declare namespace API {
         input?: WorkflowInputReference | undefined;
         output?: WorkflowOutputReference | undefined;
         currentActivity?: WorkflowInstanceScheduledActivity | undefined;
-        fault?: WorkflowFault | undefined;
+        faults?: WorkflowInstanceFault[] | undefined;
         variables?: any | undefined;
         metadata?: any | undefined;
         scheduledActivities?: WorkflowInstanceScheduledActivity[] | undefined;
@@ -475,7 +477,7 @@ declare namespace API {
         workflowDefinitionVersionId?: string | undefined;
         name?: string | undefined;
         version?: number | undefined;
-        workflowStatus?: number | undefined;
+        workflowStatus?: Enum.WorkflowInstanceStatus | undefined;
         correlationId?: string | undefined;
         contextType?: string | undefined;
         contextId?: string | undefined;
@@ -483,7 +485,6 @@ declare namespace API {
         finishedTime?: string | undefined;
         cancelledTime?: string | undefined;
         faultedTime?: string | undefined;
-        fault?: WorkflowFault | undefined;
     };
 
     /**

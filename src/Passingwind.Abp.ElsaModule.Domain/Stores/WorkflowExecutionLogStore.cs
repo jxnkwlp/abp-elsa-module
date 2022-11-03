@@ -38,20 +38,13 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         protected override async Task<Expression<Func<WorkflowExecutionLog, bool>>> MapSpecificationAsync(ISpecification<WorkflowExecutionLogRecordModel> specification)
         {
-            if (specification is ActivityIdSpecification activityIdSpecification)
+            return specification switch
             {
-                return x => x.ActivityId == Guid.Parse(activityIdSpecification.ActivityId);
-            }
-            else if (specification is ActivityTypeSpecification activityTypeSpecification)
-            {
-                return x => x.ActivityType == activityTypeSpecification.ActivityType;
-            }
-            else if (specification is WorkflowInstanceIdSpecification workflowInstanceIdSpecification)
-            {
-                return x => x.WorkflowInstanceId == Guid.Parse(workflowInstanceIdSpecification.WorkflowInstanceId);
-            }
-            else
-                return await base.MapSpecificationAsync(specification);
+                ActivityIdSpecification activityIdSpecification => x => x.ActivityId == Guid.Parse(activityIdSpecification.ActivityId),
+                ActivityTypeSpecification activityTypeSpecification => x => x.ActivityType == activityTypeSpecification.ActivityType,
+                WorkflowInstanceIdSpecification workflowInstanceIdSpecification => x => x.WorkflowInstanceId == Guid.Parse(workflowInstanceIdSpecification.WorkflowInstanceId),
+                _ => await base.MapSpecificationAsync(specification)
+            };
         }
 
         protected override Guid ConvertKey(string value)
