@@ -130,13 +130,18 @@ const Index: React.FC = () => {
                     onClick={() => {
                         setEditModalData(
                             Object.assign({}, record, {
-                                variablesString: JSON.stringify(record.variables ?? {}),
+                                variablesString: JSON.stringify(record.variables ?? {}, null, 2),
                             }),
                         );
                         setEditModalDataId(record.id);
-                        setEditModalVisible(true);
                         setEditModalTitle(
-                            `${intl.formatMessage({ id: 'common.dict.edit' })} ${record.name}`,
+                            `${intl.formatMessage({ id: 'common.dict.edit' })} - ${record.name}`,
+                        );
+                        setEditModalVisible(true);
+                        editForm.setFieldsValue(
+                            Object.assign({}, record, {
+                                variablesString: JSON.stringify(record.variables ?? {}, null, 2),
+                            }),
                         );
                     }}
                 >
@@ -236,17 +241,17 @@ const Index: React.FC = () => {
 
             {/*  */}
             <ModalForm
-                layout="horizontal"
                 form={editForm}
-                preserve={false}
-                labelCol={{ span: 5 }}
-                width={650}
-                labelWrap
                 title={editModalTitle}
                 visible={editModalVisible}
                 modalProps={{ destroyOnClose: true, maskClosable: false }}
+                preserve={false}
                 onVisibleChange={setEditModalVisible}
                 initialValues={editModalData}
+                labelCol={{ span: 5 }}
+                width={650}
+                labelWrap
+                layout="horizontal"
                 onValuesChange={(value) => {
                     if (value.displayName) {
                         editForm.setFieldsValue({
@@ -279,6 +284,7 @@ const Index: React.FC = () => {
             {/*  */}
             <ModalForm
                 layout="horizontal"
+                modalProps={{ destroyOnClose: true, maskClosable: false }}
                 preserve={false}
                 labelCol={{ span: 5 }}
                 width={600}
@@ -287,7 +293,6 @@ const Index: React.FC = () => {
                     id: 'page.definition.dispatch',
                 })}
                 visible={dispatchFormVisible}
-                modalProps={{ destroyOnClose: true, maskClosable: false }}
                 onVisibleChange={setDispatchFormVisible}
                 onFinish={async (value) => {
                     const result = await workflowDefinitionDispatch(dispatchId!, value);

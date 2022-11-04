@@ -57,11 +57,9 @@ const EditFormItems: React.FC = () => {
                         key: 'variables',
                         label: intl.formatMessage({ id: 'page.definition.edit.variables' }),
                         children: (
-                            <>
-                                <ProForm.Item name="variablesString">
-                                    <MonacorEditorInput language="json" height={300} />
-                                </ProForm.Item>
-                            </>
+                            <ProForm.Item name="variablesString">
+                                <MonacorEditorInput language="json" height={300} />
+                            </ProForm.Item>
                         ),
                     },
                     {

@@ -72,7 +72,7 @@ public class DemoDbContext :
         builder.ConfigureFeatureManagement();
         builder.ConfigureTenantManagement();
 
-        //builder.ConfigureElsaModule();
+        builder.ConfigureElsaModule();
 
         /* Configure your own tables/entities inside here */
 

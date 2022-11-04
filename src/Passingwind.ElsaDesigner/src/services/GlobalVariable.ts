@@ -68,6 +68,7 @@ export async function getGlobalVariableByKey(
 export async function getGlobalVariableList(
     params: {
         filter?: string | undefined,
+        isSecret?: boolean | undefined,
         skipCount?: number | undefined,
         maxResultCount?: number | undefined
     },

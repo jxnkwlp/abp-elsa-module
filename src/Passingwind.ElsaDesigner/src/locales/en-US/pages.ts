@@ -147,6 +147,8 @@ export default {
     //
     'page.variable.field.key': 'Key',
     'page.variable.field.value': 'Value',
+    'page.variable.field.isSecret': 'Secret',
+    'page.variable.field.isSecret.tooltip': 'Set as secret, the value will not be visible in the list and editing, only modify or delete operations',
     //
     'page.settings.email.smtpHost': 'Host',
     'page.settings.email.smtpPort': 'Port',

@@ -7,5 +7,6 @@ namespace Passingwind.Abp.ElsaModule.GlobalVariables
     {
         public string Key { get; set; }
         public string Value { get; set; }
+        public bool IsSecret { get; set; }
     }
 }

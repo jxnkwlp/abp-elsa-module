@@ -4,22 +4,20 @@ import {
     getGlobalVariableList,
     updateGlobalVariable,
 } from '@/services/GlobalVariable';
-import { getRoleList } from '@/services/Role';
 import type { API } from '@/services/typings';
-import { ActionType, ProColumnType, ProFormTextArea } from '@ant-design/pro-components';
+import { ActionType, ProColumnType, ProForm } from '@ant-design/pro-components';
 import {
     ModalForm,
     PageContainer,
-    ProFormCheckbox,
-    ProFormSelect,
     ProFormSwitch,
     ProFormText,
+    ProFormTextArea,
     ProTable,
 } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Tag } from 'antd';
-import moment from 'moment';
+import { Button, message, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
 import { formatMessage, useIntl } from 'umi';
+import MonacorEditorInput from '../designer/form-input/monacor-editor-input';
 
 const handleAdd = async (data: any) => {
     const response = await createGlobalVariable(data);
@@ -71,17 +69,25 @@ const Index: React.FC = () => {
             width: 200,
         },
         {
+            dataIndex: 'isSecret',
+            title: intl.formatMessage({ id: 'page.variable.field.isSecret' }),
+            search: false,
+            align: 'center',
+            renderText: (_) => {
+                return _ ? 'Y' : 'N';
+            },
+            width: 150,
+        },
+        {
             dataIndex: 'value',
             title: intl.formatMessage({ id: 'page.variable.field.value' }),
             search: false,
             ellipsis: true,
-            width: 600,
         },
         {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
-            align: 'center',
-            width: 100,
+            width: 130,
             render: (text, record, _, action) => [
                 <a
                     key="edit"
@@ -157,7 +163,7 @@ const Index: React.FC = () => {
 
             <ModalForm
                 title={editModalTitle}
-                width="600px"
+                width={650}
                 visible={editModalVisible}
                 modalProps={{ destroyOnClose: true, maskClosable: false }}
                 preserve={false}
@@ -178,9 +184,9 @@ const Index: React.FC = () => {
                         actionRef.current?.reload();
                     }
                 }}
-                layout="horizontal"
+                layout="vertical"
                 labelWrap
-                labelCol={{ span: 3 }}
+                labelCol={{ span: 4 }}
             >
                 <ProFormText
                     rules={[{ required: true }, { max: 64 }, { pattern: /^\w+$/ }]}
@@ -188,14 +194,26 @@ const Index: React.FC = () => {
                     label={intl.formatMessage({ id: 'page.variable.field.key' })}
                     disabled={!!editModalDataId}
                 />
-                <ProFormTextArea
+                <ProFormSwitch
+                    rules={[{ required: false }]}
+                    name="isSecret"
+                    label={intl.formatMessage({ id: 'page.variable.field.isSecret' })}
+                    extra={intl.formatMessage({ id: 'page.variable.field.isSecret.tooltip' })}
+                />
+                {/* <ProFormTextArea
                     rules={[{ required: false }]}
                     name="value"
                     label={intl.formatMessage({ id: 'page.variable.field.value' })}
                     fieldProps={{
                         autoSize: { minRows: 2, maxRows: 20 },
                     }}
-                />
+                /> */}
+                <ProForm.Item
+                    name="value"
+                    label={intl.formatMessage({ id: 'page.variable.field.value' })}
+                >
+                    <MonacorEditorInput height={150} />
+                </ProForm.Item>
             </ModalForm>
         </PageContainer>
     );
