@@ -26,6 +26,7 @@ public class ElsaModuleEntityFrameworkCoreModule : AbpModule
                                                                                 .Include(c => c.ScheduledActivities)
                                                                                 .Include(c => c.Metadata)
                                                                                 .Include(c => c.Variables)
+                                                                                .Include(c => c.Faults)
                                                                                 );
         });
 

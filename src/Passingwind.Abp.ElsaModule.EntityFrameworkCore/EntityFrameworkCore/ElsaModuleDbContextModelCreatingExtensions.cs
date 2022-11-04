@@ -210,6 +210,17 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Value).HasConversion(new ElsaEFJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
         });
 
+        builder.Entity<WorkflowInstanceFault>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceFaults", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.HasKey(x => new { x.Id, x.WorkflowInstanceId });
+
+            b.Property(x => x.ActivityInput).HasConversion(new ElsaEFJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
+            b.Property(x => x.Exception).HasConversion(new ElsaEFJsonValueConverter<Elsa.Models.SimpleException>(), ValueComparer.CreateDefault(typeof(Elsa.Models.SimpleException), false));
+        });
+
         builder.Entity<WorkflowExecutionLog>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowExecutionLogs", ElsaModuleDbProperties.DbSchema);

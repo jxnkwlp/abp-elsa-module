@@ -163,7 +163,7 @@ namespace Passingwind.Abp.ElsaModule.Common
                     Outcomes = logs.Where(x => x.Data?.ContainsKey("Outcomes") == true).SelectMany(x => x.Data.SafeGetValue<string, object, string[]>("Outcomes")).ToArray(),
 
                     StateData = entity.ActivityData.FirstOrDefault(x => x.ActivityId == itemLogs.Key)?.Data ?? default,
-                    JournalData = logs.First().Data.Where(x => x.Key != "Outcomes").ToDictionary(x => x.Key, x => x.Value),
+                    JournalData = logs.First().Data?.Where(x => x.Key != "Outcomes")?.ToDictionary(x => x.Key, x => x.Value),
 
                     Message = logs.First().Message,
                 };

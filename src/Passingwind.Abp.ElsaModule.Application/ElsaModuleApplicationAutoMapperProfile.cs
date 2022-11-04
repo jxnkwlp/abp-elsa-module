@@ -71,6 +71,7 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
         CreateMap<WorkflowInstanceBlockingActivity, WorkflowInstanceBlockingActivityDto>();
         CreateMap<WorkflowInstanceActivityScope, WorkflowInstanceActivityScopeDto>();
         CreateMap<WorkflowInstanceActivityData, WorkflowInstanceActivityDataDto>();
+        CreateMap<WorkflowInstanceFault, WorkflowInstanceFaultDto>();
 
         CreateMap<WorkflowExecutionLog, WorkflowExecutionLogDto>();
 

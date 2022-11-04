@@ -34,7 +34,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task AddAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Add [{model.GetType()}] {model.Id} ... ");
+            Logger.LogDebug($"Call {typeof(TModel).Name} [AddAsync], Id: {model.Id} ");
 
             var entity = await MapToEntityAsync(model);
             await Repository.InsertAsync(entity, true, cancellationToken);
@@ -42,10 +42,10 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task AddManyAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
         {
+            Logger.LogDebug($"Call {typeof(TModel).Name} [AddManyAsync] ");
+
             if (models.Any() == false)
                 return;
-
-            Logger.LogDebug($"AddMany [{models.GetType()}] ... ");
 
             var entities = new List<TEntity>();
 
@@ -59,13 +59,15 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task<int> CountAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
         {
+            Logger.LogDebug($"Call {typeof(TModel).Name} [CountAsync]");
+
             var expression = await MapSpecificationAsync(specification);
             return await Repository.CountAsync(expression, cancellationToken);
         }
 
         public virtual async Task DeleteAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Delete [{model.GetType()}] {model.Id} ... ");
+            Logger.LogDebug($"Call {typeof(TModel).Name} [DeleteAsync], Id:{model.Id} ");
 
             var id = (TKey)Convert.ChangeType(model.Id, typeof(TKey));
             await Repository.DeleteAsync(x => x.Id.Equals(id), true, cancellationToken);
@@ -73,6 +75,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task<int> DeleteManyAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
         {
+            Logger.LogDebug($"Call {typeof(TModel).Name} [DeleteManyAsync] ");
+
             var expression = await MapSpecificationAsync(specification);
             var count = await Repository.CountAsync(expression, cancellationToken);
             await Repository.DeleteAsync(expression, true, cancellationToken);
@@ -103,10 +107,19 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
             query = query.Where(filter);
 
-            // TODO orderBy
+            if (orderBy != null)
+            {
+                // TODO orderBy  
+                //var orderByExp = orderBy.OrderByExpression.ConvertType<TModel, TEntity>();
+                //query = (orderBy.SortDirection == SortDirection.Ascending) ? query.OrderBy(orderByExp) : query.OrderByDescending(orderByExp);
+            }
+            else
+            {
+                query = query.OrderByDescending(x => x.Id);
+            }
 
             if (paging != null)
-                query = query.OrderByDescending(x => x.Id).Skip(paging.Skip).Take(paging.Take);
+                query = query.Skip(paging.Skip).Take(paging.Take);
 
             var list = await AsyncQueryableExecuter.ToListAsync(query, cancellationToken).ConfigureAwait(false);
 

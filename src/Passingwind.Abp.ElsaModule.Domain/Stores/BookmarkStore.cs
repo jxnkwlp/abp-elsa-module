@@ -39,50 +39,61 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         protected override async Task<Expression<Func<Bookmark, bool>>> MapSpecificationAsync(ISpecification<BookmarkModel> specification)
         {
-            if (specification is BookmarkHashSpecification hashSpecification)
+            switch (specification)
             {
-                var tenantId = hashSpecification.TenantId.ToGuid();
-                return x => x.TenantId == tenantId && x.ActivityType == hashSpecification.ActivityType && x.Hash == hashSpecification.Hash;
-            }
-            else if (specification is BookmarkIdsSpecification idsSpecification)
-            {
-                var ids = idsSpecification.Ids.ToList().ConvertAll(Guid.Parse);
-                return x => ids.Contains(x.Id);
-            }
-            else if (specification is BookmarkSpecification bookmarkSpecification)
-            {
-                var tenantId = bookmarkSpecification.TenantId.ToGuid();
-                Expression<Func<Bookmark, bool>> expression = (x) => x.ActivityType == bookmarkSpecification.ActivityType && x.TenantId == tenantId;
+                case BookmarkHashSpecification hashSpecification:
+                    {
+                        var tenantId = hashSpecification.TenantId.ToGuid();
+                        return x => x.TenantId == tenantId && x.ActivityType == hashSpecification.ActivityType && x.Hash == hashSpecification.Hash;
+                    }
 
-                if (!string.IsNullOrEmpty(bookmarkSpecification.CorrelationId))
-                    expression = expression.And(x => x.CorrelationId == bookmarkSpecification.CorrelationId);
+                case BookmarkIdsSpecification idsSpecification:
+                    {
+                        var ids = idsSpecification.Ids.ToList().ConvertAll(Guid.Parse);
+                        return x => ids.Contains(x.Id);
+                    }
 
-                return expression;
+                case BookmarkSpecification bookmarkSpecification:
+                    {
+                        var tenantId = bookmarkSpecification.TenantId.ToGuid();
+                        Expression<Func<Bookmark, bool>> expression = (x) => x.ActivityType == bookmarkSpecification.ActivityType && x.TenantId == tenantId;
+
+                        if (!string.IsNullOrEmpty(bookmarkSpecification.CorrelationId))
+                            expression = expression.And(x => x.CorrelationId == bookmarkSpecification.CorrelationId);
+
+                        return expression;
+                    }
+
+                case BookmarkTypeAndWorkflowInstanceSpecification bookmarkTypeAndWorkflowInstanceSpecification:
+                    {
+                        return x => x.ModelType == bookmarkTypeAndWorkflowInstanceSpecification.ModelType && x.WorkflowInstanceId == Guid.Parse(bookmarkTypeAndWorkflowInstanceSpecification.WorkflowInstanceId);
+                    }
+
+                case BookmarkTypeSpecification bookmarkTypeSpecification:
+                    {
+                        var tenantId = bookmarkTypeSpecification.TenantId.ToGuid();
+                        return x => x.ModelType == bookmarkTypeSpecification.ModelType && x.TenantId == tenantId;
+                    }
+
+                case CorrelationIdSpecification correlationIdSpecification:
+                    {
+                        return x => x.CorrelationId == correlationIdSpecification.CorrelationId;
+                    }
+
+                case WorkflowInstanceIdSpecification workflowInstanceIdSpecification:
+                    {
+                        return x => x.WorkflowInstanceId == Guid.Parse(workflowInstanceIdSpecification.WorkflowInstanceId);
+                    }
+
+                case WorkflowInstanceIdsSpecification workflowInstanceIdsSpecification:
+                    {
+                        var ids = workflowInstanceIdsSpecification.WorkflowInstanceIds.ToList().ConvertAll(Guid.Parse);
+                        return x => ids.Contains(x.WorkflowInstanceId);
+                    }
+
+                default:
+                    return await base.MapSpecificationAsync(specification);
             }
-            else if (specification is BookmarkTypeAndWorkflowInstanceSpecification bookmarkTypeAndWorkflowInstanceSpecification)
-            {
-                return x => x.ModelType == bookmarkTypeAndWorkflowInstanceSpecification.ModelType && x.WorkflowInstanceId == Guid.Parse(bookmarkTypeAndWorkflowInstanceSpecification.WorkflowInstanceId);
-            }
-            else if (specification is BookmarkTypeSpecification bookmarkTypeSpecification)
-            {
-                var tenantId = bookmarkTypeSpecification.TenantId.ToGuid();
-                return x => x.ModelType == bookmarkTypeSpecification.ModelType && x.TenantId == tenantId;
-            }
-            else if (specification is CorrelationIdSpecification correlationIdSpecification)
-            {
-                return x => x.CorrelationId == correlationIdSpecification.CorrelationId;
-            }
-            else if (specification is WorkflowInstanceIdSpecification workflowInstanceIdSpecification)
-            {
-                return x => x.WorkflowInstanceId == Guid.Parse(workflowInstanceIdSpecification.WorkflowInstanceId);
-            }
-            else if (specification is WorkflowInstanceIdsSpecification workflowInstanceIdsSpecification)
-            {
-                var ids = workflowInstanceIdsSpecification.WorkflowInstanceIds.ToList().ConvertAll(Guid.Parse);
-                return x => ids.Contains(x.WorkflowInstanceId);
-            }
-            else
-                return await base.MapSpecificationAsync(specification);
         }
 
         protected override Guid ConvertKey(string value)

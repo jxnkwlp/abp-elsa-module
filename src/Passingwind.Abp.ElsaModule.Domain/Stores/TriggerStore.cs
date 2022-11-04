@@ -39,33 +39,41 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         protected override async Task<Expression<Func<Trigger, bool>>> MapSpecificationAsync(ISpecification<TriggerModel> specification)
         {
-            if (specification is WorkflowDefinitionIdSpecification idSpecification)
+            switch (specification)
             {
-                var id = idSpecification.WorkflowDefinitionId.ToGuid();
-                return (x) => x.WorkflowDefinitionId == id;
+                case WorkflowDefinitionIdSpecification idSpecification:
+                    {
+                        var id = idSpecification.WorkflowDefinitionId.ToGuid();
+                        return (x) => x.WorkflowDefinitionId == id;
+                    }
+
+                case WorkflowDefinitionIdsSpecification idsSpecification:
+                    {
+                        var ids = idsSpecification.WorkflowDefinitionIds.ToList().ConvertAll(Guid.Parse);
+                        return (x) => ids.Contains(x.WorkflowDefinitionId);
+                    }
+
+                case TriggerSpecification triggerSpecification:
+                    {
+                        var tenantId = triggerSpecification.TenantId.ToGuid();
+                        return trigger => trigger.TenantId == tenantId && trigger.ActivityType == triggerSpecification.ActivityType && triggerSpecification.Hashes.Contains(trigger.Hash);
+                    }
+
+                case TriggerModelTypeSpecification modelTypeSpecification:
+                    {
+                        var tenantId = modelTypeSpecification.TenantId.ToGuid();
+                        return x => modelTypeSpecification.ModelType.Equals(x.ModelType) && x.TenantId == tenantId;
+                    }
+
+                case TriggerIdsSpecification triggerIdsSpecification:
+                    {
+                        var ids = triggerIdsSpecification.Ids.ToList().ConvertAll(Guid.Parse);
+                        return x => ids.Contains(x.Id);
+                    }
+
+                default:
+                    return await base.MapSpecificationAsync(specification);
             }
-            else if (specification is WorkflowDefinitionIdsSpecification idsSpecification)
-            {
-                var ids = idsSpecification.WorkflowDefinitionIds.ToList().ConvertAll(Guid.Parse);
-                return (x) => ids.Contains(x.WorkflowDefinitionId);
-            }
-            else if (specification is TriggerSpecification triggerSpecification)
-            {
-                var tenantId = triggerSpecification.TenantId.ToGuid();
-                return trigger => trigger.TenantId == tenantId && trigger.ActivityType == triggerSpecification.ActivityType && triggerSpecification.Hashes.Contains(trigger.Hash);
-            }
-            else if (specification is TriggerModelTypeSpecification modelTypeSpecification)
-            {
-                var tenantId = modelTypeSpecification.TenantId.ToGuid();
-                return x => modelTypeSpecification.ModelType.Equals(x.ModelType) && x.TenantId == tenantId;
-            }
-            else if (specification is TriggerIdsSpecification triggerIdsSpecification)
-            {
-                var ids = triggerIdsSpecification.Ids.ToList().ConvertAll(Guid.Parse);
-                return x => ids.Contains(x.Id);
-            }
-            else
-                return await base.MapSpecificationAsync(specification);
         }
 
         protected override Guid ConvertKey(string value)

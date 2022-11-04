@@ -80,6 +80,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
                 Connections = entity.Connections.Select(x => MapToModel(x)).ToArray(),
                 Activities = entity.Activities.Select(x => MapToModel(x)).ToArray(),
+
+                CreatedAt = ToInstant(entity.CreationTime),
             };
 
             return model;
@@ -98,6 +100,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 Properties = entity.Properties,
                 SaveWorkflowContext = entity.SaveWorkflowContext,
                 Type = entity.Type,
+                PropertyStorageProviders = entity.PropertyStorageProviders,
             };
         }
 
@@ -351,7 +354,14 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 WorkflowDefinitionId = Guid.Parse(model.DefinitionId),
                 WorkflowDefinitionVersionId = Guid.Parse(model.DefinitionVersionId),
 
-                Fault = model.Fault,
+                Faults = model.Faults.Select(x => new WorkflowInstanceFault()
+                {
+                    ActivityInput = x.ActivityInput,
+                    Exception = x.Exception,
+                    FaultedActivityId = x.FaultedActivityId?.ToGuid(),
+                    Message = x.Message,
+                    Resuming = x.Resuming
+                }).ToList(),
                 Input = model.Input,
                 Output = model.Output,
 
@@ -361,6 +371,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 BlockingActivities = model.BlockingActivities.Select(x => new WorkflowInstanceBlockingActivity { ActivityId = Guid.Parse(x.ActivityId), ActivityType = x.ActivityType, Tag = x.Tag, }).ToList(),
                 ScheduledActivities = model.ScheduledActivities.Select(x => new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(x.ActivityId), Input = x.Input, }).ToList(),
                 ActivityScopes = model.Scopes.Select(x => new WorkflowInstanceActivityScope { ActivityId = Guid.Parse(x.ActivityId), Variables = (Dictionary<string, object>)x.Variables.Data, }).ToList(),
+
+
             };
         }
 
@@ -383,7 +395,14 @@ namespace Passingwind.Abp.ElsaModule.Stores
             entity.CurrentActivity = model.CurrentActivity == null ? default : new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(model.CurrentActivity.ActivityId), Input = model.CurrentActivity.Input };
             entity.LastExecutedActivityId = string.IsNullOrEmpty(model.LastExecutedActivityId) ? null : Guid.Parse(model.LastExecutedActivityId);
 
-            entity.Fault = model.Fault;
+            entity.Faults = model.Faults.Select(x => new WorkflowInstanceFault()
+            {
+                ActivityInput = x.ActivityInput,
+                Exception = x.Exception,
+                FaultedActivityId = x.FaultedActivityId?.ToGuid(),
+                Message = x.Message,
+                Resuming = x.Resuming
+            }).ToList();
             entity.Input = model.Input;
             entity.Output = model.Output;
             // TODO
@@ -424,7 +443,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 CurrentActivity = entity.CurrentActivity == null ? default : new Elsa.Models.ScheduledActivity(entity.CurrentActivity.ActivityId.ToString(), entity.CurrentActivity.Input),
                 LastExecutedActivityId = entity.LastExecutedActivityId?.ToString(),
 
-                Fault = entity.Fault,
+                Faults = new Elsa.Models.SimpleStack<Elsa.Models.WorkflowFault>(entity.Faults.Select(x => new Elsa.Models.WorkflowFault(x.Exception, x.Message, x.FaultedActivityId.ToString(), x.ActivityInput, x.Resuming))),
                 Input = entity.Input,
                 Output = entity.Output,
 

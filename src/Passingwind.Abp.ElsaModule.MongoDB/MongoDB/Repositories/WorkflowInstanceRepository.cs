@@ -66,8 +66,11 @@ namespace Passingwind.Abp.ElsaModule.MongoDB.Repositories
         {
             var query = await GetMongoQueryableAsync(cancellationToken);
 
+            var startDate2 = startDate.Date;
+            var endDate2 = endDate.Date;
+
             var list = await query
-                       .Where(x => x.WorkflowStatus == workflowStatus && x.CreationTime.Date >= startDate.Date && x.CreationTime.Date <= endDate.Date)
+                       .Where(x => x.WorkflowStatus == workflowStatus && x.CreationTime >= startDate2 && x.CreationTime <= endDate2)
                        .Select(x => new { x.Id, x.CreationTime })
                        .ToListAsync(cancellationToken);
 

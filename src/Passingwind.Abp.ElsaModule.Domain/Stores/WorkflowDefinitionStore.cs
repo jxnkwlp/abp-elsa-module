@@ -46,68 +46,92 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         protected override async Task<Expression<Func<WorkflowDefinitionVersion, bool>>> MapSpecificationAsync(ISpecification<WorkflowDefinitionModel> specification)
         {
-            if (specification is LatestOrPublishedWorkflowDefinitionIdSpecification latestOrPublishedWorkflowDefinitionIdSpecification)
+            switch (specification)
             {
-                return x => x.DefinitionId == Guid.Parse(latestOrPublishedWorkflowDefinitionIdSpecification.WorkflowDefinitionId) && (x.IsLatest || x.IsPublished);
+                case LatestOrPublishedWorkflowDefinitionIdSpecification latestOrPublishedWorkflowDefinitionIdSpecification:
+                    {
+                        return x => x.DefinitionId == Guid.Parse(latestOrPublishedWorkflowDefinitionIdSpecification.WorkflowDefinitionId) && (x.IsLatest || x.IsPublished);
+                    }
+
+                case ManyWorkflowDefinitionIdsSpecification manyWorkflowDefinitionIdsSpecification:
+                    {
+                        var ids = manyWorkflowDefinitionIdsSpecification.Ids.ToList().ConvertAll(Guid.Parse);
+
+                        Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => ids.Contains(x.DefinitionId);
+
+                        return expression.WithVersion(manyWorkflowDefinitionIdsSpecification.VersionOptions);
+                    }
+
+                case ManyWorkflowDefinitionNamesSpecification manyWorkflowDefinitionNamesSpecification:
+                    {
+                        var ids = await _workflowDefinitionRepository.GetIdsByNamesAsync(manyWorkflowDefinitionNamesSpecification.Names);
+
+                        return x => ids.Contains(x.Id);
+                    }
+
+                case ManyWorkflowDefinitionVersionIdsSpecification manyWorkflowDefinitionVersionIdsSpecification:
+                    {
+                        var ids = manyWorkflowDefinitionVersionIdsSpecification.DefinitionVersionIds.ToList().ConvertAll(Guid.Parse);
+                        return x => ids.Contains(x.Id);
+                    }
+
+                case VersionOptionsSpecification versionOptionsSpecification:
+                    {
+                        Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => true;
+
+                        return expression.WithVersion(versionOptionsSpecification.VersionOptions);
+                    }
+
+                case WorkflowDefinitionIdSpecification workflowDefinitionIdSpecification:
+                    {
+                        var tenantId = workflowDefinitionIdSpecification.TenantId.ToGuid();
+
+                        Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => x.DefinitionId == Guid.Parse(workflowDefinitionIdSpecification.Id) && x.TenantId == tenantId;
+
+                        return expression.WithVersion(workflowDefinitionIdSpecification.VersionOptions);
+                    }
+
+                case WorkflowDefinitionNameSpecification workflowDefinitionNameSpecification:
+                    {
+                        var tenantId = workflowDefinitionNameSpecification.TenantId.ToGuid();
+                        var id = await _workflowDefinitionRepository.GetIdByNameAsync(workflowDefinitionNameSpecification.Name);
+
+                        Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => x.Id == id && x.TenantId == tenantId;
+
+                        return expression.WithVersion(workflowDefinitionNameSpecification.VersionOptions);
+                    }
+
+                case WorkflowDefinitionSearchTermSpecification workflowDefinitionSearchTermSpecification:
+                    {
+                        var filter = workflowDefinitionSearchTermSpecification.SearchTerm;
+
+                        if (string.IsNullOrEmpty(filter))
+                            return x => true;
+
+                        var list = await _workflowDefinitionRepository.GetListAsync(filter);
+                        var ids = list.Select(x => x.Id).ToArray();
+                        return x => ids.Contains(x.Id);
+                    }
+
+                case WorkflowDefinitionTagSpecification workflowDefinitionTagSpecification:
+                    {
+                        var tenantId = workflowDefinitionTagSpecification.TenantId.ToGuid();
+
+                        var id = await _workflowDefinitionRepository.GetIdByTagAsync(workflowDefinitionTagSpecification.Tag);
+
+                        Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => x.Id == id && x.TenantId == tenantId;
+
+                        return expression.WithVersion(workflowDefinitionTagSpecification.VersionOptions);
+                    }
+
+                case WorkflowDefinitionVersionIdSpecification workflowDefinitionVersionIdSpecification:
+                    {
+                        return x => x.Id == Guid.Parse(workflowDefinitionVersionIdSpecification.VersionId);
+                    }
+
+                default:
+                    return await base.MapSpecificationAsync(specification);
             }
-            else if (specification is ManyWorkflowDefinitionIdsSpecification manyWorkflowDefinitionIdsSpecification)
-            {
-                var ids = manyWorkflowDefinitionIdsSpecification.Ids.ToList().ConvertAll(Guid.Parse);
-
-                Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => ids.Contains(x.DefinitionId);
-
-                return expression.WithVersion(manyWorkflowDefinitionIdsSpecification.VersionOptions);
-            }
-            else if (specification is ManyWorkflowDefinitionNamesSpecification manyWorkflowDefinitionNamesSpecification)
-            {
-                var ids = await _workflowDefinitionRepository.GetIdsByNamesAsync(manyWorkflowDefinitionNamesSpecification.Names);
-
-                return x => ids.Contains(x.Id);
-            }
-            else if (specification is ManyWorkflowDefinitionVersionIdsSpecification manyWorkflowDefinitionVersionIdsSpecification)
-            {
-                var ids = manyWorkflowDefinitionVersionIdsSpecification.DefinitionVersionIds.ToList().ConvertAll(Guid.Parse);
-                return x => ids.Contains(x.Id);
-            }
-            else if (specification is VersionOptionsSpecification versionOptionsSpecification)
-            {
-                Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => true;
-
-                return expression.WithVersion(versionOptionsSpecification.VersionOptions);
-            }
-            else if (specification is WorkflowDefinitionIdSpecification workflowDefinitionIdSpecification)
-            {
-                var tenantId = workflowDefinitionIdSpecification.TenantId.ToGuid();
-
-                Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => x.DefinitionId == Guid.Parse(workflowDefinitionIdSpecification.Id) && x.TenantId == tenantId;
-
-                return expression.WithVersion(workflowDefinitionIdSpecification.VersionOptions);
-            }
-            else if (specification is WorkflowDefinitionNameSpecification workflowDefinitionNameSpecification)
-            {
-                var tenantId = workflowDefinitionNameSpecification.TenantId.ToGuid();
-                var id = await _workflowDefinitionRepository.GetIdByNameAsync(workflowDefinitionNameSpecification.Name);
-
-                Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => x.Id == id && x.TenantId == tenantId;
-
-                return expression.WithVersion(workflowDefinitionNameSpecification.VersionOptions);
-            }
-            else if (specification is WorkflowDefinitionTagSpecification workflowDefinitionTagSpecification)
-            {
-                var tenantId = workflowDefinitionTagSpecification.TenantId.ToGuid();
-
-                var id = await _workflowDefinitionRepository.GetIdByTagAsync(workflowDefinitionTagSpecification.Tag);
-
-                Expression<Func<WorkflowDefinitionVersion, bool>> expression = x => x.Id == id && x.TenantId == tenantId;
-
-                return expression.WithVersion(workflowDefinitionTagSpecification.VersionOptions);
-            }
-            else if (specification is WorkflowDefinitionVersionIdSpecification workflowDefinitionVersionIdSpecification)
-            {
-                return x => x.Id == Guid.Parse(workflowDefinitionVersionIdSpecification.VersionId);
-            }
-            else
-                return await base.MapSpecificationAsync(specification);
         }
 
         protected override Guid ConvertKey(string value)

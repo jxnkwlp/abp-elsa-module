@@ -9,17 +9,11 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 public class ElsaModuleDbContext : AbpDbContext<ElsaModuleDbContext>, IElsaModuleDbContext
 {
     public DbSet<Bookmark> Bookmarks { get; set; }
-
     public DbSet<Trigger> Triggers { get; set; }
-
     public DbSet<WorkflowDefinition> WorkflowDefinitions { get; set; }
-
     public DbSet<WorkflowDefinitionVersion> WorkflowDefinitionVersions { get; set; }
-
     public DbSet<WorkflowExecutionLog> WorkflowExecutionLogs { get; set; }
-
     public DbSet<WorkflowInstance> WorkflowInstances { get; set; }
-
     public DbSet<GlobalVariable> GlobalVariables { get; set; }
 
     public ElsaModuleDbContext(DbContextOptions<ElsaModuleDbContext> options)

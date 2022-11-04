@@ -45,7 +45,10 @@ public class WorkflowInstance : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     public WorkflowOutputReference Output { get; set; }
 
+    [Obsolete]
     public WorkflowFault Fault { get; set; }
+
+    public List<WorkflowInstanceFault> Faults { get; set; } = new List<WorkflowInstanceFault>();
 
     public WorkflowInstanceScheduledActivity CurrentActivity { get; set; }
 

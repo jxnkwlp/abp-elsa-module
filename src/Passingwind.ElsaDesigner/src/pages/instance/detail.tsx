@@ -10,7 +10,7 @@ import { ClockCircleOutlined, FieldTimeOutlined, FunctionOutlined } from '@ant-d
 import { ProCard } from '@ant-design/pro-card';
 import { ProDescriptions } from '@ant-design/pro-descriptions';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Alert, Card, Col, Modal, Row, Space, Tabs, Tag, Timeline } from 'antd';
+import { Alert, Card, Col, Empty, Modal, Result, Row, Space, Tabs, Tag, Timeline } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
@@ -246,9 +246,11 @@ const Index: React.FC = () => {
         }
 
         // error
-        if (data?.fault?.faultedActivityId) {
-            flowAction.current?.setNodeStatus(data.fault.faultedActivityId!, 'failed');
-        }
+        (data?.faults ?? []).forEach((item) => {
+            if (item.faultedActivityId) {
+                flowAction.current?.setNodeStatus(item.faultedActivityId!, 'failed');
+            }
+        });
     };
 
     useEffect(() => {
@@ -273,10 +275,10 @@ const Index: React.FC = () => {
 
     return (
         <PageContainer title={title} loading={loading}>
-            {data?.fault && (
+            {(data?.faults?.length ?? 0) > 0 && (
                 <Alert
                     showIcon
-                    message={data?.fault.message}
+                    message={data!.faults![0].message}
                     type="error"
                     description=""
                     style={{ marginBottom: 10 }}
@@ -395,12 +397,6 @@ const Index: React.FC = () => {
                                     id: 'page.instance.variables',
                                 }),
                             },
-                            // {
-                            //     key: 'data',
-                            //     tab: intl.formatMessage({
-                            //         id: 'page.instance.data',
-                            //     }),
-                            // },
                         ]}
                         onTabChange={(key) => {
                             setTabKey(key);
@@ -473,26 +469,49 @@ const Index: React.FC = () => {
                                 })}
                             </Timeline>
                         )}
-                        {tabKey === 'input' && (
-                            <div className="data-render-container">
-                                {dataRender(JSON.stringify(data?.input ?? {}, null, 2))}
-                            </div>
-                        )}
-                        {tabKey === 'fault' && (
-                            <div className="data-render-container">
-                                {dataRender(JSON.stringify(data?.fault ?? {}, null, 2))}
-                            </div>
-                        )}
-                        {tabKey === 'variables' && (
-                            <div className="data-render-container">
-                                {dataRender(JSON.stringify(data?.variables ?? {}, null, 2))}
-                            </div>
-                        )}
-                        {tabKey === 'data' && (
-                            <div className="data-render-container">
-                                {dataRender(JSON.stringify(data?.activityData ?? {}, null, 2))}
-                            </div>
-                        )}
+
+                        {tabKey === 'input' &&
+                            (data?.input ? (
+                                <>
+                                    <div className="data-render-container">
+                                        {dataRender(JSON.stringify(data.input ?? {}, null, 2))}
+                                    </div>
+                                </>
+                            ) : (
+                                <Empty />
+                            ))}
+                        {tabKey === 'fault' &&
+                            (data?.faults?.length ? (
+                                <>
+                                    <div className="data-render-container">
+                                        {dataRender(JSON.stringify(data.faults ?? [], null, 2))}
+                                    </div>
+                                </>
+                            ) : (
+                                <Empty />
+                            ))}
+                        {tabKey === 'variables' &&
+                            (data?.variables ? (
+                                <>
+                                    <div className="data-render-container">
+                                        {dataRender(JSON.stringify(data.variables ?? {}, null, 2))}
+                                    </div>
+                                </>
+                            ) : (
+                                <Empty />
+                            ))}
+                        {tabKey === 'data' &&
+                            (data?.activityData ? (
+                                <>
+                                    <div className="data-render-container">
+                                        {dataRender(
+                                            JSON.stringify(data.activityData ?? {}, null, 2),
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <Empty />
+                            ))}
                     </Card>
                 </Col>
             </Row>

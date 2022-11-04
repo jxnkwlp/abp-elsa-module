@@ -1,5 +1,5 @@
 ﻿using System;
-using Elsa.Models;
+using Passingwind.Abp.ElsaModule.Common;
 using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.WorkflowInstances
@@ -13,8 +13,7 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         public string Name { get; set; }
         public int Version { get; set; }
 
-        // public WorkflowStatus WorkflowStatus { get; set; }
-        public int WorkflowStatus { get; set; }
+        public WorkflowInstanceStatus WorkflowStatus { get; set; }
         public string CorrelationId { get; set; }
         public string ContextType { get; set; }
         public string ContextId { get; set; }
@@ -23,7 +22,5 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         public DateTime? FinishedTime { get; set; }
         public DateTime? CancelledTime { get; set; }
         public DateTime? FaultedTime { get; set; }
-
-        public WorkflowFault Fault { get; set; }
     }
 }
