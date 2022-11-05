@@ -145,6 +145,8 @@ export default {
     //
     'page.variable.field.key': '名称',
     'page.variable.field.value': '值',
+    'page.variable.field.isSecret': '机密',
+    'page.variable.field.isSecret.tooltip': '设置为机密，值在列表和编辑将不可见，仅可以修改或删除操作',
     //
     'page.settings.email.smtpHost': '主机',
     'page.settings.email.smtpPort': '端口',

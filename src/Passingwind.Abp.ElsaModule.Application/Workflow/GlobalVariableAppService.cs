@@ -30,6 +30,7 @@ namespace Passingwind.Abp.ElsaModule.Workflow
             {
                 Key = input.Key,
                 Value = input.Value,
+                IsSecret = input.IsSecret,
             };
 
             await _globalVariableRepository.InsertAsync(entity);
@@ -46,22 +47,40 @@ namespace Passingwind.Abp.ElsaModule.Workflow
         {
             var entity = await _globalVariableRepository.GetAsync(id);
 
-            return ObjectMapper.Map<GlobalVariable, GlobalVariableDto>(entity);
+            var dto = ObjectMapper.Map<GlobalVariable, GlobalVariableDto>(entity);
+
+            if (dto.IsSecret)
+                dto.Value = null;
+
+            return dto;
         }
 
         public async Task<GlobalVariableDto> GetByKeyAsync(string key)
         {
             var entity = await _globalVariableRepository.GetAsync(key);
 
-            return ObjectMapper.Map<GlobalVariable, GlobalVariableDto>(entity);
+            var dto = ObjectMapper.Map<GlobalVariable, GlobalVariableDto>(entity);
+
+            if (dto.IsSecret)
+                dto.Value = null;
+
+            return dto;
         }
 
         public async Task<PagedResultDto<GlobalVariableDto>> GetListAsync(GlobalVariableListRequestDto input)
         {
             var count = await _globalVariableRepository.CountAsync(input.Filter);
-            var list = await _globalVariableRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, nameof(GlobalVariableDto.Key));
+            var list = await _globalVariableRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, input.Filter, nameof(GlobalVariableDto.Key));
 
-            return new PagedResultDto<GlobalVariableDto>(count, ObjectMapper.Map<List<GlobalVariable>, List<GlobalVariableDto>>(list));
+            var result = ObjectMapper.Map<List<GlobalVariable>, List<GlobalVariableDto>>(list);
+
+            foreach (var item in result)
+            {
+                if (item.IsSecret)
+                    item.Value = null;
+            }
+
+            return new PagedResultDto<GlobalVariableDto>(count, result);
         }
 
         public async Task<GlobalVariableDto> UpdateAsync(Guid id, GlobalVariableCreateOrUpdateDto input)
@@ -69,6 +88,7 @@ namespace Passingwind.Abp.ElsaModule.Workflow
             var entity = await _globalVariableRepository.GetAsync(id);
 
             entity.Value = input.Value;
+            entity.IsSecret = input.IsSecret;
 
             await _globalVariableRepository.UpdateAsync(entity);
 

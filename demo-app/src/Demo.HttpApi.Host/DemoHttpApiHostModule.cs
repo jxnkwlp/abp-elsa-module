@@ -73,7 +73,7 @@ namespace Demo;
     typeof(AbpSwashbuckleModule),
     typeof(AbpMailKitModule)
 )]
-[DependsOn(typeof(ElsaModuleMongoDbModule))]
+// [DependsOn(typeof(ElsaModuleMongoDbModule))]
 public class DemoHttpApiHostModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)

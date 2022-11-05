@@ -147,6 +147,7 @@ declare namespace API {
         lastModifierId?: string | undefined;
         key?: string | undefined;
         value?: string | undefined;
+        isSecret?: boolean | undefined;
     };
 
     /**
@@ -155,6 +156,7 @@ declare namespace API {
     type GlobalVariableCreateOrUpdate = {
         key: string;
         value?: string | undefined;
+        isSecret?: boolean | undefined;
     };
 
     /**

@@ -10,9 +10,10 @@ public class GlobalVariable : FullAuditedAggregateRoot<Guid>, IMultiTenant
     public string Key { get; set; }
     // TODO
     public GlobalVariableValueType Type { get; set; }
+    public bool IsSecret { get; set; }
     public string Value { get; set; }
 
-    // Limit the variable who can access.
+    // Limit the variable who can use.
     // public string[] Scopes { get; set; }
 }
 
