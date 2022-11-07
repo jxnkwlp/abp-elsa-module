@@ -1,4 +1,5 @@
 import { isInteger } from '@antv/util';
+import { GlobalAPI } from './global';
 
 export const randString = (prefix: string = '', length: number = 5) => {
     let result = '';
@@ -46,3 +47,18 @@ export const enumToStatus = (value: any) => {
 //             return [v]:value[key]
 //         });
 // };
+
+export const saveTableQueryParams = (tableId: string, params: any) => {
+    if (params)
+        window.sessionStorage.setItem('table_query_' + tableId, JSON.stringify(params));
+    else
+        window.sessionStorage.removeItem('table_query_' + tableId);
+}
+
+export const getTableQueryParams = (tableId: string) => {
+    const json = window.sessionStorage.getItem('table_query_' + tableId) ?? '';
+    if (json)
+        return JSON.parse(json) as GlobalAPI.TableQueryConfig;
+    else
+        return undefined;
+}

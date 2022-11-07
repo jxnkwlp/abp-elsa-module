@@ -82,6 +82,8 @@ export async function getWorkflowDefinitionDefinition(
 export async function getWorkflowDefinitionList(
     params: {
         filter?: string | undefined,
+        isSingleton?: boolean | undefined,
+        sorting?: string | undefined,
         skipCount?: number | undefined,
         maxResultCount?: number | undefined
     },

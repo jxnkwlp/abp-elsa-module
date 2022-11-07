@@ -1,3 +1,6 @@
+import type { GlobalAPI } from '@/services/global';
+import type { API } from '@/services/typings';
+import { getTableQueryParams, saveTableQueryParams } from '@/services/utils';
 import {
     deleteWorkflowDefinition,
     getWorkflowDefinitionList,
@@ -7,16 +10,15 @@ import {
     workflowDefinitionPublish,
     workflowDefinitionUnPublish,
 } from '@/services/WorkflowDefinition';
+import type { ProFormInstance } from '@ant-design/pro-components';
 import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
-import { TableDropdown } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
+import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import { Button, Form, message, Modal } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { formatMessage, useHistory, useIntl } from 'umi';
 import EditFormItems from './edit-form-items';
-import type { API } from '@/services/typings';
 
 const handleEdit = async (id: string, data: any) => {
     const response = await updateWorkflowDefinitionDefinition(id, data);
@@ -37,8 +39,11 @@ const handleDelete = async (id: string) => {
 };
 
 const Index: React.FC = () => {
-    const actionRef = useRef<ActionType>();
     const intl = useIntl();
+
+    const searchFormRef = useRef<ProFormInstance>();
+    const actionRef = useRef<ActionType>();
+    const [tableQueryConfig, setTableQueryConfig] = useState<GlobalAPI.TableQueryConfig>();
 
     const history = useHistory();
 
@@ -51,8 +56,6 @@ const Index: React.FC = () => {
 
     const [dispatchFormVisible, setDispatchFormVisible] = useState<boolean>(false);
     const [dispatchId, setDispatchId] = useState<string>();
-
-    // const [searchKey, setSearchKey] = useState<string>();
 
     const [editForm] = Form.useForm();
 
@@ -67,12 +70,16 @@ const Index: React.FC = () => {
             title: intl.formatMessage({ id: 'page.definition.field.name' }),
             search: false,
             copyable: true,
+            sorter: true,
+            sortOrder: tableQueryConfig?.sort?.name ?? undefined,
         },
         {
             dataIndex: 'displayName',
             title: intl.formatMessage({ id: 'page.definition.field.displayName' }),
             search: false,
             copyable: true,
+            sorter: true,
+            sortOrder: tableQueryConfig?.sort?.displayName ?? undefined,
         },
         {
             dataIndex: 'description',
@@ -83,11 +90,15 @@ const Index: React.FC = () => {
             dataIndex: 'latestVersion',
             title: intl.formatMessage({ id: 'page.definition.field.latestVersion' }),
             search: false,
+            sorter: true,
+            sortOrder: tableQueryConfig?.sort?.latestVersion ?? undefined,
         },
         {
             dataIndex: 'publishedVersion',
             title: intl.formatMessage({ id: 'page.definition.field.publishedVersion' }),
             search: false,
+            sorter: true,
+            sortOrder: tableQueryConfig?.sort?.publishedVersion ?? undefined,
         },
         {
             dataIndex: 'isSingleton',
@@ -97,15 +108,17 @@ const Index: React.FC = () => {
                 true: { text: 'Y' },
                 false: { text: 'N' },
             },
+            sorter: true,
         },
         {
-            dataIndex: 'creationTime',
+            dataIndex: 'lastModificationTime',
             title: intl.formatMessage({ id: 'common.dict.lastModificationTime' }),
             valueType: 'dateTime',
             search: false,
             renderText: (_, record) => {
-                return record.lastModificationTime ?? record.creationTime;
+                return _ ?? record.creationTime;
             },
+            sorter: true,
         },
         {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
@@ -197,11 +210,19 @@ const Index: React.FC = () => {
         },
     ];
 
+    useEffect(() => {
+        const tableQueryConfig = getTableQueryParams('workflow_definitions') ?? {};
+        setTableQueryConfig(tableQueryConfig);
+        searchFormRef.current?.setFieldsValue(tableQueryConfig?.filter);
+    }, []);
+
     return (
         <PageContainer>
             <ProTable<API.WorkflowDefinition>
                 columns={columns}
                 actionRef={actionRef}
+                formRef={searchFormRef}
+                search={{ labelWidth: 120 }}
                 rowKey="id"
                 toolBarRender={() => [
                     <Button
@@ -214,28 +235,58 @@ const Index: React.FC = () => {
                         {intl.formatMessage({ id: 'common.dict.create' })}
                     </Button>,
                 ]}
-                search={{ labelWidth: 120 }}
-                request={async (params) => {
+                onReset={() => {
+                    setTableQueryConfig({});
+                }}
+                pagination={tableQueryConfig?.pagination}
+                onChange={(pagination, filters, sorter) => {
+                    //pagination & sorter
+                    let newConfig = {
+                        ...tableQueryConfig,
+                        pagination: pagination,
+                        filter: undefined,
+                    };
+                    if (sorter) {
+                        newConfig = {
+                            ...newConfig,
+                            sort: { [sorter.field]: sorter.order },
+                        };
+                    }
+                    setTableQueryConfig(newConfig);
+                    saveTableQueryParams('workflow_definitions', newConfig);
+                }}
+                request={async (params, sort) => {
                     const { current, pageSize } = params;
                     delete params.current;
                     delete params.pageSize;
                     const skipCount = (current! - 1) * pageSize!;
+
+                    // filter
+                    const newConfig = {
+                        ...tableQueryConfig,
+                        filter: params,
+                    };
+                    setTableQueryConfig(newConfig);
+                    saveTableQueryParams('workflow_definitions', newConfig);
+
+                    const sortResult = { ...(tableQueryConfig?.sort ?? {}), ...(sort ?? {}) };
+                    const sorting = Object.keys(sortResult ?? {})
+                        .map((x) => {
+                            return `${x} ${sortResult[x] == 'ascend' ? '' : 'desc'}`;
+                        })
+                        ?.join(', ');
                     const result = await getWorkflowDefinitionList({
+                        ...tableQueryConfig?.filter,
                         ...params,
                         skipCount,
                         maxResultCount: pageSize,
+                        sorting: sorting,
                     });
-                    if (result)
-                        return {
-                            success: true,
-                            data: result.items,
-                            total: result.totalCount,
-                        };
-                    else {
-                        return {
-                            success: false,
-                        };
-                    }
+                    return {
+                        success: !!result,
+                        data: result?.items,
+                        total: result?.totalCount,
+                    };
                 }}
             />
 

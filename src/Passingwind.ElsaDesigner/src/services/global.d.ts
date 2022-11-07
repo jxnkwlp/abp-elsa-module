@@ -1,6 +1,9 @@
 // @ts-ignore
 /* eslint-disable */
 
+import { TablePaginationConfig } from "antd";
+import { SortOrder } from "antd/es/table/interface";
+
 declare namespace GlobalAPI {
 
     // type CurrentUser = {
@@ -31,4 +34,10 @@ declare namespace GlobalAPI {
         description?: string;
         type?: NoticeIconItemType;
     };
+
+    type TableQueryConfig = {
+        pagination?: TablePaginationConfig | undefined,
+        sort?: Record<string, SortOrder> | undefined,
+        filter?: any | undefined,
+    }
 }

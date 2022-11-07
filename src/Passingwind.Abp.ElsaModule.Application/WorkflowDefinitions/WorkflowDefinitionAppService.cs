@@ -113,8 +113,8 @@ namespace Passingwind.Abp.ElsaModule.Common
 
         public virtual async Task<PagedResultDto<WorkflowDefinitionDto>> GetListAsync(WorkflowDefinitionListRequestDto input)
         {
-            var count = await _workflowDefinitionRepository.CountAsync(name: input.Filter);
-            var list = await _workflowDefinitionRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, name: input.Filter);
+            var count = await _workflowDefinitionRepository.CountAsync(name: input.Filter, isSingleton: input.IsSingleton);
+            var list = await _workflowDefinitionRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, name: input.Filter, isSingleton: input.IsSingleton, ordering: input.Sorting);
 
             return new PagedResultDto<WorkflowDefinitionDto>(count, ObjectMapper.Map<List<WorkflowDefinition>, List<WorkflowDefinitionDto>>(list));
         }

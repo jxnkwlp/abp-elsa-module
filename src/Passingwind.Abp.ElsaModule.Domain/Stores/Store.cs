@@ -107,16 +107,16 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
             query = query.Where(filter);
 
-            if (orderBy != null)
-            {
-                // TODO orderBy  
-                //var orderByExp = orderBy.OrderByExpression.ConvertType<TModel, TEntity>();
-                //query = (orderBy.SortDirection == SortDirection.Ascending) ? query.OrderBy(orderByExp) : query.OrderByDescending(orderByExp);
-            }
-            else
-            {
-                query = query.OrderByDescending(x => x.Id);
-            }
+            // TODO orderBy  
+            //if (orderBy != null)
+            //{
+            //var orderByExp = orderBy.OrderByExpression.ConvertType<TModel, TEntity>();
+            //query = (orderBy.SortDirection == SortDirection.Ascending) ? query.OrderBy(orderByExp) : query.OrderByDescending(orderByExp);
+            //}
+            //else
+            //{
+            query = query.OrderByDescending(x => x.Id);
+            //}
 
             if (paging != null)
                 query = query.Skip(paging.Skip).Take(paging.Take);
