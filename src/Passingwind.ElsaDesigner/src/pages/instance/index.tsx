@@ -1,7 +1,7 @@
 import { WorkflowInstanceStatus } from '@/services/enums';
 import type { GlobalAPI } from '@/services/global';
 import type { API } from '@/services/typings';
-import { getTableQueryParams, saveTableQueryParams } from '@/services/utils';
+import { formatTableSorter, getTableQueryConfig, saveTableQueryConfig } from '@/services/utils';
 import { getWorkflowDefinitionList } from '@/services/WorkflowDefinition';
 import {
     deleteWorkflowInstance,
@@ -26,7 +26,7 @@ const Index: React.FC = () => {
     const [tableQueryConfig, setTableQueryConfig] = useState<GlobalAPI.TableQueryConfig>();
 
     useEffect(() => {
-        const tableQueryConfig = getTableQueryParams('workflow_instances') ?? {};
+        const tableQueryConfig = getTableQueryConfig('workflow_instances') ?? {};
         setTableQueryConfig(tableQueryConfig);
         searchFormRef.current?.setFieldsValue(tableQueryConfig?.filter);
     }, []);
@@ -241,6 +241,7 @@ const Index: React.FC = () => {
                 search={{ labelWidth: 120 }}
                 rowKey="id"
                 onReset={() => {
+                    // clear filter & pagination
                     setTableQueryConfig({
                         ...tableQueryConfig,
                         filter: undefined,
@@ -253,40 +254,39 @@ const Index: React.FC = () => {
                     let newConfig = {
                         ...tableQueryConfig,
                     };
-                    if (sorter) {
+                    if (sorter && sorter.field) {
                         newConfig = {
                             ...newConfig,
-                            sort: { [sorter.field]: sorter.order },
+                            sort: { [sorter.field]: sorter.order ?? '' },
                         };
                     }
                     setTableQueryConfig(newConfig);
-                    saveTableQueryParams('workflow_instances', newConfig);
                 }}
                 request={async (params, sort) => {
-                    console.log(params, sort);
                     const { current, pageSize } = params;
                     delete params.current;
                     delete params.pageSize;
                     const skipCount = (current! - 1) * pageSize!;
 
-                    // filter
+                    // filter & pagination
                     const newConfig = {
                         ...tableQueryConfig,
-                        filter: { ...params },
+                        filter: { ...tableQueryConfig?.filter, ...params },
                         pagination: { current, pageSize },
                     } as GlobalAPI.TableQueryConfig;
                     setTableQueryConfig(newConfig);
-                    saveTableQueryParams('workflow_instances', newConfig);
 
-                    const sortResult = { ...(newConfig?.sort ?? {}), ...(sort ?? {}) };
-                    const sorting = Object.keys(sortResult ?? {})
-                        .map((x) => {
-                            return `${x} ${sortResult[x] == 'ascend' ? '' : 'desc'}`;
-                        })
-                        ?.join(', ');
+                    // save session
+                    saveTableQueryConfig('workflow_instances', newConfig);
 
+                    const sorting = formatTableSorter({
+                        ...(newConfig?.sort ?? {}),
+                        ...(sort ?? {}),
+                    });
+
+                    // fetch
                     const result = await getWorkflowInstanceList({
-                        ...params,
+                        ...newConfig.filter,
                         skipCount,
                         maxResultCount: pageSize,
                         sorting: sorting,

@@ -1,5 +1,6 @@
 import { isInteger } from '@antv/util';
-import { GlobalAPI } from './global';
+import type { SortOrder } from 'antd/lib/table/interface';
+import type { GlobalAPI } from './global';
 
 export const randString = (prefix: string = '', length: number = 5) => {
     let result = '';
@@ -48,14 +49,22 @@ export const enumToStatus = (value: any) => {
 //         });
 // };
 
-export const saveTableQueryParams = (tableId: string, params: any) => {
+export const formatTableSorter = (sorter: Record<string, SortOrder>) => {
+    return Object.keys(sorter ?? {})
+        .map((x) => {
+            return `${x} ${sorter[x] == 'ascend' ? '' : 'desc'}`;
+        })
+        ?.join(', ');
+}
+
+export const saveTableQueryConfig = (tableId: string, params: any) => {
     if (params)
         window.sessionStorage.setItem('table_query_' + tableId, JSON.stringify(params));
     else
         window.sessionStorage.removeItem('table_query_' + tableId);
 }
 
-export const getTableQueryParams = (tableId: string) => {
+export const getTableQueryConfig = (tableId: string) => {
     const json = window.sessionStorage.getItem('table_query_' + tableId) ?? '';
     if (json)
         return JSON.parse(json) as GlobalAPI.TableQueryConfig;
