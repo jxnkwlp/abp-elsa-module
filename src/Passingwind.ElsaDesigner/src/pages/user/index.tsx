@@ -192,6 +192,7 @@ const Index: React.FC = () => {
             <ProTable<API.IdentityUser>
                 columns={columns}
                 actionRef={actionRef}
+                search={{ labelWidth: 140 }}
                 rowKey="id"
                 toolBarRender={() => [
                     <Button

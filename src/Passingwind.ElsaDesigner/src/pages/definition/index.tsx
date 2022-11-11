@@ -42,7 +42,8 @@ const Index: React.FC = () => {
     const intl = useIntl();
 
     const searchFormRef = useRef<ProFormInstance>();
-    const actionRef = useRef<ActionType>();
+    const tableActionRef = useRef<ActionType>();
+    const [tableFilterCollapsed, setTableFilterCollapsed] = useState<boolean>(true);
     const [tableQueryConfig, setTableQueryConfig] = useState<GlobalAPI.TableQueryConfig>();
 
     const history = useHistory();
@@ -220,9 +221,9 @@ const Index: React.FC = () => {
         <PageContainer>
             <ProTable<API.WorkflowDefinition>
                 columns={columns}
-                actionRef={actionRef}
+                actionRef={tableActionRef}
                 formRef={searchFormRef}
-                search={{ labelWidth: 120 }}
+                search={{ labelWidth: 140 }}
                 rowKey="id"
                 toolBarRender={() => [
                     <Button
@@ -329,7 +330,7 @@ const Index: React.FC = () => {
 
                     if (success) {
                         setEditModalVisible(false);
-                        actionRef.current?.reload();
+                        tableActionRef.current?.reload();
                     }
                 }}
             >

@@ -14,8 +14,8 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
 
         public DateTime[] CreationTimes { get; set; }
         public DateTime[] FinishedTimes { get; set; }
-        public DateTime[] LastExecutedTime { get; set; }
-        public DateTime[] FaultedTime { get; set; }
+        public DateTime[] LastExecutedTimes { get; set; }
+        public DateTime[] FaultedTimes { get; set; }
 
         public string Sorting { get; set; }
     }

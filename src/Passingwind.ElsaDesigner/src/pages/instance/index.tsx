@@ -22,13 +22,17 @@ const Index: React.FC = () => {
     const intl = useIntl();
 
     const searchFormRef = useRef<ProFormInstance>();
-    const actionRef = useRef<ActionType>();
+    const tableActionRef = useRef<ActionType>();
+    const [tableFilterCollapsed, setTableFilterCollapsed] = useState<boolean>(true);
     const [tableQueryConfig, setTableQueryConfig] = useState<GlobalAPI.TableQueryConfig>();
 
     useEffect(() => {
         const tableQueryConfig = getTableQueryConfig('workflow_instances') ?? {};
         setTableQueryConfig(tableQueryConfig);
         searchFormRef.current?.setFieldsValue(tableQueryConfig?.filter);
+        if (Object.keys(tableQueryConfig?.filter).length > 0) {
+            setTableFilterCollapsed(false);
+        }
     }, []);
 
     const columns: ProColumnType<API.WorkflowInstance>[] = [
@@ -89,34 +93,62 @@ const Index: React.FC = () => {
             dataIndex: 'creationTime',
             title: intl.formatMessage({ id: 'common.dict.creationTime' }),
             valueType: 'dateTime',
-            search: false,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.creationTime ?? undefined,
+            search: false,
+        },
+        {
+            dataIndex: 'creationTimes',
+            title: intl.formatMessage({ id: 'common.dict.creationTime' }),
+            valueType: 'dateTimeRange',
+            hideInTable: true,
         },
         {
             dataIndex: 'finishedTime',
             title: intl.formatMessage({ id: 'page.instance.field.finishedTime' }),
             valueType: 'dateTime',
-            search: false,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.finishedTime ?? undefined,
+            search: false,
+        },
+        {
+            dataIndex: 'finishedTimes',
+            title: intl.formatMessage({ id: 'page.instance.field.finishedTime' }),
+            valueType: 'dateTimeRange',
+            hideInTable: true,
         },
         {
             dataIndex: 'lastExecutedTime',
             title: intl.formatMessage({ id: 'page.instance.field.lastExecutedTime' }),
             valueType: 'dateTime',
-            search: false,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.lastExecutedTime ?? undefined,
+            search: false,
         },
         {
-            dataIndex: 'faultedTime',
+            dataIndex: 'lastExecutedTimes',
+            title: intl.formatMessage({ id: 'page.instance.field.lastExecutedTime' }),
+            valueType: 'dateTimeRange',
+            hideInTable: true,
+        },
+        {
+            dataIndex: 'faultedTimes',
             title: intl.formatMessage({ id: 'page.instance.field.faultedTime' }),
-            valueType: 'dateTime',
-            search: false,
+            valueType: (e, t) => {
+                if (t == 'table') return 'dateTime';
+                return 'dateTimeRange';
+            },
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.faultedTime ?? undefined,
+            search: false,
         },
+        {
+            dataIndex: 'faultedTimes',
+            title: intl.formatMessage({ id: 'page.instance.field.faultedTime' }),
+            valueType: 'dateTimeRange',
+            hideInTable: true,
+        },
+        //
         {
             dataIndex: 'correlationId',
             title: intl.formatMessage({ id: 'page.instance.field.correlationId' }),
@@ -236,9 +268,13 @@ const Index: React.FC = () => {
         <PageContainer>
             <ProTable<API.WorkflowInstance>
                 columns={columns}
-                actionRef={actionRef}
+                actionRef={tableActionRef}
                 formRef={searchFormRef}
-                search={{ labelWidth: 120 }}
+                search={{
+                    labelWidth: 140,
+                    collapsed: tableFilterCollapsed,
+                    onCollapse: setTableFilterCollapsed,
+                }}
                 rowKey="id"
                 onReset={() => {
                     // clear filter & pagination

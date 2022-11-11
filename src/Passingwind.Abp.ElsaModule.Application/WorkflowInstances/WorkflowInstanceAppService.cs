@@ -25,6 +25,7 @@ namespace Passingwind.Abp.ElsaModule.Common
         private readonly IWorkflowReviver _workflowReviver;
         private readonly IWorkflowLaunchpad _workflowLaunchpad;
         private readonly IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> _workflowInstanceDateCountStatisticsDistributedCache;
+        private readonly IDistributedCache<WorkflowInstanceStatusCountStatisticsResultDto> _workflowInstanceStatusCountStatisticsDistributedCache;
 
         public WorkflowInstanceAppService(IJsonSerializer jsonSerializer, IWorkflowInstanceRepository workflowInstanceRepository, IWorkflowDefinitionRepository workflowDefinitionRepository, IWorkflowExecutionLogRepository workflowExecutionLogRepository, IStoreMapper storeMapper, IWorkflowInstanceCanceller workflowInstanceCanceller, IWorkflowReviver workflowReviver, IWorkflowLaunchpad workflowLaunchpad, IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> workflowInstanceDateCountStatisticsDistributedCache)
         {
@@ -107,8 +108,30 @@ namespace Passingwind.Abp.ElsaModule.Common
 
         public async Task<PagedResultDto<WorkflowInstanceBasicDto>> GetListAsync(WorkflowInstanceListRequestDto input)
         {
-            var count = await _workflowInstanceRepository.LongCountAsync(name: input.Name, definitionId: input.WorkflowDefinitionId, version: input.Version, status: input.WorkflowStatus, correlationId: input.CorrelationId);
-            var list = await _workflowInstanceRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, null, name: input.Name, definitionId: input.WorkflowDefinitionId, version: input.Version, status: input.WorkflowStatus, correlationId: input.CorrelationId);
+            var count = await _workflowInstanceRepository.LongCountAsync(
+                name: input.Name,
+                definitionId: input.WorkflowDefinitionId,
+                version: input.Version,
+                status: input.WorkflowStatus,
+                correlationId: input.CorrelationId,
+                creationTimes: input.CreationTimes,
+                finishedTimes: input.FinishedTimes,
+                faultedTimes: input.FaultedTimes,
+                lastExecutedTimes: input.LastExecutedTimes);
+
+            var list = await _workflowInstanceRepository.GetPagedListAsync(
+                input.SkipCount,
+                input.MaxResultCount,
+                null,
+                name: input.Name,
+                definitionId: input.WorkflowDefinitionId,
+                version: input.Version,
+                status: input.WorkflowStatus,
+                correlationId: input.CorrelationId,
+                creationTimes: input.CreationTimes,
+                finishedTimes: input.FinishedTimes,
+                faultedTimes: input.FaultedTimes,
+                lastExecutedTimes: input.LastExecutedTimes);
 
             return new PagedResultDto<WorkflowInstanceBasicDto>(count, ObjectMapper.Map<List<WorkflowInstance>, List<WorkflowInstanceBasicDto>>(list));
         }
@@ -185,7 +208,7 @@ namespace Passingwind.Abp.ElsaModule.Common
             var endDate = Clock.Now.Date;
             var startDate = Clock.Now.Date.AddDays(-datePeriod);
 
-            var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync($"StatusDateCountStatistics:{datePeriod}", async () =>
+            var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync($"workflow:instance:status:datecount:statistics:{datePeriod}", async () =>
             {
                 var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Finished, startDate, endDate);
                 var faulted = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Faulted, startDate, endDate);
@@ -210,6 +233,28 @@ namespace Passingwind.Abp.ElsaModule.Common
             });
 
             return dto;
+        }
+
+        public async Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync()
+        {
+            return await _workflowInstanceStatusCountStatisticsDistributedCache.GetOrAddAsync("workflow:instance:status:count:statistic", async () =>
+                   {
+                       var runningCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Running);
+                       var faultedCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Faulted);
+                       var suspendedCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Suspended);
+                       var finishedCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Finished);
+
+                       return new WorkflowInstanceStatusCountStatisticsResultDto
+                       {
+                           Faulted = faultedCount,
+                           Finished = finishedCount,
+                           Suspended = suspendedCount,
+                           Running = runningCount,
+                       };
+                   }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
+                   {
+                       AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10),
+                   });
         }
     }
 }

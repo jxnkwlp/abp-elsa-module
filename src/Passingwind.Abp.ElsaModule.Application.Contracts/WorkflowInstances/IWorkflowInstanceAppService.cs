@@ -9,9 +9,12 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
     public interface IWorkflowInstanceAppService : IApplicationService
     {
         Task<WorkflowInstanceDto> GetAsync(Guid id);
+
         Task DeleteAsync(Guid id);
         Task BatchDeleteAsync(WorkflowInstancesBatchDeleteRequestDto input);
+
         Task<PagedResultDto<WorkflowInstanceBasicDto>> GetListAsync(WorkflowInstanceListRequestDto input);
+
         Task<ListResultDto<WorkflowExecutionLogDto>> GetExecutionLogsAsync(Guid id);
 
         Task<WorkflowInstanceExecutionLogSummaryDto> GetLogSummaryAsync(Guid id);
@@ -22,6 +25,8 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         Task ExecuteAsync(Guid id, WorkflowInstanceExecuteRequestDto input);
 
         Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(int datePeriod = 30);
+
+        Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync();
 
     }
 }

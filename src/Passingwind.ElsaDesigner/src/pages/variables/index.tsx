@@ -47,7 +47,7 @@ const handleDelete = async (id: string) => {
 };
 
 const Index: React.FC = () => {
-    const actionRef = useRef<ActionType>();
+    const tableActionRef = useRef<ActionType>();
     const intl = useIntl();
 
     const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
@@ -121,7 +121,8 @@ const Index: React.FC = () => {
         <PageContainer>
             <ProTable<API.IdentityUser>
                 columns={columns}
-                actionRef={actionRef}
+                actionRef={tableActionRef}
+                search={{ labelWidth: 140 }}
                 rowKey="id"
                 toolBarRender={() => [
                     <Button
@@ -181,7 +182,7 @@ const Index: React.FC = () => {
 
                     if (success) {
                         setEditModalVisible(false);
-                        actionRef.current?.reload();
+                        tableActionRef.current?.reload();
                     }
                 }}
                 layout="vertical"
