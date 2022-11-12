@@ -30,7 +30,7 @@ const Index: React.FC = () => {
         const tableQueryConfig = getTableQueryConfig('workflow_instances') ?? {};
         setTableQueryConfig(tableQueryConfig);
         searchFormRef.current?.setFieldsValue(tableQueryConfig?.filter);
-        if (Object.keys(tableQueryConfig?.filter).length > 0) {
+        if (Object.keys(tableQueryConfig?.filter ?? {}).length > 0) {
             setTableFilterCollapsed(false);
         }
     }, []);
