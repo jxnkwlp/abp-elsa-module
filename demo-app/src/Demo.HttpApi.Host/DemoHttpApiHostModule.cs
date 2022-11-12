@@ -30,15 +30,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Passingwind.Abp.ElsaModule;
 using Passingwind.Abp.ElsaModule.Activities;
-using Passingwind.Abp.ElsaModule.MongoDB;
 using Passingwind.Abp.ElsaModule.Services;
 using StackExchange.Redis;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
@@ -74,7 +71,7 @@ namespace Demo;
     typeof(AbpMailKitModule)
 )]
 // [DependsOn(typeof(ElsaModuleMongoDbModule))]
-public class DemoHttpApiHostModule : AbpModule
+public partial class DemoHttpApiHostModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
@@ -349,25 +346,8 @@ public class DemoHttpApiHostModule : AbpModule
     {
         Configure<AbpLocalizationOptions>(options =>
         {
-            options.Languages.Add(new LanguageInfo("ar", "ar", "العربية"));
-            options.Languages.Add(new LanguageInfo("cs", "cs", "Čeština"));
             options.Languages.Add(new LanguageInfo("en", "en", "English"));
-            options.Languages.Add(new LanguageInfo("en-GB", "en-GB", "English (UK)"));
-            options.Languages.Add(new LanguageInfo("fi", "fi", "Finnish"));
-            options.Languages.Add(new LanguageInfo("fr", "fr", "Français"));
-            options.Languages.Add(new LanguageInfo("hi", "hi", "Hindi", "in"));
-            options.Languages.Add(new LanguageInfo("is", "is", "Icelandic", "is"));
-            options.Languages.Add(new LanguageInfo("it", "it", "Italiano", "it"));
-            options.Languages.Add(new LanguageInfo("ro-RO", "ro-RO", "Română"));
-            options.Languages.Add(new LanguageInfo("hu", "hu", "Magyar"));
-            options.Languages.Add(new LanguageInfo("pt-BR", "pt-BR", "Português"));
-            options.Languages.Add(new LanguageInfo("ru", "ru", "Русский"));
-            options.Languages.Add(new LanguageInfo("sk", "sk", "Slovak"));
-            options.Languages.Add(new LanguageInfo("tr", "tr", "Türkçe"));
             options.Languages.Add(new LanguageInfo("zh-Hans", "zh-Hans", "简体中文"));
-            options.Languages.Add(new LanguageInfo("zh-Hant", "zh-Hant", "繁體中文"));
-            options.Languages.Add(new LanguageInfo("de-DE", "de-DE", "Deutsch", "de"));
-            options.Languages.Add(new LanguageInfo("es", "es", "Español", "es"));
         });
     }
 
@@ -422,7 +402,14 @@ public class DemoHttpApiHostModule : AbpModule
         app.UseCorrelationId();
         app.UseStatusCodePages();
         app.UseStaticFiles();
-        app.UseSpaStaticFiles();
+        app.UseSpaStaticFiles(new StaticFileOptions()
+        {
+            OnPrepareResponse = (context) =>
+            {
+                context.Context.Response.Headers.Add("cache-control", new[] { "public, max-age=31536000" });
+                context.Context.Response.Headers.Add("Expires", new[] { DateTime.UtcNow.AddYears(1).ToString("R") }); // Format RFC1123
+            }
+        });
         app.UseRouting();
         app.UseCors();
         app.UseAuthentication();
@@ -441,6 +428,7 @@ public class DemoHttpApiHostModule : AbpModule
         app.UseAbpSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Demo API");
+            options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
 
             var configuration = context.GetConfiguration();
             options.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
@@ -465,45 +453,6 @@ public class DemoHttpApiHostModule : AbpModule
         });
 
         app.UseSpa(c => { });
-    }
-
-    public class SwaggerEnumDescriptions : ISchemaFilter
-    {
-        public void Apply(OpenApiSchema schema, SchemaFilterContext context)
-        {
-            var type = context.Type;
-
-            if (type.IsEnum)
-            {
-                var names = Enum.GetNames(type);
-
-                var values2 = new OpenApiArray();
-
-                values2.AddRange(names.Select(x => new OpenApiObject
-                {
-                    ["name"] = new OpenApiString(Convert.ToInt32(Enum.Parse(type, x)).ToString()),
-                    ["value"] = new OpenApiString(x),
-                }));
-
-                var values1 = new OpenApiArray();
-                values1.AddRange(names.Select(x => new OpenApiString(x)));
-
-                schema.Extensions.Add(
-                    "x-enumNames",
-                    values1
-                );
-
-                schema.Extensions.Add(
-                    "x-ms-enum",
-                    new OpenApiObject
-                    {
-                        ["name"] = new OpenApiString(type.Name),
-                        ["modelAsString"] = new OpenApiBoolean(true),
-                        ["values"] = values2,
-                    }
-                );
-            }
-        }
     }
 
     private class HangfireDashboardAsyncAuthorizationFilter : IDashboardAuthorizationFilter
