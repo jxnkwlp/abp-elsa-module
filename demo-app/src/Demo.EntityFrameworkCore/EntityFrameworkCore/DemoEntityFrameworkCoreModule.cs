@@ -43,9 +43,15 @@ public class DemoEntityFrameworkCoreModule : AbpModule
 
         Configure<AbpDbContextOptions>(options =>
         {
+            options.PreConfigure(config =>
+            {
+                config.DbContextOptions.EnableDetailedErrors(true).EnableSensitiveDataLogging();
+            });
+
             /* The main point to change your DBMS.
              * See also DemoMigrationsDbContextFactory for EF Core tooling. */
             options.UseSqlServer();
+
         });
     }
 }

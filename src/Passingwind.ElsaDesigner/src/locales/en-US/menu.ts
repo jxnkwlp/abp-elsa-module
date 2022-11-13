@@ -60,4 +60,6 @@ export default {
     'menu.system.users': 'Users',
     'menu.system.roles': 'Roles',
     'menu.system.settings': 'Settings',
+    'menu.system.auditLogs': 'Audit Logs',
+    'menu.system.securityLogs': 'Security Logs',
 };

@@ -1,7 +1,8 @@
 {
   "culture": "en",
   "texts": {
-    "MyAccount":  "My account",
-    "SamplePageMessage": "A sample page for the ElsaModule module"
+    "MyAccount": "My account",
+    "SamplePageMessage": "A sample page for the ElsaModule module",
+    "ElsaModule:WorkflowDefinition:NameExists": "Workflow definition name '{name}' exists"
   }
 }

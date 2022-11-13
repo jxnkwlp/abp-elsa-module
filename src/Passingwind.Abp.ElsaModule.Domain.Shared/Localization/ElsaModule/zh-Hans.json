@@ -2,6 +2,7 @@
   "culture": "zh-Hans",
   "texts": {
     "MyAccount": "我的账户",
-    "SamplePageMessage": "ElsaModule模块的示例页面"
+    "SamplePageMessage": "ElsaModule模块的示例页面",
+    "ElsaModule:WorkflowDefinition:NameExists": "定义名称'{name}'已经存在"
   }
 }

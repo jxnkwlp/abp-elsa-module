@@ -72,6 +72,7 @@ export default {
     'page.definition.dispatch.input': 'Input',
     'page.definition.publish': 'Publish',
     'page.definition.unpublish': 'Unpublish',
+    'page.definition.copyable': 'Copy Latest Version',
     'page.definition.latest': 'Latest',
     'page.definition.published': 'Published',
     'page.definition.settings': 'Settings',
@@ -84,6 +85,8 @@ export default {
     'page.definition.versions.comparison.label': 'Comparison {v1} and {v2}',
     'page.definition.published.success': 'Publish workflow success. version: {version}',
     'page.definition.saved.success': 'Save successed. version: {version}',
+    'page.definition.import.autoLayout': 'Auto Layout',
+    'page.definition.import.files': 'JSON Files',
     //
     'page.definition.field.name': 'Name',
     'page.definition.field.displayName': 'Display Name',

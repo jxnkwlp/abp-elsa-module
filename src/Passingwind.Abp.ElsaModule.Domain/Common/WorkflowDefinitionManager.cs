@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Elsa.Models;
+using Volo.Abp;
+using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 
 namespace Passingwind.Abp.ElsaModule.Common;
@@ -15,6 +17,14 @@ public class WorkflowDefinitionManager : DomainService
     {
         _workflowDefinitionRepository = workflowDefinitionRepository;
         _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
+    }
+
+    public virtual async Task CheckNameExistsAsync(WorkflowDefinition entity)
+    {
+        var exists = await _workflowDefinitionRepository.AnyAsync(x => x.Name == entity.Name && x.Id != entity.Id);
+
+        if (exists)
+            throw new BusinessException(ElsaModuleErrorCodes.WorkflowDefinitionNameExists).WithData("name", entity.Name);
     }
 
     public virtual Task<WorkflowDefinition> CreateDefinitionAsync(string name, string displayName, Guid? tenantId, string description, bool isSingleton, bool deleteCompletedInstances, string channel, string tag, WorkflowPersistenceBehavior persistenceBehavior, WorkflowContextOptions contextOptions, Dictionary<string, object> variables, Dictionary<string, object> customAttributes)

@@ -85,6 +85,16 @@
                 component: './setting',
             },
             {
+                path: 'audit/logs',
+                name: 'auditLogs',
+                component: './audit/logs',
+            },
+            {
+                path: 'security/logs',
+                name: 'securityLogs',
+                component: './security/logs',
+            },
+            {
                 component: './404',
             },
         ],

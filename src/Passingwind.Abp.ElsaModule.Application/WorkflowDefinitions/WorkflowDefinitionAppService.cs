@@ -45,6 +45,9 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         );
         defintion.SetVersion(1, null);
 
+        // check name
+        await _workflowDefinitionManager.CheckNameExistsAsync(defintion);
+
         WorkflowDefinitionVersion version = await _workflowDefinitionManager.CreateDefinitionVersionAsync(
             defintion.Id,
             CurrentTenant.Id,
@@ -257,6 +260,9 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         defintion.Variables = input.Definition.Variables;
         await _workflowDefinitionRepository.UpdateAsync(defintion);
 
+        // check name
+        await _workflowDefinitionManager.CheckNameExistsAsync(defintion);
+
         var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(currentVersion);
         dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(defintion);
         return dto;
@@ -275,6 +281,9 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         entity.PersistenceBehavior = input.PersistenceBehavior;
         entity.ContextOptions = input.ContextOptions;
         entity.Variables = input.Variables;
+
+        // check name
+        await _workflowDefinitionManager.CheckNameExistsAsync(entity);
 
         await _workflowDefinitionRepository.UpdateAsync(entity);
 

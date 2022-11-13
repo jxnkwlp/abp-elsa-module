@@ -191,6 +191,10 @@ const Index: React.FC = () => {
                             if (await workflowDefinitionUnPublish(record.id!)) {
                                 action?.reload();
                             }
+                        } else if (key == 'copyable') {
+                            history.push(
+                                `/designer?fromId=${record.id}&fromVersion=${record.latestVersion}`,
+                            );
                         }
                     }}
                     menus={[
@@ -204,7 +208,21 @@ const Index: React.FC = () => {
                             name: intl.formatMessage({ id: 'page.definition.unpublish' }),
                             disabled: record.publishedVersion == null,
                         },
-                        { key: 'delete', name: intl.formatMessage({ id: 'common.dict.delete' }) },
+                        {
+                            type: 'divider',
+                        },
+                        {
+                            key: 'copyable',
+                            name: intl.formatMessage({ id: 'page.definition.copyable' }),
+                        },
+                        {
+                            type: 'divider',
+                        },
+                        {
+                            key: 'delete',
+                            name: intl.formatMessage({ id: 'common.dict.delete' }),
+                            danger: true,
+                        },
                     ]}
                 />,
             ],

@@ -32,6 +32,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using Owl.Abp.CultureMap;
 using Passingwind.Abp.ElsaModule;
 using Passingwind.Abp.ElsaModule.Activities;
 using Passingwind.Abp.ElsaModule.Services;
@@ -349,6 +350,21 @@ public partial class DemoHttpApiHostModule : AbpModule
             options.Languages.Add(new LanguageInfo("en", "en", "English"));
             options.Languages.Add(new LanguageInfo("zh-Hans", "zh-Hans", "简体中文"));
         });
+
+        Configure<OwlCultureMapOptions>(options =>
+        {
+            var zhHansCultureMapInfo = new CultureMapInfo
+            {
+                TargetCulture = "zh-Hans",
+                SourceCultures = new List<string>
+                {
+                    "zh", "zh-CN"
+                }
+            };
+
+            options.CulturesMaps.Add(zhHansCultureMapInfo);
+            options.UiCulturesMaps.Add(zhHansCultureMapInfo);
+        });
     }
 
     private void ConfigureDataProtection(
@@ -398,7 +414,7 @@ public partial class DemoHttpApiHostModule : AbpModule
         }
 
         app.UseForwardedHeaders();
-        app.UseAbpRequestLocalization();
+        app.UseOwlRequestLocalization();
         app.UseCorrelationId();
         app.UseStatusCodePages();
         app.UseStaticFiles();

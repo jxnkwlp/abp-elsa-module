@@ -60,4 +60,6 @@ export default {
     'menu.system.users': '用户',
     'menu.system.roles': '角色',
     'menu.system.settings': '设置',
+    'menu.system.auditLogs': '审计日志',
+    'menu.system.securityLogs': '安全日志',
 };

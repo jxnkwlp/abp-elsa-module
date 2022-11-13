@@ -27,6 +27,7 @@
         <PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="5.3.4" />
         <PackageReference Include="Volo.Abp.Swashbuckle" Version="5.3.4" />
         <PackageReference Include="Volo.Abp.MailKit" Version="5.3.4" />
+        <PackageReference Include="Owl.Abp.CultureMap" Version="2.2.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -35,7 +36,7 @@
         <PackageReference Include="Elsa.Activities.Http" Version="2.9.1" />
         <PackageReference Include="Elsa.Activities.UserTask" Version="2.9.1" />
         <PackageReference Include="Elsa.Activities.BlobStorage" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.File" Version="2.9.1" /> 
+        <PackageReference Include="Elsa.Activities.File" Version="2.9.1" />
         <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.9.1" />
         <PackageReference Include="Elsa.Activities.Entity" Version="2.9.1" />
         <PackageReference Include="Elsa.Activities.RabbitMq" Version="2.9.1" />
@@ -43,14 +44,14 @@
         <PackageReference Include="Elsa.Activities.Http.OpenApi" Version="2.9.1" />
     </ItemGroup>
 
-    <ItemGroup> 
-        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.Activities\Passingwind.Abp.ElsaModule.Activities.csproj" /> 
-        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.MongoDB\Passingwind.Abp.ElsaModule.MongoDB.csproj" /> 
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.Activities\Passingwind.Abp.ElsaModule.Activities.csproj" />
+        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.MongoDB\Passingwind.Abp.ElsaModule.MongoDB.csproj" />
         <ProjectReference Include="..\Demo.Application\Demo.Application.csproj" />
         <ProjectReference Include="..\Demo.EntityFrameworkCore\Demo.EntityFrameworkCore.csproj" />
         <ProjectReference Include="..\Demo.HttpApi\Demo.HttpApi.csproj" />
     </ItemGroup>
-    
+
 
     <ItemGroup>
         <Compile Remove="Logs\**" />

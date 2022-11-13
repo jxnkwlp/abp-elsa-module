@@ -10,6 +10,7 @@ import {
     updateWorkflowDefinition,
 } from '@/services/WorkflowDefinition';
 import { GlobalOutlined, SaveOutlined, SettingOutlined } from '@ant-design/icons';
+import { ProFormSwitch, ProFormUploadDragger } from '@ant-design/pro-components';
 import { ModalForm } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
@@ -27,7 +28,6 @@ import {
     Space,
     Spin,
     Tag,
-    Upload,
 } from 'antd';
 import type { RcFile } from 'antd/lib/upload';
 import { isArray } from 'lodash';
@@ -57,14 +57,18 @@ import type {
 const Index: React.FC = () => {
     const location = useLocation();
     const history = useHistory();
+
     const intl = useIntl();
 
     const flowAction = useRef<FlowActionType>();
 
     const [loading, setLoading] = React.useState(false);
 
+    const [fromDefinition, setFromDefinition] = React.useState<{ id: string; version: number }>();
+
     const [submiting, setSubmiting] = React.useState(false);
-    const [id, setId] = React.useState<string>();
+    //
+    const [definitionId, setDefinitionId] = React.useState<string>();
     const [version, setVersion] = React.useState<number>(1);
     const [, setDefinitionVersion] = React.useState<API.WorkflowDefinitionVersion>();
     const [definition, setDefinition] = React.useState<API.WorkflowDefinition>();
@@ -100,6 +104,8 @@ const Index: React.FC = () => {
     const [jsonEditorVisible, setJsonEditorVisible] = React.useState<boolean>(false);
     const [jsonEditorValue, setJsonEditorValue] = React.useState<string>('');
     const jsonEditorRef = React.createRef<MonacoEditor>();
+
+    const [importModalVisible, setImportModalVisible] = React.useState<boolean>(false);
 
     const loadServerData = async (
         definiton: API.WorkflowDefinitionVersion,
@@ -152,7 +158,7 @@ const Index: React.FC = () => {
         }
     };
 
-    const handleOnImport = async (file: RcFile) => {
+    const handleOnImport = async (file: RcFile, autoLayout: boolean = true) => {
         try {
             const content = await file.text();
             const data = JSON.parse(content);
@@ -168,14 +174,17 @@ const Index: React.FC = () => {
                 });
             }
 
-            await loadServerData(data2 as API.WorkflowDefinition, true);
+            await loadServerData(data2 as API.WorkflowDefinition, autoLayout);
             message.info('import successful.');
+
+            //
+            return true;
         } catch (error) {
             console.error(error);
             message.error('Import file failed');
+            //
+            return false;
         }
-
-        // const result = await flowAction.current?.getGraphData();
     };
 
     // show node edit form
@@ -471,8 +480,8 @@ const Index: React.FC = () => {
         const { activities, connections } = conventToServerData(gdata!);
 
         let result = null;
-        if (id) {
-            result = await updateWorkflowDefinition(id, {
+        if (definitionId) {
+            result = await updateWorkflowDefinition(definitionId, {
                 definition: definition as API.WorkflowDefinitionCreateOrUpdate,
                 activities,
                 connections,
@@ -504,12 +513,14 @@ const Index: React.FC = () => {
                 );
             }
             // new
-            if (!id) {
+            if (!definitionId) {
                 // message.success('Create successed.');
                 history.replace(`/designer?id=${result.definition?.id}`);
             }
-
-            setId(result.definition!.id);
+            // clear
+            setFromDefinition(undefined);
+            //
+            setDefinitionId(result.definition!.id);
             setVersion(result.version!);
             //
             setDefinitionVersion(result);
@@ -530,12 +541,18 @@ const Index: React.FC = () => {
     ) => {
         const loading = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
 
-        const sourceVersion = await getWorkflowDefinitionVersion(id!, sourceVersionNumber);
+        const sourceVersion = await getWorkflowDefinitionVersion(
+            definitionId!,
+            sourceVersionNumber,
+        );
         let targetVersion: API.WorkflowDefinitionVersion;
         if (targetVersionNumber) {
-            targetVersion = await getWorkflowDefinitionVersion(id!, targetVersionNumber);
+            targetVersion = await getWorkflowDefinitionVersion(definitionId!, targetVersionNumber);
         } else {
-            targetVersion = await getWorkflowDefinitionPreviousVersion(id!, sourceVersionNumber);
+            targetVersion = await getWorkflowDefinitionPreviousVersion(
+                definitionId!,
+                sourceVersionNumber,
+            );
         }
 
         if (!targetVersion) {
@@ -636,18 +653,43 @@ const Index: React.FC = () => {
             setVersion(definitonVersion.version!);
             //
             await loadServerData(definitonVersion);
+
+            //
+            if (fromDefinition) {
+                // update
+                setDefinition({
+                    ...definitonVersion.definition,
+                    name: definitonVersion.definition?.name + '_copy',
+                    displayName: definitonVersion.definition?.displayName + '_copy',
+                });
+                showCreateModal();
+            }
         } else {
             history.goBack();
         }
     };
 
     useEffect(() => {
+        if (fromDefinition && !definitionId) {
+            setDefinitionId(undefined);
+            loadData(fromDefinition.id, fromDefinition.version);
+        }
+    }, [fromDefinition]);
+
+    useEffect(() => {
         // @ts-ignore
-        const qid = location.query?.id ?? '';
-        setId(qid);
-        if (qid) {
-            loadData(qid);
-        } else {
+        const _id = (location.query?.id ?? '') as string | undefined;
+        // @ts-ignore
+        const _fromId = (location.query?.fromId ?? '') as string | undefined;
+        // @ts-ignore
+        const _fromVersion = (location.query?.fromVersion ?? undefined) as number | undefined;
+        //
+        setDefinitionId(_id);
+        if (_fromId && _fromVersion) setFromDefinition({ id: _fromId, version: _fromVersion });
+        if (_id) {
+            loadData(_id);
+        }
+        if (!_id && !_fromId) {
             showCreateModal();
         }
     }, []);
@@ -659,7 +701,6 @@ const Index: React.FC = () => {
                     const charCode = String.fromCharCode(e.which).toLowerCase();
                     if ((e.ctrlKey || e.metaKey) && charCode === 's') {
                         e.preventDefault();
-                        console.log('ctrl+s');
                         if (definition?.name) {
                             await handleSaveGraphData();
                         }
@@ -669,15 +710,19 @@ const Index: React.FC = () => {
                 title={
                     <>
                         <span style={{ fontSize: 18 }}>{definition?.name} </span>
-                        <Tag>
-                            {intl.formatMessage({ id: 'page.definition.latest' })}:{' '}
-                            {definition?.latestVersion ?? 1}
-                        </Tag>
-                        {definition?.publishedVersion && (
-                            <Tag>
-                                {intl.formatMessage({ id: 'page.definition.published' })}:{' '}
-                                {definition?.publishedVersion}
-                            </Tag>
+                        {!fromDefinition && (
+                            <>
+                                <Tag>
+                                    {intl.formatMessage({ id: 'page.definition.latest' })}:{' '}
+                                    {definition?.latestVersion ?? 1}
+                                </Tag>
+                                {definition?.publishedVersion && (
+                                    <Tag>
+                                        {intl.formatMessage({ id: 'page.definition.published' })}:{' '}
+                                        {definition?.publishedVersion}
+                                    </Tag>
+                                )}
+                            </>
                         )}
                     </>
                 }
@@ -725,7 +770,7 @@ const Index: React.FC = () => {
                                         onClick={() => {
                                             setVersionListModalVisible(true);
                                         }}
-                                        disabled={!id}
+                                        disabled={!definitionId}
                                     >
                                         {intl.formatMessage({ id: 'page.definition.versions' })}
                                     </Menu.Item>
@@ -753,17 +798,13 @@ const Index: React.FC = () => {
                                     >
                                         {intl.formatMessage({ id: 'common.dict.export' })}
                                     </Menu.Item>
-                                    <Menu.Item key="import">
-                                        <Upload
-                                            accept=".json"
-                                            showUploadList={false}
-                                            beforeUpload={(file) => {
-                                                handleOnImport(file);
-                                                return false;
-                                            }}
-                                        >
-                                            {intl.formatMessage({ id: 'common.dict.import' })}
-                                        </Upload>
+                                    <Menu.Item
+                                        key="import"
+                                        onClick={() => {
+                                            setImportModalVisible(true);
+                                        }}
+                                    >
+                                        {intl.formatMessage({ id: 'common.dict.import' })}
                                     </Menu.Item>
                                 </Menu>
                             }
@@ -879,7 +920,7 @@ const Index: React.FC = () => {
                 // }}
             >
                 <NodePropForm
-                    workflowDefinitionId={id}
+                    workflowDefinitionId={definitionId}
                     properties={nodeTypePropList}
                     getFieldValue={editNodeFormRef.getFieldValue}
                     setFieldsValue={editNodeFormRef.setFieldsValue}
@@ -899,7 +940,7 @@ const Index: React.FC = () => {
                     if (oldVersion) {
                         setVersionListModalVisible(false);
                         message.loading(intl.formatMessage({ id: 'common.dict.loading' }), 1);
-                        loadData(id!, oldVersion);
+                        loadData(definitionId!, oldVersion);
                     } else {
                         message.error(
                             intl.formatMessage({ id: 'page.definition.versions.no-select' }),
@@ -990,7 +1031,7 @@ const Index: React.FC = () => {
                                             } else {
                                                 const result =
                                                     await deleteWorkflowDefinitionVersion(
-                                                        id!,
+                                                        definitionId!,
                                                         record.version!,
                                                     );
 
@@ -1023,7 +1064,7 @@ const Index: React.FC = () => {
                         delete params.current;
                         delete params.pageSize;
                         const skipCount = (current! - 1) * pageSize!;
-                        const result = await getWorkflowDefinitionVersions(id!, {
+                        const result = await getWorkflowDefinitionVersions(definitionId!, {
                             skipCount,
                             maxResultCount: pageSize,
                         });
@@ -1065,6 +1106,53 @@ const Index: React.FC = () => {
                     />
                 </div>
             </Modal>
+            {/* import */}
+            <ModalForm
+                title={intl.formatMessage({ id: 'common.dict.import' })}
+                visible={importModalVisible}
+                onVisibleChange={setImportModalVisible}
+                modalProps={{ maskClosable: false, destroyOnClose: true }}
+                preserve={false}
+                labelWrap={true}
+                width={650}
+                onFinish={async (values) => {
+                    if (!values.files?.length) {
+                        return;
+                    }
+                    if (
+                        await handleOnImport(
+                            values.files[0].originFileObj,
+                            values.autoLayout ?? true,
+                        )
+                    ) {
+                        setImportModalVisible(false);
+                    }
+                }}
+                submitter={{
+                    searchConfig: { submitText: intl.formatMessage({ id: 'common.dict.import' }) },
+                }}
+            >
+                <ProFormSwitch
+                    label={intl.formatMessage({ id: 'page.definition.import.autoLayout' })}
+                    name="autoLayout"
+                />
+                {/* <ProFormUploadButton accept=".json" /> */}
+                <ProFormUploadDragger
+                    label={intl.formatMessage({ id: 'page.definition.import.files' })}
+                    name="files"
+                    accept=".json"
+                    max={1}
+                    fieldProps={{
+                        multiple: false,
+                        maxCount: 1,
+                        beforeUpload: (file) => {
+                            return false;
+                        },
+                    }}
+                    rules={[{ required: true }]}
+                    requiredMark={false}
+                />
+            </ModalForm>
         </PageContainer>
     );
 };

@@ -5,6 +5,7 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -22,10 +23,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 5.0.x
+            dotnet-version: |
+                5.0.x
+                6.0.x
+                7.0.x
 
       - name: Install Dotnet Tool
         run: dotnet tool install -g Passingwind.Git-CI-Tools
@@ -38,11 +42,6 @@ jobs:
           gitci release changes --output ./changeslog.md
           gitci version next --format json --output ./version.json --build-ver "${{env.GITHUB_SHA_SHORT}}" 
           ls ./
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.x
 
       - id: changes
         uses: dorny/paths-filter@v2

@@ -70,6 +70,7 @@ export default {
     'page.definition.dispatch.input': '输入',
     'page.definition.publish': '发布',
     'page.definition.unpublish': '取消发布',
+    'page.definition.copyable': '复制最新版本',
     'page.definition.latest': '最新',
     'page.definition.published': '已发布',
     'page.definition.settings': '设置',
@@ -82,6 +83,8 @@ export default {
     'page.definition.versions.comparison.label': '版本比较：{v1}/{v2}',
     'page.definition.published.success': '发布流程成功，版本：{version}',
     'page.definition.saved.success': '保存成功，版本：{version}',
+    'page.definition.import.autoLayout': '自动布局',
+    'page.definition.import.files': 'JSON文件',
     //
     'page.definition.field.name': '名称',
     'page.definition.field.displayName': '显示名称',

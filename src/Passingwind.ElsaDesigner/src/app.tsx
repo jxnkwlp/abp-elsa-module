@@ -77,6 +77,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         footerRender: () => <Footer />,
         onPageChange: () => {
             const { location } = history;
+            if (isDev) console.log(location);
             // 如果没有登录，重定向到 login
             if (!initialState?.currentUser && location.pathname !== loginPath) {
                 history.push(loginPath);
@@ -163,4 +164,12 @@ export const request: RequestConfig = {
         // 如果状态码非 20X，则返回 null
         return null;
     },
+    requestInterceptors: [
+        (url, options) => {
+            const locale = window.localStorage.getItem('umi_locale');
+            if (locale && options.headers) options.headers['Accept-Language'] = locale;
+
+            return { url, options };
+        },
+    ],
 };

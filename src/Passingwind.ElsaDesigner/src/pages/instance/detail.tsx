@@ -417,58 +417,61 @@ const Index: React.FC = () => {
                                 )}
                             </div>
                         )}
-                        {tabKey === 'logs' && (
-                            <Timeline
-                                mode="left"
-                                pending={
-                                    data?.workflowStatus == WorkflowInstanceStatus.Running ||
-                                    data?.workflowStatus == WorkflowInstanceStatus.Suspended
-                                }
-                                reverse
-                            >
-                                {(activitiesSummary ?? []).map((item) => {
-                                    return (
-                                        <Timeline.Item
-                                            key={item.activityId}
-                                            color={
-                                                item.isExecuting
-                                                    ? 'gray'
-                                                    : item.isFaulted
-                                                    ? 'red'
-                                                    : 'green'
-                                            }
-                                            dot={
-                                                item.isExecuting ? (
-                                                    <ClockCircleOutlined
-                                                        style={{ fontSize: '12px' }}
-                                                    />
-                                                ) : null
-                                            }
-                                            // label={moment(item.startTime).format(
-                                            //     'YYYY-MM-DD HH:mm:ss',
-                                            // )}
-                                        >
-                                            <Space>
-                                                <span style={{ fontSize: 16 }}>
-                                                    {item.displayName}
-                                                </span>
-                                                <Tag>
-                                                    <FieldTimeOutlined />{' '}
-                                                    {moment(item.startTime).format(
-                                                        'YYYY-MM-DD HH:mm:ss',
-                                                    )}
-                                                </Tag>
-                                                <Tag>
-                                                    <FunctionOutlined /> {item.activityType}
-                                                </Tag>
-                                            </Space>
-                                            {/* {item.status}  */}
-                                            {item.message && <p>{item.message}</p>}
-                                        </Timeline.Item>
-                                    );
-                                })}
-                            </Timeline>
-                        )}
+                        {tabKey === 'logs' &&
+                            ((activitiesSummary ?? []).length ? (
+                                <Timeline
+                                    mode="left"
+                                    pending={
+                                        data?.workflowStatus == WorkflowInstanceStatus.Running ||
+                                        data?.workflowStatus == WorkflowInstanceStatus.Suspended
+                                    }
+                                    reverse
+                                >
+                                    {activitiesSummary.map((item) => {
+                                        return (
+                                            <Timeline.Item
+                                                key={item.activityId}
+                                                color={
+                                                    item.isExecuting
+                                                        ? 'gray'
+                                                        : item.isFaulted
+                                                        ? 'red'
+                                                        : 'green'
+                                                }
+                                                dot={
+                                                    item.isExecuting ? (
+                                                        <ClockCircleOutlined
+                                                            style={{ fontSize: '12px' }}
+                                                        />
+                                                    ) : null
+                                                }
+                                                // label={moment(item.startTime).format(
+                                                //     'YYYY-MM-DD HH:mm:ss',
+                                                // )}
+                                            >
+                                                <Space>
+                                                    <span style={{ fontSize: 16 }}>
+                                                        {item.displayName}
+                                                    </span>
+                                                    <Tag>
+                                                        <FieldTimeOutlined />{' '}
+                                                        {moment(item.startTime).format(
+                                                            'YYYY-MM-DD HH:mm:ss',
+                                                        )}
+                                                    </Tag>
+                                                    <Tag>
+                                                        <FunctionOutlined /> {item.activityType}
+                                                    </Tag>
+                                                </Space>
+                                                {/* {item.status}  */}
+                                                {item.message && <p>{item.message}</p>}
+                                            </Timeline.Item>
+                                        );
+                                    })}
+                                </Timeline>
+                            ) : (
+                                <Empty />
+                            ))}
 
                         {tabKey === 'input' &&
                             (data?.input ? (
