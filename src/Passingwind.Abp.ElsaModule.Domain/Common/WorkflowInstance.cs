@@ -48,9 +48,9 @@ public class WorkflowInstance : FullAuditedAggregateRoot<Guid>, IMultiTenant
     [Obsolete]
     public WorkflowFault Fault { get; set; }
 
-    public List<WorkflowInstanceFault> Faults { get; set; } = new List<WorkflowInstanceFault>();
-
     public WorkflowInstanceScheduledActivity CurrentActivity { get; set; }
+
+    public List<WorkflowInstanceFault> Faults { get; set; } = new List<WorkflowInstanceFault>();
 
     public List<WorkflowInstanceVariable> Variables { get; set; } = new List<WorkflowInstanceVariable>();
 

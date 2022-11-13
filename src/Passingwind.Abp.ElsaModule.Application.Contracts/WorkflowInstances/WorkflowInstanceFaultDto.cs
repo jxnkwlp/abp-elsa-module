@@ -1,15 +1,13 @@
 ﻿using System;
-using Elsa.Models;
-using Volo.Abp.Application.Dtos;
+using Passingwind.Abp.ElsaModule.Common;
 
-namespace Passingwind.Abp.ElsaModule.Common
+namespace Passingwind.Abp.ElsaModule.WorkflowInstances;
+
+public class WorkflowInstanceFaultDto
 {
-    public class WorkflowInstanceFaultDto : EntityDto<Guid>
-    {
-        public Guid? FaultedActivityId { get; set; }
-        public bool Resuming { get; set; }
-        public object ActivityInput { get; set; }
-        public string Message { get; set; }
-        public SimpleException Exception { get; set; }
-    }
+    public Guid? FaultedActivityId { get; set; }
+    public bool Resuming { get; set; }
+    public object ActivityInput { get; set; }
+    public string Message { get; set; }
+    public SimpleExceptionModel Exception { get; set; }
 }

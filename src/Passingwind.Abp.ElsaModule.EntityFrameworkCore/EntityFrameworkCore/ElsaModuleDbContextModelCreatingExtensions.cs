@@ -218,7 +218,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.HasKey(x => new { x.Id, x.WorkflowInstanceId });
 
             b.Property(x => x.ActivityInput).HasConversion(new ElsaEFJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
-            b.Property(x => x.Exception).HasConversion(new ElsaEFJsonValueConverter<Elsa.Models.SimpleException>(), ValueComparer.CreateDefault(typeof(Elsa.Models.SimpleException), false));
+            b.Property(x => x.Exception).HasConversion(new ElsaEFJsonValueConverter<SimpleExceptionModel>(), ValueComparer.CreateDefault(typeof(SimpleExceptionModel), false));
         });
 
         builder.Entity<WorkflowExecutionLog>(b =>
