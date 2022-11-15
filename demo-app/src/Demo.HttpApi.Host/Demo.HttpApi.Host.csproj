@@ -45,7 +45,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.Activities\Passingwind.Abp.ElsaModule.Activities.csproj" />
+        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.ElsaExtensions\Passingwind.Abp.ElsaModule.ElsaExtensions.csproj" />
         <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.MongoDB\Passingwind.Abp.ElsaModule.MongoDB.csproj" />
         <ProjectReference Include="..\Demo.Application\Demo.Application.csproj" />
         <ProjectReference Include="..\Demo.EntityFrameworkCore\Demo.EntityFrameworkCore.csproj" />

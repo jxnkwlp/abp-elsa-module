@@ -8,7 +8,7 @@ using Elsa.Services.Models;
 using MimeKit;
 using Volo.Abp.Emailing;
 
-namespace Passingwind.Abp.ElsaModule
+namespace Passingwind.Abp.ElsaModule.Services
 {
     public class AbpSmtpService : ISmtpService
     {

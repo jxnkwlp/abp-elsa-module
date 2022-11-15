@@ -14,14 +14,14 @@ namespace Passingwind.Abp.ElsaModule.Activities
         typeof(AbpEmailingModule),
         typeof(AbpEventBusModule)
         )]
-    public class ElsaModuleActivitiesModule : AbpModule
+    public class ElsaModuleExtensionModule : AbpModule
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
             PreConfigure<ElsaModuleOptions>(configure =>
             {
                 configure.Builder
-                    .AddActivitiesFrom(typeof(ElsaModuleActivitiesModule))
+                    .AddActivitiesFrom(typeof(ElsaModuleExtensionModule))
                     ;
             });
         }
@@ -44,7 +44,7 @@ namespace Passingwind.Abp.ElsaModule.Activities
             //context.Services.AddBookmarkProvidersFrom(typeof(ElsaModuleActivitiesModule).Assembly);
             //context.Services.AddWorkflowContextProvider(typeof(ElsaModuleActivitiesModule).Assembly);
 
-            context.Services.AddMediatR(typeof(ElsaModuleActivitiesModule).Assembly);
+            context.Services.AddMediatR(typeof(ElsaModuleExtensionModule).Assembly);
 
             context.Services.AddOptions<CSharpOptions>("Elsa:CSharp");
         }

@@ -58,7 +58,7 @@ using Volo.Abp.VirtualFileSystem;
 namespace Demo;
 
 [DependsOn(
-    typeof(ElsaModuleActivitiesModule),
+    typeof(ElsaModuleExtensionModule),
     typeof(DemoHttpApiModule),
     typeof(AbpAutofacModule),
     typeof(AbpCachingStackExchangeRedisModule),
