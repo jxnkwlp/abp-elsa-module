@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.Application.Contracts", "src\Passingwind.Abp.ElsaModule.Application.Contracts\Passingwind.Abp.ElsaModule.Application.Contracts.csproj", "{BD65D04F-08D5-40C1-8C24-77CA0BACB877}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Passingwind.Abp.ElsaModule.ElsaExtensions", "src\Passingwind.Abp.ElsaModule.ElsaExtensions\Passingwind.Abp.ElsaModule.ElsaExtensions.csproj", "{D2F19C34-346A-432D-A29C-170A03B8D761}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.ElsaExtensions", "src\Passingwind.Abp.ElsaModule.ElsaExtensions\Passingwind.Abp.ElsaModule.ElsaExtensions.csproj", "{D2F19C34-346A-432D-A29C-170A03B8D761}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
