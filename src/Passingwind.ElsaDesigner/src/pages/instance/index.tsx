@@ -71,7 +71,8 @@ const Index: React.FC = () => {
                 );
             },
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.name ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.name ?? null,
+            fixed: 'left',
         },
         {
             dataIndex: 'version',
@@ -79,22 +80,23 @@ const Index: React.FC = () => {
             valueType: 'digit',
             width: 100,
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.version ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.version ?? null,
         },
         {
             dataIndex: 'workflowStatus',
             title: intl.formatMessage({ id: 'page.instance.field.workflowStatus' }),
             valueEnum: workflowStatusEnum,
-            width: 150,
+            width: 120,
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.workflowStatus ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.workflowStatus ?? null,
         },
         {
             dataIndex: 'creationTime',
             title: intl.formatMessage({ id: 'common.dict.creationTime' }),
             valueType: 'dateTime',
+            width: 150,
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.creationTime ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.creationTime ?? null,
             search: false,
         },
         {
@@ -107,8 +109,9 @@ const Index: React.FC = () => {
             dataIndex: 'finishedTime',
             title: intl.formatMessage({ id: 'page.instance.field.finishedTime' }),
             valueType: 'dateTime',
+            width: 150,
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.finishedTime ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.finishedTime ?? null,
             search: false,
         },
         {
@@ -121,8 +124,9 @@ const Index: React.FC = () => {
             dataIndex: 'lastExecutedTime',
             title: intl.formatMessage({ id: 'page.instance.field.lastExecutedTime' }),
             valueType: 'dateTime',
+            width: 150,
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.lastExecutedTime ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.lastExecutedTime ?? null,
             search: false,
         },
         {
@@ -132,14 +136,12 @@ const Index: React.FC = () => {
             hideInTable: true,
         },
         {
-            dataIndex: 'faultedTimes',
+            dataIndex: 'faultedTime',
             title: intl.formatMessage({ id: 'page.instance.field.faultedTime' }),
-            valueType: (e, t) => {
-                if (t == 'table') return 'dateTime';
-                return 'dateTimeRange';
-            },
+            valueType: 'dateTime',
+            width: 150,
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.faultedTime ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.faultedTime ?? null,
             search: false,
         },
         {
@@ -161,6 +163,7 @@ const Index: React.FC = () => {
             valueType: 'option',
             width: 170,
             align: 'center',
+            fixed: 'right',
             render: (text, record, _, action) => {
                 const menus = [];
 
@@ -275,57 +278,58 @@ const Index: React.FC = () => {
                     collapsed: tableFilterCollapsed,
                     onCollapse: setTableFilterCollapsed,
                 }}
+                scroll={{ x: 1600 }}
                 rowKey="id"
                 onReset={() => {
-                    // clear filter & pagination
+                    // clear filter & pagination & sorting
                     setTableQueryConfig({
-                        ...tableQueryConfig,
-                        filter: undefined,
+                        sort: null,
+                        filter: null,
                         pagination: undefined,
                     });
                 }}
                 pagination={tableQueryConfig?.pagination}
-                onChange={(pagination, filters, sorter) => {
-                    // sorter
-                    let newConfig = {
+                onChange={(pagination, _, sorter) => {
+                    // update pagination
+                    let queryConfig: GlobalAPI.TableQueryConfig = {
                         ...tableQueryConfig,
+                        pagination: {
+                            current: pagination.current ?? 1,
+                            pageSize: pagination.pageSize ?? 10,
+                        },
+                        sort: null,
                     };
-                    if (sorter && sorter.field) {
-                        newConfig = {
-                            ...newConfig,
+                    // update sorter
+                    if (sorter && sorter.column && sorter.field) {
+                        queryConfig = {
+                            ...queryConfig,
                             sort: { [sorter.field]: sorter.order ?? '' },
                         };
                     }
-                    setTableQueryConfig(newConfig);
+                    // update
+                    setTableQueryConfig(queryConfig);
                 }}
-                request={async (params, sort) => {
+                request={async (params) => {
                     const { current, pageSize } = params;
                     delete params.current;
                     delete params.pageSize;
                     const skipCount = (current! - 1) * pageSize!;
 
-                    // filter & pagination
-                    const newConfig = {
+                    // update filter
+                    const queryConfig: GlobalAPI.TableQueryConfig = {
                         ...tableQueryConfig,
                         filter: { ...tableQueryConfig?.filter, ...params },
-                        pagination: { current, pageSize },
-                    } as GlobalAPI.TableQueryConfig;
-                    setTableQueryConfig(newConfig);
+                    };
 
                     // save session
-                    saveTableQueryConfig('workflow_instances', newConfig);
-
-                    const sorting = formatTableSorter({
-                        ...(newConfig?.sort ?? {}),
-                        ...(sort ?? {}),
-                    });
+                    saveTableQueryConfig('workflow_instances', queryConfig);
 
                     // fetch
                     const result = await getWorkflowInstanceList({
-                        ...newConfig.filter,
+                        ...queryConfig.filter,
                         skipCount,
                         maxResultCount: pageSize,
-                        sorting: sorting,
+                        sorting: formatTableSorter(queryConfig?.sort ?? {}),
                     });
                     return {
                         success: !!result,

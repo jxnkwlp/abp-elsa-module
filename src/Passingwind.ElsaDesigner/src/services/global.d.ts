@@ -37,7 +37,7 @@ declare namespace GlobalAPI {
 
     type TableQueryConfig = {
         pagination?: TablePaginationConfig | undefined,
-        sort?: Record<string, SortOrder> | undefined,
+        sort?: Record<string, SortOrder> | null,
         filter?: any | undefined,
     }
 }

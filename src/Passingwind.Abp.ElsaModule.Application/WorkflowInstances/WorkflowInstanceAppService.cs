@@ -133,7 +133,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         var list = await _workflowInstanceRepository.GetPagedListAsync(
             input.SkipCount,
             input.MaxResultCount,
-            null,
+            input.Sorting,
             name: input.Name,
             definitionId: input.WorkflowDefinitionId,
             version: input.Version,

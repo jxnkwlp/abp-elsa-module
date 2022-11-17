@@ -72,7 +72,9 @@ const Index: React.FC = () => {
             search: false,
             copyable: true,
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.name ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.name ?? null,
+            width: 220,
+            fixed: 'left',
         },
         {
             dataIndex: 'displayName',
@@ -80,26 +82,30 @@ const Index: React.FC = () => {
             search: false,
             copyable: true,
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.displayName ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.displayName ?? null,
+            width: 220,
         },
         {
             dataIndex: 'description',
             title: intl.formatMessage({ id: 'page.definition.field.description' }),
             search: false,
+            width: 150,
         },
         {
             dataIndex: 'latestVersion',
             title: intl.formatMessage({ id: 'page.definition.field.latestVersion' }),
             search: false,
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.latestVersion ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.latestVersion ?? null,
+            width: 150,
         },
         {
             dataIndex: 'publishedVersion',
             title: intl.formatMessage({ id: 'page.definition.field.publishedVersion' }),
             search: false,
             sorter: true,
-            sortOrder: tableQueryConfig?.sort?.publishedVersion ?? undefined,
+            sortOrder: tableQueryConfig?.sort?.publishedVersion ?? null,
+            width: 150,
         },
         {
             dataIndex: 'isSingleton',
@@ -110,22 +116,26 @@ const Index: React.FC = () => {
                 false: { text: 'N' },
             },
             sorter: true,
+            sortOrder: tableQueryConfig?.sort?.isSingleton ?? null,
+            width: 120,
+            align: 'center',
         },
         {
             dataIndex: 'lastModificationTime',
             title: intl.formatMessage({ id: 'common.dict.lastModificationTime' }),
             valueType: 'dateTime',
             search: false,
-            renderText: (_, record) => {
-                return _ ?? record.creationTime;
-            },
+            renderText: (_, record) => _ ?? record.creationTime,
             sorter: true,
+            sortOrder: tableQueryConfig?.sort?.lastModificationTime ?? null,
+            width: 150,
         },
         {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
-            width: 200,
+            width: 180,
             align: 'center',
+            fixed: 'right',
             render: (text, record, _, action) => [
                 <a
                     key="dispatch"
@@ -233,6 +243,9 @@ const Index: React.FC = () => {
         const tableQueryConfig = getTableQueryConfig('workflow_definitions') ?? {};
         setTableQueryConfig(tableQueryConfig);
         searchFormRef.current?.setFieldsValue(tableQueryConfig?.filter);
+        if (Object.keys(tableQueryConfig?.filter ?? {}).length > 0) {
+            setTableFilterCollapsed(false);
+        }
     }, []);
 
     return (
@@ -242,6 +255,7 @@ const Index: React.FC = () => {
                 actionRef={tableActionRef}
                 formRef={searchFormRef}
                 search={{ labelWidth: 140 }}
+                scroll={{ x: 1300 }}
                 rowKey="id"
                 toolBarRender={() => [
                     <Button
@@ -255,55 +269,56 @@ const Index: React.FC = () => {
                     </Button>,
                 ]}
                 onReset={() => {
-                    // clear filter & pagination
+                    // clear filter & pagination & sorting
                     setTableQueryConfig({
-                        ...tableQueryConfig,
-                        filter: undefined,
+                        sort: null,
+                        filter: null,
                         pagination: undefined,
                     });
                 }}
                 pagination={tableQueryConfig?.pagination}
-                onChange={(pagination, filters, sorter) => {
-                    // sorter
-                    let newConfig = {
+                onChange={(pagination, _, sorter) => {
+                    // update pagination
+                    let queryConfig: GlobalAPI.TableQueryConfig = {
                         ...tableQueryConfig,
+                        pagination: {
+                            current: pagination.current ?? 1,
+                            pageSize: pagination.pageSize ?? 10,
+                        },
+                        sort: null,
                     };
-                    if (sorter && sorter.field) {
-                        newConfig = {
-                            ...newConfig,
+                    // update sorter
+                    if (sorter && sorter.column && sorter.field) {
+                        queryConfig = {
+                            ...queryConfig,
                             sort: { [sorter.field]: sorter.order ?? '' },
                         };
                     }
-                    setTableQueryConfig(newConfig);
+
+                    // update
+                    setTableQueryConfig(queryConfig);
                 }}
-                request={async (params, sort) => {
+                request={async (params) => {
                     const { current, pageSize } = params;
                     delete params.current;
                     delete params.pageSize;
                     const skipCount = (current! - 1) * pageSize!;
 
-                    // filter & pagination
-                    const newConfig = {
+                    // update filter
+                    const queryConfig: GlobalAPI.TableQueryConfig = {
                         ...tableQueryConfig,
                         filter: { ...tableQueryConfig?.filter, ...params },
-                        pagination: { current, pageSize },
-                    } as GlobalAPI.TableQueryConfig;
-                    setTableQueryConfig(newConfig);
+                    };
 
                     // save session
-                    saveTableQueryConfig('workflow_definitions', newConfig);
-
-                    const sorting = formatTableSorter({
-                        ...(newConfig?.sort ?? {}),
-                        ...(sort ?? {}),
-                    });
+                    saveTableQueryConfig('workflow_definitions', queryConfig);
 
                     // fetch
                     const result = await getWorkflowDefinitionList({
-                        ...newConfig.filter,
+                        ...queryConfig.filter,
                         skipCount,
                         maxResultCount: pageSize,
-                        sorting: sorting,
+                        sorting: formatTableSorter(queryConfig?.sort ?? {}),
                     });
                     return {
                         success: !!result,

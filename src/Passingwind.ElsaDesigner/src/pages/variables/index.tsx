@@ -76,18 +76,21 @@ const Index: React.FC = () => {
             renderText: (_) => {
                 return _ ? 'Y' : 'N';
             },
-            width: 150,
+            width: 100,
         },
         {
             dataIndex: 'value',
             title: intl.formatMessage({ id: 'page.variable.field.value' }),
             search: false,
             ellipsis: true,
+            width: 500,
         },
         {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
-            width: 130,
+            width: 110,
+            align: 'center',
+            fixed: 'right',
             render: (text, record, _, action) => [
                 <a
                     key="edit"
@@ -123,6 +126,7 @@ const Index: React.FC = () => {
                 columns={columns}
                 actionRef={tableActionRef}
                 search={{ labelWidth: 140 }}
+                scroll={{ x: 800 }}
                 rowKey="id"
                 toolBarRender={() => [
                     <Button
@@ -185,7 +189,7 @@ const Index: React.FC = () => {
                         tableActionRef.current?.reload();
                     }
                 }}
-                layout="vertical"
+                layout="horizontal"
                 labelWrap
                 labelCol={{ span: 4 }}
             >
@@ -201,20 +205,20 @@ const Index: React.FC = () => {
                     label={intl.formatMessage({ id: 'page.variable.field.isSecret' })}
                     extra={intl.formatMessage({ id: 'page.variable.field.isSecret.tooltip' })}
                 />
-                {/* <ProFormTextArea
+                <ProFormTextArea
                     rules={[{ required: false }]}
                     name="value"
                     label={intl.formatMessage({ id: 'page.variable.field.value' })}
                     fieldProps={{
                         autoSize: { minRows: 2, maxRows: 20 },
                     }}
-                /> */}
-                <ProForm.Item
+                />
+                {/* <ProForm.Item
                     name="value"
                     label={intl.formatMessage({ id: 'page.variable.field.value' })}
                 >
                     <MonacorEditorInput height={150} />
-                </ProForm.Item>
+                </ProForm.Item> */}
             </ModalForm>
         </PageContainer>
     );
