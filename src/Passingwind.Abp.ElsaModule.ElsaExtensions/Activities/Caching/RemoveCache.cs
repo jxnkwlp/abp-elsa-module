@@ -13,10 +13,10 @@ namespace Passingwind.Abp.ElsaModule.Activities.Caching
 {
     [Activity(
         Category = "Abp",
-        DisplayName = "Get Cache",
+        DisplayName = "Remove Cache",
         Outcomes = new[] { OutcomeNames.Done }
     )]
-    public class GetCache : Activity
+    public class RemoveCache : Activity
     {
         [ActivityInput(
             Label = "Key",
@@ -26,22 +26,20 @@ namespace Passingwind.Abp.ElsaModule.Activities.Caching
         [Required]
         public string Key { get; set; }
 
-        [ActivityOutput]
-        public string Value { get; set; }
 
         private readonly IDistributedCache _distributedCache;
 
-        public GetCache(IDistributedCache distributedCache)
+        public RemoveCache(IDistributedCache distributedCache)
         {
             _distributedCache = distributedCache;
         }
 
-        protected override async ValueTask<IActivityExecutionResult> OnExecuteAsync(ActivityExecutionContext context)
+        public override async ValueTask<IActivityExecutionResult> ExecuteAsync(ActivityExecutionContext context)
         {
             if (string.IsNullOrEmpty(Key))
                 throw new ArgumentNullException(nameof(Key));
 
-            Value = await _distributedCache.GetStringAsync(Key, context.CancellationToken);
+            await _distributedCache.RemoveAsync(Key, context.CancellationToken);
 
             return Done();
         }

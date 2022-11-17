@@ -47,11 +47,6 @@ namespace Passingwind.Abp.ElsaModule.Activities.Caching
 
         protected override async ValueTask<IActivityExecutionResult> OnExecuteAsync(ActivityExecutionContext context)
         {
-            return await ExecuteAsync();
-        }
-
-        private async ValueTask<IActivityExecutionResult> ExecuteAsync()
-        {
             if (string.IsNullOrEmpty(Key))
                 throw new ArgumentNullException(nameof(Key));
 
@@ -62,10 +57,9 @@ namespace Passingwind.Abp.ElsaModule.Activities.Caching
                 options.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(Expiration.Value);
             }
 
-            await _distributedCache.SetStringAsync(Key, Value ?? string.Empty, options);
+            await _distributedCache.SetStringAsync(Key, Value ?? string.Empty, options, context.CancellationToken);
 
             return Done();
         }
-
     }
 }
