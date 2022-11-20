@@ -250,6 +250,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     {
         return await _workflowInstanceStatusCountStatisticsDistributedCache.GetOrAddAsync("workflow:instance:status:count:statistic", async () =>
                {
+                   var allCount = await _workflowInstanceRepository.LongCountAsync();
                    var runningCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Running);
                    var faultedCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Faulted);
                    var suspendedCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Suspended);
@@ -257,6 +258,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
                    return new WorkflowInstanceStatusCountStatisticsResultDto
                    {
+                       All = allCount,
                        Faulted = faultedCount,
                        Finished = finishedCount,
                        Suspended = suspendedCount,
@@ -264,7 +266,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
                    };
                }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
                {
-                   AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10),
+                   AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(5),
                });
     }
 }

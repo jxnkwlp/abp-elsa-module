@@ -56,6 +56,12 @@ export default {
     'page.role.field.isStatic': '静态',
     //
     'page.dashboard.statistics.datecount.title': '{d}日内流程实例计数统计',
+    'page.dashboard.statistics.status.title': '状态统计',
+    'page.dashboard.statistics.status.all': '所有',
+    'page.dashboard.statistics.status.finished': '完成',
+    'page.dashboard.statistics.status.faulted': '失败',
+    'page.dashboard.statistics.status.running': '运行中',
+    'page.dashboard.statistics.status.suspended': '挂起',
     //
     'page.definition.edit.basic': '基本信息',
     'page.definition.edit.variables': '变量',
@@ -85,6 +91,10 @@ export default {
     'page.definition.saved.success': '保存成功，版本：{version}',
     'page.definition.import.autoLayout': '自动布局',
     'page.definition.import.files': 'JSON文件',
+    'page.definition.autoSaveDisabled': '禁用自动保存',
+    'page.definition.autoSaveEnabled': '启用自动保存',
+    'page.definition.autoSaveDisabledTips': '自动保存已关闭',
+    'page.definition.autoSaveEnabledTips': '自动保存已开启',
     //
     'page.definition.field.name': '名称',
     'page.definition.field.displayName': '显示名称',
@@ -116,6 +126,7 @@ export default {
     'page.instance.field.faultedTime': '失败时间',
     'page.instance.field.correlationId': '相关ID',
     //
+    'page.instance.view': '查看',
     'page.instance.cancel': '取消',
     'page.instance.cancel.confirm.title': '确定要取消该实例吗？',
     'page.instance.cancel.confirm.content': '此操作将取消实例及其中的所有任务。',
@@ -138,6 +149,7 @@ export default {
     'page.instance.journalData': '期刊数据',
     'page.instance.outcomes': '输出点',
     'page.instance.activityId': '节点ID',
+    'page.instance.activityType': '节点类型',
     'page.instance.node.select.tips': '请先选择一个节点',
     'page.instance.status.idle': '等待中',
     'page.instance.status.running': '运行中',

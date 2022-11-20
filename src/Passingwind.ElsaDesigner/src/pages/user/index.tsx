@@ -270,7 +270,10 @@ const Index: React.FC = () => {
                     rules={[
                         { required: true },
                         { max: 128 },
-                        { pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/ },
+                        {
+                            pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
+                            message: 'invalid email address',
+                        },
                     ]}
                     name="email"
                     label={intl.formatMessage({ id: 'page.user.field.email' })}

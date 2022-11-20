@@ -107,6 +107,8 @@ const Index: React.FC = () => {
 
     const [importModalVisible, setImportModalVisible] = React.useState<boolean>(false);
 
+    const [autoSaveEnabled, setAutoSaveEnabled] = React.useState<boolean>(false);
+
     const loadServerData = async (
         definiton: API.WorkflowDefinitionVersion,
         autoLayout: boolean = false,
@@ -670,6 +672,21 @@ const Index: React.FC = () => {
     };
 
     useEffect(() => {
+        let timer: number | undefined = undefined;
+        if (autoSaveEnabled) {
+            timer = window.setInterval(() => {
+                console.info('auto save on ' + new Date());
+                handleSaveGraphData(false);
+            }, 10 * 1000);
+        } else {
+            if (timer) window.clearInterval(timer);
+        }
+        return () => {
+            if (timer) window.clearInterval(timer);
+        };
+    }, [autoSaveEnabled]);
+
+    useEffect(() => {
         if (fromDefinition && !definitionId) {
             setDefinitionId(undefined);
             loadData(fromDefinition.id, fromDefinition.version);
@@ -806,6 +823,34 @@ const Index: React.FC = () => {
                                     >
                                         {intl.formatMessage({ id: 'common.dict.import' })}
                                     </Menu.Item>
+                                    <Menu.Divider />
+                                    <Menu.Item
+                                        key="autoSave"
+                                        onClick={() => {
+                                            if (autoSaveEnabled) {
+                                                message.info(
+                                                    intl.formatMessage({
+                                                        id: 'page.definition.autoSaveDisabledTips',
+                                                    }),
+                                                );
+                                            } else {
+                                                message.info(
+                                                    intl.formatMessage({
+                                                        id: 'page.definition.autoSaveEnabledTips',
+                                                    }),
+                                                );
+                                            }
+                                            setAutoSaveEnabled(!autoSaveEnabled);
+                                        }}
+                                    >
+                                        {autoSaveEnabled
+                                            ? intl.formatMessage({
+                                                  id: 'page.definition.autoSaveDisabled',
+                                              })
+                                            : intl.formatMessage({
+                                                  id: 'page.definition.autoSaveEnabled',
+                                              })}
+                                    </Menu.Item>
                                 </Menu>
                             }
                         >
@@ -880,7 +925,7 @@ const Index: React.FC = () => {
                     });
                     return true;
                 }}
-                onValuesChange={(value) => {
+                onValuesChange={(value: any) => {
                     if (value.displayName) {
                         editForm.setFieldsValue({
                             name: value.displayName?.replaceAll(' ', '-')?.toLowerCase(),

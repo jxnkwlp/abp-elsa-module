@@ -58,6 +58,12 @@ export default {
     'page.role.field.isStatic': 'Static',
     //
     'page.dashboard.statistics.datecount.title': 'Process instance count statistics within {d} days',
+    'page.dashboard.statistics.status.title': 'Status Statistics',
+    'page.dashboard.statistics.status.all': 'All',
+    'page.dashboard.statistics.status.finished': 'Finished',
+    'page.dashboard.statistics.status.faulted': 'Faulted',
+    'page.dashboard.statistics.status.running': 'Running',
+    'page.dashboard.statistics.status.suspended': 'Suspended',
     //
     'page.definition.edit.basic': 'Basic',
     'page.definition.edit.variables': 'Variables',
@@ -87,6 +93,10 @@ export default {
     'page.definition.saved.success': 'Save successed. version: {version}',
     'page.definition.import.autoLayout': 'Auto Layout',
     'page.definition.import.files': 'JSON Files',
+    'page.definition.autoSaveDisabled': 'Disable Auto Save',
+    'page.definition.autoSaveEnabled': 'Enable Auto Save',
+    'page.definition.autoSaveDisabledTips': 'Auto save disabled',
+    'page.definition.autoSaveEnabledTips': 'Auto save enabled',
     //
     'page.definition.field.name': 'Name',
     'page.definition.field.displayName': 'Display Name',
@@ -118,6 +128,7 @@ export default {
     'page.instance.field.faultedTime': 'Faulted Time',
     'page.instance.field.correlationId': 'Correlation ID',
     //
+    'page.instance.view': 'View',
     'page.instance.cancel': 'Cancel',
     'page.instance.cancel.confirm.title': 'Are you sure to cancel this instance?',
     'page.instance.cancel.confirm.content': 'This operation will cancel the instance and all the tasks in it.',
@@ -140,6 +151,7 @@ export default {
     'page.instance.journalData': 'Journal Data',
     'page.instance.outcomes': 'Outcomes',
     'page.instance.activityId': 'Activity ID',
+    'page.instance.activityType': 'Activity Type',
     'page.instance.node.select.tips': 'Please select an node first.',
     'page.instance.status.idle': 'Idle',
     'page.instance.status.running': 'Running',

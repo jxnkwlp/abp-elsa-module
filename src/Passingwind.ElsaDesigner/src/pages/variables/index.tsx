@@ -194,7 +194,14 @@ const Index: React.FC = () => {
                 labelCol={{ span: 4 }}
             >
                 <ProFormText
-                    rules={[{ required: true }, { max: 64 }, { pattern: /^\w+$/ }]}
+                    rules={[
+                        { required: true },
+                        { max: 64 },
+                        {
+                            pattern: /^[\u4e00-\u9fa5A-Za-z0-9\-\_]*$/,
+                            message: 'invalid character',
+                        },
+                    ]}
                     name="key"
                     label={intl.formatMessage({ id: 'page.variable.field.key' })}
                     disabled={!!editModalDataId}

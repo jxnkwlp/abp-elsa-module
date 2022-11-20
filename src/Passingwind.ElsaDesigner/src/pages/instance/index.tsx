@@ -9,11 +9,11 @@ import {
     workflowInstanceCancel,
     workflowInstanceRetry,
 } from '@/services/WorkflowInstance';
-import type { ProFormInstance } from '@ant-design/pro-components';
+import { ProFormInstance, TableDropdown } from '@ant-design/pro-components';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { message, Modal } from 'antd';
+import { message, Modal, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useIntl } from 'umi';
 import { workflowStatusEnum } from './status';
@@ -78,7 +78,7 @@ const Index: React.FC = () => {
             dataIndex: 'version',
             title: intl.formatMessage({ id: 'page.instance.field.version' }),
             valueType: 'digit',
-            width: 100,
+            width: 80,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.version ?? null,
         },
@@ -86,7 +86,7 @@ const Index: React.FC = () => {
             dataIndex: 'workflowStatus',
             title: intl.formatMessage({ id: 'page.instance.field.workflowStatus' }),
             valueEnum: workflowStatusEnum,
-            width: 120,
+            width: 100,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.workflowStatus ?? null,
         },
@@ -161,108 +161,115 @@ const Index: React.FC = () => {
         {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
-            width: 170,
+            width: 80,
             align: 'center',
             fixed: 'right',
             render: (text, record, _, action) => {
-                const menus = [];
-
-                if (
-                    record.workflowStatus == WorkflowInstanceStatus.Idle ||
-                    record.workflowStatus == WorkflowInstanceStatus.Running ||
-                    record.workflowStatus == WorkflowInstanceStatus.Suspended
-                ) {
-                    menus.push(
-                        <a
-                            key="cancel"
-                            onClick={() => {
-                                Modal.confirm({
-                                    title: intl.formatMessage({
-                                        id: 'page.instance.cancel.confirm.title',
-                                    }),
-                                    content: intl.formatMessage({
-                                        id: 'page.instance.cancel.confirm.content',
-                                    }),
-                                    onOk: async () => {
-                                        const result = await workflowInstanceCancel(record.id!);
-                                        if (result?.response?.ok) {
-                                            message.success(
-                                                intl.formatMessage({
-                                                    id: 'page.instance.cancel.confirm.success',
-                                                }),
-                                            );
-                                            action?.reload();
-                                        }
-                                    },
-                                });
+                return (
+                    <Space>
+                        <Link
+                            key="view"
+                            to={{
+                                pathname: `/instances/${record.id}`,
                             }}
                         >
-                            {intl.formatMessage({ id: 'page.instance.cancel' })}
-                        </a>,
-                    );
-                }
-
-                if (record.workflowStatus == WorkflowInstanceStatus.Faulted) {
-                    menus.push(
-                        <a
-                            key="retry"
-                            onClick={() => {
-                                Modal.confirm({
-                                    title: intl.formatMessage({
-                                        id: 'page.instance.retry.confirm.title',
-                                    }),
-                                    content: intl.formatMessage({
-                                        id: 'page.instance.retry.confirm.content',
-                                    }),
-                                    onOk: async () => {
-                                        const result = await workflowInstanceRetry(record.id!, {});
-                                        if (result?.response?.ok) {
-                                            message.success(
-                                                intl.formatMessage({
-                                                    id: 'page.instance.retry.confirm.success',
-                                                }),
+                            {intl.formatMessage({ id: 'page.instance.view' })}
+                        </Link>
+                        <TableDropdown
+                            key="actionGroup"
+                            onSelect={(key) => {
+                                if (key == 'delete') {
+                                    Modal.confirm({
+                                        title: intl.formatMessage({
+                                            id: 'common.dict.delete.confirm',
+                                        }),
+                                        content: intl.formatMessage({
+                                            id: 'page.instance.delete.confirm.content',
+                                        }),
+                                        onOk: async () => {
+                                            const result = await deleteWorkflowInstance(record.id!);
+                                            if (result?.response?.ok) {
+                                                message.success(
+                                                    intl.formatMessage({
+                                                        id: 'common.dict.delete.success',
+                                                    }),
+                                                );
+                                                action?.reload();
+                                            }
+                                        },
+                                    });
+                                } else if (key == 'retry') {
+                                    Modal.confirm({
+                                        title: intl.formatMessage({
+                                            id: 'page.instance.retry.confirm.title',
+                                        }),
+                                        content: intl.formatMessage({
+                                            id: 'page.instance.retry.confirm.content',
+                                        }),
+                                        onOk: async () => {
+                                            const result = await workflowInstanceRetry(
+                                                record.id!,
+                                                {},
                                             );
-                                            action?.reload();
-                                        }
-                                    },
-                                });
+                                            if (result?.response?.ok) {
+                                                message.success(
+                                                    intl.formatMessage({
+                                                        id: 'page.instance.retry.confirm.success',
+                                                    }),
+                                                );
+                                                action?.reload();
+                                            }
+                                        },
+                                    });
+                                } else if (key == 'cancel') {
+                                    Modal.confirm({
+                                        title: intl.formatMessage({
+                                            id: 'page.instance.cancel.confirm.title',
+                                        }),
+                                        content: intl.formatMessage({
+                                            id: 'page.instance.cancel.confirm.content',
+                                        }),
+                                        onOk: async () => {
+                                            const result = await workflowInstanceCancel(record.id!);
+                                            if (result?.response?.ok) {
+                                                message.success(
+                                                    intl.formatMessage({
+                                                        id: 'page.instance.cancel.confirm.success',
+                                                    }),
+                                                );
+                                                action?.reload();
+                                            }
+                                        },
+                                    });
+                                }
                             }}
-                        >
-                            {intl.formatMessage({ id: 'page.instance.retry' })}
-                        </a>,
-                    );
-                }
-
-                menus.push(
-                    <a
-                        key="delete"
-                        onClick={() => {
-                            Modal.confirm({
-                                title: intl.formatMessage({
-                                    id: 'common.dict.delete.confirm',
-                                }),
-                                content: intl.formatMessage({
-                                    id: 'page.instance.delete.confirm.content',
-                                }),
-                                onOk: async () => {
-                                    const result = await deleteWorkflowInstance(record.id!);
-                                    if (result?.response?.ok) {
-                                        message.success(
-                                            intl.formatMessage({
-                                                id: 'common.dict.delete.success',
-                                            }),
-                                        );
-                                        action?.reload();
-                                    }
+                            menus={[
+                                {
+                                    key: 'cancel',
+                                    name: intl.formatMessage({ id: 'page.instance.retry' }),
+                                    disabled:
+                                        record.workflowStatus != WorkflowInstanceStatus.Idle &&
+                                        record.workflowStatus != WorkflowInstanceStatus.Running &&
+                                        record.workflowStatus != WorkflowInstanceStatus.Suspended,
                                 },
-                            });
-                        }}
-                    >
-                        {intl.formatMessage({ id: 'common.dict.delete' })}
-                    </a>,
+                                {
+                                    key: 'retry',
+                                    name: intl.formatMessage({ id: 'page.instance.cancel' }),
+                                    disabled:
+                                        record.workflowStatus != WorkflowInstanceStatus.Faulted,
+                                },
+                                {
+                                    type: 'divider',
+                                },
+                                {
+                                    key: 'delete',
+                                    name: intl.formatMessage({ id: 'common.dict.delete' }),
+                                    danger: true,
+                                },
+                            ]}
+                        />
+                    </Space>
                 );
-
-                return menus;
             },
         },
     ];

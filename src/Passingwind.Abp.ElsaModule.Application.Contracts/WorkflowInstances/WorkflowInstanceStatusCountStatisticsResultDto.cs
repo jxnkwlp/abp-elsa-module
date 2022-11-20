@@ -2,6 +2,7 @@
 {
     public class WorkflowInstanceStatusCountStatisticsResultDto
     {
+        public long All { get; set; }
         public long Running { get; set; }
         public long Finished { get; set; }
         public long Faulted { get; set; }

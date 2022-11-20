@@ -1,6 +1,6 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
- * Total count: 160
+ * Total count: 161
  **/
 import * as Enum from "./enums";
 
@@ -68,17 +68,6 @@ declare namespace API {
     /**
      * *TODO*
      **/
-    type SimpleException = {
-        type?: any | undefined;
-        message?: string | undefined;
-        stackTrace?: string | undefined;
-        innerException?: SimpleException | undefined;
-        data?: any | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
     type WorkflowContextOptions = {
         contextType?: any | undefined;
         contextFidelity?: Enum.WorkflowContextFidelity | undefined;
@@ -110,6 +99,17 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type SimpleExceptionModel = {
+        type?: any | undefined;
+        message?: string | undefined;
+        stackTrace?: string | undefined;
+        data?: any | undefined;
+        innerException?: SimpleExceptionModel | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type WorkflowExecutionLog = {
         id?: string | undefined;
         creationTime?: string | undefined;
@@ -122,18 +122,6 @@ declare namespace API {
         message?: string | undefined;
         source?: string | undefined;
         data?: any | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type WorkflowInstanceFault = {
-        id?: string | undefined;
-        faultedActivityId?: string | undefined;
-        resuming?: boolean | undefined;
-        activityInput?: any | undefined;
-        message?: string | undefined;
-        exception?: SimpleException | undefined;
     };
 
     /**
@@ -559,6 +547,17 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type WorkflowInstanceFault = {
+        faultedActivityId?: string | undefined;
+        resuming?: boolean | undefined;
+        activityInput?: any | undefined;
+        message?: string | undefined;
+        exception?: SimpleExceptionModel | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type WorkflowInstanceRetryRequest = {
         runImmediately?: boolean | undefined;
     };
@@ -569,6 +568,17 @@ declare namespace API {
     type WorkflowInstanceScheduledActivity = {
         activityId?: string | undefined;
         input?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowInstanceStatusCountStatisticsResult = {
+        all?: number | undefined;
+        running?: number | undefined;
+        finished?: number | undefined;
+        faulted?: number | undefined;
+        suspended?: number | undefined;
     };
 
     /**

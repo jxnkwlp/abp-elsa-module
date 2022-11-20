@@ -10,7 +10,20 @@ import { ClockCircleOutlined, FieldTimeOutlined, FunctionOutlined } from '@ant-d
 import { ProCard } from '@ant-design/pro-card';
 import { ProDescriptions } from '@ant-design/pro-descriptions';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Alert, Card, Col, Empty, Modal, Result, Row, Space, Tabs, Tag, Timeline } from 'antd';
+import {
+    Alert,
+    Card,
+    Col,
+    Empty,
+    Modal,
+    Result,
+    Row,
+    Space,
+    Tabs,
+    Tag,
+    Timeline,
+    Tooltip,
+} from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import MonacoEditor from 'react-monaco-editor';
@@ -79,6 +92,11 @@ const Index: React.FC = () => {
                             {
                                 title: intl.formatMessage({ id: 'page.instance.activityId' }),
                                 dataIndex: 'activityId',
+                                copyable: true,
+                            },
+                            {
+                                title: intl.formatMessage({ id: 'page.instance.activityType' }),
+                                dataIndex: 'activityType',
                                 copyable: true,
                             },
                             {
@@ -445,19 +463,19 @@ const Index: React.FC = () => {
                                                         />
                                                     ) : null
                                                 }
-                                                // label={moment(item.startTime).format(
-                                                //     'YYYY-MM-DD HH:mm:ss',
-                                                // )}
                                             >
                                                 <Space>
-                                                    <span style={{ fontSize: 16 }}>
-                                                        {item.displayName}
-                                                    </span>
+                                                    <Tooltip
+                                                        title={item.activityId}
+                                                        placement="left"
+                                                    >
+                                                        <span style={{ fontSize: 16 }}>
+                                                            {item.displayName}
+                                                        </span>
+                                                    </Tooltip>
                                                     <Tag>
-                                                        <FieldTimeOutlined />{' '}
-                                                        {moment(item.startTime).format(
-                                                            'YYYY-MM-DD HH:mm:ss',
-                                                        )}
+                                                        <FieldTimeOutlined />
+                                                        {moment(item.startTime).format()}
                                                     </Tag>
                                                     <Tag>
                                                         <FunctionOutlined /> {item.activityType}
@@ -494,22 +512,10 @@ const Index: React.FC = () => {
                                 <Empty />
                             ))}
                         {tabKey === 'variables' &&
-                            (data?.variables ? (
+                            (Object.keys(data?.variables ?? {}).length ? (
                                 <>
                                     <div className="data-render-container">
-                                        {dataRender(JSON.stringify(data.variables ?? {}, null, 2))}
-                                    </div>
-                                </>
-                            ) : (
-                                <Empty />
-                            ))}
-                        {tabKey === 'data' &&
-                            (data?.activityData ? (
-                                <>
-                                    <div className="data-render-container">
-                                        {dataRender(
-                                            JSON.stringify(data.activityData ?? {}, null, 2),
-                                        )}
+                                        {dataRender(JSON.stringify(data?.variables ?? {}, null, 2))}
                                     </div>
                                 </>
                             ) : (

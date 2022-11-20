@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 11
+ * Total count: 12
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -68,11 +68,16 @@ export async function getWorkflowInstanceExecutionLogs(
  **/
 export async function getWorkflowInstanceList(
     params: {
+        workflowDefinitionId?: string | undefined,
         name?: string | undefined,
         version?: number | undefined,
         workflowStatus?: any | undefined,
         correlationId?: string | undefined,
-        workflowDefinitionId?: string | undefined,
+        creationTimes?: string[] | undefined,
+        finishedTimes?: string[] | undefined,
+        lastExecutedTimes?: string[] | undefined,
+        faultedTimes?: string[] | undefined,
+        sorting?: string | undefined,
         skipCount?: number | undefined,
         maxResultCount?: number | undefined
     },
@@ -93,6 +98,18 @@ export async function getWorkflowInstanceLogSummary(
     options?: { [key: string]: any }
 ) {
     return request<API.WorkflowInstanceExecutionLogSummary>(`/api/elsa/workflow/instances/${id}/execution-logs/summary`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/elsa/workflow/instances/statistics/status 
+ **/
+export async function getWorkflowInstanceStatusCountStatistics(
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowInstanceStatusCountStatisticsResult>(`/api/elsa/workflow/instances/statistics/status`, {
         method: 'GET',
         ...(options || {}),
     });
