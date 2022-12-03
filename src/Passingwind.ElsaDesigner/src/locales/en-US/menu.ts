@@ -45,6 +45,8 @@ export default {
     'menu.account.settings': 'Account Settings',
     'menu.account.trigger': 'Trigger Error',
     'menu.account.logout': 'Logout',
+    'menu.account.apikeys': 'API Keys',
+    'menu.account.change-password': 'Change Password',
     'menu.editor': 'Graphic Editor',
     'menu.editor.flow': 'Flow Editor',
     'menu.editor.mind': 'Mind Editor',

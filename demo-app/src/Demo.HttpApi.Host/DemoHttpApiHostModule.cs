@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Demo.ApiKeys;
 using Demo.EntityFrameworkCore;
 using Demo.MultiTenancy;
 using Demo.Services;
@@ -20,6 +21,7 @@ using Hangfire.Annotations;
 using Hangfire.Dashboard;
 using Hangfire.MemoryStorage;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection;
@@ -29,6 +31,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
@@ -40,7 +43,6 @@ using StackExchange.Redis;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
-using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
@@ -124,7 +126,7 @@ public partial class DemoHttpApiHostModule : AbpModule
 
         Configure<AbpAntiForgeryOptions>(options =>
         {
-            options.AutoValidate = false;
+            options.AutoValidate = true;
         });
 
         Configure<AbpClockOptions>(options =>
@@ -134,6 +136,7 @@ public partial class DemoHttpApiHostModule : AbpModule
 
         Configure<AbpJsonOptions>(options =>
         {
+            // options.DefaultDateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssZ";
             options.UseHybridSerializer = false;
         });
 
@@ -223,10 +226,10 @@ public partial class DemoHttpApiHostModule : AbpModule
 
     private void ConfigureConventionalControllers()
     {
-        Configure<AbpAspNetCoreMvcOptions>(options =>
-        {
-            options.ConventionalControllers.Create(typeof(DemoApplicationModule).Assembly);
-        });
+        //Configure<AbpAspNetCoreMvcOptions>(options =>
+        //{
+        //    options.ConventionalControllers.Create(typeof(DemoApplicationModule).Assembly);
+        //});
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)
@@ -242,6 +245,10 @@ public partial class DemoHttpApiHostModule : AbpModule
                 options.Authority = configuration["AuthServer:Authority"];
                 options.RequireHttpsMetadata = Convert.ToBoolean(configuration["AuthServer:RequireHttpsMetadata"]);
                 options.Audience = "Demo";
+            })
+            .AddApiKey(options =>
+            {
+                options.KeyName = ApiKeyDefaults.ApiKeyName;
             })
             ;
         context.Services.ConfigureApplicationCookie(optopns =>
@@ -262,7 +269,27 @@ public partial class DemoHttpApiHostModule : AbpModule
                 }
                 return Task.CompletedTask;
             };
+
+            optopns.ForwardDefaultSelector = (ctx) =>
+            {
+                // Bearer
+                string authorization = ctx.Request.Headers.Authorization;
+                if (!authorization.IsNullOrWhiteSpace() && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    return JwtBearerDefaults.AuthenticationScheme;
+                }
+
+                // ApiKey
+                if (ctx.Request.Headers.ContainsKey(ApiKeyDefaults.ApiKeyName) || ctx.Request.Query.ContainsKey(ApiKeyDefaults.ApiKeyName))
+                {
+                    return ApiKeyDefaults.AuthenticationScheme;
+                }
+
+                return null;
+            };
         });
+
+        // context.Services.ForwardIdentityAuthenticationForBearer();
     }
 
     private static void ConfigureSwaggerServices(ServiceConfigurationContext context, IConfiguration configuration)
@@ -435,6 +462,8 @@ public partial class DemoHttpApiHostModule : AbpModule
         {
             app.UseMultiTenancy();
         }
+
+        app.UseUnitOfWork();
 
         app.UseAuthorization();
 

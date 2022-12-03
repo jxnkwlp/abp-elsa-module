@@ -1,10 +1,32 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
- * Total count: 161
+ * Total count: 164
  **/
 import * as Enum from "./enums";
 
 declare namespace API {
+    /**
+     * *TODO*
+     **/
+    type ApiKey = {
+        id?: string | undefined;
+        creationTime?: string | undefined;
+        creatorId?: string | undefined;
+        lastModificationTime?: string | undefined;
+        lastModifierId?: string | undefined;
+        name?: string | undefined;
+        expirationTime?: string | undefined;
+        secret?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type ApiKeyCreateOrUpdate = {
+        name?: string | undefined;
+        expirationTime?: string | undefined;
+    };
+
     /**
      * *TODO*
      **/
@@ -669,6 +691,14 @@ declare namespace API {
         userNameOrEmailAddress: string;
         password: string;
         rememberMe?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type ApiKeyPagedResult = {
+        items?: ApiKey[] | undefined;
+        totalCount?: number | undefined;
     };
 
     /**

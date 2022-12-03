@@ -59,7 +59,7 @@ const Index: React.FC = () => {
             dataIndex: 'name',
             title: intl.formatMessage({ id: 'page.instance.field.name' }),
             copyable: true,
-            render: (_, record) => {
+            renderText: (_, record) => {
                 return (
                     <Link
                         to={{
@@ -246,7 +246,7 @@ const Index: React.FC = () => {
                             menus={[
                                 {
                                     key: 'cancel',
-                                    name: intl.formatMessage({ id: 'page.instance.retry' }),
+                                    name: intl.formatMessage({ id: 'page.instance.cancel' }),
                                     disabled:
                                         record.workflowStatus != WorkflowInstanceStatus.Idle &&
                                         record.workflowStatus != WorkflowInstanceStatus.Running &&
@@ -254,7 +254,7 @@ const Index: React.FC = () => {
                                 },
                                 {
                                     key: 'retry',
-                                    name: intl.formatMessage({ id: 'page.instance.cancel' }),
+                                    name: intl.formatMessage({ id: 'page.instance.retry' }),
                                     disabled:
                                         record.workflowStatus != WorkflowInstanceStatus.Faulted,
                                 },

@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/dot-notation */
 import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
-import { message, notification } from 'antd';
+import { message, Modal, notification } from 'antd';
+import Cookies from 'js-cookie';
 import moment from 'moment';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
 import { history, Link } from 'umi';
@@ -15,7 +17,7 @@ const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/auth/login';
 
 moment.defaultFormat = 'YYYY-MM-DD HH:mm:SS';
-moment.defaultFormatUtc = 'YYYY-MM-DD HH:mm:SS(+0)';
+moment.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:SSZ';
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -153,6 +155,10 @@ export const request: RequestConfig = {
             if ((status == 403 || status == 400) && data?.error?.message)
                 errorText = data?.error?.message;
 
+            if (!errorText && status == 400) {
+                errorText = 'Please refresh and try again';
+            }
+
             message.error(errorText ?? '请求失败');
         } else if (!response) {
             notification.error({
@@ -166,9 +172,12 @@ export const request: RequestConfig = {
     },
     requestInterceptors: [
         (url, options) => {
-            const locale = window.localStorage.getItem('umi_locale');
-            if (locale && options.headers) options.headers['Accept-Language'] = locale;
+            if (options.headers) {
+                options.headers['RequestVerificationToken'] = Cookies.get('XSRF-TOKEN');
 
+                const locale = window.localStorage.getItem('umi_locale');
+                if (locale) options.headers['Accept-Language'] = locale;
+            }
             return { url, options };
         },
     ],

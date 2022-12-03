@@ -174,4 +174,20 @@ export default {
     'page.settings.email.defaultFromDisplayName': '默认发件人名字',
     'page.settings.email.testToAddress': '测试接收人地址',
     'page.settings.email.testSend': '发送',
+    //
+    'page.apikey.field.name': '名称',
+    'page.apikey.field.expirationTime': '到期时间',
+    'page.apikey.field.expirationRange': '有效期',
+    'page.apikey.field.expirationRange.r0': '不限制',
+    'page.apikey.field.expirationRange.r1': '1天',
+    'page.apikey.field.expirationRange.r2': '7天',
+    'page.apikey.field.expirationRange.r3': '15天',
+    'page.apikey.field.expirationRange.r4': '30天',
+    'page.apikey.field.expirationRange.r5': '2个月',
+    'page.apikey.field.expirationRange.r6': '3个月',
+    'page.apikey.field.expirationRange.r7': '6个月',
+    'page.apikey.field.expirationRange.r8': '1年',
+    'page.apikey.tips.p1': '您的新 API 密钥是:',
+    'page.apikey.tips.p2': 'API 密钥一旦创建就无法检索。 确保将此密钥保存在安全的地方，例如密码管理工具。',
+
 };

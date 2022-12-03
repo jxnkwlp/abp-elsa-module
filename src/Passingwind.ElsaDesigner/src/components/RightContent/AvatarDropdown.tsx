@@ -1,5 +1,11 @@
 import { loginLogout } from '@/services/Login';
-import { LockOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import {
+    KeyOutlined,
+    LockOutlined,
+    LogoutOutlined,
+    SettingOutlined,
+    UserOutlined,
+} from '@ant-design/icons';
 import { Avatar, Menu, Spin } from 'antd';
 import type { ItemType } from 'antd/lib/menu/hooks/useItems';
 import { stringify } from 'querystring';
@@ -18,7 +24,7 @@ export type GlobalHeaderRightProps = {
  */
 const loginOut = async () => {
     await loginLogout();
-    const { query = {}, search, pathname } = history.location;
+    // const { query = {}, search, pathname } = history.location;
     // Note: There may be security issues, please note
     if (window.location.pathname !== '/auth/login') {
         history.replace({
@@ -72,12 +78,17 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
                   {
                       key: 'center',
                       icon: <UserOutlined />,
-                      label: '个人中心',
+                      label: intl.formatMessage({ id: 'app.account.center' }),
                   },
                   {
                       key: 'settings',
                       icon: <SettingOutlined />,
-                      label: '个人设置',
+                      label: intl.formatMessage({ id: 'app.account.settings' }),
+                  },
+                  {
+                      key: 'apikeys',
+                      icon: <KeyOutlined />,
+                      label: intl.formatMessage({ id: 'app.account.apikeys' }),
                   },
                   {
                       type: 'divider' as const,

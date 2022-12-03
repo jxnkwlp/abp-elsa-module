@@ -57,10 +57,24 @@
 
     //
     {
-        path: '/account/change-password',
-        name: 'Change Password',
+        path: '/account',
+        name: 'account',
         hideInMenu: true,
-        component: './profile/changepassword',
+        routes: [
+            {
+                path: '/account/change-password',
+                name: 'change-password',
+                component: './profile/changepassword',
+            },
+            {
+                path: '/account/apikeys',
+                name: 'apikeys',
+                component: './security/apikey',
+            },
+            {
+                component: './404',
+            },
+        ],
     },
     //
     {

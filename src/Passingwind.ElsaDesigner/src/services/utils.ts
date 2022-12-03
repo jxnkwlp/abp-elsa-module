@@ -1,5 +1,6 @@
 import { isInteger } from '@antv/util';
 import type { SortOrder } from 'antd/lib/table/interface';
+import moment from 'moment';
 import type { GlobalAPI } from './global';
 
 export const randString = (prefix: string = '', length: number = 5) => {
@@ -70,4 +71,14 @@ export const getTableQueryConfig = (tableId: string) => {
         return JSON.parse(json) as GlobalAPI.TableQueryConfig;
     else
         return undefined;
+}
+
+
+export const formatDateTimeToUtc = (value: string) => {
+    if (value) {
+        if (moment(value).isValid()) {
+            return moment(value).utc();
+        }
+    }
+    return value;
 }

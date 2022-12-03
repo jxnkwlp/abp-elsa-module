@@ -5,7 +5,7 @@ import {
     updateGlobalVariable,
 } from '@/services/GlobalVariable';
 import type { API } from '@/services/typings';
-import { ActionType, ProColumnType, ProForm } from '@ant-design/pro-components';
+import type { ActionType, ProColumnType } from '@ant-design/pro-components';
 import {
     ModalForm,
     PageContainer,
@@ -17,7 +17,6 @@ import {
 import { Button, message, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
 import { formatMessage, useIntl } from 'umi';
-import MonacorEditorInput from '../designer/form-input/monacor-editor-input';
 
 const handleAdd = async (data: any) => {
     const response = await createGlobalVariable(data);

@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Demo.ApiKeys;
+using Microsoft.EntityFrameworkCore;
 using Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
@@ -52,6 +54,8 @@ public class DemoDbContext :
 
     #endregion
 
+    public DbSet<ApiKey> ApiKeys { get; set; }
+
     public DemoDbContext(DbContextOptions<DemoDbContext> options)
         : base(options)
     {
@@ -72,6 +76,7 @@ public class DemoDbContext :
         builder.ConfigureFeatureManagement();
         builder.ConfigureTenantManagement();
 
+        // elsa module
         builder.ConfigureElsaModule();
 
         /* Configure your own tables/entities inside here */
@@ -82,5 +87,15 @@ public class DemoDbContext :
         //    b.ConfigureByConvention(); //auto configure for the base class props
         //    //...
         //});
+
+        builder.Entity<ApiKey>(b =>
+        {
+            b.ToTable(DemoConsts.DbTablePrefix + "ApiKeys", DemoConsts.DbSchema);
+            b.ConfigureByConvention(); //auto configure for the base class props
+
+            b.Property(x => x.Name).IsRequired().HasMaxLength(64);
+            b.Property(x => x.Secret).IsRequired().HasMaxLength(128);
+        });
+
     }
 }

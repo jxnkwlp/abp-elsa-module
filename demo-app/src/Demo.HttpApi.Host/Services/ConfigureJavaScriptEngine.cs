@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Elsa.Scripting.JavaScript.Events;
 using Elsa.Scripting.JavaScript.Messages;
 using MediatR;
-using NodaTime;
 
 namespace Demo.Services
 {
@@ -14,7 +13,7 @@ namespace Demo.Services
         {
             var engine = notification.Engine;
 
-            engine.SetValue("formatDateTime", (Func<DateTime, string, string>)((source, temp) => source.ToString(temp))); 
+            engine.SetValue("formatDateTime", (Func<DateTime, string, string>)((source, temp) => source.ToString(temp)));
 
             return Task.CompletedTask;
         }
@@ -26,7 +25,7 @@ namespace Demo.Services
         {
             var output = notification.Output;
 
-            output.AppendLine("declare function formatDateTime(dateTime: DateTime, format: string): string"); 
+            output.AppendLine("declare function formatDateTime(dateTime: DateTime, format: string): string");
 
             return Task.CompletedTask;
         }
