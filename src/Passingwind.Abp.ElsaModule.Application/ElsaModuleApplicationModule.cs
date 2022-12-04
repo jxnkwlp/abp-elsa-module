@@ -7,6 +7,7 @@ using Passingwind.Abp.ElsaModule.WorkflowInstances;
 using Volo.Abp.Application;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.DistributedLocking;
 using Volo.Abp.Json;
 using Volo.Abp.Json.SystemTextJson;
 using Volo.Abp.Modularity;
@@ -51,7 +52,6 @@ public partial class ElsaModuleApplicationModule : AbpModule
             options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowInstanceExecutionLogSummaryDto));
             options.UnsupportedTypes.AddIfNotContains(typeof(RuntimeSelectListContextDto));
         });
-
 
     }
 }

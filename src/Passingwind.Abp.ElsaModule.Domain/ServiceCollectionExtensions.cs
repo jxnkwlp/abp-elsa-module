@@ -1,6 +1,7 @@
 ﻿using System;
 using Elsa.Options;
 using Microsoft.Extensions.DependencyInjection;
+using Passingwind.Abp.ElsaModule.Services;
 using Passingwind.Abp.ElsaModule.Stores;
 
 namespace Passingwind.Abp.ElsaModule;
@@ -12,14 +13,14 @@ public static class ServiceCollectionExtensions
         return services
             .AddElsa(ob =>
             {
-                ob.UseStore();
+                ob.UseStore()
+                    .AddCustomTenantAccessor<AbpElsaTenantAccessor>()
+                    ;
 
                 ob
+                 .AddActivitiesFrom(typeof(ElsaModuleDomainModule))
                  .AddConsoleActivities()
-                 .AddJavaScriptActivities()
-                 ;
-
-                ob.AddActivitiesFrom(typeof(ElsaModuleDomainModule));
+                 .AddJavaScriptActivities();
 
                 services.ExecutePreConfiguredActions<ElsaModuleOptions>(new ElsaModuleOptions(ob));
 

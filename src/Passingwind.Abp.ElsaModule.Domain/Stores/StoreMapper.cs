@@ -396,7 +396,7 @@ public class StoreMapper : IStoreMapper
         entity.CorrelationId = model.CorrelationId;
         entity.CurrentActivity = model.CurrentActivity == null ? default : new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(model.CurrentActivity.ActivityId), Input = model.CurrentActivity.Input };
         entity.LastExecutedActivityId = model.LastExecutedActivityId.ToGuid();
-         
+
         // find new
         var newFaults = (model.Faults.Select(x => new WorkflowInstanceFault(_guidGenerator.Create())
         {
@@ -406,7 +406,7 @@ public class StoreMapper : IStoreMapper
             Message = x.Message,
             Resuming = x.Resuming,
             Exception = SimpleExceptionModel.FromException(x.Exception),
-        })).Except(entity.Faults, new WorkflowInstanceFaultEqualityComparer());
+        })).Except(entity.Faults, WorkflowInstanceFaultEqualityComparer.Instance);
         entity.Faults.AddRange(newFaults);
 
         entity.Input = model.Input;
@@ -416,7 +416,7 @@ public class StoreMapper : IStoreMapper
         entity.Variables = model.Variables.Data.Select(x => new WorkflowInstanceVariable { Key = x.Key, Value = x.Value }).ToList();
         entity.ActivityData = model.ActivityData.ToList().Select(x => new WorkflowInstanceActivityData() { ActivityId = Guid.Parse(x.Key), Data = (Dictionary<string, object>)x.Value }).ToList();
         entity.BlockingActivities = model.BlockingActivities.Select(x => new WorkflowInstanceBlockingActivity { ActivityId = Guid.Parse(x.ActivityId), ActivityType = x.ActivityType, Tag = x.Tag, }).ToList();
-        entity.ScheduledActivities = model.ScheduledActivities.Select(x => new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(x.ActivityId), Input = x.Input, }).ToList();
+        entity.ScheduledActivities = model.ScheduledActivities.Select(x => new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(x.ActivityId), Input = x.Input, }).Distinct().ToList();
         entity.ActivityScopes = model.Scopes.Select(x => new WorkflowInstanceActivityScope { ActivityId = Guid.Parse(x.ActivityId), Variables = (Dictionary<string, object>)x.Variables.Data, }).ToList();
 
         return entity;

@@ -45,7 +45,11 @@ public class DemoEntityFrameworkCoreModule : AbpModule
         {
             options.PreConfigure(config =>
             {
-                config.DbContextOptions.EnableDetailedErrors(true).EnableSensitiveDataLogging();
+                config
+                    .DbContextOptions
+                    .EnableDetailedErrors(true)
+                    .EnableSensitiveDataLogging()
+                    ;
             });
 
             /* The main point to change your DBMS.

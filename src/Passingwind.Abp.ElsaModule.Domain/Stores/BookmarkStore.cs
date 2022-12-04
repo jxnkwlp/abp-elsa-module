@@ -5,36 +5,26 @@ using System.Threading.Tasks;
 using Elsa.Persistence;
 using Elsa.Persistence.Specifications;
 using Elsa.Persistence.Specifications.Bookmarks;
-using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.Common;
-using Volo.Abp.Domain.Repositories;
-using Volo.Abp.Linq;
 using BookmarkModel = Elsa.Models.Bookmark;
 
 namespace Passingwind.Abp.ElsaModule.Stores
 {
     public class BookmarkStore : Store<BookmarkModel, Bookmark, Guid>, IBookmarkStore
     {
-        private readonly IStoreMapper _storeMapper;
-
-        public BookmarkStore(ILoggerFactory loggerFactory, IRepository<Bookmark, Guid> repository, IAsyncQueryableExecuter asyncQueryableExecuter, IStoreMapper storeMapper) : base(loggerFactory, repository, asyncQueryableExecuter)
-        {
-            _storeMapper = storeMapper;
-        }
-
         protected override Task<Bookmark> MapToEntityAsync(BookmarkModel model)
         {
-            return Task.FromResult(_storeMapper.MapToEntity(model));
+            return Task.FromResult(StoreMapper.MapToEntity(model));
         }
 
         protected override Task<Bookmark> MapToEntityAsync(BookmarkModel model, Bookmark entity)
         {
-            return Task.FromResult(_storeMapper.MapToEntity(model, entity));
+            return Task.FromResult(StoreMapper.MapToEntity(model, entity));
         }
 
         protected override Task<BookmarkModel> MapToModelAsync(Bookmark entity)
         {
-            return Task.FromResult(_storeMapper.MapToModel(entity));
+            return Task.FromResult(StoreMapper.MapToModel(entity));
         }
 
         protected override async Task<Expression<Func<Bookmark, bool>>> MapSpecificationAsync(ISpecification<BookmarkModel> specification)

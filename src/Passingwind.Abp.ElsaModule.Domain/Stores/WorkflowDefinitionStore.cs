@@ -5,10 +5,7 @@ using System.Threading.Tasks;
 using Elsa.Persistence;
 using Elsa.Persistence.Specifications;
 using Elsa.Persistence.Specifications.WorkflowDefinitions;
-using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.Common;
-using Volo.Abp.Domain.Repositories;
-using Volo.Abp.Linq;
 using WorkflowDefinitionModel = Elsa.Models.WorkflowDefinition;
 
 namespace Passingwind.Abp.ElsaModule.Stores
@@ -16,24 +13,22 @@ namespace Passingwind.Abp.ElsaModule.Stores
     public class WorkflowDefinitionStore : Store<WorkflowDefinitionModel, WorkflowDefinitionVersion, Guid>, IWorkflowDefinitionStore
     {
         private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
-        private readonly IStoreMapper _storeMapper;
 
-        public WorkflowDefinitionStore(ILoggerFactory loggerFactory, IRepository<WorkflowDefinitionVersion, Guid> repository, IAsyncQueryableExecuter asyncQueryableExecuter, IWorkflowDefinitionRepository workflowDefinitionRepository, IStoreMapper storeMapper) : base(loggerFactory, repository, asyncQueryableExecuter)
+        public WorkflowDefinitionStore(IWorkflowDefinitionRepository workflowDefinitionRepository)
         {
             _workflowDefinitionRepository = workflowDefinitionRepository;
-            _storeMapper = storeMapper;
         }
 
         protected override Task<WorkflowDefinitionVersion> MapToEntityAsync(WorkflowDefinitionModel model)
         {
             throw new NotImplementedException();
-            //return _storeMapper.MapToEntity(model);
+            //return StoreMapper.MapToEntity(model);
         }
 
         protected override Task<WorkflowDefinitionVersion> MapToEntityAsync(WorkflowDefinitionModel model, WorkflowDefinitionVersion entity)
         {
             throw new NotImplementedException();
-            // return _storeMapper.MapToEntity(model, entity);
+            // return StoreMapper.MapToEntity(model, entity);
         }
 
         protected override async Task<WorkflowDefinitionModel> MapToModelAsync(WorkflowDefinitionVersion entity)
@@ -41,7 +36,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             var definitionId = entity.DefinitionId;
             var definition = await _workflowDefinitionRepository.GetAsync(definitionId);
 
-            return _storeMapper.MapToModel(entity, definition);
+            return StoreMapper.MapToModel(entity, definition);
         }
 
         protected override async Task<Expression<Func<WorkflowDefinitionVersion, bool>>> MapSpecificationAsync(ISpecification<WorkflowDefinitionModel> specification)

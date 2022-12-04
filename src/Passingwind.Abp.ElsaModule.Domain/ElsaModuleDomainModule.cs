@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Passingwind.Abp.ElsaModule.Services;
-using Passingwind.Abp.ElsaModule.Stores;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
 using Volo.Abp.Json.SystemTextJson;
@@ -19,13 +18,6 @@ public class ElsaModuleDomainModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services
-            .AddScoped<BookmarkStore>()
-            .AddScoped<TriggerStore>()
-            .AddScoped<WorkflowDefinitionStore>()
-            .AddScoped<WorkflowExecutionLogStore>()
-            .AddScoped<WorkflowInstanceStore>();
-
         PostConfigure<AbpSystemTextJsonSerializerOptions>(options =>
         {
             options.JsonSerializerOptions.Converters.AddIfNotContains(new SystemTextJsonTypeJsonConverter());

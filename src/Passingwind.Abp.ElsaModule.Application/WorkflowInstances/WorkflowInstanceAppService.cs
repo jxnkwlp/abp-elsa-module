@@ -68,7 +68,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
             throw new UserFriendlyException($"Cannot cancel a workflow instance with status {entity.WorkflowStatus}");
     }
 
-    public async Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input)
+    public virtual async Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id);
 
@@ -89,7 +89,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         }
     }
 
-    public async Task DispatchAsync(Guid id, WorkflowInstanceDispatchRequestDto input)
+    public virtual async Task DispatchAsync(Guid id, WorkflowInstanceDispatchRequestDto input)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id);
         // var instance = _storeMapper.MapToModel(entity);

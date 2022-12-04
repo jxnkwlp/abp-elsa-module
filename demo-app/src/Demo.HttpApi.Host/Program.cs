@@ -4,31 +4,35 @@ using Demo.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Serilog;
-using Serilog.Events;
+using Microsoft.Extensions.Logging;
+using NLog;
+using NLog.Web;
 
 namespace Demo;
 
-public class Program
+public static class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-            .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-            .Enrich.FromLogContext()
-            .WriteTo.Async(c => c.File("Logs/logs.log", shared: true, rollingInterval: RollingInterval.Day))
-            .WriteTo.Async(c => c.Console())
-            .CreateLogger();
+        var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
         try
         {
-            Log.Information("Starting Demo.HttpApi.Host.");
+            logger.Info("Starting Demo.HttpApi.Host.");
+
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.AddAppSettingsSecretsJson()
+                .ConfigureLogging((host, logging) =>
+                {
+                    logging.AddSimpleConsole(formatOption =>
+                    {
+                        formatOption.SingleLine = true;
+                        formatOption.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
+                    });
+                })
+                .UseNLog(new NLogAspNetCoreOptions { RemoveLoggerFactoryFilter = false, })
                 .UseAutofac()
-                .UseSerilog();
+                ;
             await builder.AddApplicationAsync<DemoHttpApiHostModule>();
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
@@ -42,12 +46,12 @@ public class Program
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Host terminated unexpectedly!");
+            logger.Error(ex, "Host terminated unexpectedly!");
             return 1;
         }
         finally
         {
-            Log.CloseAndFlush();
+            NLog.LogManager.Shutdown();
         }
     }
 

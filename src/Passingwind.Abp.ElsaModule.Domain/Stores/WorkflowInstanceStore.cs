@@ -7,41 +7,26 @@ using System.Threading.Tasks;
 using Elsa.Persistence;
 using Elsa.Persistence.Specifications;
 using Elsa.Persistence.Specifications.WorkflowInstances;
-using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.Common;
-using Volo.Abp.Domain.Repositories;
-using Volo.Abp.Linq;
-using Volo.Abp.Timing;
 using WorkflowInstanceModel = Elsa.Models.WorkflowInstance;
 
 namespace Passingwind.Abp.ElsaModule.Stores
 {
     public class WorkflowInstanceStore : Store<WorkflowInstanceModel, WorkflowInstance, Guid>, IWorkflowInstanceStore
     {
-        private readonly IStoreMapper _storeMapper;
-        private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
-        private readonly IClock _clock;
-
-        public WorkflowInstanceStore(ILoggerFactory loggerFactory, IRepository<WorkflowInstance, Guid> repository, IAsyncQueryableExecuter asyncQueryableExecuter, IStoreMapper storeMapper, IWorkflowDefinitionRepository workflowDefinitionRepository, IClock clock) : base(loggerFactory, repository, asyncQueryableExecuter)
-        {
-            _storeMapper = storeMapper;
-            _workflowDefinitionRepository = workflowDefinitionRepository;
-            _clock = clock;
-        }
-
         protected override Task<WorkflowInstance> MapToEntityAsync(WorkflowInstanceModel model)
         {
-            return Task.FromResult(_storeMapper.MapToEntity(model));
+            return Task.FromResult(StoreMapper.MapToEntity(model));
         }
 
         protected override Task<WorkflowInstance> MapToEntityAsync(WorkflowInstanceModel model, WorkflowInstance entity)
         {
-            return Task.FromResult(_storeMapper.MapToEntity(model, entity));
+            return Task.FromResult(StoreMapper.MapToEntity(model, entity));
         }
 
         protected override Task<WorkflowInstanceModel> MapToModelAsync(WorkflowInstance entity)
         {
-            return Task.FromResult(_storeMapper.MapToModel(entity));
+            return Task.FromResult(StoreMapper.MapToModel(entity));
         }
 
         public async Task<IEnumerable<TOut>> FindManyAsync<TOut>(ISpecification<WorkflowInstanceModel> specification, Expression<Func<WorkflowInstanceModel, TOut>> funcMapping, IOrderBy<WorkflowInstanceModel> orderBy = null, IPaging paging = null, CancellationToken cancellationToken = default) where TOut : class
@@ -69,7 +54,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
             var selectQuery = query.Select(mappingExp);
 
-            var list = await AsyncQueryableExecuter.ToListAsync(selectQuery, cancellationToken);
+            var list = await AsyncExecuter.ToListAsync(selectQuery, cancellationToken);
 
             return list;
         }

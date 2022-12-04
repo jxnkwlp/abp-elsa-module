@@ -20,6 +20,9 @@ using Hangfire;
 using Hangfire.Annotations;
 using Hangfire.Dashboard;
 using Hangfire.MemoryStorage;
+using Medallion.Threading;
+using Medallion.Threading.FileSystem;
+using Medallion.Threading.Redis;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -44,10 +47,10 @@ using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc.AntiForgery;
-using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
+using Volo.Abp.DistributedLocking;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Json;
 using Volo.Abp.Localization;
@@ -69,9 +72,9 @@ namespace Demo;
     typeof(AbpAccountWebModule),
     typeof(DemoApplicationModule),
     typeof(DemoEntityFrameworkCoreModule),
-    typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule),
-    typeof(AbpMailKitModule)
+    typeof(AbpMailKitModule),
+    typeof(AbpDistributedLockingModule)
 )]
 // [DependsOn(typeof(ElsaModuleMongoDbModule))]
 public partial class DemoHttpApiHostModule : AbpModule
@@ -90,6 +93,19 @@ public partial class DemoHttpApiHostModule : AbpModule
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
         ConfigureElsa(context, configuration);
+
+        context.Services.AddSingleton<IDistributedLockProvider>(sp =>
+        {
+            if (configuration.GetValue<bool>("Redis:IsEnabled"))
+            {
+                var connection = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
+                return new RedisDistributedSynchronizationProvider(connection.GetDatabase());
+            }
+            else
+            {
+                return new FileDistributedSynchronizationProvider(new DirectoryInfo(Path.Combine(Path.GetTempPath(), "DemoElsaModuleDistributedLock")));
+            }
+        });
 
         Configure<ForwardedHeadersOptions>(options =>
         {
@@ -165,6 +181,7 @@ public partial class DemoHttpApiHostModule : AbpModule
                 .AddHttpActivities(http =>
                 {
                     http.HttpEndpointAuthorizationHandlerFactory = ActivatorUtilities.GetServiceOrCreateInstance<AuthenticationBasedHttpEndpointAuthorizationHandler>;
+                    http.HttpEndpointWorkflowFaultHandlerFactory = ActivatorUtilities.GetServiceOrCreateInstance<AbpHttpEndpointWorkflowFaultHandler>;
                 }, builder =>
                 {
                     builder.ConfigureHttpClient(client => { client.Timeout = TimeSpan.FromMinutes(10); });
@@ -434,16 +451,15 @@ public partial class DemoHttpApiHostModule : AbpModule
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
 
-
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
+        app.UseStatusCodePages();
+        //if (env.IsDevelopment())
+        //{
+        //    app.UseDeveloperExceptionPage();
+        //}
 
         app.UseForwardedHeaders();
         app.UseOwlRequestLocalization();
         app.UseCorrelationId();
-        app.UseStatusCodePages();
         app.UseStaticFiles();
         app.UseSpaStaticFiles(new StaticFileOptions()
         {
@@ -482,7 +498,6 @@ public partial class DemoHttpApiHostModule : AbpModule
         });
 
         app.UseAuditing();
-        app.UseAbpSerilogEnrichers();
 
         app.UseConfiguredEndpoints();
 
@@ -498,6 +513,12 @@ public partial class DemoHttpApiHostModule : AbpModule
         });
 
         app.UseSpa(c => { });
+
+        app.Use((context, next) =>
+        {
+            context.Response.StatusCode = 404;
+            return next();
+        });
     }
 
     private class HangfireDashboardAsyncAuthorizationFilter : IDashboardAuthorizationFilter

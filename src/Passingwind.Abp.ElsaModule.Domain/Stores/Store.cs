@@ -8,33 +8,53 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elsa.Persistence.Specifications;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Guids;
 using Volo.Abp.Linq;
+using Volo.Abp.MultiTenancy;
+using Volo.Abp.Timing;
 using Volo.Abp.Uow;
 
 namespace Passingwind.Abp.ElsaModule.Stores
 {
     [UnitOfWork]
-    public abstract class Store<TModel, TEntity, TKey> where TModel : Elsa.Models.IEntity where TEntity : class, IEntity<TKey>
+    public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where TModel : Elsa.Models.IEntity where TEntity : class, IEntity<TKey>
     {
-        private readonly SemaphoreSlim _semaphore = new(1);
+        // private static readonly SemaphoreSlim _semaphore = new(1);
 
-        protected ILogger Logger { get; set; }
-        //protected IAbpLazyServiceProvider LazyServiceProvider { get; }
-        protected IRepository<TEntity, TKey> Repository { get; }
-        protected IAsyncQueryableExecuter AsyncQueryableExecuter { get; }
+        public IAbpLazyServiceProvider LazyServiceProvider { get; set; }
 
-        protected Store(ILoggerFactory loggerFactory, IRepository<TEntity, TKey> repository, IAsyncQueryableExecuter asyncQueryableExecuter)
+        protected IClock Clock => LazyServiceProvider.LazyGetRequiredService<IClock>();
+
+        protected IGuidGenerator GuidGenerator => LazyServiceProvider.LazyGetService<IGuidGenerator>(SimpleGuidGenerator.Instance);
+
+        protected ILoggerFactory LoggerFactory => LazyServiceProvider.LazyGetRequiredService<ILoggerFactory>();
+
+        protected ICurrentTenant CurrentTenant => LazyServiceProvider.LazyGetRequiredService<ICurrentTenant>();
+
+        protected IAsyncQueryableExecuter AsyncExecuter => LazyServiceProvider.LazyGetRequiredService<IAsyncQueryableExecuter>();
+
+        protected ILogger Logger => LazyServiceProvider.LazyGetService<ILogger>(provider => LoggerFactory?.CreateLogger(GetType()) ?? NullLogger.Instance);
+
+        // protected IAbpDistributedLock DistributedLock => LazyServiceProvider.LazyGetRequiredService<IAbpDistributedLock>();
+
+        protected IUnitOfWorkManager UnitOfWork => LazyServiceProvider.LazyGetRequiredService<IUnitOfWorkManager>();
+
+        protected IRepository<TEntity, TKey> Repository => LazyServiceProvider.LazyGetRequiredService<IRepository<TEntity, TKey>>();
+
+        protected IStoreMapper StoreMapper => LazyServiceProvider.LazyGetRequiredService<IStoreMapper>();
+
+
+        protected Store()
         {
-            Logger = loggerFactory.CreateLogger(GetType());
-            Repository = repository;
-            AsyncQueryableExecuter = asyncQueryableExecuter;
         }
 
         public virtual async Task AddAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Call {typeof(TModel).Name} [AddAsync], Id: {model.Id} ");
+            Logger.LogDebug($"Call {typeof(TModel).Name} [AddAsync] with id '{model.Id}' ");
 
             var entity = await MapToEntityAsync(model);
             await Repository.InsertAsync(entity, true, cancellationToken);
@@ -67,7 +87,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task DeleteAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Call {typeof(TModel).Name} [DeleteAsync], Id:{model.Id} ");
+            Logger.LogDebug($"Call {typeof(TModel).Name} [DeleteAsync] with id '{model.Id}'");
 
             var id = (TKey)Convert.ChangeType(model.Id, typeof(TKey));
             await Repository.DeleteAsync(x => x.Id.Equals(id), true, cancellationToken);
@@ -86,6 +106,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task<TModel> FindAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
         {
+            Logger.LogDebug($"Call {typeof(TModel).Name} [FindAsync] ");
+
             var expression = await MapSpecificationAsync(specification);
             var entity = await Repository.FindAsync(expression, true, cancellationToken);
 
@@ -98,9 +120,10 @@ namespace Passingwind.Abp.ElsaModule.Stores
             return await MapToModelAsync(entity);
         }
 
-        [UnitOfWork]
         public virtual async Task<IEnumerable<TModel>> FindManyAsync(ISpecification<TModel> specification, IOrderBy<TModel> orderBy = null, IPaging paging = null, CancellationToken cancellationToken = default)
         {
+            Logger.LogDebug($"Call {typeof(TModel).Name} [FindManyAsync] ");
+
             var filter = await MapSpecificationAsync(specification).ConfigureAwait(false);
 
             var query = await Repository.WithDetailsAsync();
@@ -121,7 +144,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
             if (paging != null)
                 query = query.Skip(paging.Skip).Take(paging.Take);
 
-            var list = await AsyncQueryableExecuter.ToListAsync(query, cancellationToken).ConfigureAwait(false);
+            var list = await AsyncExecuter.ToListAsync(query).ConfigureAwait(false);
 
             var result = new List<TModel>();
 
@@ -133,53 +156,68 @@ namespace Passingwind.Abp.ElsaModule.Stores
             return result;
         }
 
+        private static readonly object _saveKey = new object();
+
         public virtual async Task SaveAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            await _semaphore.WaitAsync(cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+                return;
 
-            Logger.LogDebug($"Save [{model.GetType()}] {model.Id} ... ");
-
-            try
+            using (var uow = UnitOfWork.Begin(requiresNew: true))
             {
-                TKey id = ConvertKey(model.Id);
+                if (cancellationToken.IsCancellationRequested)
+                    return;
 
-                var entity = await Repository.FindAsync(id);
+                Logger.LogDebug($"Call {typeof(TModel).Name} [SaveAsync] ");
 
-                if (entity == default)
+                try
                 {
-                    entity = await MapToEntityAsync(model);
-                    await Repository.InsertAsync(entity, true, cancellationToken);
+                    Logger.LogDebug($"Saving [{typeof(TModel).Name}] with id '{model.Id}' ... ");
+
+                    TKey id = ConvertKey(model.Id);
+
+                    var entity = await Repository.FindAsync(id, true, cancellationToken);
+
+                    if (entity == default)
+                    {
+                        entity = await MapToEntityAsync(model);
+                        await Repository.InsertAsync(entity, true, cancellationToken);
+                    }
+                    else
+                    {
+                        entity = await MapToEntityAsync(model, entity);
+                        await Repository.UpdateAsync(entity, true, cancellationToken);
+                    }
+
+                    await uow.CompleteAsync();
                 }
-                else
+                catch (Exception ex)
                 {
-                    entity = await MapToEntityAsync(model, entity);
-                    await Repository.UpdateAsync(entity, true, cancellationToken);
+                    if (ex is TaskCanceledException ex2)
+                    {
+                        Logger.LogWarning(ex2, $"Task canceled when saving '{typeof(TModel).Name}' with id '{model.Id}'.");
+                    }
+                    else
+                    {
+                        Logger.LogError(ex, $"Saving '{typeof(TModel).Name}' with id '{model.Id}' failed.");
+                        throw;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, $"Saving '{typeof(TModel)}' data failed.");
-                throw;
-            }
-            finally
-            {
-                _semaphore.Release();
             }
         }
 
         public virtual async Task UpdateAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Update [{model.GetType()}] {model.Id} ... ");
+            Logger.LogDebug($"Call {typeof(TModel).Name} [UpdateAsync] with id '{model.Id}'");
 
             TKey id = ConvertKey(model.Id);
 
-            var entity = await Repository.GetAsync(x => x.Id.Equals(id));
+            var entity = await Repository.GetAsync(x => x.Id.Equals(id), true, cancellationToken);
 
             entity = await MapToEntityAsync(model, entity);
 
-            await Repository.UpdateAsync(entity);
+            await Repository.UpdateAsync(entity, true, cancellationToken);
         }
-
 
         protected virtual async Task<Expression<Func<TEntity, bool>>> MapSpecificationAsync(ISpecification<TModel> specification)
         {
