@@ -9,13 +9,20 @@
 
     <ItemGroup>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" /> 
-        <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="5.3.1" />
-        <PackageReference Include="Volo.Abp.Authorization" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="6.0.1" />
+        <PackageReference Include="Volo.Abp.Authorization" Version="6.0.1" />
         <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Domain.Shared\Passingwind.Abp.ElsaModule.Domain.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elsa.Abstractions" Version="2.9.1" />
+        <PackageReference Include="Elsa.Abstractions" Version="2.9.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Update="Fody" Version="6.6.4">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
  
 </Project>

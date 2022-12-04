@@ -8,13 +8,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.Http.Client" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.Http.Client" Version="6.0.1" />
         <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Application.Contracts\Passingwind.Abp.ElsaModule.Application.Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <EmbeddedResource Include="**\*generate-proxy.json" />
         <Content Remove="**\*generate-proxy.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Update="Fody" Version="6.6.4">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
  
 </Project>

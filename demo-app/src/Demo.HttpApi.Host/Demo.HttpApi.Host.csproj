@@ -11,18 +11,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.AspNetCore.MultiTenancy" Version="5.3.4" />
-        <PackageReference Include="Volo.Abp.Account.Web" Version="5.3.4" />
-        <PackageReference Include="Volo.Abp.Autofac" Version="5.3.4" />
-        <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="5.3.4" />
-        <PackageReference Include="Volo.Abp.Swashbuckle" Version="5.3.4" />
-        <PackageReference Include="Volo.Abp.MailKit" Version="5.3.4" />
+        <PackageReference Include="Volo.Abp.AspNetCore.MultiTenancy" Version="6.0.1" />
+        <PackageReference Include="Volo.Abp.Account.Web" Version="6.0.1" />
+        <PackageReference Include="Volo.Abp.Autofac" Version="6.0.1" />
+        <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="6.0.1" />
+        <PackageReference Include="Volo.Abp.Swashbuckle" Version="6.0.1" />
+        <PackageReference Include="Volo.Abp.MailKit" Version="6.0.1" />
         <PackageReference Include="Owl.Abp.CultureMap" Version="2.2.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Hangfire.Core" Version="1.7.28" />
         <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.*" />
+        <PackageReference Include="Hangfire.Core" Version="1.7.28" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
         <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.8.5" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.*" />
@@ -34,17 +34,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elsa" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.Email" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.Http" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.UserTask" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.BlobStorage" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.File" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.Entity" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.RabbitMq" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.Sql" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.Http.OpenApi" Version="2.9.1" />
+        <PackageReference Include="Elsa" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.Email" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.Http" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.UserTask" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.BlobStorage" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.File" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.Entity" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.RabbitMq" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.Sql" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.Http.OpenApi" Version="2.9.2" />
     </ItemGroup>
 
     <ItemGroup>

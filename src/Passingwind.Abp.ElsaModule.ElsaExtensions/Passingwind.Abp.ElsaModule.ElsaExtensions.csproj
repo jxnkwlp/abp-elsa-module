@@ -9,18 +9,25 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.*" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.3.1" />
-        <PackageReference Include="Volo.Abp.EventBus" Version="5.3.1" />
-        <PackageReference Include="Volo.Abp.Emailing" Version="5.3.1" />
+        <PackageReference Include="Volo.Abp.EventBus" Version="6.0.1" />
+        <PackageReference Include="Volo.Abp.Emailing" Version="6.0.1" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elsa.Activities.Email" Version="2.9.1" />
-        <PackageReference Include="Elsa.Activities.Http" Version="2.9.1" />
+        <PackageReference Include="Elsa.Activities.Email" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.Http" Version="2.9.2" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Domain\Passingwind.Abp.ElsaModule.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Update="Fody" Version="6.6.4">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
 
 </Project>
