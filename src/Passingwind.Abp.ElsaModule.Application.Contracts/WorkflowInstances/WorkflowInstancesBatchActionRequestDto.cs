@@ -2,7 +2,7 @@
 
 namespace Passingwind.Abp.ElsaModule.WorkflowInstances
 {
-    public class WorkflowInstancesBatchDeleteRequestDto
+    public class WorkflowInstancesBatchActionRequestDto
     {
         public Guid[] Ids { get; set; }
     }

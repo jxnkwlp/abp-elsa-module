@@ -33,6 +33,8 @@ export default {
     'common.dict.modified.success': '修改成功',
     'common.dict.deleted.success': '删除成功',
     'common.dict.table-action': "操作",
+    'common.dict.table.clearSelected': "清理选中",
+    'common.dict.success': "操作成功",
     'common.dict.creationTime': '创建时间',
     'common.dict.lastModificationTime': '修改时间',
     'common.dict.import': '导入',

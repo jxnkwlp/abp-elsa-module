@@ -176,7 +176,9 @@ const Index: React.FC = () => {
                     onSelect={async (key) => {
                         if (key == 'delete') {
                             Modal.confirm({
-                                title: 'Confirm delete?',
+                                title: intl.formatMessage({
+                                    id: 'common.dict.delete.confirm',
+                                }),
                                 onOk: async () => {
                                     if (await handleDelete(record.id!)) {
                                         action?.reload();

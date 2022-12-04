@@ -152,7 +152,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         await _workflowInstanceRepository.DeleteAsync(id);
     }
 
-    public async Task BatchDeleteAsync(WorkflowInstancesBatchDeleteRequestDto input)
+    public async Task BatchDeleteAsync(WorkflowInstancesBatchActionRequestDto input)
     {
         if (input?.Ids?.Any() == true)
         {
@@ -269,4 +269,27 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(5),
                });
     }
+
+    public async Task BatchCancelAsync(WorkflowInstancesBatchActionRequestDto input)
+    {
+        if (input?.Ids?.Any() == true)
+        {
+            foreach (var id in input.Ids)
+            {
+                await CancelAsync(id);
+            }
+        }
+    }
+
+    public async Task BatchRetryAsync(WorkflowInstancesBatchActionRequestDto input)
+    {
+        if (input?.Ids?.Any() == true)
+        {
+            foreach (var id in input.Ids)
+            {
+                await RetryAsync(id, new WorkflowInstanceRetryRequestDto { RunImmediately = false });
+            }
+        }
+    }
+
 }

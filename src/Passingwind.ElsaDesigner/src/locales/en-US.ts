@@ -32,6 +32,8 @@ export default {
     'common.dict.modified.success': 'Successfully modified',
     'common.dict.deleted.success': 'Successfully deleted',
     'common.dict.table-action': "Action",
+    'common.dict.table.clearSelected': "Clear Selected",
+    'common.dict.success': "Success",
     'common.dict.creationTime': 'Creation Time',
     'common.dict.lastModificationTime': 'Modification Time',
     'common.dict.import': 'Import',

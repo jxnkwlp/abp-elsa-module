@@ -11,18 +11,22 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         Task<WorkflowInstanceDto> GetAsync(Guid id);
 
         Task DeleteAsync(Guid id);
-        Task BatchDeleteAsync(WorkflowInstancesBatchDeleteRequestDto input);
+        Task BatchDeleteAsync(WorkflowInstancesBatchActionRequestDto input);
+
+        Task CancelAsync(Guid id);
+        Task BatchCancelAsync(WorkflowInstancesBatchActionRequestDto input);
+
+        Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input);
+        Task BatchRetryAsync(WorkflowInstancesBatchActionRequestDto input);
+
+        Task DispatchAsync(Guid id, WorkflowInstanceDispatchRequestDto input);
+        Task ExecuteAsync(Guid id, WorkflowInstanceExecuteRequestDto input);
 
         Task<PagedResultDto<WorkflowInstanceBasicDto>> GetListAsync(WorkflowInstanceListRequestDto input);
 
         Task<ListResultDto<WorkflowExecutionLogDto>> GetExecutionLogsAsync(Guid id);
 
         Task<WorkflowInstanceExecutionLogSummaryDto> GetLogSummaryAsync(Guid id);
-
-        Task CancelAsync(Guid id);
-        Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input);
-        Task DispatchAsync(Guid id, WorkflowInstanceDispatchRequestDto input);
-        Task ExecuteAsync(Guid id, WorkflowInstanceExecuteRequestDto input);
 
         Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(int datePeriod = 30);
 

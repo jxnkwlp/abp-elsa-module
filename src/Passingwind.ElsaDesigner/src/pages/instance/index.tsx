@@ -4,8 +4,11 @@ import type { API } from '@/services/typings';
 import { formatTableSorter, getTableQueryConfig, saveTableQueryConfig } from '@/services/utils';
 import { getWorkflowDefinitionList } from '@/services/WorkflowDefinition';
 import {
+    batchDeleteWorkflowInstance,
     deleteWorkflowInstance,
     getWorkflowInstanceList,
+    workflowInstanceBatchCancel,
+    workflowInstanceBatchRetry,
     workflowInstanceCancel,
     workflowInstanceRetry,
 } from '@/services/WorkflowInstance';
@@ -13,7 +16,7 @@ import { ProFormInstance, TableDropdown } from '@ant-design/pro-components';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { message, Modal, Space } from 'antd';
+import { Button, message, Modal, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useIntl } from 'umi';
 import { workflowStatusEnum } from './status';
@@ -25,6 +28,8 @@ const Index: React.FC = () => {
     const tableActionRef = useRef<ActionType>();
     const [tableFilterCollapsed, setTableFilterCollapsed] = useState<boolean>(true);
     const [tableQueryConfig, setTableQueryConfig] = useState<GlobalAPI.TableQueryConfig>();
+    const [tableSelectedRowKeys, setTableSelectedRowKeys] = useState<React.Key[]>();
+    const [tableSelectedRows, setTableSelectedRows] = useState<API.WorkflowInstance[]>([]);
 
     useEffect(() => {
         const tableQueryConfig = getTableQueryConfig('workflow_instances') ?? {};
@@ -280,6 +285,138 @@ const Index: React.FC = () => {
                 columns={columns}
                 actionRef={tableActionRef}
                 formRef={searchFormRef}
+                rowSelection={{
+                    selectedRowKeys: tableSelectedRowKeys,
+                    onChange: (selectedRowKeys, selectedRows) => {
+                        setTableSelectedRows(selectedRows);
+                        setTableSelectedRowKeys(selectedRowKeys);
+                    },
+                }}
+                tableAlertOptionRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => {
+                    // issue 'selectedRows' wil be lost the new values.
+                    return (
+                        <Space>
+                            <Button
+                                key="retry"
+                                type="link"
+                                disabled={
+                                    !(
+                                        selectedRowKeys.length > 0 &&
+                                        tableSelectedRows.every(
+                                            (x) =>
+                                                x.workflowStatus == WorkflowInstanceStatus.Faulted,
+                                        )
+                                    )
+                                }
+                                onClick={() => {
+                                    Modal.confirm({
+                                        title: intl.formatMessage({
+                                            id: 'page.instance.retry.confirm.title',
+                                        }),
+                                        content: intl.formatMessage({
+                                            id: 'page.instance.retry.confirm.content',
+                                        }),
+                                        onOk: async () => {
+                                            const result = await workflowInstanceBatchRetry({
+                                                ids: selectedRowKeys.map((x) => x as string),
+                                            });
+                                            if (result?.response?.ok) {
+                                                onCleanSelected();
+                                                tableActionRef.current?.reload();
+                                                message.success(
+                                                    intl.formatMessage({
+                                                        id: 'common.dict.success',
+                                                    }),
+                                                );
+                                            }
+                                        },
+                                    });
+                                }}
+                            >
+                                {intl.formatMessage({ id: 'page.instance.retry' })}
+                            </Button>
+                            <Button
+                                key="cancel"
+                                type="link"
+                                disabled={
+                                    !(
+                                        selectedRowKeys.length > 0 &&
+                                        tableSelectedRows.every(
+                                            (x) =>
+                                                x.workflowStatus ==
+                                                    WorkflowInstanceStatus.Running ||
+                                                x.workflowStatus == WorkflowInstanceStatus.Idle ||
+                                                x.workflowStatus ==
+                                                    WorkflowInstanceStatus.Suspended,
+                                        )
+                                    )
+                                }
+                                onClick={() => {
+                                    Modal.confirm({
+                                        title: intl.formatMessage({
+                                            id: 'page.instance.cancel.confirm.title',
+                                        }),
+                                        content: intl.formatMessage({
+                                            id: 'page.instance.cancel.confirm.content',
+                                        }),
+                                        onOk: async () => {
+                                            const result = await workflowInstanceBatchCancel({
+                                                ids: selectedRowKeys.map((x) => x as string),
+                                            });
+                                            if (result?.response?.ok) {
+                                                onCleanSelected();
+                                                tableActionRef.current?.reload();
+                                                message.success(
+                                                    intl.formatMessage({
+                                                        id: 'common.dict.success',
+                                                    }),
+                                                );
+                                            }
+                                        },
+                                    });
+                                }}
+                            >
+                                {intl.formatMessage({ id: 'page.instance.cancel' })}
+                            </Button>
+                            <Button
+                                key="delete"
+                                danger
+                                type="link"
+                                onClick={() => {
+                                    Modal.confirm({
+                                        title: intl.formatMessage({
+                                            id: 'common.dict.delete.confirm',
+                                        }),
+                                        content: intl.formatMessage({
+                                            id: 'page.instance.delete.confirm.content',
+                                        }),
+                                        onOk: async () => {
+                                            const result = await batchDeleteWorkflowInstance({
+                                                ids: selectedRowKeys.map((x) => x as string),
+                                            });
+                                            if (result?.response?.ok) {
+                                                onCleanSelected();
+                                                tableActionRef.current?.reload();
+                                                message.success(
+                                                    intl.formatMessage({
+                                                        id: 'common.dict.success',
+                                                    }),
+                                                );
+                                            }
+                                        },
+                                    });
+                                }}
+                            >
+                                {intl.formatMessage({ id: 'common.dict.delete' })}
+                            </Button>
+                            <Button key="clear" type="link" onClick={() => onCleanSelected()}>
+                                {intl.formatMessage({
+                                    id: 'common.dict.table.clearSelected',
+                                })}
+                            </Button>
+                        </Space>
+                    );
+                }}
                 search={{
                     labelWidth: 140,
                     collapsed: tableFilterCollapsed,
@@ -294,6 +431,8 @@ const Index: React.FC = () => {
                         filter: null,
                         pagination: undefined,
                     });
+                    // clear selected
+                    setTableSelectedRowKeys([]);
                 }}
                 pagination={tableQueryConfig?.pagination}
                 onChange={(pagination, _, sorter) => {
@@ -315,8 +454,13 @@ const Index: React.FC = () => {
                     }
                     // update
                     setTableQueryConfig(queryConfig);
+                    // clear selected
+                    setTableSelectedRowKeys([]);
                 }}
                 request={async (params) => {
+                    // clear selected
+                    setTableSelectedRowKeys([]);
+                    //
                     const { current, pageSize } = params;
                     delete params.current;
                     delete params.pageSize;

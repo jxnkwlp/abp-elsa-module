@@ -606,7 +606,7 @@ declare namespace API {
     /**
      * *TODO*
      **/
-    type WorkflowInstancesBatchDeleteRequest = {
+    type WorkflowInstancesBatchActionRequest = {
         ids?: string[] | undefined;
     };
 

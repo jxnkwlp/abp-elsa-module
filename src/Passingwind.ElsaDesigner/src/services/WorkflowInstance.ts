@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 12
+ * Total count: 14
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -12,7 +12,7 @@ import { request } from 'umi';
  * *TODO* DELETE /api/elsa/workflow/instances 
  **/
 export async function batchDeleteWorkflowInstance(
-    payload: API.WorkflowInstancesBatchDeleteRequest,
+    payload: API.WorkflowInstancesBatchActionRequest,
     options?: { [key: string]: any }
 ) {
     return request<any>(`/api/elsa/workflow/instances`, {
@@ -127,6 +127,36 @@ export async function getWorkflowInstanceStatusDateCountStatistics(
     return request<API.WorkflowInstanceDateCountStatisticsResult>(`/api/elsa/workflow/instances/statistics/count-date`, {
         method: 'GET',
         params: params,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* POST /api/elsa/workflow/instances/cancel 
+ **/
+export async function workflowInstanceBatchCancel(
+    payload: API.WorkflowInstancesBatchActionRequest,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/elsa/workflow/instances/cancel`, {
+        method: 'POST',
+        data: payload,
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* POST /api/elsa/workflow/instances/retry 
+ **/
+export async function workflowInstanceBatchRetry(
+    payload: API.WorkflowInstancesBatchActionRequest,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/elsa/workflow/instances/retry`, {
+        method: 'POST',
+        data: payload,
+        getResponse: true,
         ...(options || {}),
     });
 }
