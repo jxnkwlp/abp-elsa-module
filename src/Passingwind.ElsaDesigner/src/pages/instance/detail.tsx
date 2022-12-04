@@ -154,8 +154,8 @@ const Index: React.FC = () => {
 
         if (!result) {
             Modal.error({
-                title: 'Error',
-                content: 'The workflow defintion does not exist.',
+                title: intl.formatMessage({ id: 'common.dict.error.tips' }),
+                content: intl.formatMessage({ id: 'page.definition.notFound' }),
                 onOk: () => {
                     history.goBack();
                 },
@@ -190,8 +190,8 @@ const Index: React.FC = () => {
             setTitle(result?.name);
         } else {
             Modal.error({
-                title: 'Error',
-                content: 'The workflow instance does not exist.',
+                title: intl.formatMessage({ id: 'common.dict.error.tips' }),
+                content: intl.formatMessage({ id: 'page.instance.notFound' }),
                 onOk: () => {
                     history.goBack();
                 },

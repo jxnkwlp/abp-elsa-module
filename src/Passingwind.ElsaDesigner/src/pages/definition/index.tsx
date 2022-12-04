@@ -17,7 +17,7 @@ import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import { Button, Form, message, Modal } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import { formatMessage, useHistory, useIntl } from 'umi';
+import { formatMessage, Link, useHistory, useIntl } from 'umi';
 import EditFormItems from './edit-form-items';
 
 const handleEdit = async (id: string, data: any) => {
@@ -75,6 +75,7 @@ const Index: React.FC = () => {
             sortOrder: tableQueryConfig?.sort?.name ?? null,
             width: 220,
             fixed: 'left',
+            renderText: (_, record) => <Link to={`/definitions/${record.id}`}>{_}</Link>,
         },
         {
             dataIndex: 'displayName',
@@ -138,15 +139,13 @@ const Index: React.FC = () => {
             fixed: 'right',
             render: (text, record, _, action) => [
                 <a
-                    key="dispatch"
+                    key="designer"
                     onClick={() => {
-                        setDispatchId(record.id);
-                        setActionRow(record);
-                        setDispatchFormVisible(true);
+                        history.push('/designer?id=' + record.id);
                     }}
                 >
                     {intl.formatMessage({
-                        id: 'page.definition.dispatch',
+                        id: 'page.definition.designer',
                     })}
                 </a>,
                 <a
@@ -171,16 +170,7 @@ const Index: React.FC = () => {
                 >
                     {intl.formatMessage({ id: 'page.definition.settings' })}
                 </a>,
-                <a
-                    key="designer"
-                    onClick={() => {
-                        history.push('/designer?id=' + record.id);
-                    }}
-                >
-                    {intl.formatMessage({
-                        id: 'page.definition.designer',
-                    })}
-                </a>,
+
                 <TableDropdown
                     key="actionGroup"
                     onSelect={async (key) => {
@@ -205,9 +195,21 @@ const Index: React.FC = () => {
                             history.push(
                                 `/designer?fromId=${record.id}&fromVersion=${record.latestVersion}`,
                             );
+                        } else if (key == 'dispatch') {
+                            setDispatchId(record.id);
+                            setActionRow(record);
+                            setDispatchFormVisible(true);
                         }
                     }}
                     menus={[
+                        {
+                            key: 'dispatch',
+                            name: intl.formatMessage({ id: 'page.definition.dispatch' }),
+                            disabled: !record.publishedVersion,
+                        },
+                        {
+                            type: 'divider',
+                        },
                         {
                             key: 'publish',
                             name: intl.formatMessage({ id: 'page.definition.publish' }),
@@ -226,7 +228,7 @@ const Index: React.FC = () => {
                             name: intl.formatMessage({ id: 'page.definition.copyable' }),
                         },
                         {
-                            type: 'divider',
+                            type: 'divider' as const,
                         },
                         {
                             key: 'delete',

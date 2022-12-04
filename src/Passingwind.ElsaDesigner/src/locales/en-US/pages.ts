@@ -97,6 +97,9 @@ export default {
     'page.definition.autoSaveEnabled': 'Enable Auto Save',
     'page.definition.autoSaveDisabledTips': 'Auto save disabled',
     'page.definition.autoSaveEnabledTips': 'Auto save enabled',
+    'page.definition.switchVersion': 'Switch version',
+    'page.definition.notFound': 'The workflow definition does not exist',
+    'page.definition.versionNotFound': 'The workflow definition does not exist',
     //
     'page.definition.field.name': 'Name',
     'page.definition.field.displayName': 'Display Name',
@@ -159,6 +162,7 @@ export default {
     'page.instance.status.suspended': 'Suspended',
     'page.instance.status.faulted': 'Faulted',
     'page.instance.status.cancelled': 'Cancelled',
+    'page.instance.notFound': 'The workflow instance does not exist',
     //
     'page.variable.field.key': 'Key',
     'page.variable.field.value': 'Value',

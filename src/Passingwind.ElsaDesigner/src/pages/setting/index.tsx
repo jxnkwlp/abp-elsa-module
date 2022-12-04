@@ -54,7 +54,7 @@ const Index: React.FC = () => {
     return (
         <PageContainer>
             <Card
-                tabList={[{ tab: 'Email (SMTP)', key: 'email' }]}
+                tabList={[{ tab: 'Email Smtp', key: 'email' }]}
                 activeTabKey={tab}
                 onTabChange={onTabChange}
             >

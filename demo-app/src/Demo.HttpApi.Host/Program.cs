@@ -14,23 +14,19 @@ public static class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+        var logger = NLog.LogManager.Setup().GetCurrentClassLogger();
 
         try
         {
-            logger.Info("Starting Demo.HttpApi.Host.");
+            logger.Info("Starting Demo.HttpApi.Host."); 
 
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.AddAppSettingsSecretsJson()
-                .ConfigureLogging((host, logging) =>
+                .ConfigureLogging((logging) =>
                 {
-                    logging.AddSimpleConsole(formatOption =>
-                    {
-                        formatOption.SingleLine = true;
-                        formatOption.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
-                    });
+                    logging.ClearProviders();
                 })
-                .UseNLog(new NLogAspNetCoreOptions { RemoveLoggerFactoryFilter = false, })
+                .UseNLog(new NLogAspNetCoreOptions { RemoveLoggerFactoryFilter = false })
                 .UseAutofac()
                 ;
             await builder.AddApplicationAsync<DemoHttpApiHostModule>();
@@ -54,5 +50,4 @@ public static class Program
             NLog.LogManager.Shutdown();
         }
     }
-
 }

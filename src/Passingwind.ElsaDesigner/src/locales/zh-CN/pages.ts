@@ -95,6 +95,9 @@ export default {
     'page.definition.autoSaveEnabled': '启用自动保存',
     'page.definition.autoSaveDisabledTips': '自动保存已关闭',
     'page.definition.autoSaveEnabledTips': '自动保存已开启',
+    'page.definition.switchVersion': '切换版本',
+    'page.definition.notFound': '工作流定义不存在',
+    'page.definition.versionNotFound': '工作流定义不存在',
     //
     'page.definition.field.name': '名称',
     'page.definition.field.displayName': '显示名称',
@@ -157,6 +160,7 @@ export default {
     'page.instance.status.suspended': '已挂起',
     'page.instance.status.faulted': '已失败',
     'page.instance.status.cancelled': '已取消',
+    'page.instance.notFound': '工作流程实例不存在',
     //
     'page.variable.field.key': '名称',
     'page.variable.field.value': '值',

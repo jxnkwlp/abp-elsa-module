@@ -31,7 +31,7 @@
         component: './instance',
     },
     {
-        name: 'Instance Detail',
+        name: 'InstanceDetail',
         path: '/instances/:id',
         component: './instance/detail',
         hideInMenu: true,
@@ -41,6 +41,12 @@
         icon: 'BranchesOutlined',
         path: '/definitions',
         component: './definition',
+    },
+    {
+        name: 'DefinitionDetail',
+        path: '/definitions/:id',
+        component: './definition/detail',
+        hideInMenu: true,
     },
     {
         name: 'Variables',
