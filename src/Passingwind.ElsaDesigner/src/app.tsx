@@ -4,11 +4,11 @@ import RightContent from '@/components/RightContent';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
-import { message, Modal, notification } from 'antd';
+import { message, notification } from 'antd';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
-import { history, Link } from 'umi';
+import { history, Link, formatMessage } from 'umi';
 import defaultSettings from '../config/defaultSettings';
 import { getAbpApplicationConfiguration } from './services/AbpApplicationConfiguration';
 import type { API } from './services/typings';
@@ -126,30 +126,54 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     };
 };
 
-const httpRequestCodeMessage: Record<number, string> = {
-    200: '服务器成功返回请求的数据。',
-    201: '新建或修改数据成功。',
-    202: '一个请求已经进入后台排队（异步任务）。',
-    204: '删除数据成功。',
-    400: '发出的请求有错误。',
-    401: '未授权，请先登录',
-    403: '无权访问',
-    404: '请求的资源不存在',
-    406: '请求的格式不可得。',
-    410: '请求的资源被永久删除，且不会再得到的。',
-    422: '当创建一个对象时，发生一个验证错误。',
-    500: '服务器发生错误，请检查服务器。',
-    501: '网关错误。',
-    502: '网关错误。',
-    503: '服务不可用，服务器暂时过载或维护。',
-    504: '网关超时。',
+// const httpRequestCodeMessage: Record<number, string> = {
+//     200: '服务器成功返回请求的数据。',
+//     201: '新建或修改数据成功。',
+//     202: '一个请求已经进入后台排队（异步任务）。',
+//     204: '删除数据成功。',
+//     400: '发出的请求有错误。',
+//     401: '未授权，请先登录',
+//     403: '无权访问',
+//     404: '请求的资源不存在',
+//     406: '请求的格式不可得。',
+//     410: '请求的资源被永久删除，且不会再得到的。',
+//     422: '当创建一个对象时，发生一个验证错误。',
+//     500: '服务器发生错误，请检查服务器。',
+//     501: '网关错误。',
+//     502: '网关错误。',
+//     503: '服务不可用，服务器暂时过载或维护。',
+//     504: '网关超时。',
+// };
+
+const httpRequestCodeMessageDefaults: Record<number, string> = {
+    200: 'The server successfully returned the requested data. ',
+    201: 'Create or modify data successfully. ',
+    202: 'A request has been queued in the background (asynchronous task). ',
+    204: 'Delete data successfully. ',
+    400: 'There was an error in the request issued. ',
+    401: 'Unauthorized, please log in first. ',
+    403: 'No access. ',
+    404: 'The requested resource does not exist. ',
+    406: 'The requested format is not available. ',
+    410: 'The requested resource has been permanently deleted and will no longer be available. ',
+    422: 'A validation error occurred while creating an object. ',
+    500: 'An error occurred on the server, please check the server. ',
+    501: 'Bad gateway. ',
+    502: 'Bad gateway. ',
+    503: 'The service is unavailable, the server is temporarily overloaded or under maintenance. ',
+    504: 'Gateway timed out. ',
 };
 
 export const request: RequestConfig = {
     errorHandler: (error) => {
         const { data, response } = error;
         if (response && response.status) {
-            let errorText = httpRequestCodeMessage[response.status] || response.statusText;
+            const errorMessage = formatMessage({
+                id: `common.http.response.statusCode.${response.status}`,
+                defaultMessage: httpRequestCodeMessageDefaults[response.status],
+            });
+
+            let errorText = errorMessage || response.statusText;
             const { status } = response;
 
             if ((status == 403 || status == 400) && data?.error?.message)
@@ -159,11 +183,13 @@ export const request: RequestConfig = {
                 errorText = 'Please refresh and try again';
             }
 
-            message.error(errorText ?? '请求失败');
+            message.error(
+                errorText ?? formatMessage({ id: 'common.http.response.error.requestFailed' }),
+            );
         } else if (!response) {
             notification.error({
-                description: '您的网络发生异常，无法连接服务器',
-                message: '网络异常',
+                description: formatMessage({ id: 'common.http.response.error.networkError1' }),
+                message: formatMessage({ id: 'common.http.response.error.networkError2' }),
             });
         }
 

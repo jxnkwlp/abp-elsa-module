@@ -1,6 +1,6 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
- * Total count: 164
+ * Total count: 165
  **/
 import * as Enum from "./enums";
 
@@ -23,7 +23,7 @@ declare namespace API {
      * *TODO*
      **/
     type ApiKeyCreateOrUpdate = {
-        name?: string | undefined;
+        name: string;
         expirationTime?: string | undefined;
     };
 
@@ -822,6 +822,7 @@ declare namespace API {
         timing?: Timing | undefined;
         clock?: Clock | undefined;
         objectExtensions?: ObjectExtensions | undefined;
+        extraProperties?: any | undefined;
     };
 
     /**
@@ -1236,6 +1237,11 @@ declare namespace API {
         type?: string | undefined;
         typeSimple?: string | undefined;
         isRequired?: boolean | undefined;
+        minLength?: number | undefined;
+        maxLength?: number | undefined;
+        minimum?: string | undefined;
+        maximum?: string | undefined;
+        regex?: string | undefined;
     };
 
     /**
@@ -1473,6 +1479,16 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type SendTestEmailInput = {
+        senderEmailAddress: string;
+        targetEmailAddress: string;
+        subject: string;
+        body?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type UpdateEmailSettings = {
         smtpHost?: string | undefined;
         smtpPort?: number | undefined;
@@ -1494,6 +1510,7 @@ declare namespace API {
         userName?: string | undefined;
         name?: string | undefined;
         surname?: string | undefined;
+        isActive?: boolean | undefined;
         email?: string | undefined;
         emailConfirmed?: boolean | undefined;
         phoneNumber?: string | undefined;

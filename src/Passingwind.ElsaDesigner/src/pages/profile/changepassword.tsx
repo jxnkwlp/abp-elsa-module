@@ -1,6 +1,7 @@
 import { profileChangePassword } from '@/services/Profile';
+import { ProForm } from '@ant-design/pro-components';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Button, Card, Form, Input, Modal, Spin } from 'antd';
+import { Button, Card, Col, Form, Input, Modal, Row, Space, Spin } from 'antd';
 import React, { useState } from 'react';
 import { history, useIntl, useModel } from 'umi';
 
@@ -23,89 +24,89 @@ const Index: React.FC = () => {
     return (
         <PageContainer>
             <Card title={intl.formatMessage({ id: 'page.change-password.title' })}>
-                <Spin spinning={loading}>
-                    <Form
-                        form={form}
-                        name="basic"
-                        labelCol={{ span: 4 }}
-                        wrapperCol={{ span: 8 }}
-                        layout="vertical"
-                        onFinish={async (values) => {
-                            setLoading(true);
-                            if (await handleUpdate(values)) {
-                                Modal.info({
-                                    title: intl.formatMessage({ id: 'common.dict.info.tips' }),
-                                    content: intl.formatMessage({
-                                        id: 'page.change-password.submit.success',
-                                    }),
-                                    onOk: async () => {
-                                        await setInitialState((s) => ({
-                                            ...s,
-                                            currentUser: undefined,
-                                        }));
-                                        history.replace('/auth/login');
-                                    },
-                                });
-                            }
-                            setLoading(false);
-                        }}
-                    >
-                        <Form.Item
-                            label={intl.formatMessage({
-                                id: 'page.change-password.field.currentPassword',
-                            })}
-                            name="currentPassword"
-                            rules={[{ required: true }, { min: 6 }, { max: 32 }]}
-                        >
-                            <Input.Password maxLength={32} />
-                        </Form.Item>
-                        <Form.Item
-                            label={intl.formatMessage({
-                                id: 'page.change-password.field.newPassword',
-                            })}
-                            name="newPassword"
-                            rules={[{ required: true }, { min: 6 }, { max: 32 }]}
-                        >
-                            <Input.Password maxLength={32} />
-                        </Form.Item>
-                        <Form.Item
-                            label={intl.formatMessage({
-                                id: 'page.change-password.field.confirmPassword',
-                            })}
-                            name="confirmNewPassword"
-                            dependencies={['newPassword']}
-                            rules={[
-                                { required: true },
-                                { min: 6 },
-                                { max: 32 },
-                                ({ getFieldValue }) => ({
-                                    validator(_, value) {
-                                        if (!value || getFieldValue('newPassword') === value) {
-                                            return Promise.resolve();
-                                        }
-                                        return Promise.reject(
-                                            new Error(
-                                                intl.formatMessage({
-                                                    id: 'page.change-password.field.2passwordnotmatch',
-                                                }),
-                                            ),
-                                        );
-                                    },
+                <ProForm
+                    layout="horizontal"
+                    labelWrap
+                    labelCol={{ span: 3 }}
+                    wrapperCol={{ sm: 24, md: 18, lg: 12, xl: 6, xxl: 4 }}
+                    submitter={{
+                        render: (props, doms) => {
+                            return (
+                                <Row>
+                                    <Col offset={3}>
+                                        <Space>{doms}</Space>
+                                    </Col>
+                                </Row>
+                            );
+                        },
+                    }}
+                    onFinish={async (values) => {
+                        setLoading(true);
+                        if (await handleUpdate(values)) {
+                            Modal.info({
+                                title: intl.formatMessage({ id: 'common.dict.info.tips' }),
+                                content: intl.formatMessage({
+                                    id: 'page.change-password.submit.success',
                                 }),
-                            ]}
-                        >
-                            <Input.Password maxLength={32} />
-                        </Form.Item>
-
-                        <Form.Item label="">
-                            <Button type="primary" htmlType="submit">
-                                {intl.formatMessage({
-                                    id: 'page.change-password.submit',
-                                })}
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </Spin>
+                                onOk: async () => {
+                                    await setInitialState((s) => ({
+                                        ...s,
+                                        currentUser: undefined,
+                                    }));
+                                    history.replace('/auth/login');
+                                },
+                            });
+                        }
+                        setLoading(false);
+                    }}
+                >
+                    <Form.Item
+                        label={intl.formatMessage({
+                            id: 'page.change-password.field.currentPassword',
+                        })}
+                        name="currentPassword"
+                        rules={[{ required: true }, { min: 6 }, { max: 32 }]}
+                    >
+                        <Input.Password maxLength={32} />
+                    </Form.Item>
+                    <Form.Item
+                        label={intl.formatMessage({
+                            id: 'page.change-password.field.newPassword',
+                        })}
+                        name="newPassword"
+                        rules={[{ required: true }, { min: 6 }, { max: 32 }]}
+                    >
+                        <Input.Password maxLength={32} />
+                    </Form.Item>
+                    <Form.Item
+                        label={intl.formatMessage({
+                            id: 'page.change-password.field.confirmPassword',
+                        })}
+                        name="confirmNewPassword"
+                        dependencies={['newPassword']}
+                        rules={[
+                            { required: true },
+                            { min: 6 },
+                            { max: 32 },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue('newPassword') === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(
+                                        new Error(
+                                            intl.formatMessage({
+                                                id: 'page.change-password.field.2passwordnotmatch',
+                                            }),
+                                        ),
+                                    );
+                                },
+                            }),
+                        ]}
+                    >
+                        <Input.Password maxLength={32} />
+                    </Form.Item>
+                </ProForm>
             </Card>
         </PageContainer>
     );

@@ -73,7 +73,7 @@ const Index: React.FC = () => {
             copyable: true,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.name ?? null,
-            width: 220,
+            width: 250,
             fixed: 'left',
             renderText: (_, record) => <Link to={`/definitions/${record.id}`}>{_}</Link>,
         },
@@ -84,13 +84,13 @@ const Index: React.FC = () => {
             copyable: true,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.displayName ?? null,
-            width: 220,
+            width: 250,
         },
         {
             dataIndex: 'description',
             title: intl.formatMessage({ id: 'page.definition.field.description' }),
             search: false,
-            width: 150,
+            width: 160,
         },
         {
             dataIndex: 'latestVersion',
@@ -98,7 +98,7 @@ const Index: React.FC = () => {
             search: false,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.latestVersion ?? null,
-            width: 150,
+            width: 160,
         },
         {
             dataIndex: 'publishedVersion',
@@ -106,7 +106,7 @@ const Index: React.FC = () => {
             search: false,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.publishedVersion ?? null,
-            width: 150,
+            width: 160,
         },
         {
             dataIndex: 'isSingleton',
@@ -129,7 +129,7 @@ const Index: React.FC = () => {
             renderText: (_, record) => _ ?? record.creationTime,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.lastModificationTime ?? null,
-            width: 150,
+            width: 180,
         },
         {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
