@@ -211,18 +211,21 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         return dto;
     }
 
-    public async Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(int datePeriod = 30)
+    public async Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(GetStatusDateCountStatisticsRequestDto input)
     {
+        var datePeriod = input.DatePeriod ?? 30;
         if (datePeriod <= 0)
             throw new ArgumentOutOfRangeException("datePeriod must > 0");
 
-        var endDate = Clock.Now.Date;
-        var startDate = Clock.Now.Date.AddDays(-datePeriod);
+        double tz = input.Tz;
 
-        var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync($"workflow:instance:status:datecount:statistics:{datePeriod}", async () =>
+        var endDate = Clock.Now;
+        var startDate = Clock.Now.AddDays(-datePeriod);
+
+        var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync($"workflow:instance:status:datecount:statistics:{datePeriod}:tz:{tz}", async () =>
         {
-            var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Finished, startDate, endDate);
-            var faulted = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Faulted, startDate, endDate);
+            var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Finished, startDate, endDate, timeZone: tz);
+            var faulted = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Faulted, startDate, endDate, timeZone: tz);
 
             var dto = new WorkflowInstanceDateCountStatisticsResultDto();
 
@@ -240,7 +243,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
             return dto;
         }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
         {
-            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(15),
+            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10),
         });
 
         return dto;
@@ -266,7 +269,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
                    };
                }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
                {
-                   AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(5),
+                   AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(2),
                });
     }
 

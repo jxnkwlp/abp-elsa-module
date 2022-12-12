@@ -118,7 +118,7 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus workflowStatus, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus workflowStatus, DateTime startDate, DateTime endDate, double timeZone = 0, CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
@@ -131,6 +131,7 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
                    .ToListAsync(cancellationToken);
 
         return list
+                .Select(x => new { Id = x.Id, CreationTime = x.CreationTime.AddHours(timeZone) })
                 .GroupBy(x => x.CreationTime.Date)
                 .ToDictionary(x => x.Key.Date, x => x.Count());
     }

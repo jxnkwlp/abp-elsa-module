@@ -163,6 +163,7 @@ export default {
     'page.instance.status.faulted': 'Faulted',
     'page.instance.status.cancelled': 'Cancelled',
     'page.instance.notFound': 'The workflow instance does not exist',
+    'page.instance.reload': 'Reload',
     //
     'page.variable.field.key': 'Key',
     'page.variable.field.value': 'Value',

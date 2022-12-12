@@ -16,6 +16,7 @@ import type { API } from './services/typings';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/auth/login';
 
+// YYYY-MM-DD HH:mm:ss'
 moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
 moment.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ssZ';
 

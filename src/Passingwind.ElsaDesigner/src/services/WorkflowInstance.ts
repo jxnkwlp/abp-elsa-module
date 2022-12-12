@@ -9,7 +9,7 @@ import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* DELETE /api/elsa/workflow/instances 
+ * *TODO* DELETE /api/elsa/workflow/instances
  **/
 export async function batchDeleteWorkflowInstance(
     payload: API.WorkflowInstancesBatchActionRequest,
@@ -24,7 +24,7 @@ export async function batchDeleteWorkflowInstance(
 }
 
 /**
- * *TODO* DELETE /api/elsa/workflow/instances/{id} 
+ * *TODO* DELETE /api/elsa/workflow/instances/{id}
  **/
 export async function deleteWorkflowInstance(
     id: string,
@@ -38,7 +38,7 @@ export async function deleteWorkflowInstance(
 }
 
 /**
- * *TODO* GET /api/elsa/workflow/instances/{id} 
+ * *TODO* GET /api/elsa/workflow/instances/{id}
  **/
 export async function getWorkflowInstance(
     id: string,
@@ -51,7 +51,7 @@ export async function getWorkflowInstance(
 }
 
 /**
- * *TODO* GET /api/elsa/workflow/instances/{id}/execution-logs 
+ * *TODO* GET /api/elsa/workflow/instances/{id}/execution-logs
  **/
 export async function getWorkflowInstanceExecutionLogs(
     id: string,
@@ -64,7 +64,7 @@ export async function getWorkflowInstanceExecutionLogs(
 }
 
 /**
- * *TODO* GET /api/elsa/workflow/instances 
+ * *TODO* GET /api/elsa/workflow/instances
  **/
 export async function getWorkflowInstanceList(
     params: {
@@ -91,7 +91,7 @@ export async function getWorkflowInstanceList(
 }
 
 /**
- * *TODO* GET /api/elsa/workflow/instances/{id}/execution-logs/summary 
+ * *TODO* GET /api/elsa/workflow/instances/{id}/execution-logs/summary
  **/
 export async function getWorkflowInstanceLogSummary(
     id: string,
@@ -104,7 +104,7 @@ export async function getWorkflowInstanceLogSummary(
 }
 
 /**
- * *TODO* GET /api/elsa/workflow/instances/statistics/status 
+ * *TODO* GET /api/elsa/workflow/instances/statistics/status
  **/
 export async function getWorkflowInstanceStatusCountStatistics(
     options?: { [key: string]: any }
@@ -116,11 +116,12 @@ export async function getWorkflowInstanceStatusCountStatistics(
 }
 
 /**
- * *TODO* GET /api/elsa/workflow/instances/statistics/count-date 
+ * *TODO* GET /api/elsa/workflow/instances/statistics/count-date
  **/
 export async function getWorkflowInstanceStatusDateCountStatistics(
     params: {
         datePeriod?: number | undefined
+        tz?: number | undefined
     },
     options?: { [key: string]: any }
 ) {
@@ -132,7 +133,7 @@ export async function getWorkflowInstanceStatusDateCountStatistics(
 }
 
 /**
- * *TODO* POST /api/elsa/workflow/instances/cancel 
+ * *TODO* POST /api/elsa/workflow/instances/cancel
  **/
 export async function workflowInstanceBatchCancel(
     payload: API.WorkflowInstancesBatchActionRequest,
@@ -147,7 +148,7 @@ export async function workflowInstanceBatchCancel(
 }
 
 /**
- * *TODO* POST /api/elsa/workflow/instances/retry 
+ * *TODO* POST /api/elsa/workflow/instances/retry
  **/
 export async function workflowInstanceBatchRetry(
     payload: API.WorkflowInstancesBatchActionRequest,
@@ -162,7 +163,7 @@ export async function workflowInstanceBatchRetry(
 }
 
 /**
- * *TODO* POST /api/elsa/workflow/instances/{id}/cancel 
+ * *TODO* POST /api/elsa/workflow/instances/{id}/cancel
  **/
 export async function workflowInstanceCancel(
     id: string,
@@ -176,7 +177,7 @@ export async function workflowInstanceCancel(
 }
 
 /**
- * *TODO* POST /api/elsa/workflow/instances/{id}/dispatch 
+ * *TODO* POST /api/elsa/workflow/instances/{id}/dispatch
  **/
 export async function workflowInstanceDispatch(
     id: string,
@@ -192,7 +193,7 @@ export async function workflowInstanceDispatch(
 }
 
 /**
- * *TODO* POST /api/elsa/workflow/instances/{id}/execute 
+ * *TODO* POST /api/elsa/workflow/instances/{id}/execute
  **/
 export async function workflowInstanceExecute(
     id: string,
@@ -208,7 +209,7 @@ export async function workflowInstanceExecute(
 }
 
 /**
- * *TODO* POST /api/elsa/workflow/instances/{id}/retry 
+ * *TODO* POST /api/elsa/workflow/instances/{id}/retry
  **/
 export async function workflowInstanceRetry(
     id: string,

@@ -28,7 +28,7 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
 
         Task<WorkflowInstanceExecutionLogSummaryDto> GetLogSummaryAsync(Guid id);
 
-        Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(int datePeriod = 30);
+        Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(GetStatusDateCountStatisticsRequestDto input);
 
         Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync();
 

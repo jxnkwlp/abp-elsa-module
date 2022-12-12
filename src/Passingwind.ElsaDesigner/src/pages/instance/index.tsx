@@ -16,7 +16,7 @@ import { ProFormInstance, TableDropdown } from '@ant-design/pro-components';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, message, Modal, Space } from 'antd';
+import { Button, message, Modal, Space, Typography } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useIntl } from 'umi';
 import { workflowStatusEnum } from './status';
@@ -63,21 +63,14 @@ const Index: React.FC = () => {
         {
             dataIndex: 'name',
             title: intl.formatMessage({ id: 'page.instance.field.name' }),
-            copyable: true,
-            renderText: (_, record) => {
-                return (
-                    <Link
-                        to={{
-                            pathname: `/instances/${record.id}`,
-                        }}
-                    >
-                        {_}
-                    </Link>
-                );
-            },
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.name ?? null,
             fixed: 'left',
+            render: (_, record) => (
+                <Typography.Text copyable={{ text: record.name }}>
+                    <Link to={`/instances/${record.id}`}>{_}</Link>
+                </Typography.Text>
+            ),
         },
         {
             dataIndex: 'version',
@@ -283,6 +276,9 @@ const Index: React.FC = () => {
         <PageContainer>
             <ProTable<API.WorkflowInstance>
                 columns={columns}
+                dateFormatter={(value) => {
+                    return value.format();
+                }}
                 actionRef={tableActionRef}
                 formRef={searchFormRef}
                 rowSelection={{
@@ -292,7 +288,7 @@ const Index: React.FC = () => {
                         setTableSelectedRowKeys(selectedRowKeys);
                     },
                 }}
-                tableAlertOptionRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => {
+                tableAlertOptionRender={({ selectedRowKeys, _, onCleanSelected }) => {
                     // issue 'selectedRows' wil be lost the new values.
                     return (
                         <Space>
@@ -457,6 +453,11 @@ const Index: React.FC = () => {
                     // clear selected
                     setTableSelectedRowKeys([]);
                 }}
+                beforeSearchSubmit={(params) => {
+                    // update filter
+                    setTableQueryConfig({ ...tableQueryConfig, filter: params });
+                    return params;
+                }}
                 request={async (params) => {
                     // clear selected
                     setTableSelectedRowKeys([]);
@@ -466,11 +467,11 @@ const Index: React.FC = () => {
                     delete params.pageSize;
                     const skipCount = (current! - 1) * pageSize!;
 
-                    // update filter
-                    const queryConfig: GlobalAPI.TableQueryConfig = {
-                        ...tableQueryConfig,
-                        filter: { ...tableQueryConfig?.filter, ...params },
-                    };
+                    // clear some params
+                    const queryConfig = { ...tableQueryConfig };
+                    delete queryConfig?.filter?.current;
+                    delete queryConfig?.filter?.pageSize;
+                    delete queryConfig?.filter?._timestamp;
 
                     // save session
                     saveTableQueryConfig('workflow_instances', queryConfig);

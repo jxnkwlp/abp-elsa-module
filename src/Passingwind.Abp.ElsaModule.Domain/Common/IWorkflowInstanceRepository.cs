@@ -64,6 +64,6 @@ public interface IWorkflowInstanceRepository : IRepository<WorkflowInstance, Gui
         DateTime[] creationTimes = null,
         CancellationToken cancellationToken = default);
 
-    Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus WorkflowInstanceStatus, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
+    Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus workflowStatus, DateTime startDate, DateTime endDate, double timeZone = 0, CancellationToken cancellationToken = default);
 
 }

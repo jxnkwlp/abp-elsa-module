@@ -161,6 +161,7 @@ export default {
     'page.instance.status.faulted': '已失败',
     'page.instance.status.cancelled': '已取消',
     'page.instance.notFound': '工作流程实例不存在',
+    'page.instance.reload': '刷新',
     //
     'page.variable.field.key': '名称',
     'page.variable.field.value': '值',

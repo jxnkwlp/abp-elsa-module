@@ -1,26 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { Alert, Card } from 'antd';
+import type { API } from '@/services/typings';
 import {
     getWorkflowInstanceStatusCountStatistics,
     getWorkflowInstanceStatusDateCountStatistics,
 } from '@/services/WorkflowInstance';
 import { Line } from '@ant-design/charts';
-import moment from 'moment';
-import { useIntl } from 'umi';
 import { StatisticCard } from '@ant-design/pro-components';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Card } from 'antd';
+import moment from 'moment';
 import RcResizeObserver from 'rc-resize-observer';
-import { API } from '@/services/typings';
-
-const imgStyle = {
-    display: 'block',
-    width: 42,
-    height: 42,
-};
+import React, { useEffect, useState } from 'react';
+import { useIntl } from 'umi';
 
 const Index: React.FC = () => {
     const intl = useIntl();
 
+    const [loading, setLoading] = useState<boolean>(false);
     const [responsive, setResponsive] = useState(false);
 
     const [statusDateCountStatistics, setStatusDateCountStatistics] = useState<any>([]);
@@ -38,7 +33,8 @@ const Index: React.FC = () => {
 
     useEffect(() => {
         const load = async () => {
-            const result = await getWorkflowInstanceStatusDateCountStatistics({});
+            setLoading(true);
+            const result = await getWorkflowInstanceStatusDateCountStatistics({ tz: 8 });
             const list = (result?.items ?? []).map((x) => {
                 return {
                     date: moment(x.date).format('MM-DD'),
@@ -56,6 +52,8 @@ const Index: React.FC = () => {
                 }),
             );
             setStatusDateCountStatistics(list);
+
+            setLoading(false);
         };
 
         load();
@@ -70,6 +68,7 @@ const Index: React.FC = () => {
                 }}
             >
                 <StatisticCard.Group
+                    loading={loading}
                     direction={responsive ? 'column' : 'row'}
                     title={intl.formatMessage({ id: 'page.dashboard.statistics.status.title' })}
                 >
@@ -121,6 +120,7 @@ const Index: React.FC = () => {
             </RcResizeObserver>
 
             <Card
+                loading={loading}
                 title={intl.formatMessage(
                     {
                         id: 'page.dashboard.statistics.datecount.title',

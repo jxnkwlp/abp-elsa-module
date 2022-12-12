@@ -12,11 +12,11 @@ import { ProDescriptions } from '@ant-design/pro-descriptions';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
     Alert,
+    Button,
     Card,
     Col,
     Empty,
     Modal,
-    Result,
     Row,
     Space,
     Tabs,
@@ -271,12 +271,23 @@ const Index: React.FC = () => {
         });
     };
 
+    const updateGraph = async () => {
+        flowAction.current?.setAllNodeStatus('inactive');
+        flowAction.current?.setAllEdgesStyle('inactive');
+
+        await updateGraphNodeStatus();
+    };
+
+    const reload = async () => {
+        setSelectActivityId('');
+        setTabKey('logs');
+        await loadData(id!);
+        await updateGraph();
+    };
+
     useEffect(() => {
         if (graphInit && data) {
-            flowAction.current?.setAllNodeStatus('inactive');
-            flowAction.current?.setAllEdgesStyle('inactive');
-
-            updateGraphNodeStatus();
+            updateGraph();
         }
     }, [graphInit, data, definition, logs, logSummary]);
 
@@ -292,7 +303,23 @@ const Index: React.FC = () => {
     }, [0]);
 
     return (
-        <PageContainer title={title} loading={loading}>
+        <PageContainer
+            title={title}
+            loading={loading}
+            extra={[
+                <Button
+                    key="reload"
+                    type="primary"
+                    loading={loading}
+                    disabled={!id}
+                    onClick={() => {
+                        reload();
+                    }}
+                >
+                    {intl.formatMessage({ id: 'page.instance.reload' })}
+                </Button>,
+            ]}
+        >
             {(data?.faults?.length ?? 0) > 0 && (
                 <Alert
                     showIcon
@@ -306,6 +333,7 @@ const Index: React.FC = () => {
             <ProCard
                 title={intl.formatMessage({ id: 'page.instance.general' })}
                 style={{ marginBottom: 16 }}
+                collapsible
             >
                 <ProDescriptions
                     dataSource={data}

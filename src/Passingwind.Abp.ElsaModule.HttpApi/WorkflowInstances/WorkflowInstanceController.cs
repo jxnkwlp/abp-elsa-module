@@ -91,9 +91,9 @@ namespace Passingwind.Abp.ElsaModule.WorkflowInstances
         }
 
         [HttpGet("statistics/count-date")]
-        public Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(int datePeriod = 30)
+        public Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(GetStatusDateCountStatisticsRequestDto input)
         {
-            return _service.GetStatusDateCountStatisticsAsync(datePeriod);
+            return _service.GetStatusDateCountStatisticsAsync(input);
         }
 
         [HttpPost("{id}/retry")]

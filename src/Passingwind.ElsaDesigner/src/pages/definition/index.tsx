@@ -15,7 +15,7 @@ import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-des
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
-import { Button, Form, message, Modal } from 'antd';
+import { Button, Form, message, Modal, Typography } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { formatMessage, Link, useHistory, useIntl } from 'umi';
 import EditFormItems from './edit-form-items';
@@ -70,12 +70,15 @@ const Index: React.FC = () => {
             dataIndex: 'name',
             title: intl.formatMessage({ id: 'page.definition.field.name' }),
             search: false,
-            copyable: true,
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.name ?? null,
             width: 250,
             fixed: 'left',
-            renderText: (_, record) => <Link to={`/definitions/${record.id}`}>{_}</Link>,
+            render: (_, record) => (
+                <Typography.Text copyable={{ text: record.name }}>
+                    <Link to={`/definitions/${record.id}`}>{_}</Link>
+                </Typography.Text>
+            ),
         },
         {
             dataIndex: 'displayName',
@@ -134,7 +137,7 @@ const Index: React.FC = () => {
         {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
-            width: 180,
+            width: 110,
             align: 'center',
             fixed: 'right',
             render: (text, record, _, action) => [
@@ -148,33 +151,36 @@ const Index: React.FC = () => {
                         id: 'page.definition.designer',
                     })}
                 </a>,
-                <a
-                    key="edit"
-                    onClick={() => {
-                        setEditModalData(
-                            Object.assign({}, record, {
-                                variablesString: JSON.stringify(record.variables ?? {}, null, 2),
-                            }),
-                        );
-                        setEditModalDataId(record.id);
-                        setEditModalTitle(
-                            `${intl.formatMessage({ id: 'common.dict.edit' })} - ${record.name}`,
-                        );
-                        setEditModalVisible(true);
-                        editForm.setFieldsValue(
-                            Object.assign({}, record, {
-                                variablesString: JSON.stringify(record.variables ?? {}, null, 2),
-                            }),
-                        );
-                    }}
-                >
-                    {intl.formatMessage({ id: 'page.definition.settings' })}
-                </a>,
-
                 <TableDropdown
                     key="actionGroup"
                     onSelect={async (key) => {
-                        if (key == 'delete') {
+                        if (key == 'edit') {
+                            setEditModalData(
+                                Object.assign({}, record, {
+                                    variablesString: JSON.stringify(
+                                        record.variables ?? {},
+                                        null,
+                                        2,
+                                    ),
+                                }),
+                            );
+                            setEditModalDataId(record.id);
+                            setEditModalTitle(
+                                `${intl.formatMessage({ id: 'common.dict.edit' })} - ${
+                                    record.name
+                                }`,
+                            );
+                            setEditModalVisible(true);
+                            editForm.setFieldsValue(
+                                Object.assign({}, record, {
+                                    variablesString: JSON.stringify(
+                                        record.variables ?? {},
+                                        null,
+                                        2,
+                                    ),
+                                }),
+                            );
+                        } else if (key == 'delete') {
                             Modal.confirm({
                                 title: intl.formatMessage({
                                     id: 'common.dict.delete.confirm',
@@ -204,6 +210,10 @@ const Index: React.FC = () => {
                         }
                     }}
                     menus={[
+                        {
+                            key: 'edit',
+                            name: intl.formatMessage({ id: 'page.definition.settings' }),
+                        },
                         {
                             key: 'dispatch',
                             name: intl.formatMessage({ id: 'page.definition.dispatch' }),
@@ -256,6 +266,9 @@ const Index: React.FC = () => {
         <PageContainer>
             <ProTable<API.WorkflowDefinition>
                 columns={columns}
+                dateFormatter={(value) => {
+                    return value.format();
+                }}
                 actionRef={tableActionRef}
                 formRef={searchFormRef}
                 search={{ labelWidth: 140 }}
@@ -302,17 +315,22 @@ const Index: React.FC = () => {
                     // update
                     setTableQueryConfig(queryConfig);
                 }}
+                beforeSearchSubmit={(params) => {
+                    // update filter
+                    setTableQueryConfig({ ...tableQueryConfig, filter: params });
+                    return params;
+                }}
                 request={async (params) => {
                     const { current, pageSize } = params;
                     delete params.current;
                     delete params.pageSize;
                     const skipCount = (current! - 1) * pageSize!;
 
-                    // update filter
-                    const queryConfig: GlobalAPI.TableQueryConfig = {
-                        ...tableQueryConfig,
-                        filter: { ...tableQueryConfig?.filter, ...params },
-                    };
+                    // clear some params
+                    const queryConfig = { ...tableQueryConfig };
+                    delete queryConfig?.filter?.current;
+                    delete queryConfig?.filter?.pageSize;
+                    delete queryConfig?.filter?._timestamp;
 
                     // save session
                     saveTableQueryConfig('workflow_definitions', queryConfig);

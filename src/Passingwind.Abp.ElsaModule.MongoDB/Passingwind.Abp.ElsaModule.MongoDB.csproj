@@ -13,11 +13,4 @@
         <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Domain\Passingwind.Abp.ElsaModule.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Update="Fody" Version="6.6.4">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-      </PackageReference>
-    </ItemGroup>
- 
 </Project>

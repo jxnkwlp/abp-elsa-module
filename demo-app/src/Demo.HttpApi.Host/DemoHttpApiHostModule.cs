@@ -195,6 +195,7 @@ public partial class DemoHttpApiHostModule : AbpModule
                 .AddHangfireTemporalActivities()
                 // .AddRabbitMqActivities()
                 .AddSqlServerActivities()
+
                 ;
         });
         // context.Services.AddElsaApiEndpoints();

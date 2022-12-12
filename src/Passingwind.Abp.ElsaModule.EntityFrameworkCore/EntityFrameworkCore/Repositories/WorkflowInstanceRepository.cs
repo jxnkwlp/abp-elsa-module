@@ -114,16 +114,17 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus workflowStatus, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus workflowStatus, DateTime startDate, DateTime endDate, double timeZone = 0, CancellationToken cancellationToken = default)
     {
         var dbset = await GetDbSetAsync();
 
         var list = await dbset
-              .Where(x => x.WorkflowStatus == workflowStatus && x.CreationTime.Date >= startDate.Date && x.CreationTime.Date <= endDate.Date)
+              .Where(x => x.WorkflowStatus == workflowStatus && x.CreationTime >= startDate && x.CreationTime <= endDate)
               .Select(x => new { x.Id, x.CreationTime })
               .ToListAsync(cancellationToken);
 
         return list
+                .Select(x => new { Id = x.Id, CreationTime = x.CreationTime.AddHours(timeZone) })
                 .GroupBy(x => x.CreationTime.Date)
                 .ToDictionary(x => x.Key.Date, x => x.Count());
     }
