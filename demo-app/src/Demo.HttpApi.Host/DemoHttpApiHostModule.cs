@@ -8,14 +8,11 @@ using Demo.EntityFrameworkCore;
 using Demo.MultiTenancy;
 using Demo.Services;
 using Elsa;
-using Elsa.Activities.Http.JavaScript;
 using Elsa.Activities.Http.OpenApi;
-using Elsa.Activities.Http.Scripting.JavaScript;
 using Elsa.Activities.Http.Services;
 using Elsa.Activities.Sql.Extensions;
 using Elsa.Activities.UserTask.Extensions;
 using Elsa.Scripting.JavaScript.Options;
-using Elsa.Scripting.JavaScript.Providers;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Medallion.Threading;
@@ -32,7 +29,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -168,9 +164,6 @@ public partial class DemoHttpApiHostModule : AbpModule
 
     public override void PostConfigureServices(ServiceConfigurationContext context)
     {
-        // elsa issue fix
-        context.Services.RemoveAll(x => x.ImplementationType == typeof(HttpTypeDefinitionProvider));
-        context.Services.RemoveAll(x => x.ImplementationType == typeof(HttpEndpointTypeDefinitionRenderer));
     }
 
     private void ConfigureElsa(ServiceConfigurationContext context, IConfiguration configuration)
@@ -209,9 +202,6 @@ public partial class DemoHttpApiHostModule : AbpModule
         context.Services.AddTransient<IUserLookupService, UserAndRoleLookupService>();
         context.Services.AddTransient<IRoleLookupService, UserAndRoleLookupService>();
 
-        // elsa issue fix
-        context.Services.AddJavaScriptTypeDefinitionProvider<HttpTypeDefinitionProviderFix>();
-        context.Services.AddSingleton<IActivityTypeDefinitionRenderer, HttpEndpointTypeDefinitionRendererFix>();
     }
 
     private void ConfigureCache(IConfiguration configuration)
