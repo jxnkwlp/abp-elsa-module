@@ -211,7 +211,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         return dto;
     }
 
-    public async Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(GetStatusDateCountStatisticsRequestDto input)
+    public async Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(WorkflowInstanceGetStatusDateCountStatisticsRequestDto input)
     {
         var datePeriod = input.DatePeriod ?? 30;
         if (datePeriod <= 0)

@@ -17,8 +17,9 @@ import { useIntl } from 'umi';
 import CaseEditorInput from './form-input/case-editor-builder-input';
 import MonacorEditorInput from './form-input/monacor-editor-input';
 import {
+    getCSharpEditorLanguageProvider,
     getEditorLanguage,
-    getEditorScriptDefinitonsContent,
+    getJavascriptEditorDefinitonsContent,
     getPropertySyntaxes,
 } from './service';
 import type { NodeTypeProperty } from './type';
@@ -51,7 +52,17 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
 
     const getScriptDefinitonsContent = async () => {
         if (!props.workflowDefinitionId) return '';
-        const result = await getEditorScriptDefinitonsContent(props.workflowDefinitionId);
+        const result = await getJavascriptEditorDefinitonsContent(props.workflowDefinitionId);
+        return result;
+    };
+
+    const getCSharpLanguageProvider = async (provider: string, payload: any) => {
+        if (!props.workflowDefinitionId) return '';
+        const result = await getCSharpEditorLanguageProvider(
+            props.workflowDefinitionId,
+            provider,
+            payload,
+        );
         return result;
     };
 
@@ -135,16 +146,14 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                     height={150}
                                     language={getEditorLanguage(uiEditor)}
                                     getJavaScriptLibs={async () => {
-                                        if (uiEditor.toLocaleLowerCase() == 'javascript') {
-                                            return [
-                                                {
-                                                    content: await getScriptDefinitonsContent(),
-                                                    filePath: 'script.d.ts',
-                                                },
-                                            ];
-                                        }
-                                        return [];
+                                        return [
+                                            {
+                                                content: await getScriptDefinitonsContent(),
+                                                filePath: 'script.d.ts',
+                                            },
+                                        ];
                                     }}
+                                    getCSharpLanguageProviderRequest={getCSharpLanguageProvider}
                                 />
                             </ProForm.Item>
                         </Col>
@@ -200,16 +209,14 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         height={150}
                         language={getEditorLanguage(uiEditor)}
                         getJavaScriptLibs={async () => {
-                            if (uiEditor.toLocaleLowerCase() == 'javascript') {
-                                return [
-                                    {
-                                        content: await getScriptDefinitonsContent(),
-                                        filePath: 'script.d.ts',
-                                    },
-                                ];
-                            }
-                            return [];
+                            return [
+                                {
+                                    content: await getScriptDefinitonsContent(),
+                                    filePath: 'script.d.ts',
+                                },
+                            ];
                         }}
+                        getCSharpLanguageProviderRequest={getCSharpLanguageProvider}
                     />
                 </ProForm.Item>
             </Col>

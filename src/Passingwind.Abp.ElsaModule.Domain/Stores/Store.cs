@@ -25,6 +25,8 @@ namespace Passingwind.Abp.ElsaModule.Stores
     {
         // private static readonly SemaphoreSlim _semaphore = new(1);
 
+        protected Guid StoreId { get; }
+
         public IAbpLazyServiceProvider LazyServiceProvider { get; set; }
 
         protected IClock Clock => LazyServiceProvider.LazyGetRequiredService<IClock>();
@@ -50,11 +52,12 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         protected Store()
         {
+            StoreId = Guid.NewGuid();
         }
 
         public virtual async Task AddAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Call {typeof(TModel).Name} [AddAsync] with id '{model.Id}' ");
+            Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [AddAsync] with id '{model.Id}' ");
 
             var entity = await MapToEntityAsync(model);
             await Repository.InsertAsync(entity, true, cancellationToken);
@@ -62,7 +65,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task AddManyAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Call {typeof(TModel).Name} [AddManyAsync] ");
+            Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [AddManyAsync] ");
 
             if (models.Any() == false)
                 return;
@@ -79,7 +82,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task<int> CountAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Call {typeof(TModel).Name} [CountAsync]");
+            Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [CountAsync]");
 
             var expression = await MapSpecificationAsync(specification);
             return await Repository.CountAsync(expression, cancellationToken);
@@ -87,7 +90,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task DeleteAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Call {typeof(TModel).Name} [DeleteAsync] with id '{model.Id}'");
+            Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [DeleteAsync] with id '{model.Id}'");
 
             var id = (TKey)Convert.ChangeType(model.Id, typeof(TKey));
             await Repository.DeleteAsync(x => x.Id.Equals(id), true, cancellationToken);
@@ -95,7 +98,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task<int> DeleteManyAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Call {typeof(TModel).Name} [DeleteManyAsync] ");
+            Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [DeleteManyAsync] ");
 
             var expression = await MapSpecificationAsync(specification);
             var count = await Repository.CountAsync(expression, cancellationToken);
@@ -106,7 +109,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task<TModel> FindAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Call {typeof(TModel).Name} [FindAsync] ");
+            Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [FindAsync] ");
 
             var expression = await MapSpecificationAsync(specification);
             var entity = await Repository.FindAsync(expression, true, cancellationToken);
@@ -122,7 +125,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task<IEnumerable<TModel>> FindManyAsync(ISpecification<TModel> specification, IOrderBy<TModel> orderBy = null, IPaging paging = null, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Call {typeof(TModel).Name} [FindManyAsync] ");
+            Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [FindManyAsync] ");
 
             var filter = await MapSpecificationAsync(specification).ConfigureAwait(false);
 
@@ -168,7 +171,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                Logger.LogDebug($"Call {typeof(TModel).Name} [SaveAsync] ");
+                Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [SaveAsync] ");
 
                 try
                 {
@@ -208,7 +211,7 @@ namespace Passingwind.Abp.ElsaModule.Stores
 
         public virtual async Task UpdateAsync(TModel model, CancellationToken cancellationToken = default)
         {
-            Logger.LogDebug($"Call {typeof(TModel).Name} [UpdateAsync] with id '{model.Id}'");
+            Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [UpdateAsync] with id '{model.Id}'");
 
             TKey id = ConvertKey(model.Id);
 

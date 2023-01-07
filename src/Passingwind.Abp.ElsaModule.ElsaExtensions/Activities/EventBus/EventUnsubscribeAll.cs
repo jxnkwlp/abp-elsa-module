@@ -1,7 +1,6 @@
-﻿namespace Passingwind.Abp.ElsaModule.Activities.EventBus
-{
-    public class EventUnsubscribeAll
-    {
+﻿namespace Passingwind.Abp.ElsaModule.Activities.EventBus;
 
-    }
+public class EventUnsubscribeAll
+{
+
 }

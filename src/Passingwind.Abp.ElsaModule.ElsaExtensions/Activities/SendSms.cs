@@ -1,7 +1,6 @@
-﻿namespace Passingwind.Abp.ElsaModule.Activities
-{
-    public class SendSms
-    {
+﻿namespace Passingwind.Abp.ElsaModule.Activities;
 
-    }
+public class SendSms
+{
+
 }

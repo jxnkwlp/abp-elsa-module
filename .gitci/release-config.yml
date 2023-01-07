@@ -8,12 +8,15 @@
   minor:
     commits:
       - "[feat]"
+      - ":zap:"
+      - ":bulb:"
     labels:
       - "Versioning - Minor"
   patch:
     commits:
       - "[fix]"
-      - "[fix bugs]"
+      - "fix"
+      - ":bug:"
     labels:
       - "Versioning - Patch"
   default: patch

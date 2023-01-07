@@ -6,7 +6,12 @@ import {
     getWorkflowInstanceExecutionLogs,
     getWorkflowInstanceLogSummary,
 } from '@/services/WorkflowInstance';
-import { ClockCircleOutlined, FieldTimeOutlined, FunctionOutlined } from '@ant-design/icons';
+import {
+    ClockCircleOutlined,
+    FieldTimeOutlined,
+    FunctionOutlined,
+    StockOutlined,
+} from '@ant-design/icons';
 import { ProCard } from '@ant-design/pro-card';
 import { ProDescriptions } from '@ant-design/pro-descriptions';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -502,11 +507,15 @@ const Index: React.FC = () => {
                                                         </span>
                                                     </Tooltip>
                                                     <Tag>
-                                                        <FieldTimeOutlined />
+                                                        <FieldTimeOutlined />{' '}
                                                         {moment(item.startTime).format()}
                                                     </Tag>
                                                     <Tag>
                                                         <FunctionOutlined /> {item.activityType}
+                                                    </Tag>
+                                                    <Tag>
+                                                        <StockOutlined />{' '}
+                                                        {item.duration?.toFixed(0)}ms
                                                     </Tag>
                                                 </Space>
                                                 {/* {item.status}  */}

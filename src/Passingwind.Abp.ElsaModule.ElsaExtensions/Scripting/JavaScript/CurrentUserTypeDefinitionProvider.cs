@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using Elsa.Scripting.JavaScript.Services;
 using Passingwind.Abp.ElsaModule.Activities;
 
-namespace Passingwind.Abp.ElsaModule.Scripting.JavaScript
+namespace Passingwind.Abp.ElsaModule.Scripting.JavaScript;
+
+public class CurrentUserTypeDefinitionProvider : TypeDefinitionProvider
 {
-    public class CurrentUserTypeDefinitionProvider : TypeDefinitionProvider
+    public override IEnumerable<Type> CollectTypes(TypeDefinitionContext context)
     {
-        public override IEnumerable<Type> CollectTypes(TypeDefinitionContext context)
-        {
-            yield return typeof(CurrentUserOutputModel);
-        }
+        yield return typeof(CurrentUserOutputModel);
     }
 }

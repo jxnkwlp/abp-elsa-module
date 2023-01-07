@@ -67,6 +67,7 @@ const Test: React.FC = () => {
                 <MonacoEditor
                     height={500}
                     onChange={(v) => {}}
+                    language="csharp"
                     options={{
                         wordWrap: 'bounded',
                         wordWrapColumn: 1024,
@@ -79,9 +80,9 @@ const Test: React.FC = () => {
                     editorDidMount={(e) => {}}
                 />
 
-                <MonacoDiffEditor height={500} />
+                {/* <MonacoDiffEditor height={500} /> */}
 
-                <div id="graphContainer" style={{ height: '500px' }}></div>
+                {/* <div id="graphContainer" style={{ height: '500px' }}></div> */}
             </Card>
         </PageContainer>
     );

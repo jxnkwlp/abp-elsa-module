@@ -1,6 +1,6 @@
 ﻿/**
  * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
- * Total count: 165
+ * Total count: 170
  **/
 import * as Enum from "./enums";
 
@@ -167,6 +167,46 @@ declare namespace API {
         key: string;
         value?: string | undefined;
         isSecret?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type HoverInfoRequest = {
+        code?: string | undefined;
+        position?: number | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type HoverInfoResult = {
+        information?: string | undefined;
+        offsetFrom?: number | undefined;
+        offsetTo?: number | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type TabCompletionRequest = {
+        code?: string | undefined;
+        position?: number | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type TabCompletionResult = {
+        items?: TabCompletionResultItem[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type TabCompletionResultItem = {
+        suggestion?: string | undefined;
+        description?: string | undefined;
     };
 
     /**

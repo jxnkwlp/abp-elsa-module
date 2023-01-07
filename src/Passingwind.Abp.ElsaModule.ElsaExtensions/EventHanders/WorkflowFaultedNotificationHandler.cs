@@ -9,73 +9,72 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.Bookmarks;
 
-namespace Passingwind.Abp.ElsaModule.EventHanders
+namespace Passingwind.Abp.ElsaModule.EventHanders;
+
+public class WorkflowFaultedNotificationHandler : INotificationHandler<WorkflowExecutionFinished>
 {
-    public class WorkflowFaultedNotificationHandler : INotificationHandler<WorkflowExecutionFinished>
+    private const string _activityType = nameof(Passingwind.Abp.ElsaModule.Activities.Workflows.WorkflowFaulted);
+    private readonly ILogger<WorkflowFaultedNotificationHandler> _logger;
+    private readonly IWorkflowLaunchpad _workflowLaunchpad;
+
+    public WorkflowFaultedNotificationHandler(ILogger<WorkflowFaultedNotificationHandler> logger, IWorkflowLaunchpad workflowLaunchpad)
     {
-        private const string _activityType = nameof(Passingwind.Abp.ElsaModule.Activities.Workflows.WorkflowFaulted);
-        private readonly ILogger<WorkflowFaultedNotificationHandler> _logger;
-        private readonly IWorkflowLaunchpad _workflowLaunchpad;
+        _logger = logger;
+        _workflowLaunchpad = workflowLaunchpad;
+    }
 
-        public WorkflowFaultedNotificationHandler(ILogger<WorkflowFaultedNotificationHandler> logger, IWorkflowLaunchpad workflowLaunchpad)
+    public async Task Handle(WorkflowExecutionFinished notification, CancellationToken cancellationToken)
+    {
+        var instance = notification.WorkflowExecutionContext.WorkflowInstance;
+        var blueprint = notification.WorkflowExecutionContext.WorkflowBlueprint;
+
+        if (blueprint.Activities.Any(x => x.Type == _activityType))
+            return;
+
+        await RunWorkflowFaultedAsync(instance, blueprint, cancellationToken);
+    }
+
+    protected virtual async Task RunWorkflowFaultedAsync(WorkflowInstance instance, IWorkflowBlueprint workflowBlueprint, CancellationToken cancellationToken)
+    {
+        var bookmark = new WorkflowFaultedBookmark(workflowBlueprint.Name, workflowBlueprint.Version);
+        var collectWorkflowsContext = new WorkflowsQuery(_activityType, bookmark, instance.CorrelationId, default, default, instance.TenantId);
+        var pendingWorkflows = await _workflowLaunchpad.FindWorkflowsAsync(collectWorkflowsContext, cancellationToken);
+
+        if (!pendingWorkflows.Any())
         {
-            _logger = logger;
-            _workflowLaunchpad = workflowLaunchpad;
+            bookmark = new WorkflowFaultedBookmark(workflowBlueprint.Name);
+            collectWorkflowsContext = new WorkflowsQuery(_activityType, bookmark, instance.CorrelationId, default, default, instance.TenantId);
+            pendingWorkflows = await _workflowLaunchpad.FindWorkflowsAsync(collectWorkflowsContext, cancellationToken);
         }
 
-        public async Task Handle(WorkflowExecutionFinished notification, CancellationToken cancellationToken)
+        if (!pendingWorkflows.Any())
+            return;
+
+        if (!instance.Faults.Any())
+            return;
+
+        var faultedActivityId = instance.Faults.Peek().FaultedActivityId;
+        var faultedActivity = workflowBlueprint.Activities.FirstOrDefault(x => x.Id == faultedActivityId);
+
+        var inputObj = new Activities.Workflows.WorkflowFaultedInput
         {
-            var instance = notification.WorkflowExecutionContext.WorkflowInstance;
-            var blueprint = notification.WorkflowExecutionContext.WorkflowBlueprint;
+            WorkflowId = instance.Id,
+            WorkflowName = instance.Name,
+            WorkflowVersion = instance.Version,
+            TenantId = instance.TenantId,
+            Fault = instance.Faults.Peek(),
+            Faults = instance.Faults.ToArray(),
+            Input = instance.Input,
+            Variables = instance.Variables,
+            CurrentActivity = instance.CurrentActivity,
+            FaultedActivity = faultedActivity,
+        };
 
-            if (blueprint.Activities.Any(x => x.Type == _activityType))
-                return;
-
-            await RunWorkflowFaultedAsync(instance, blueprint, cancellationToken);
-        }
-
-        protected virtual async Task RunWorkflowFaultedAsync(WorkflowInstance instance, IWorkflowBlueprint workflowBlueprint, CancellationToken cancellationToken)
+        foreach (var workflow in pendingWorkflows)
         {
-            var bookmark = new WorkflowFaultedBookmark(workflowBlueprint.Name, workflowBlueprint.Version);
-            var collectWorkflowsContext = new WorkflowsQuery(_activityType, bookmark, instance.CorrelationId, default, default, instance.TenantId);
-            var pendingWorkflows = await _workflowLaunchpad.FindWorkflowsAsync(collectWorkflowsContext, cancellationToken);
+            var result = await _workflowLaunchpad.ExecutePendingWorkflowAsync(workflow, new WorkflowInput(inputObj), cancellationToken);
 
-            if (!pendingWorkflows.Any())
-            {
-                bookmark = new WorkflowFaultedBookmark(workflowBlueprint.Name);
-                collectWorkflowsContext = new WorkflowsQuery(_activityType, bookmark, instance.CorrelationId, default, default, instance.TenantId);
-                pendingWorkflows = await _workflowLaunchpad.FindWorkflowsAsync(collectWorkflowsContext, cancellationToken);
-            }
-
-            if (!pendingWorkflows.Any())
-                return;
-
-            if (!instance.Faults.Any())
-                return;
-
-            var faultedActivityId = instance.Faults.Peek().FaultedActivityId;
-            var faultedActivity = workflowBlueprint.Activities.FirstOrDefault(x => x.Id == faultedActivityId);
-
-            var inputObj = new Activities.Workflows.WorkflowFaultedInput
-            {
-                WorkflowId = instance.Id,
-                WorkflowName = instance.Name,
-                WorkflowVersion = instance.Version,
-                TenantId = instance.TenantId,
-                Fault = instance.Faults.Peek(),
-                Faults = instance.Faults.ToArray(),
-                Input = instance.Input,
-                Variables = instance.Variables,
-                CurrentActivity = instance.CurrentActivity,
-                FaultedActivity = faultedActivity,
-            };
-
-            foreach (var workflow in pendingWorkflows)
-            {
-                var result = await _workflowLaunchpad.ExecutePendingWorkflowAsync(workflow, new WorkflowInput(inputObj), cancellationToken);
-
-                // no-op
-            }
+            // no-op
         }
     }
 }

@@ -8,54 +8,53 @@ using Elsa.Services.Models;
 using MimeKit;
 using Volo.Abp.Emailing;
 
-namespace Passingwind.Abp.ElsaModule.Services
+namespace Passingwind.Abp.ElsaModule.Services;
+
+public class AbpSmtpService : ISmtpService
 {
-    public class AbpSmtpService : ISmtpService
+    private readonly IEmailSender _emailSender;
+
+    public AbpSmtpService(IEmailSender emailSender)
     {
-        private readonly IEmailSender _emailSender;
+        _emailSender = emailSender;
+    }
 
-        public AbpSmtpService(IEmailSender emailSender)
+    public async Task SendAsync(ActivityExecutionContext context, MimeMessage message, CancellationToken cancellationToken)
+    {
+        var mailMessage = new MailMessage()
         {
-            _emailSender = emailSender;
-        }
+            Subject = message.Subject,
+            Body = message.HtmlBody,
+            IsBodyHtml = true,
+            BodyEncoding = Encoding.UTF8,
+        };
 
-        public async Task SendAsync(ActivityExecutionContext context, MimeMessage message, CancellationToken cancellationToken)
-        {
-            var mailMessage = new MailMessage()
+        if (message.From.Any())
+            mailMessage.From = new MailAddress(((MailboxAddress)message.From[0]).Address);
+
+        if (message.To.Any())
+            foreach (var item in message.To)
             {
-                Subject = message.Subject,
-                Body = message.HtmlBody,
-                IsBodyHtml = true,
-                BodyEncoding = Encoding.UTF8,
-            };
-
-            if (message.From.Any())
-                mailMessage.From = new MailAddress(((MailboxAddress)message.From[0]).Address);
-
-            if (message.To.Any())
-                foreach (var item in message.To)
-                {
-                    mailMessage.To.Add(((MailboxAddress)item).Address);
-                }
-
-            if (message.Cc.Any())
-                foreach (var item in message.Cc)
-                {
-                    mailMessage.CC.Add(((MailboxAddress)item).Address);
-                }
-
-            if (message.Bcc.Any())
-                foreach (var item in message.Bcc)
-                {
-                    mailMessage.Bcc.Add(((MailboxAddress)item).Address);
-                }
-
-            if (message.Attachments.Any())
-            {
-                // TODO
+                mailMessage.To.Add(((MailboxAddress)item).Address);
             }
 
-            await _emailSender.SendAsync(mailMessage);
+        if (message.Cc.Any())
+            foreach (var item in message.Cc)
+            {
+                mailMessage.CC.Add(((MailboxAddress)item).Address);
+            }
+
+        if (message.Bcc.Any())
+            foreach (var item in message.Bcc)
+            {
+                mailMessage.Bcc.Add(((MailboxAddress)item).Address);
+            }
+
+        if (message.Attachments.Any())
+        {
+            // TODO
         }
+
+        await _emailSender.SendAsync(mailMessage);
     }
 }

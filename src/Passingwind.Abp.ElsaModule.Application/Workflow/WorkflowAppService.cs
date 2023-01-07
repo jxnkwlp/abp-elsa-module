@@ -7,38 +7,37 @@ using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Application.Dtos;
 
-namespace Passingwind.Abp.ElsaModule.Workflow
+namespace Passingwind.Abp.ElsaModule.Workflow;
+
+[Authorize]
+public class WorkflowAppService : ElsaModuleAppService, IWorkflowAppService
 {
-    [Authorize]
-    public class WorkflowAppService : ElsaModuleAppService, IWorkflowAppService
+    private readonly IWorkflowStorageService _workflowStorageService;
+    private readonly IEnumerable<IWorkflowProvider> _workflowProviders;
+
+    public WorkflowAppService(IWorkflowStorageService workflowStorageService, IEnumerable<IWorkflowProvider> workflowProviders)
     {
-        private readonly IWorkflowStorageService _workflowStorageService;
-        private readonly IEnumerable<IWorkflowProvider> _workflowProviders;
+        _workflowStorageService = workflowStorageService;
+        _workflowProviders = workflowProviders;
+    }
 
-        public WorkflowAppService(IWorkflowStorageService workflowStorageService, IEnumerable<IWorkflowProvider> workflowProviders)
+    public Task<ListResultDto<WorkflowStorageProviderInfoDto>> GetStorageProvidersAsync()
+    {
+        var all = _workflowStorageService.ListProviders();
+
+        var list = all.Select(x => new WorkflowStorageProviderInfoDto { Name = x.Name, DisplayName = x.DisplayName }).ToList();
+
+        return Task.FromResult(new ListResultDto<WorkflowStorageProviderInfoDto>(list));
+    }
+
+    public Task<ListResultDto<WorkflowProviderDescriptorDto>> GetProvidersAsync()
+    {
+        var items = _workflowProviders.Select(x => new WorkflowProviderDescriptorDto
         {
-            _workflowStorageService = workflowStorageService;
-            _workflowProviders = workflowProviders;
-        }
+            Name = x.GetType().Name,
+            Type = x.GetType().Name.Humanize(),
+        }).ToArray();
 
-        public Task<ListResultDto<WorkflowStorageProviderInfoDto>> GetStorageProvidersAsync()
-        {
-            var all = _workflowStorageService.ListProviders();
-
-            var list = all.Select(x => new WorkflowStorageProviderInfoDto { Name = x.Name, DisplayName = x.DisplayName }).ToList();
-
-            return Task.FromResult(new ListResultDto<WorkflowStorageProviderInfoDto>(list));
-        }
-
-        public Task<ListResultDto<WorkflowProviderDescriptorDto>> GetProvidersAsync()
-        {
-            var items = _workflowProviders.Select(x => new WorkflowProviderDescriptorDto
-            {
-                Name = x.GetType().Name,
-                Type = x.GetType().Name.Humanize(),
-            }).ToArray();
-
-            return Task.FromResult(new ListResultDto<WorkflowProviderDescriptorDto>(items));
-        }
+        return Task.FromResult(new ListResultDto<WorkflowProviderDescriptorDto>(items));
     }
 }

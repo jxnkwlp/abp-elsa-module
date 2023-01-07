@@ -1,4 +1,5 @@
 import { getDesignerActivityTypes, getDesignerScriptTypeDefinition } from '@/services/Designer';
+import { monacoCsharpCompletionTabCompletion } from '@/services/MonacoCsharpCompletion';
 import type { API } from '@/services/typings';
 import { randString } from '@/services/utils';
 import { CloseCircleOutlined, ForkOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
@@ -95,10 +96,12 @@ export const getNodeTypeData = async (): Promise<NodeTypeGroup[]> => {
 
 export const getEditorLanguage = (syntax: string): string => {
     switch (syntax) {
-        case 'JavaScript':
-            return 'javascript';
         case 'Json':
             return 'json';
+        case 'JavaScript':
+            return 'javascript';
+        case 'C#':
+            return 'csharp';
         case 'Liquid':
             return 'liquid';
         case 'SQL':
@@ -113,11 +116,11 @@ export const getEditorLanguage = (syntax: string): string => {
  *  获取属性值语法配置
  */
 export const getPropertySyntaxes = (property: NodeTypeProperty): NodePropertySyntax => {
-    let syntaxes = (property.supportedSyntaxes ?? []).map((x) => {
+    let syntaxes: string[] = (property.supportedSyntaxes ?? []).map((x) => {
         return x;
     });
     // set default 'Literal'
-    let defaultSyntax: NodePropertySyntaxNames = property.defaultSyntax ?? 'Literal';
+    let defaultSyntax: NodePropertySyntaxNames | string = property.defaultSyntax ?? 'Literal';
     let editorSyntax = '';
     //
     if (defaultSyntax && syntaxes.length == 0) {
@@ -150,6 +153,11 @@ export const getPropertySyntaxes = (property: NodeTypeProperty): NodePropertySyn
 
     // push 'Variable'
     // syntaxes.push('Variable');
+
+    // push C#
+    if (syntaxes.indexOf('JavaScript') >= 0 && syntaxes.indexOf('C#') == -1) {
+        syntaxes.push('C#');
+    }
 
     // end
     if (syntaxes.length > 0) defaultSyntax = syntaxes[0];
@@ -425,9 +433,19 @@ export const conventToGraphData = async (
     return { nodes: nodes, edges: edges };
 };
 
-export const getEditorScriptDefinitonsContent = async (id: string) => {
+export const getJavascriptEditorDefinitonsContent = async (id: string) => {
     const result = await getDesignerScriptTypeDefinition(id);
     return await result?.response?.text();
+};
+
+export const getCSharpEditorLanguageProvider = async (
+    id: string,
+    provider: string,
+    payload: any,
+) => {
+    if (provider == 'completion') {
+        await monacoCsharpCompletionTabCompletion(payload);
+    }
 };
 
 export const graphValidateMagnet = (graph: Graph, args: any) => {

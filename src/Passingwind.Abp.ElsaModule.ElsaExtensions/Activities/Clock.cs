@@ -6,46 +6,45 @@ using Elsa.Services;
 using Elsa.Services.Models;
 using Volo.Abp.Timing;
 
-namespace Passingwind.Abp.ElsaModule.Activities
+namespace Passingwind.Abp.ElsaModule.Activities;
+
+[Activity(
+    Category = "Abp",
+    DisplayName = "Clock",
+    Outcomes = new[] { OutcomeNames.Done }
+)]
+public class Clock : Activity
 {
-    [Activity(
-        Category = "Abp",
-        DisplayName = "Clock",
-        Outcomes = new[] { OutcomeNames.Done }
-    )]
-    public class Clock : Activity
+    [ActivityOutput]
+    public ClockOutputModel Output { get; set; }
+
+    private readonly IClock _clock;
+
+    public Clock(IClock clock)
     {
-        [ActivityOutput]
-        public ClockOutputModel Output { get; set; }
-
-        private readonly IClock _clock;
-
-        public Clock(IClock clock)
-        {
-            _clock = clock;
-        }
-
-        protected override IActivityExecutionResult OnExecute(ActivityExecutionContext context)
-        {
-            return Execute();
-        }
-
-        private IActivityExecutionResult Execute()
-        {
-            Output = new ClockOutputModel
-            {
-                Now = _clock.Now,
-                Kind = _clock.Kind,
-            };
-
-            return Done();
-        }
-
+        _clock = clock;
     }
 
-    public class ClockOutputModel
+    protected override IActivityExecutionResult OnExecute(ActivityExecutionContext context)
     {
-        public DateTime Now { get; set; }
-        public DateTimeKind Kind { get; set; }
+        return Execute();
     }
+
+    private IActivityExecutionResult Execute()
+    {
+        Output = new ClockOutputModel
+        {
+            Now = _clock.Now,
+            Kind = _clock.Kind,
+        };
+
+        return Done();
+    }
+
+}
+
+public class ClockOutputModel
+{
+    public DateTime Now { get; set; }
+    public DateTimeKind Kind { get; set; }
 }

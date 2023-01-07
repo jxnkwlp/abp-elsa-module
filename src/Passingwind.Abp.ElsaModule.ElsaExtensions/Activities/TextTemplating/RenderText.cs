@@ -1,7 +1,6 @@
-﻿namespace Passingwind.Abp.ElsaModule.Activities.TextTemplating
-{
-    public class RenderText
-    {
+﻿namespace Passingwind.Abp.ElsaModule.Activities.TextTemplating;
 
-    }
+public class RenderText
+{
+
 }

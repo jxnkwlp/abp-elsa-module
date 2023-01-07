@@ -9,41 +9,40 @@ using Elsa.Services;
 using Elsa.Services.Models;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace Passingwind.Abp.ElsaModule.Activities.Caching
+namespace Passingwind.Abp.ElsaModule.Activities.Caching;
+
+[Activity(
+    Category = "Abp",
+    DisplayName = "Get Cache",
+    Outcomes = new[] { OutcomeNames.Done }
+)]
+public class GetCache : Activity
 {
-    [Activity(
-        Category = "Abp",
-        DisplayName = "Get Cache",
-        Outcomes = new[] { OutcomeNames.Done }
-    )]
-    public class GetCache : Activity
+    [ActivityInput(
+        Label = "Key",
+        Hint = "",
+        SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid },
+        IsDesignerCritical = true)]
+    [Required]
+    public string Key { get; set; }
+
+    [ActivityOutput]
+    public string Value { get; set; }
+
+    private readonly IDistributedCache _distributedCache;
+
+    public GetCache(IDistributedCache distributedCache)
     {
-        [ActivityInput(
-            Label = "Key",
-            Hint = "",
-            SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid },
-            IsDesignerCritical = true)]
-        [Required]
-        public string Key { get; set; }
+        _distributedCache = distributedCache;
+    }
 
-        [ActivityOutput]
-        public string Value { get; set; }
+    protected override async ValueTask<IActivityExecutionResult> OnExecuteAsync(ActivityExecutionContext context)
+    {
+        if (string.IsNullOrEmpty(Key))
+            throw new ArgumentNullException(nameof(Key));
 
-        private readonly IDistributedCache _distributedCache;
+        Value = await _distributedCache.GetStringAsync(Key, context.CancellationToken);
 
-        public GetCache(IDistributedCache distributedCache)
-        {
-            _distributedCache = distributedCache;
-        }
-
-        protected override async ValueTask<IActivityExecutionResult> OnExecuteAsync(ActivityExecutionContext context)
-        {
-            if (string.IsNullOrEmpty(Key))
-                throw new ArgumentNullException(nameof(Key));
-
-            Value = await _distributedCache.GetStringAsync(Key, context.CancellationToken);
-
-            return Done();
-        }
+        return Done();
     }
 }

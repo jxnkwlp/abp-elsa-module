@@ -12,81 +12,80 @@ using Elsa.Metadata;
 using Elsa.Services;
 using Elsa.Services.Models;
 using Microsoft.Extensions.Options;
-using Passingwind.Abp.ElsaModule.Services;
+using Passingwind.Abp.ElsaModule.Scripting.CSharp;
 
-namespace Passingwind.Abp.ElsaModule.Activities.Scripting
+namespace Passingwind.Abp.ElsaModule.Activities.Scripting;
+
+[Action(
+    DisplayName = "Run CSharp",
+    Category = "Scripting",
+    Description = "Run CSharp code.",
+    Outcomes = new[] { OutcomeNames.Done })]
+public class RunCSharp : Activity, IActivityPropertyOptionsProvider
 {
-    [Action(
-        DisplayName = "Run CSharp (experiment)",
-        Category = "Scripting",
-        Description = "Run CSharp code.",
-        Outcomes = new[] { OutcomeNames.Done })]
-    public class RunCSharp : Activity, IActivityPropertyOptionsProvider
+    [ActivityInput(Hint = "The CSharp code to run.", UIHint = ActivityInputUIHints.CodeEditor, OptionsProvider = typeof(RunCSharp))]
+    public string Script { get; set; }
+
+    [ActivityInput(
+        Hint = "The possible outcomes that can be set by the script.",
+        UIHint = ActivityInputUIHints.MultiText,
+        DefaultSyntax = SyntaxNames.Json,
+        SupportedSyntaxes = new[] { SyntaxNames.Json, SyntaxNames.JavaScript, SyntaxNames.Liquid, CSharpSyntaxName.CSharp },
+        ConsiderValuesAsOutcomes = true
+    )]
+    public ICollection<string> PossibleOutcomes { get; set; } = new List<string> { OutcomeNames.Done };
+
+    [ActivityOutput]
+    public object Output { get; set; }
+
+
+    private readonly ICSharpService _cSharpService;
+    private readonly IOptions<CSharpScriptOptions> _options;
+
+    public RunCSharp(ICSharpService cSharpService, IOptions<CSharpScriptOptions> options)
     {
-        [ActivityInput(Hint = "The CSharp code to run.", UIHint = ActivityInputUIHints.CodeEditor, OptionsProvider = typeof(RunCSharp))]
-        public string Script { get; set; }
+        _cSharpService = cSharpService;
+        _options = options;
+    }
 
-        [ActivityInput(
-            Hint = "The possible outcomes that can be set by the script.",
-            UIHint = ActivityInputUIHints.MultiText,
-            DefaultSyntax = SyntaxNames.Json,
-            SupportedSyntaxes = new[] { SyntaxNames.Json, SyntaxNames.JavaScript, SyntaxNames.Liquid },
-            ConsiderValuesAsOutcomes = true
-        )]
-        public ICollection<string> PossibleOutcomes { get; set; } = new List<string> { OutcomeNames.Done };
+    protected override async ValueTask<IActivityExecutionResult> OnExecuteAsync(ActivityExecutionContext context)
+    {
+        var script = Script;
 
-        [ActivityOutput] public object Output { get; set; }
+        if (string.IsNullOrWhiteSpace(script))
+            return Done();
 
+        var outcomes = new List<string>();
 
-        private readonly ICSharpEvaluator _iCSharpEvaluator;
-        private readonly IOptions<CSharpOptions> _options;
+        var setOutcome = (string value) => outcomes.Add(value);
+        var setOutcomes = (IEnumerable<string> values) => outcomes.AddRange(values.Distinct());
 
-        public RunCSharp(ICSharpEvaluator iCSharpEvaluator, IOptions<CSharpOptions> options)
+        var output = await _cSharpService.EvaluateAsync(script, typeof(object), context, (configure) =>
         {
-            _iCSharpEvaluator = iCSharpEvaluator;
-            _options = options;
-        }
+            configure.Context.SetOutcome = setOutcome;
+            configure.Context.SetOutcomes = setOutcomes;
+        }, context.CancellationToken);
 
-        protected override async ValueTask<IActivityExecutionResult> OnExecuteAsync(ActivityExecutionContext context)
+        outcomes = outcomes.Distinct().ToList();
+
+        if (outcomes.Count == 0)
+            outcomes.Add(OutcomeNames.Done);
+
+        Output = output;
+
+        return Outcomes(outcomes.Distinct());
+    }
+
+    public object GetOptions(PropertyInfo property)
+    {
+        if (property.Name != nameof(Script))
+            return null;
+
+        return new
         {
-            var script = Script;
-
-            if (string.IsNullOrWhiteSpace(script))
-                return Done();
-
-            var outcomes = new List<string>();
-
-            var cSharpEvaluationContext = new CSharpEvaluationContext { Imports = _options.Value.Imports, };
-
-            var setOutcome = (string value) => outcomes.Add(value);
-            var setOutcomes = (IEnumerable<string> values) => outcomes.AddRange(values);
-
-            var output = await _iCSharpEvaluator.EvaluateAsync(script, typeof(object), cSharpEvaluationContext, context, (g) =>
-            {
-                g.Dynamic.SetOutcome = setOutcome;
-                g.Dynamic.SetOutcomes = setOutcomes;
-            }, context.CancellationToken);
-
-            if (!outcomes.Any())
-                outcomes.Add(OutcomeNames.Done);
-
-            Output = output;
-
-            return Outcomes(outcomes);
-        }
-
-        public object GetOptions(PropertyInfo property)
-        {
-            if (property.Name != nameof(Script))
-                return null;
-
-            return new
-            {
-                EditorHeight = "Large",
-                Context = nameof(RunCSharp),
-                Syntax = "C#",
-            };
-        }
-
+            EditorHeight = "Large",
+            Context = nameof(RunCSharp),
+            Syntax = CSharpSyntaxName.CSharp,
+        };
     }
 }

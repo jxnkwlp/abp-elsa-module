@@ -1,7 +1,6 @@
-﻿namespace Passingwind.Abp.ElsaModule.Activities.Settings
-{
-    public class ReadSetting
-    {
+﻿namespace Passingwind.Abp.ElsaModule.Activities.Settings;
 
-    }
+public class ReadSetting
+{
+
 }

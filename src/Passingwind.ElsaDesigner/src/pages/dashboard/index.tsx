@@ -34,7 +34,8 @@ const Index: React.FC = () => {
     useEffect(() => {
         const load = async () => {
             setLoading(true);
-            const result = await getWorkflowInstanceStatusDateCountStatistics({ tz: 8 });
+            const tz = moment().utcOffset() / 60;
+            const result = await getWorkflowInstanceStatusDateCountStatistics({ tz: tz });
             const list = (result?.items ?? []).map((x) => {
                 return {
                     date: moment(x.date).format('MM-DD'),

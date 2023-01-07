@@ -1,7 +1,6 @@
-﻿namespace Passingwind.Abp.ElsaModule.Activities.EventBus
-{
-    public class EventPublish
-    {
+﻿namespace Passingwind.Abp.ElsaModule.Activities.EventBus;
 
-    }
+public class EventPublish
+{
+
 }

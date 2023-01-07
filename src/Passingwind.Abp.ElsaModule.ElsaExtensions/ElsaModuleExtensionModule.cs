@@ -1,57 +1,67 @@
 ﻿using Elsa.Activities.Email.Services;
+using Elsa.Expressions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Passingwind.Abp.ElsaModule.Bookmarks;
+using Passingwind.Abp.ElsaModule.Scripting.CSharp;
+using Passingwind.Abp.ElsaModule.Scripting.CSharp.Expressions;
 using Passingwind.Abp.ElsaModule.Scripting.JavaScript;
 using Passingwind.Abp.ElsaModule.Services;
 using Volo.Abp.Emailing;
 using Volo.Abp.EventBus;
 using Volo.Abp.Modularity;
 
-namespace Passingwind.Abp.ElsaModule.Activities
+namespace Passingwind.Abp.ElsaModule;
+
+[DependsOn(
+    typeof(AbpEmailingModule),
+    typeof(AbpEventBusModule)
+    )]
+public class ElsaModuleExtensionModule : AbpModule
 {
-    [DependsOn(
-        typeof(AbpEmailingModule),
-        typeof(AbpEventBusModule)
-        )]
-    public class ElsaModuleExtensionModule : AbpModule
+    public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-        public override void PreConfigureServices(ServiceConfigurationContext context)
+        PreConfigure<ElsaModuleOptions>(configure =>
         {
-            PreConfigure<ElsaModuleOptions>(configure =>
-            {
-                configure.Builder
-                    .AddActivitiesFrom(typeof(ElsaModuleExtensionModule))
-                    ;
-            });
-        }
-
-        public override void ConfigureServices(ServiceConfigurationContext context)
-        {
-            context.Services.AddTransient<IUserLookupService, EmptyUserLookupService>();
-            context.Services.AddTransient<IRoleLookupService, EmptyRoleLookupService>();
-
-            context.Services.AddTransient<ICSharpEvaluator, CSharpEvaluator>();
-
-            context.Services
-                .AddJavaScriptTypeDefinitionProvider<CurrentUserTypeDefinitionProvider>()
-                .AddJavaScriptTypeDefinitionProvider<CurrentTenantTypeDefinitionProvider>()
-                .AddJavaScriptTypeDefinitionProvider<ClockTypeDefinitionProvider>()
-                .AddJavaScriptTypeDefinitionProvider<WorkflowFaultedTypeDefinitionProvider>()
+            configure.Builder
+                .AddActivitiesFrom(typeof(ElsaModuleExtensionModule))
                 ;
+        });
 
-            context.Services.AddBookmarkProvider<WorkflowFaultedBookmarkProvider>();
-            //context.Services.AddBookmarkProvidersFrom(typeof(ElsaModuleActivitiesModule).Assembly);
-            //context.Services.AddWorkflowContextProvider(typeof(ElsaModuleActivitiesModule).Assembly);
-
-            context.Services.AddMediatR(typeof(ElsaModuleExtensionModule).Assembly);
-
-            context.Services.AddOptions<CSharpOptions>("Elsa:CSharp");
-        }
-
-        public override void PostConfigureServices(ServiceConfigurationContext context)
+        PreConfigure<IMvcBuilder>(mvcBuilder =>
         {
-            context.Services.Replace<ISmtpService, AbpSmtpService>(ServiceLifetime.Singleton);
-        }
+            mvcBuilder.AddApplicationPartIfNotExists(typeof(ElsaModuleExtensionModule).Assembly);
+        });
+    }
+
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
+        context.Services.AddTransient<IUserLookupService, EmptyUserLookupService>();
+        context.Services.AddTransient<IRoleLookupService, EmptyRoleLookupService>();
+
+        // 
+        context.Services
+                .AddScoped<ICSharpEvaluator, CSharpEvaluator>()
+                .AddScoped<IExpressionHandler, CSharpExpressionHandler>();
+
+        context.Services
+            .AddJavaScriptTypeDefinitionProvider<CurrentUserTypeDefinitionProvider>()
+            .AddJavaScriptTypeDefinitionProvider<CurrentTenantTypeDefinitionProvider>()
+            .AddJavaScriptTypeDefinitionProvider<ClockTypeDefinitionProvider>()
+            .AddJavaScriptTypeDefinitionProvider<WorkflowFaultedTypeDefinitionProvider>()
+            ;
+
+        context.Services.AddBookmarkProvider<WorkflowFaultedBookmarkProvider>();
+        //context.Services.AddBookmarkProvidersFrom(typeof(ElsaModuleActivitiesModule).Assembly);
+        //context.Services.AddWorkflowContextProvider(typeof(ElsaModuleActivitiesModule).Assembly);
+
+        context.Services.AddMediatR(typeof(ElsaModuleExtensionModule).Assembly);
+
+        context.Services.AddOptions<CSharpScriptOptions>("Elsa:CSharp");
+    }
+
+    public override void PostConfigureServices(ServiceConfigurationContext context)
+    {
+        context.Services.Replace<ISmtpService, AbpSmtpService>(ServiceLifetime.Singleton);
     }
 }

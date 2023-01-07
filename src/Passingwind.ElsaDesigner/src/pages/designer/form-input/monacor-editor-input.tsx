@@ -14,6 +14,13 @@ type MonacorEditorInputProps = {
     height?: number;
     options?: monaco.editor.IStandaloneEditorConstructionOptions;
     getJavaScriptLibs?: () => Promise<{ content: string; filePath: string }[]>;
+    getCSharpLanguageProviderRequest?: (
+        provider: 'completion' | 'hoverinfo',
+        payload: any,
+    ) =>
+        | Promise<any>
+        | Promise<{ suggestion: string; description?: string }[]>
+        | Promise<{ description?: string }>;
 };
 
 const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
@@ -40,23 +47,74 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
     };
 
     const updateEditorScriptExtraLibs = async () => {
-        if (props.getJavaScriptLibs) {
-            const libs = await props.getJavaScriptLibs();
-            if (libs?.length > 0) {
-                monaco.languages.typescript.javascriptDefaults.setExtraLibs(libs ?? []);
+        if (!props?.getJavaScriptLibs) return;
 
-                libs.forEach((x) => {
-                    const oldModel = monaco.editor.getModel(monaco.Uri.parse(x.filePath));
+        const libs = await props.getJavaScriptLibs();
+        if (libs?.length > 0) {
+            monaco.languages.typescript.javascriptDefaults.setExtraLibs(libs ?? []);
 
-                    if (oldModel) oldModel.dispose();
+            libs.forEach((x) => {
+                const oldModel = monaco.editor.getModel(monaco.Uri.parse(x.filePath));
 
-                    monaco.editor.createModel(
-                        x.content,
-                        'typescript',
-                        monaco.Uri.parse(x.filePath),
-                    );
-                });
-            }
+                if (oldModel) oldModel.dispose();
+
+                monaco.editor.createModel(x.content, 'typescript', monaco.Uri.parse(x.filePath));
+            });
+        }
+    };
+
+    const registerCSharpLanguageProvider = (monacoInstance: typeof monaco) => {
+        if (!props?.getCSharpLanguageProviderRequest) return;
+
+        // // monaco.languages.registerCompletionItemProvider;
+        // console.log(1);
+        // monacoInstance.languages.registerCompletionItemProvider('csharp', {
+        //     triggerCharacters: [' ', '.'],
+        //     provideCompletionItems: async (model, position) => {
+        //         console.log(model);
+        //         const result = await props?.getCSharpLanguageProviderRequest?.('completion', {
+        //             code: model.getValue(),
+        //             position: model.getOffsetAt(position),
+        //         });
+
+        //         if (result) {
+        //             const suggestions = result.map((x) => {
+        //                 return {
+        //                     label: {
+        //                         label: x.suggestion,
+        //                         description: x.description,
+        //                     },
+        //                     kind: monaco.languages.CompletionItemKind.Function,
+        //                     insertText: x.Suggestion,
+        //                 };
+        //             });
+        //             return { suggestions: suggestions };
+        //         } else {
+        //             return { suggestions: [] };
+        //         }
+        //     },
+        // });
+
+        // monacoInstance.languages.registerHoverProvider('csharp', {
+        //     provideHover: async (model, position, token) => {
+        //         const result = await props?.getCSharpLanguageProviderRequest?.('hoverinfo', {
+        //             code: model.getValue(),
+        //             position: model.getOffsetAt(position),
+        //         });
+
+        //         return { contents: [] };
+        //     },
+        // });
+    };
+
+    const onEditorMount = (
+        editor: monaco.editor.IStandaloneCodeEditor,
+        monacoInstance: typeof monaco,
+    ) => {
+        editor.setValue(value?.toString());
+
+        if (props.language == 'csharp') {
+            registerCSharpLanguageProvider(monacoInstance);
         }
     };
 
@@ -69,6 +127,9 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
         if (props.language == 'javascript') {
             updateEditorScriptExtraLibs();
         }
+        //  else if (props.language == 'csharp') {
+        // registerCSharpLanguageProvider();
+        // }
     }, [props.language]);
 
     return (
@@ -104,8 +165,8 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                     foldingStrategy: 'auto',
                     ...props?.options,
                 }}
-                editorDidMount={(e) => {
-                    e.setValue(value?.toString());
+                editorDidMount={(e, m) => {
+                    onEditorMount(e, m);
                 }}
             />
             <div className="fullscreen-toggle">
@@ -158,8 +219,8 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                             foldingStrategy: 'auto',
                             ...props?.options,
                         }}
-                        editorDidMount={(e) => {
-                            e.setValue(value?.toString());
+                        editorDidMount={(e, m) => {
+                            onEditorMount(e, m);
                         }}
                     />
                 </div>
