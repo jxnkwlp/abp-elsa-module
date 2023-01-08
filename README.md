@@ -13,7 +13,7 @@ Elsa module integration for abp. [![NuGet](https://img.shields.io/nuget/v/Passin
   - [x] Configuration (Read)
   - [x] Emailing (integrated with abp user&role system)
   - [ ] EventBus (Publish,Subscribe,Unsubscribe)
-  - [ ] String decryption & encryption
+  - [x] String decryption & encryption
   - [ ] Setting (Read,Write)
   - [x] Clock
   - [x] Current tenant
@@ -21,6 +21,8 @@ Elsa module integration for abp. [![NuGet](https://img.shields.io/nuget/v/Passin
   - [x] Guid generate
   - [x] Http authorization
   - [ ] Send sms
+  - [x] Run CSharp code as script
+    - [ ] Editor intellisense
 
 ## Screenshots
 
