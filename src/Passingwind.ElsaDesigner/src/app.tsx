@@ -16,9 +16,9 @@ import type { API } from './services/typings';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/auth/login';
 
-// YYYY-MM-DD HH:mm:ss'
+// Update moment default format
 moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
-moment.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ssZ';
+moment.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {

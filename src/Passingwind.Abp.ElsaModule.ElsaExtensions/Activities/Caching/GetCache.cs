@@ -12,7 +12,7 @@ using Microsoft.Extensions.Caching.Distributed;
 namespace Passingwind.Abp.ElsaModule.Activities.Caching;
 
 [Activity(
-    Category = "Abp",
+    Category = "Caching",
     DisplayName = "Get Cache",
     Outcomes = new[] { OutcomeNames.Done }
 )]

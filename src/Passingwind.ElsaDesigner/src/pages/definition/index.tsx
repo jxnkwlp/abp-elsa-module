@@ -267,7 +267,7 @@ const Index: React.FC = () => {
             <ProTable<API.WorkflowDefinition>
                 columns={columns}
                 dateFormatter={(value) => {
-                    return value.format();
+                    return value.utc().format();
                 }}
                 actionRef={tableActionRef}
                 formRef={searchFormRef}

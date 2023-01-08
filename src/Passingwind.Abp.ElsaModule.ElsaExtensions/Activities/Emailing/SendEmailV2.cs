@@ -20,7 +20,7 @@ using Volo.Abp.Emailing;
 namespace Passingwind.Abp.ElsaModule.Activities.Emailing;
 
 [Activity(
-    Category = "Abp",
+    Category = "Email",
     DisplayName = "Send Email V2",
     Description = "Send an email message by system 'EmailSender'.",
     Outcomes = new[] { OutcomeNames.Done, "Error" }

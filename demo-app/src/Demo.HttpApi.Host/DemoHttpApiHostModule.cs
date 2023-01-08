@@ -12,6 +12,8 @@ using Elsa.Activities.Http.OpenApi;
 using Elsa.Activities.Http.Services;
 using Elsa.Activities.Sql.Extensions;
 using Elsa.Activities.UserTask.Extensions;
+using Elsa.Providers.Workflows;
+using Elsa.Providers.WorkflowStorage;
 using Elsa.Scripting.JavaScript.Options;
 using Hangfire;
 using Hangfire.MemoryStorage;
@@ -33,10 +35,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
 using Owl.Abp.CultureMap;
 using Passingwind.Abp.ElsaModule;
 using Passingwind.Abp.ElsaModule.Services;
 using StackExchange.Redis;
+using Storage.Net;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
@@ -202,6 +207,15 @@ public partial class DemoHttpApiHostModule : AbpModule
         context.Services.AddTransient<IUserLookupService, UserAndRoleLookupService>();
         context.Services.AddTransient<IRoleLookupService, UserAndRoleLookupService>();
 
+        // Configure blob storage for blob storage workflow storage provider. 
+        var hostEnvironment = context.Services.GetHostingEnvironment();
+        var root = Path.Combine(hostEnvironment.ContentRootPath, "storage", "workflows");
+        if (!Directory.Exists(root))
+        {
+            Directory.CreateDirectory(root);
+        }
+        Configure<BlobStorageWorkflowProviderOptions>(options => options.BlobStorageFactory = () => StorageFactory.Blobs.DirectoryFiles(root));
+        Configure<BlobStorageWorkflowStorageProviderOptions>(options => options.BlobStorageFactory = () => StorageFactory.Blobs.DirectoryFiles(root));
     }
 
     private void ConfigureCache(IConfiguration configuration)
@@ -450,12 +464,18 @@ public partial class DemoHttpApiHostModule : AbpModule
             {
                 config.UseMemoryStorage();
             }
+
+            config
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings(settings => settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb))
+                .UseColouredConsoleLogProvider();
         });
-        context.Services.AddHangfireServer(options =>
-        {
-            // hangfire default
-            // options.SchedulePollingInterval = TimeSpan.FromSeconds(15);
-        });
+        //context.Services.AddHangfireServer(options =>
+        //{
+        //    // hangfire default
+        //    // options.SchedulePollingInterval = TimeSpan.FromSeconds(15);
+        //    options.WorkerCount = Environment.ProcessorCount * 2;
+        //}); 
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)

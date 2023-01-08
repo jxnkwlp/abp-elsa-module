@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 namespace Passingwind.Abp.ElsaModule.Activities.Configuration;
 
 [Activity(
-    Category = "Abp",
+    Category = "Configuration",
     DisplayName = "Read Configuration",
     Outcomes = new[] { OutcomeNames.Done }
 )]

@@ -6,10 +6,10 @@ using Elsa.Services;
 using Elsa.Services.Models;
 using Volo.Abp.Users;
 
-namespace Passingwind.Abp.ElsaModule.Activities;
+namespace Passingwind.Abp.ElsaModule.Activities.Users;
 
 [Activity(
-    Category = "Abp",
+    Category = "Miscellaneous",
     DisplayName = "Current User",
     Description = "Get current user info",
     Outcomes = new[] { OutcomeNames.Done }

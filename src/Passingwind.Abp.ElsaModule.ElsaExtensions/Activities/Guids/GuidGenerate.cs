@@ -5,10 +5,10 @@ using Elsa.Attributes;
 using Elsa.Services;
 using Volo.Abp.Guids;
 
-namespace Passingwind.Abp.ElsaModule.Activities;
+namespace Passingwind.Abp.ElsaModule.Activities.Guids;
 
 [Action(
-    Category = "Abp",
+    Category = "Miscellaneous",
     DisplayName = "Guid Generate",
     Outcomes = new[] { OutcomeNames.Done }
 )]

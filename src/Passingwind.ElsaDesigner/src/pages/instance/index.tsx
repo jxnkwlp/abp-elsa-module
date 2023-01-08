@@ -12,7 +12,8 @@ import {
     workflowInstanceCancel,
     workflowInstanceRetry,
 } from '@/services/WorkflowInstance';
-import { ProFormInstance, TableDropdown } from '@ant-design/pro-components';
+import type { ProFormInstance } from '@ant-design/pro-components';
+import { TableDropdown } from '@ant-design/pro-components';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
@@ -277,7 +278,7 @@ const Index: React.FC = () => {
             <ProTable<API.WorkflowInstance>
                 columns={columns}
                 dateFormatter={(value) => {
-                    return value.format();
+                    return value.utc().format();
                 }}
                 actionRef={tableActionRef}
                 formRef={searchFormRef}

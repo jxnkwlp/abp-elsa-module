@@ -11,7 +11,7 @@ using Volo.Abp.Security.Encryption;
 namespace Passingwind.Abp.ElsaModule.Activities.Security;
 
 [Activity(
-    Category = "Abp",
+    Category = "Security",
     DisplayName = "String Encryption",
     Description = "",
     Outcomes = new[] { OutcomeNames.Done, "Error" }

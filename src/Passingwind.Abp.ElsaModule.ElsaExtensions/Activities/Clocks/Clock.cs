@@ -6,10 +6,10 @@ using Elsa.Services;
 using Elsa.Services.Models;
 using Volo.Abp.Timing;
 
-namespace Passingwind.Abp.ElsaModule.Activities;
+namespace Passingwind.Abp.ElsaModule.Activities.Clocks;
 
 [Activity(
-    Category = "Abp",
+    Category = "Miscellaneous",
     DisplayName = "Clock",
     Outcomes = new[] { OutcomeNames.Done }
 )]

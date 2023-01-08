@@ -220,7 +220,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         double tz = input.Tz;
 
         var endDate = Clock.Now;
-        var startDate = Clock.Now.AddDays(-datePeriod);
+        var startDate = Clock.Now.Date.AddDays(-datePeriod);
 
         var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync($"workflow:instance:status:datecount:statistics:{datePeriod}:tz:{tz}", async () =>
         {
@@ -231,7 +231,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
             for (int i = 1; i <= datePeriod; i++)
             {
-                var date = startDate.AddDays(i);
+                var date = startDate.Date.AddDays(i);
                 dto.Items.Add(new WorkflowInstanceDateCountStatisticDto
                 {
                     Date = date,

@@ -87,7 +87,6 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                             {...inputProps}
                             name={inputName}
                             options={optionList}
-                            extra={propItem.hint}
                             rules={[{ required: propItem.isRequired }]}
                         />
                     );
@@ -96,7 +95,6 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         <ProFormSwitch
                             {...inputProps}
                             name={inputName}
-                            extra={propItem.hint}
                             rules={[{ required: propItem.isRequired }]}
                         />
                     );
@@ -139,7 +137,6 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                 label={inputProps.label}
                                 name={inputName}
                                 required={propItem.isRequired}
-                                extra={propItem.hint}
                                 rules={[{ required: propItem.isRequired }]}
                             >
                                 <MonacorEditorInput
@@ -165,7 +162,6 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                 label={inputProps.label}
                                 name={inputName}
                                 required={propItem.isRequired}
-                                extra={propItem.hint}
                                 rules={[{ required: propItem.isRequired }]}
                             >
                                 <CaseEditorInput />
@@ -187,8 +183,8 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                     <ProForm.Item
                         label={inputProps.label}
                         name={inputName}
+                        extra={inputProps.extra}
                         required={propItem.isRequired}
-                        extra={propItem.hint}
                         rules={[{ required: propItem.isRequired }]}
                     >
                         <CaseEditorInput />
@@ -201,8 +197,8 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                 <ProForm.Item
                     label={inputProps.label}
                     name={inputName}
+                    extra={inputProps.extra}
                     required={propItem.isRequired}
-                    extra={propItem.hint}
                     rules={[{ required: propItem.isRequired }]}
                 >
                     <MonacorEditorInput
@@ -238,18 +234,18 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                   })
                 : [];
 
-            const isDynamicOptionItems =
-                propItem.options?.runtimeSelectListProviderType && propItem.options?.context;
+            const isDynamicOptionItems = propItem.options?.runtimeSelectListProviderType;
 
             const inputProps = {
                 // key: propItem.name,
                 label: propItem.label,
                 // name: ['props', propItem.name, ],
                 readOnly: propItem.isReadOnly,
-                placeholder: propItem.hint,
                 colProps: { span: defaultInputSpan },
                 // initialValue: propItem.defaultValue,
                 required: propItem.isRequired,
+                // placeholder: propItem.hint,
+                extra: propItem.hint,
             };
             if (isDynamicOptionItems) {
                 // provider request configure if 'runtimeSelectListProviderType' set.

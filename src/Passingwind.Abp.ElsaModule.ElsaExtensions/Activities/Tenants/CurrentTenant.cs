@@ -6,10 +6,10 @@ using Elsa.Services;
 using Elsa.Services.Models;
 using Volo.Abp.MultiTenancy;
 
-namespace Passingwind.Abp.ElsaModule.Activities;
+namespace Passingwind.Abp.ElsaModule.Activities.Tenants;
 
 [Activity(
-    Category = "Abp",
+    Category = "Miscellaneous",
     DisplayName = "Current Tenant",
     Description = "",
     Outcomes = new[] { OutcomeNames.Done }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Elsa.Scripting.JavaScript.Services;
-using Passingwind.Abp.ElsaModule.Activities;
+using Passingwind.Abp.ElsaModule.Activities.Users;
 
 namespace Passingwind.Abp.ElsaModule.Scripting.JavaScript;
 
