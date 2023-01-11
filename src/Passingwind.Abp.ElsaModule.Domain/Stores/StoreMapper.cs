@@ -449,7 +449,7 @@ public class StoreMapper : IStoreMapper
             CurrentActivity = entity.CurrentActivity == null ? default : new Elsa.Models.ScheduledActivity(entity.CurrentActivity.ActivityId.ToString(), entity.CurrentActivity.Input),
             LastExecutedActivityId = entity.LastExecutedActivityId?.ToString(),
 
-            Faults = new Elsa.Models.SimpleStack<Elsa.Models.WorkflowFault>(entity.Faults.Select(x => new Elsa.Models.WorkflowFault(x.Exception.ToException(), x.Message, x.FaultedActivityId.ToString(), x.ActivityInput, x.Resuming))),
+            Faults = new Elsa.Models.SimpleStack<Elsa.Models.WorkflowFault>(entity.Faults.Select(x => new Elsa.Models.WorkflowFault(x.Exception?.ToException(), x.Message, x.FaultedActivityId?.ToString(), x.ActivityInput, x.Resuming))),
             Input = entity.Input,
             Output = entity.Output,
 

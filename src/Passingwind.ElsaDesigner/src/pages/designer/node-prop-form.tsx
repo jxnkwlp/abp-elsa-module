@@ -105,6 +105,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                             name={inputName}
                             options={optionList}
                             rules={[{ required: propItem.isRequired }]}
+                            fieldProps={{ showSearch: true }}
                         />
                     );
                 case 'multi-text':
@@ -246,6 +247,8 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                 required: propItem.isRequired,
                 // placeholder: propItem.hint,
                 extra: propItem.hint,
+                request: null,
+                fieldProps: null,
             };
             if (isDynamicOptionItems) {
                 // provider request configure if 'runtimeSelectListProviderType' set.
@@ -264,6 +267,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         };
                     });
                 };
+                inputProps.fieldProps = { showSearch: true };
             }
 
             const propSyntax = getPropertySyntaxes(propItem);
