@@ -4,7 +4,7 @@ export default {
     'page.designer.settings.properties': 'Properties',
     'page.designer.settings.common': 'Common',
     'page.designer.settings.storage': 'Storage',
-    'page.designer.settings.activityOutputStorageProvider': 'Activity Output Storage Provider',
+    'page.designer.settings.activityOutputStorageProvider': 'Storage Provider',
     'page.designer.settings.field.name': 'Name',
     'page.designer.settings.field.name.tips': 'The technical name of the activity.',
     'page.designer.settings.field.displayName': 'Display Name',

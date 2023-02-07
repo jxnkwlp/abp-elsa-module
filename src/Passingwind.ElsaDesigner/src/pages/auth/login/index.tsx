@@ -39,32 +39,24 @@ const Login: React.FC = () => {
     };
 
     const handleSubmit = async (values: any) => {
-        try {
-            // 登录
-            const msg = await loginLogin(values);
-            if (msg.result === 1) {
-                // const defaultLoginSuccessMessage = intl.formatMessage({
-                //     id: 'pages.login.success',
-                //     defaultMessage: '登录成功！',
-                // });
-                // message.success(defaultLoginSuccessMessage);
-                await fetchUserInfo();
-                if (!history) return;
-                history.push('/');
-                return;
-            } else {
-                const defaultLoginFailureMessage = intl.formatMessage({
-                    id: 'pages.login.failure',
-                    defaultMessage: '登录失败，请重试！',
-                });
-                message.error(msg.description ?? defaultLoginFailureMessage);
-            }
-        } catch (error) {
+        // 登录
+        const msg = await loginLogin(values);
+        if (msg.result === 1) {
+            // const defaultLoginSuccessMessage = intl.formatMessage({
+            //     id: 'pages.login.success',
+            //     defaultMessage: '登录成功！',
+            // });
+            // message.success(defaultLoginSuccessMessage);
+            await fetchUserInfo();
+            if (!history) return;
+            history.push('/');
+            return;
+        } else {
             const defaultLoginFailureMessage = intl.formatMessage({
                 id: 'pages.login.failure',
                 defaultMessage: '登录失败，请重试！',
             });
-            message.error(defaultLoginFailureMessage);
+            message.error(msg.description ?? defaultLoginFailureMessage);
         }
     };
 

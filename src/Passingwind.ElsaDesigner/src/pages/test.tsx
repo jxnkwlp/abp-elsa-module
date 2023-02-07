@@ -1,14 +1,18 @@
-import React, { useEffect } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { Card, Alert, Typography, Form } from 'antd';
-import { useIntl, FormattedMessage } from 'umi';
+import MonacoEditor from '@/components/MonacoEditor';
+import { getAbpApplicationConfiguration } from '@/services/AbpApplicationConfiguration';
+import { PageContainer, ProForm, ProFormText } from '@ant-design/pro-components';
+import Editor from '@monaco-editor/react';
+import { Button, Card } from 'antd';
+import { useEffect, useState } from 'react';
+import { useIntl } from 'umi';
 import MonacorEditorInput from './designer/form-input/monacor-editor-input';
-import { Graph } from '@antv/x6';
-import { registerNodeTypes } from './designer/node';
-import MonacoEditor, { MonacoDiffEditor } from 'react-monaco-editor';
 
 const Test: React.FC = () => {
     const intl = useIntl();
+    const [value, setValue] = useState('');
+
+    const [form] = ProForm.useForm();
+
     useEffect(() => {
         //
         // registerNodeTypes();
@@ -56,33 +60,62 @@ const Test: React.FC = () => {
         // graph.fromJSON(data);
     }, []);
 
+    let controller = new AbortController();
+    const { signal } = controller;
+
+    signal.addEventListener('abort', () => {
+        console.log('aborted!');
+    });
+
     return (
         <PageContainer>
             <Card>
-                {/* <Form initialValues={{ v: new Date().getTime().toString() }}>
-                    <Form.Item name="v">
-                        <MonacorEditorInput height={500} />
-                    </Form.Item>
-                </Form> */}
-                <MonacoEditor
-                    height={500}
-                    onChange={(v) => {}}
-                    language="csharp"
-                    options={{
-                        wordWrap: 'bounded',
-                        wordWrapColumn: 1024,
-                        automaticLayout: true,
-                        autoIndent: 'full',
-                        tabSize: 2,
-                        autoClosingBrackets: 'languageDefined',
-                        foldingStrategy: 'auto',
+                {/* <Button
+                    onClick={() => {
+                        controller = new AbortController();
+                        const { signal } = controller;
+                        getAbpApplicationConfiguration({
+                            signal: signal,
+                        });
                     }}
-                    editorDidMount={(e) => {}}
-                />
+                >
+                    AAA
+                </Button>
 
-                {/* <MonacoDiffEditor height={500} /> */}
+                <Button
+                    onClick={() => {
+                        controller.abort();
+                    }}
+                >
+                    BBB
+                </Button> */}
 
-                {/* <div id="graphContainer" style={{ height: '500px' }}></div> */}
+                <Button
+                    onClick={() => {
+                        // setValue(new Date().getTime().toString());
+                        form.setFieldsValue({
+                            a: '1' + new Date().getTime().toString(),
+                            b: '2' + new Date().getTime().toString(),
+                        });
+                    }}
+                >
+                    BBB
+                </Button>
+                {/* <div style={{ height: 100 }}>
+                    <MonacorEditor value={value} />
+                </div> */}
+                <ProForm
+                    form={form}
+                    onFinish={(v) => {
+                        console.log(v);
+                    }}
+                >
+                    <ProForm.Item name="a">
+                        <MonacorEditorInput />
+                        {/* <MonacoEditor height={100} /> */}
+                    </ProForm.Item>
+                    <ProFormText name="b" />
+                </ProForm>
             </Card>
         </PageContainer>
     );

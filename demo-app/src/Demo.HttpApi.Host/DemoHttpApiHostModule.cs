@@ -126,8 +126,16 @@ public partial class DemoHttpApiHostModule : AbpModule
 
         Configure<MvcNewtonsoftJsonOptions>((options) =>
         {
-            options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver() { NamingStrategy = new CamelCaseNamingStrategy(false, true) };
+            ConfigureNewtonsoftJsonSerializerSettings(options.SerializerSettings);
         });
+
+        // Config default 'JsonSerializerSettings'
+        JsonConvert.DefaultSettings = () =>
+        {
+            var settings = new JsonSerializerSettings();
+            ConfigureNewtonsoftJsonSerializerSettings(settings);
+            return settings;
+        };
 
         Configure<AbpAntiForgeryOptions>(options =>
         {
@@ -153,18 +161,21 @@ public partial class DemoHttpApiHostModule : AbpModule
         // Mediator.
         context.Services.AddMediatR(typeof(Program).Assembly);
 
-        // 
-        JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-        {
-            Formatting = Formatting.None,
-            TypeNameHandling = TypeNameHandling.None,
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Include,
-        };
-
         context.Services.AddHealthChecks();
+    }
+
+    private static void ConfigureNewtonsoftJsonSerializerSettings(JsonSerializerSettings settings)
+    {
+        settings.Formatting = Formatting.None;
+        settings.ContractResolver = new CamelCasePropertyNamesContractResolver() { NamingStrategy = new CamelCaseNamingStrategy(false, true) };
+        settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+        settings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+        settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+        settings.NullValueHandling = NullValueHandling.Ignore;
+        settings.DefaultValueHandling = DefaultValueHandling.Include;
+        settings.TypeNameHandling = TypeNameHandling.None;
+        settings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
+        settings.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
     }
 
     public override void PostConfigureServices(ServiceConfigurationContext context)
@@ -263,12 +274,12 @@ public partial class DemoHttpApiHostModule : AbpModule
                 o.DefaultScheme = IdentityConstants.ApplicationScheme;
                 o.DefaultSignInScheme = IdentityConstants.ExternalScheme;
             })
-            .AddJwtBearer(options =>
-            {
-                options.Authority = configuration["AuthServer:Authority"];
-                options.RequireHttpsMetadata = Convert.ToBoolean(configuration["AuthServer:RequireHttpsMetadata"]);
-                options.Audience = "Demo";
-            })
+            //.AddJwtBearer(options =>
+            //{
+            //    options.Authority = configuration["AuthServer:Authority"];
+            //    options.RequireHttpsMetadata = Convert.ToBoolean(configuration["AuthServer:RequireHttpsMetadata"]);
+            //    options.Audience = "Demo";
+            //})
             .AddApiKey(options =>
             {
                 options.KeyName = ApiKeyDefaults.ApiKeyName;

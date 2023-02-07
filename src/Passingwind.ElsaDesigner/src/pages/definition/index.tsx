@@ -10,7 +10,7 @@ import {
     workflowDefinitionPublish,
     workflowDefinitionUnPublish,
 } from '@/services/WorkflowDefinition';
-import type { ProFormInstance } from '@ant-design/pro-components';
+import { ProForm, ProFormInstance } from '@ant-design/pro-components';
 import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
@@ -58,7 +58,7 @@ const Index: React.FC = () => {
     const [dispatchFormVisible, setDispatchFormVisible] = useState<boolean>(false);
     const [dispatchId, setDispatchId] = useState<string>();
 
-    const [editForm] = Form.useForm();
+    const [editForm] = ProForm.useForm();
 
     const columns: ProColumnType<API.WorkflowDefinition>[] = [
         {

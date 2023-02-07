@@ -4,11 +4,13 @@ import RightContent from '@/components/RightContent';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
+import { loader } from '@monaco-editor/react';
 import { message, notification } from 'antd';
 import Cookies from 'js-cookie';
 import moment from 'moment';
+import * as monaco from 'monaco-editor';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
-import { history, Link, formatMessage } from 'umi';
+import { formatMessage, history, Link } from 'umi';
 import defaultSettings from '../config/defaultSettings';
 import { getAbpApplicationConfiguration } from './services/AbpApplicationConfiguration';
 import type { API } from './services/typings';
@@ -19,6 +21,9 @@ const loginPath = '/auth/login';
 // Update moment default format
 moment.defaultFormat = 'YYYY-MM-DD HH:mm:ss';
 moment.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
+
+// see: https://github.com/suren-atoyan/monaco-react#loader-config
+loader.config({ monaco });
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -168,7 +173,7 @@ const httpRequestCodeMessageDefaults: Record<number, string> = {
 export const request: RequestConfig = {
     errorHandler: (error) => {
         const { data, response } = error;
-        if (response && response.status) {
+        if (response && response.status >= 300) {
             const errorMessage = formatMessage({
                 id: `common.http.response.statusCode.${response.status}`,
                 defaultMessage: httpRequestCodeMessageDefaults[response.status],
@@ -187,6 +192,12 @@ export const request: RequestConfig = {
             message.error(
                 errorText ?? formatMessage({ id: 'common.http.response.error.requestFailed' }),
             );
+        }
+        // else if (error.message == 'cancel' || error.message == 'aborted') {
+        //     console.debug('canceled');
+        // }
+        else if (error.toString().indexOf('aborted') >= 0) {
+            console.debug('aborted.', error);
         } else if (!response) {
             notification.error({
                 description: formatMessage({ id: 'common.http.response.error.networkError1' }),

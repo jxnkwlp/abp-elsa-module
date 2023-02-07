@@ -120,10 +120,10 @@
         ],
     },
 
-    // //
+
     // {
     //     path: '/test',
-    //     name: 'test page',
+    //     name: 'test',
     //     icon: 'smile',
     //     component: './test',
     // },

@@ -22,7 +22,7 @@ const CaseEditorInput: React.FC<CaseEditorInputProps> = (props) => {
     const [data, setData] = React.useState<any>([]);
     const [caseEditVisible, setCaseEditVisible] = React.useState<boolean>(false);
     const [caseEditTitle, setCaseEditTitle] = React.useState<string>(props?.title ?? 'Cases Edit');
-    const [caseEditForm] = Form.useForm();
+    const [caseEditForm] = ProForm.useForm();
 
     useEffect(() => {
         setData(JSON.parse(props?.value ?? '[]'));

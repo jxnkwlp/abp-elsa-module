@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Elsa;
 using Elsa.ActivityResults;
@@ -11,8 +12,10 @@ using Elsa.Expressions;
 using Elsa.Metadata;
 using Elsa.Services;
 using Elsa.Services.Models;
+using MediatR;
 using Microsoft.Extensions.Options;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp;
+using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
 
 namespace Passingwind.Abp.ElsaModule.Activities.Scripting;
 
@@ -21,7 +24,7 @@ namespace Passingwind.Abp.ElsaModule.Activities.Scripting;
     Category = "Scripting",
     Description = "Run CSharp code.",
     Outcomes = new[] { OutcomeNames.Done })]
-public class RunCSharp : Activity, IActivityPropertyOptionsProvider
+public class RunCSharp : Activity, IActivityPropertyOptionsProvider, INotificationHandler<CSharpScriptTypeDefinitionNotification>
 {
     [ActivityInput(Hint = "The CSharp code to run.", UIHint = ActivityInputUIHints.CodeEditor, OptionsProvider = typeof(RunCSharp))]
     public string Script { get; set; }
@@ -87,5 +90,15 @@ public class RunCSharp : Activity, IActivityPropertyOptionsProvider
             Context = nameof(RunCSharp),
             Syntax = CSharpSyntaxName.CSharp,
         };
+    }
+
+    public Task Handle(CSharpScriptTypeDefinitionNotification notification, CancellationToken cancellationToken)
+    {
+        var source = notification.CSharpTypeDefinitionSource;
+
+        source.AppendLine("public static void SetOutcome(string value) => throw new System.NotImplementedException(); ");
+        source.AppendLine("public static void SetOutcomes(IEnumerable<string> values) => throw new System.NotImplementedException(); ");
+
+        return Task.CompletedTask;
     }
 }

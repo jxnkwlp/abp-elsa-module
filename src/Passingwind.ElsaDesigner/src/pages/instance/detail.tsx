@@ -1,3 +1,4 @@
+import MonacoEditor from '@/components/MonacoEditor';
 import { WorkflowInstanceStatus } from '@/services/enums';
 import type { API } from '@/services/typings';
 import { getWorkflowDefinitionVersion } from '@/services/WorkflowDefinition';
@@ -31,7 +32,6 @@ import {
 } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import MonacoEditor from 'react-monaco-editor';
 import { useHistory, useIntl, useParams } from 'umi';
 import type { FlowActionType } from '../designer/flow';
 import Flow from '../designer/flow';
@@ -48,7 +48,6 @@ const dataRender = (value: string) => {
             options={{
                 minimap: { enabled: false },
                 readOnly: true,
-                automaticLayout: true,
                 scrollBeyondLastLine: false,
             }}
             language="json"
@@ -402,7 +401,7 @@ const Index: React.FC = () => {
                             onDataUpdate={() => {
                                 setGraphInit(true);
                             }}
-                            onNodeClick={(c, node) => {
+                            onNodeClick={(_c, node) => {
                                 setSelectActivityId(node.id!);
                             }}
                             onBlankClick={() => {
@@ -515,7 +514,13 @@ const Index: React.FC = () => {
                                                     </Tag>
                                                     <Tag>
                                                         <StockOutlined />{' '}
-                                                        {item.duration?.toFixed(0)}ms
+                                                        {/* {moment
+                                                            .duration(
+                                                                item.duration?.toFixed(0),
+                                                                'milliseconds',
+                                                            )
+                                                            .humanize()} */}
+                                                        {item.duration?.toFixed(0)} ms
                                                     </Tag>
                                                 </Space>
                                                 {/* {item.status}  */}

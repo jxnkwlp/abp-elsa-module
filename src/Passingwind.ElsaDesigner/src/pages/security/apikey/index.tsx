@@ -39,7 +39,7 @@ const Index: React.FC = () => {
 
     const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
     const [editModalTitle, setEditModalTitle] = useState<string>('');
-    const [editModalForm] = Form.useForm();
+    const [editModalForm] = ProForm.useForm();
 
     const columns: ProColumnType<API.GlobalVariable>[] = [
         {

@@ -17,7 +17,7 @@ const Index: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const intl = useIntl();
 
-    const [form] = Form.useForm();
+    const [form] = ProForm.useForm();
 
     const { initialState, setInitialState } = useModel('@@initialState');
 

@@ -1,5 +1,5 @@
 ﻿/**
- * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
+ * Generate from url: https://localhost:44315/swagger/v1/swagger.json
  * It is recommended not to modify the document
  * Total count: 4
  **/

@@ -1,12 +1,11 @@
-﻿namespace Passingwind.Abp.ElsaModule.Common
+﻿namespace Passingwind.Abp.ElsaModule.Common;
+
+public enum WorkflowInstanceStatus
 {
-    public enum WorkflowInstanceStatus
-    {
-        Idle = 0,
-        Running,
-        Finished,
-        Suspended,
-        Faulted,
-        Cancelled
-    }
+    Idle = 0,
+    Running,
+    Finished,
+    Suspended,
+    Faulted,
+    Cancelled
 }

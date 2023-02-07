@@ -1,6 +1,4 @@
-﻿using Elsa.Models;
-
-namespace Passingwind.Abp.ElsaModule;
+﻿namespace Passingwind.Abp.ElsaModule;
 
 public static class ElsaModuleErrorCodes
 {

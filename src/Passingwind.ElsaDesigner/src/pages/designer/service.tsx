@@ -1,5 +1,12 @@
-import { getDesignerActivityTypes, getDesignerScriptTypeDefinition } from '@/services/Designer';
-import { monacoCsharpCompletionTabCompletion } from '@/services/MonacoCsharpCompletion';
+import {
+    designerCSharpLanguageCodeAnalysis,
+    designerCSharpLanguageCodeFormatter,
+    designerCSharpLanguageCompletionProvider,
+    designerCSharpLanguageHoverProvider,
+    designerCSharpLanguageSignatureProvider,
+    getDesignerActivityTypes,
+    getDesignerJavaScriptTypeDefinition,
+} from '@/services/Designer';
 import type { API } from '@/services/typings';
 import { randString } from '@/services/utils';
 import { CloseCircleOutlined, ForkOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
@@ -14,11 +21,11 @@ import type {
     IGraphData,
     NodePropertySyntax,
     NodePropertySyntaxNames,
-    NodePropertyUiHints,
     NodeStatus,
     NodeTypeGroup,
     NodeTypeProperty,
 } from './type';
+import Request from 'umi-request';
 
 export const getNodeIconByType = (type: string) => {
     const dict = {
@@ -434,9 +441,14 @@ export const conventToGraphData = async (
 };
 
 export const getJavascriptEditorDefinitonsContent = async (id: string) => {
-    const result = await getDesignerScriptTypeDefinition(id);
+    const result = await getDesignerJavaScriptTypeDefinition(id);
     return await result?.response?.text();
 };
+
+let cSharpEditorCodeAnalysisProviderRequestAbortController = new AbortController();
+let cSharpEditorCompletionProviderRequestAbortController = new AbortController();
+let cSharpEditorHoverProviderRequestAbortController = new AbortController();
+let cSharpEditorSignatureProviderRequestAbortController = new AbortController();
 
 export const getCSharpEditorLanguageProvider = async (
     id: string,
@@ -444,8 +456,73 @@ export const getCSharpEditorLanguageProvider = async (
     payload: any,
 ) => {
     if (provider == 'completion') {
-        await monacoCsharpCompletionTabCompletion(payload);
+        // cancel pre request if exists.
+        if (
+            cSharpEditorCompletionProviderRequestAbortController &&
+            !cSharpEditorCompletionProviderRequestAbortController.signal.aborted
+        ) {
+            cSharpEditorCompletionProviderRequestAbortController.abort();
+        }
+
+        cSharpEditorCompletionProviderRequestAbortController = new AbortController();
+        const { signal } = cSharpEditorCompletionProviderRequestAbortController;
+        //
+        const result = await designerCSharpLanguageCompletionProvider(id, payload, {
+            signal: signal,
+        });
+        return result?.items ?? [];
+    } else if (provider == 'hoverinfo') {
+        // cancel pre request if exists.
+        if (
+            cSharpEditorHoverProviderRequestAbortController &&
+            !cSharpEditorHoverProviderRequestAbortController.signal.aborted
+        ) {
+            cSharpEditorHoverProviderRequestAbortController.abort();
+        }
+
+        cSharpEditorHoverProviderRequestAbortController = new AbortController();
+        const { signal } = cSharpEditorHoverProviderRequestAbortController;
+        //
+        const result = await designerCSharpLanguageHoverProvider(id, payload, {
+            signal: signal,
+        });
+        return result ?? undefined;
+    } else if (provider == 'signature') {
+        // cancel pre request if exists.
+        if (
+            cSharpEditorSignatureProviderRequestAbortController &&
+            !cSharpEditorSignatureProviderRequestAbortController.signal.aborted
+        ) {
+            cSharpEditorSignatureProviderRequestAbortController.abort();
+        }
+        cSharpEditorSignatureProviderRequestAbortController = new AbortController();
+        const { signal } = cSharpEditorSignatureProviderRequestAbortController;
+        const result = await designerCSharpLanguageSignatureProvider(id, payload, {
+            signal: signal,
+        });
+        return result ?? undefined;
+    } else if (provider == 'analysis') {
+        // cancel pre request if exists.
+        if (
+            cSharpEditorCodeAnalysisProviderRequestAbortController &&
+            !cSharpEditorCodeAnalysisProviderRequestAbortController.signal.aborted
+        ) {
+            cSharpEditorCodeAnalysisProviderRequestAbortController.abort();
+        }
+
+        cSharpEditorCodeAnalysisProviderRequestAbortController = new AbortController();
+        const { signal } = cSharpEditorCodeAnalysisProviderRequestAbortController;
+        //
+        const result = await designerCSharpLanguageCodeAnalysis(id, payload, {
+            signal: signal,
+        });
+        return result?.items ?? [];
+    } else if (provider == 'format') {
+        const result = await designerCSharpLanguageCodeFormatter(payload);
+        return result;
     }
+
+    return null;
 };
 
 export const graphValidateMagnet = (graph: Graph, args: any) => {

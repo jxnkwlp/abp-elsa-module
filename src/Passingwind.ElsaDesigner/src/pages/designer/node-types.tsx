@@ -1,5 +1,5 @@
 import { ApiOutlined, SettingOutlined } from '@ant-design/icons';
-import { Collapse, Tooltip } from 'antd';
+import { Collapse, Spin, Tooltip } from 'antd';
 import React, { useEffect } from 'react';
 import { useIntl } from 'umi';
 import { getNodeIconByType, getNodeTypeData } from './service';
@@ -11,6 +11,7 @@ type NodeTypesPanelProps = {
 
 const NodeTypesPanel: React.FC<NodeTypesPanelProps> = (props) => {
     const [data, setData] = React.useState<NodeTypeGroup[]>([]);
+    const [loading, setLoading] = React.useState(false);
 
     const intl = useIntl();
 
@@ -22,7 +23,9 @@ const NodeTypesPanel: React.FC<NodeTypesPanelProps> = (props) => {
     };
 
     const load = async () => {
+        setLoading(true);
         const result = await getNodeTypeData();
+        setLoading(false);
         setData(result);
     };
 
@@ -44,6 +47,7 @@ const NodeTypesPanel: React.FC<NodeTypesPanelProps> = (props) => {
             <div className="dnd-header">
                 {intl.formatMessage({ id: 'page.designer.component' })}
             </div>
+            {/* <Spin spinning={loading}> */}
             <Collapse key="groups" collapsible="header" ghost className="dnd-body">
                 {data.map((g, index) => {
                     return (
@@ -80,6 +84,7 @@ const NodeTypesPanel: React.FC<NodeTypesPanelProps> = (props) => {
                     );
                 })}
             </Collapse>
+            {/* </Spin> */}
         </div>
     );
 };

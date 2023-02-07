@@ -86,7 +86,6 @@ public class OAuth2Client : Activity, IActivityPropertyOptionsProvider
     private readonly ILogger<OAuth2Client> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
 
-
     public OAuth2Client(ILogger<OAuth2Client> logger, IHttpClientFactory httpClientFactory)
     {
         _logger = logger;

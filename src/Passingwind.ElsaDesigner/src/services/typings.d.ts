@@ -1,6 +1,7 @@
 ﻿/**
- * Generate from swagger json url: https://localhost:44315/swagger/v1/swagger.json
- * Total count: 170
+ * Generate from url: https://localhost:44315/swagger/v1/swagger.json
+ * It is recommended not to modify the document
+ * Total count: 169
  **/
 import * as Enum from "./enums";
 
@@ -9,8 +10,8 @@ declare namespace API {
      * *TODO*
      **/
     type ApiKey = {
-        id?: string | undefined;
-        creationTime?: string | undefined;
+        id: string;
+        creationTime: string;
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
@@ -54,7 +55,7 @@ declare namespace API {
         hint?: string | undefined;
         options?: any | undefined;
         category?: string | undefined;
-        order?: number | undefined;
+        order: number;
         defaultValue?: any | undefined;
         defaultSyntax?: string | undefined;
         supportedSyntaxes?: string[] | undefined;
@@ -92,7 +93,7 @@ declare namespace API {
      **/
     type WorkflowContextOptions = {
         contextType?: any | undefined;
-        contextFidelity?: Enum.WorkflowContextFidelity | undefined;
+        contextFidelity: Enum.WorkflowContextFidelity;
     };
 
     /**
@@ -126,20 +127,20 @@ declare namespace API {
         message?: string | undefined;
         stackTrace?: string | undefined;
         data?: any | undefined;
-        innerException?: SimpleExceptionModel | undefined;
+        innerException: SimpleExceptionModel;
     };
 
     /**
      * *TODO*
      **/
     type WorkflowExecutionLog = {
-        id?: string | undefined;
-        creationTime?: string | undefined;
+        id: string;
+        creationTime: string;
         creatorId?: string | undefined;
-        workflowInstanceId?: string | undefined;
-        activityId?: string | undefined;
+        workflowInstanceId: string;
+        activityId: string;
         activityType?: string | undefined;
-        timestamp?: string | undefined;
+        timestamp: string;
         eventName?: string | undefined;
         message?: string | undefined;
         source?: string | undefined;
@@ -150,8 +151,8 @@ declare namespace API {
      * *TODO*
      **/
     type GlobalVariable = {
-        id?: string | undefined;
-        creationTime?: string | undefined;
+        id: string;
+        creationTime: string;
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
@@ -172,48 +173,48 @@ declare namespace API {
     /**
      * *TODO*
      **/
-    type HoverInfoRequest = {
-        code?: string | undefined;
-        position?: number | undefined;
+    type MonacoCodeAnalysisItem = {
+        id?: string | undefined;
+        keyword?: string | undefined;
+        message?: string | undefined;
+        offsetFrom: number;
+        offsetTo: number;
+        severity: Enum.MonacoCodeAnalysisSeverity;
+        severityNumeric: number;
     };
 
     /**
      * *TODO*
      **/
-    type HoverInfoResult = {
-        information?: string | undefined;
-        offsetFrom?: number | undefined;
-        offsetTo?: number | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type TabCompletionRequest = {
-        code?: string | undefined;
-        position?: number | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type TabCompletionResult = {
-        items?: TabCompletionResultItem[] | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type TabCompletionResultItem = {
+    type MonacoCompletionItem = {
         suggestion?: string | undefined;
         description?: string | undefined;
+        symbolKind?: string | undefined;
+        itemKind: Enum.MonacoCompletionItemKind;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type MonacoSignatureParameter = {
+        label?: string | undefined;
+        documentation?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type MonacoSignatures = {
+        label?: string | undefined;
+        documentation?: string | undefined;
+        parameters?: MonacoSignatureParameter[] | undefined;
     };
 
     /**
      * *TODO*
      **/
     type Activity = {
-        activityId?: string | undefined;
+        activityId: string;
         type?: string | undefined;
         name?: string | undefined;
         displayName?: string | undefined;
@@ -230,8 +231,8 @@ declare namespace API {
      * *TODO*
      **/
     type ActivityConnection = {
-        sourceId?: string | undefined;
-        targetId?: string | undefined;
+        sourceId: string;
+        targetId: string;
         outcome?: string | undefined;
         attributes?: any | undefined;
     };
@@ -240,8 +241,8 @@ declare namespace API {
      * *TODO*
      **/
     type ActivityConnectionCreate = {
-        sourceId?: string | undefined;
-        targetId?: string | undefined;
+        sourceId: string;
+        targetId: string;
         outcome?: string | undefined;
         attributes?: any | undefined;
     };
@@ -250,7 +251,7 @@ declare namespace API {
      * *TODO*
      **/
     type ActivityCreateOrUpdate = {
-        activityId?: string | undefined;
+        activityId: string;
         type: string;
         name: string;
         displayName?: string | undefined;
@@ -271,7 +272,7 @@ declare namespace API {
         displayName?: string | undefined;
         description?: string | undefined;
         category?: string | undefined;
-        traits?: Enum.ActivityTraits | undefined;
+        traits: Enum.ActivityTraits;
         outcomes?: string[] | undefined;
         inputProperties?: ActivityInputDescriptor[] | undefined;
         outputProperties?: ActivityOutputDescriptor[] | undefined;
@@ -298,7 +299,88 @@ declare namespace API {
      * *TODO*
      **/
     type RuntimeSelectListResult = {
-        selectList?: SelectList | undefined;
+        selectList: SelectList;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDesignerCSharpLanguageAnalysisRequest = {
+        sessionId?: string | undefined;
+        code?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDesignerCSharpLanguageAnalysisResult = {
+        items?: MonacoCodeAnalysisItem[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDesignerCSharpLanguageCompletionProviderRequest = {
+        sessionId?: string | undefined;
+        code?: string | undefined;
+        position: number;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDesignerCSharpLanguageCompletionProviderResult = {
+        items?: MonacoCompletionItem[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDesignerCSharpLanguageFormatterRequest = {
+        code?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDesignerCSharpLanguageFormatterResult = {
+        code?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDesignerCSharpLanguageHoverProviderRequest = {
+        sessionId?: string | undefined;
+        code?: string | undefined;
+        position: number;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDesignerCSharpLanguageHoverProviderResult = {
+        information?: string | undefined;
+        offsetFrom: number;
+        offsetTo: number;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDesignerCSharpLanguageSignatureProviderRequest = {
+        sessionId?: string | undefined;
+        code?: string | undefined;
+        position: number;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDesignerCSharpLanguageSignatureProviderResult = {
+        signatures?: MonacoSignatures[] | undefined;
+        activeParameter: number;
+        activeSignature: number;
     };
 
     /**
@@ -345,7 +427,7 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowSignalResult = {
-        workflowInstanceId?: string | undefined;
+        workflowInstanceId: string;
         activityId?: string | undefined;
     };
 
@@ -361,8 +443,8 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowDefinition = {
-        id?: string | undefined;
-        creationTime?: string | undefined;
+        id: string;
+        creationTime: string;
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
@@ -370,14 +452,14 @@ declare namespace API {
         displayName?: string | undefined;
         tenantId?: string | undefined;
         description?: string | undefined;
-        latestVersion?: number | undefined;
+        latestVersion: number;
         publishedVersion?: number | undefined;
         isSingleton?: boolean | undefined;
         deleteCompletedInstances?: boolean | undefined;
         channel?: string | undefined;
         tag?: string | undefined;
-        persistenceBehavior?: Enum.WorkflowPersistenceBehavior | undefined;
-        contextOptions?: WorkflowContextOptions | undefined;
+        persistenceBehavior: Enum.WorkflowPersistenceBehavior;
+        contextOptions: WorkflowContextOptions;
         variables?: any | undefined;
         customAttributes?: any | undefined;
     };
@@ -393,8 +475,8 @@ declare namespace API {
         deleteCompletedInstances?: boolean | undefined;
         channel?: string | undefined;
         tag?: string | undefined;
-        persistenceBehavior?: Enum.WorkflowPersistenceBehavior | undefined;
-        contextOptions?: WorkflowContextOptions | undefined;
+        persistenceBehavior: Enum.WorkflowPersistenceBehavior;
+        contextOptions: WorkflowContextOptions;
         variables?: any | undefined;
     };
 
@@ -412,7 +494,7 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowDefinitionDispatchResult = {
-        workflowInstanceId?: string | undefined;
+        workflowInstanceId: string;
     };
 
     /**
@@ -429,13 +511,13 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowDefinitionVersion = {
-        id?: string | undefined;
-        creationTime?: string | undefined;
+        id: string;
+        creationTime: string;
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
-        definition?: WorkflowDefinition | undefined;
-        version?: number | undefined;
+        definition: WorkflowDefinition;
+        version: number;
         isLatest?: boolean | undefined;
         isPublished?: boolean | undefined;
         activities?: Activity[] | undefined;
@@ -456,12 +538,12 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowDefinitionVersionListItem = {
-        id?: string | undefined;
-        creationTime?: string | undefined;
+        id: string;
+        creationTime: string;
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
-        version?: number | undefined;
+        version: number;
         isLatest?: boolean | undefined;
         isPublished?: boolean | undefined;
     };
@@ -470,16 +552,16 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowInstance = {
-        id?: string | undefined;
-        creationTime?: string | undefined;
+        id: string;
+        creationTime: string;
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
-        workflowDefinitionId?: string | undefined;
-        workflowDefinitionVersionId?: string | undefined;
+        workflowDefinitionId: string;
+        workflowDefinitionVersionId: string;
         name?: string | undefined;
-        version?: number | undefined;
-        workflowStatus?: Enum.WorkflowInstanceStatus | undefined;
+        version: number;
+        workflowStatus: Enum.WorkflowInstanceStatus;
         correlationId?: string | undefined;
         contextType?: string | undefined;
         contextId?: string | undefined;
@@ -488,9 +570,9 @@ declare namespace API {
         cancelledTime?: string | undefined;
         faultedTime?: string | undefined;
         lastExecutedActivityId?: string | undefined;
-        input?: WorkflowInputReference | undefined;
-        output?: WorkflowOutputReference | undefined;
-        currentActivity?: WorkflowInstanceScheduledActivity | undefined;
+        input: WorkflowInputReference;
+        output: WorkflowOutputReference;
+        currentActivity: WorkflowInstanceScheduledActivity;
         faults?: WorkflowInstanceFault[] | undefined;
         variables?: any | undefined;
         metadata?: any | undefined;
@@ -504,7 +586,7 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowInstanceActivityData = {
-        activityId?: string | undefined;
+        activityId: string;
         data?: any | undefined;
     };
 
@@ -512,7 +594,7 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowInstanceActivityScope = {
-        activityId?: string | undefined;
+        activityId: string;
         variables?: any | undefined;
     };
 
@@ -520,16 +602,16 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowInstanceBasic = {
-        id?: string | undefined;
-        creationTime?: string | undefined;
+        id: string;
+        creationTime: string;
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
-        workflowDefinitionId?: string | undefined;
-        workflowDefinitionVersionId?: string | undefined;
+        workflowDefinitionId: string;
+        workflowDefinitionVersionId: string;
         name?: string | undefined;
-        version?: number | undefined;
-        workflowStatus?: Enum.WorkflowInstanceStatus | undefined;
+        version: number;
+        workflowStatus: Enum.WorkflowInstanceStatus;
         correlationId?: string | undefined;
         contextType?: string | undefined;
         contextId?: string | undefined;
@@ -543,7 +625,7 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowInstanceBlockingActivity = {
-        activityId?: string | undefined;
+        activityId: string;
         activityType?: string | undefined;
         tag?: string | undefined;
     };
@@ -552,9 +634,9 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowInstanceDateCountStatistic = {
-        date?: string | undefined;
-        finishedCount?: number | undefined;
-        failedCount?: number | undefined;
+        date: string;
+        finishedCount: number;
+        failedCount: number;
     };
 
     /**
@@ -569,7 +651,7 @@ declare namespace API {
      **/
     type WorkflowInstanceDispatchRequest = {
         activityId?: string | undefined;
-        input?: WorkflowInput | undefined;
+        input: WorkflowInput;
     };
 
     /**
@@ -577,7 +659,7 @@ declare namespace API {
      **/
     type WorkflowInstanceExecuteRequest = {
         activityId?: string | undefined;
-        input?: WorkflowInput | undefined;
+        input: WorkflowInput;
     };
 
     /**
@@ -591,15 +673,15 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowInstanceExecutionLogSummaryActivity = {
-        activityId?: string | undefined;
+        activityId: string;
         activityType?: string | undefined;
         isExecuting?: boolean | undefined;
         isExecuted?: boolean | undefined;
         isFaulted?: boolean | undefined;
-        executedCount?: number | undefined;
-        startTime?: string | undefined;
-        endTime?: string | undefined;
-        duration?: number | undefined;
+        executedCount: number;
+        startTime: string;
+        endTime: string;
+        duration: number;
         outcomes?: string[] | undefined;
         stateData?: any | undefined;
         journalData?: any | undefined;
@@ -614,7 +696,7 @@ declare namespace API {
         resuming?: boolean | undefined;
         activityInput?: any | undefined;
         message?: string | undefined;
-        exception?: SimpleExceptionModel | undefined;
+        exception: SimpleExceptionModel;
     };
 
     /**
@@ -628,7 +710,7 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowInstanceScheduledActivity = {
-        activityId?: string | undefined;
+        activityId: string;
         input?: any | undefined;
     };
 
@@ -636,11 +718,11 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowInstanceStatusCountStatisticsResult = {
-        all?: number | undefined;
-        running?: number | undefined;
-        finished?: number | undefined;
-        faulted?: number | undefined;
-        suspended?: number | undefined;
+        all: number;
+        running: number;
+        finished: number;
+        faulted: number;
+        suspended: number;
     };
 
     /**
@@ -688,7 +770,7 @@ declare namespace API {
      * *TODO*
      **/
     type ResetPassword = {
-        userId?: string | undefined;
+        userId: string;
         resetToken: string;
         password: string;
     };
@@ -720,7 +802,7 @@ declare namespace API {
      * *TODO*
      **/
     type AbpLoginResult = {
-        result?: Enum.LoginResultType | undefined;
+        result: Enum.LoginResultType;
         description?: string | undefined;
     };
 
@@ -738,7 +820,7 @@ declare namespace API {
      **/
     type ApiKeyPagedResult = {
         items?: ApiKey[] | undefined;
-        totalCount?: number | undefined;
+        totalCount: number;
     };
 
     /**
@@ -746,7 +828,7 @@ declare namespace API {
      **/
     type GlobalVariablePagedResult = {
         items?: GlobalVariable[] | undefined;
-        totalCount?: number | undefined;
+        totalCount: number;
     };
 
     /**
@@ -761,7 +843,7 @@ declare namespace API {
      **/
     type IdentityRolePagedResult = {
         items?: IdentityRole[] | undefined;
-        totalCount?: number | undefined;
+        totalCount: number;
     };
 
     /**
@@ -769,7 +851,7 @@ declare namespace API {
      **/
     type IdentityUserPagedResult = {
         items?: IdentityUser[] | undefined;
-        totalCount?: number | undefined;
+        totalCount: number;
     };
 
     /**
@@ -791,7 +873,7 @@ declare namespace API {
      **/
     type WorkflowDefinitionPagedResult = {
         items?: WorkflowDefinition[] | undefined;
-        totalCount?: number | undefined;
+        totalCount: number;
     };
 
     /**
@@ -799,7 +881,7 @@ declare namespace API {
      **/
     type WorkflowDefinitionVersionListItemPagedResult = {
         items?: WorkflowDefinitionVersionListItem[] | undefined;
-        totalCount?: number | undefined;
+        totalCount: number;
     };
 
     /**
@@ -814,7 +896,7 @@ declare namespace API {
      **/
     type WorkflowExecutionLogPagedResult = {
         items?: WorkflowExecutionLog[] | undefined;
-        totalCount?: number | undefined;
+        totalCount: number;
     };
 
     /**
@@ -822,7 +904,7 @@ declare namespace API {
      **/
     type WorkflowInstanceBasicPagedResult = {
         items?: WorkflowInstanceBasic[] | undefined;
-        totalCount?: number | undefined;
+        totalCount: number;
     };
 
     /**
@@ -851,17 +933,17 @@ declare namespace API {
      * *TODO*
      **/
     type ApplicationConfiguration = {
-        localization?: ApplicationLocalizationConfiguration | undefined;
-        auth?: ApplicationAuthConfiguration | undefined;
-        setting?: ApplicationSettingConfiguration | undefined;
-        currentUser?: CurrentUser | undefined;
-        features?: ApplicationFeatureConfiguration | undefined;
-        globalFeatures?: ApplicationGlobalFeatureConfiguration | undefined;
-        multiTenancy?: MultiTenancyInfo | undefined;
-        currentTenant?: CurrentTenant | undefined;
-        timing?: Timing | undefined;
-        clock?: Clock | undefined;
-        objectExtensions?: ObjectExtensions | undefined;
+        localization: ApplicationLocalizationConfiguration;
+        auth: ApplicationAuthConfiguration;
+        setting: ApplicationSettingConfiguration;
+        currentUser: CurrentUser;
+        features: ApplicationFeatureConfiguration;
+        globalFeatures: ApplicationGlobalFeatureConfiguration;
+        multiTenancy: MultiTenancyInfo;
+        currentTenant: CurrentTenant;
+        timing: Timing;
+        clock: Clock;
+        objectExtensions: ObjectExtensions;
         extraProperties?: any | undefined;
     };
 
@@ -885,7 +967,7 @@ declare namespace API {
     type ApplicationLocalizationConfiguration = {
         values?: any | undefined;
         languages?: LanguageInfo[] | undefined;
-        currentCulture?: CurrentCulture | undefined;
+        currentCulture: CurrentCulture;
         defaultResourceName?: string | undefined;
         languagesMap?: any | undefined;
         languageFilesMap?: any | undefined;
@@ -917,7 +999,7 @@ declare namespace API {
         cultureName?: string | undefined;
         name?: string | undefined;
         nativeName?: string | undefined;
-        dateTimeFormat?: DateTimeFormat | undefined;
+        dateTimeFormat: DateTimeFormat;
     };
 
     /**
@@ -991,9 +1073,9 @@ declare namespace API {
     type ExtensionProperty = {
         type?: string | undefined;
         typeSimple?: string | undefined;
-        displayName?: LocalizableString | undefined;
-        api?: ExtensionPropertyApi | undefined;
-        ui?: ExtensionPropertyUi | undefined;
+        displayName: LocalizableString;
+        api: ExtensionPropertyApi;
+        ui: ExtensionPropertyUi;
         attributes?: ExtensionPropertyAttribute[] | undefined;
         configuration?: any | undefined;
         defaultValue?: any | undefined;
@@ -1003,9 +1085,9 @@ declare namespace API {
      * *TODO*
      **/
     type ExtensionPropertyApi = {
-        onGet?: ExtensionPropertyApiGet | undefined;
-        onCreate?: ExtensionPropertyApiCreate | undefined;
-        onUpdate?: ExtensionPropertyApiUpdate | undefined;
+        onGet: ExtensionPropertyApiGet;
+        onCreate: ExtensionPropertyApiCreate;
+        onUpdate: ExtensionPropertyApiUpdate;
     };
 
     /**
@@ -1041,10 +1123,10 @@ declare namespace API {
      * *TODO*
      **/
     type ExtensionPropertyUi = {
-        onTable?: ExtensionPropertyUiTable | undefined;
-        onCreateForm?: ExtensionPropertyUiForm | undefined;
-        onEditForm?: ExtensionPropertyUiForm | undefined;
-        lookup?: ExtensionPropertyUiLookup | undefined;
+        onTable: ExtensionPropertyUiTable;
+        onCreateForm: ExtensionPropertyUiForm;
+        onEditForm: ExtensionPropertyUiForm;
+        lookup: ExtensionPropertyUiLookup;
     };
 
     /**
@@ -1100,15 +1182,15 @@ declare namespace API {
      * *TODO*
      **/
     type TimeZone = {
-        iana?: IanaTimeZone | undefined;
-        windows?: WindowsTimeZone | undefined;
+        iana: IanaTimeZone;
+        windows: WindowsTimeZone;
     };
 
     /**
      * *TODO*
      **/
     type Timing = {
-        timeZone?: TimeZone | undefined;
+        timeZone: TimeZone;
     };
 
     /**
@@ -1141,10 +1223,10 @@ declare namespace API {
         name?: string | undefined;
         displayName?: string | undefined;
         value?: string | undefined;
-        provider?: FeatureProvider | undefined;
+        provider: FeatureProvider;
         description?: string | undefined;
-        valueType?: IStringValueType | undefined;
-        depth?: number | undefined;
+        valueType: IStringValueType;
+        depth: number;
         parentName?: string | undefined;
     };
 
@@ -1198,7 +1280,7 @@ declare namespace API {
         supportedVersions?: string[] | undefined;
         parametersOnMethod?: MethodParameterApiDescriptionModel[] | undefined;
         parameters?: ParameterApiDescriptionModel[] | undefined;
-        returnValue?: ReturnValueApiDescriptionModel | undefined;
+        returnValue: ReturnValueApiDescriptionModel;
         allowAnonymous?: boolean | undefined;
         implementFrom?: string | undefined;
     };
@@ -1299,7 +1381,7 @@ declare namespace API {
         baseType?: string | undefined;
         isEnum?: boolean | undefined;
         enumNames?: string[] | undefined;
-        enumValues?: [] | undefined;
+        enumValues?: any[] | undefined;
         genericArguments?: string[] | undefined;
         properties?: PropertyApiDescriptionModel[] | undefined;
     };
@@ -1319,7 +1401,7 @@ declare namespace API {
      * *TODO*
      **/
     type RemoteServiceErrorResponse = {
-        error?: RemoteServiceErrorInfo | undefined;
+        error: RemoteServiceErrorInfo;
     };
 
     /**
@@ -1335,7 +1417,7 @@ declare namespace API {
      **/
     type IdentityRole = {
         extraProperties?: any | undefined;
-        id?: string | undefined;
+        id: string;
         name?: string | undefined;
         isDefault?: boolean | undefined;
         isStatic?: boolean | undefined;
@@ -1369,8 +1451,8 @@ declare namespace API {
      **/
     type IdentityUser = {
         extraProperties?: any | undefined;
-        id?: string | undefined;
-        creationTime?: string | undefined;
+        id: string;
+        creationTime: string;
         creatorId?: string | undefined;
         lastModificationTime?: string | undefined;
         lastModifierId?: string | undefined;
@@ -1506,7 +1588,7 @@ declare namespace API {
      **/
     type EmailSettings = {
         smtpHost?: string | undefined;
-        smtpPort?: number | undefined;
+        smtpPort: number;
         smtpUserName?: string | undefined;
         smtpPassword?: string | undefined;
         smtpDomain?: string | undefined;
@@ -1531,7 +1613,7 @@ declare namespace API {
      **/
     type UpdateEmailSettings = {
         smtpHost?: string | undefined;
-        smtpPort?: number | undefined;
+        smtpPort: number;
         smtpUserName?: string | undefined;
         smtpPassword?: string | undefined;
         smtpDomain?: string | undefined;
@@ -1545,7 +1627,7 @@ declare namespace API {
      * *TODO*
      **/
     type UserData = {
-        id?: string | undefined;
+        id: string;
         tenantId?: string | undefined;
         userName?: string | undefined;
         name?: string | undefined;
@@ -1563,7 +1645,7 @@ declare namespace API {
     type IStringValueType = {
         name?: string | undefined;
         properties?: any | undefined;
-        validator?: IValueValidator | undefined;
+        validator: IValueValidator;
     };
 
     /**

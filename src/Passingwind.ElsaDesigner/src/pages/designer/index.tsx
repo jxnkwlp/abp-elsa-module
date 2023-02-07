@@ -1,3 +1,5 @@
+import MonacoEditor from '@/components/MonacoEditor';
+import { MonacoCompletionItemKind } from '@/services/enums';
 import type { API } from '@/services/typings';
 import { showDownloadJsonFile } from '@/services/utils';
 import {
@@ -11,28 +13,17 @@ import {
 } from '@/services/WorkflowDefinition';
 import { GlobalOutlined, SaveOutlined, SettingOutlined } from '@ant-design/icons';
 import { ProFormSwitch, ProFormUploadDragger } from '@ant-design/pro-components';
-import { ModalForm } from '@ant-design/pro-form';
+import ProForm, { ModalForm } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { DagreLayout } from '@antv/layout';
 import type { Node } from '@antv/x6';
-import {
-    Button,
-    Card,
-    Dropdown,
-    Form,
-    Menu,
-    message,
-    Modal,
-    Popconfirm,
-    Space,
-    Spin,
-    Tag,
-} from 'antd';
+import { DiffEditor } from '@monaco-editor/react';
+import { Button, Card, Dropdown, Menu, message, Modal, Popconfirm, Space, Spin, Tag } from 'antd';
 import type { RcFile } from 'antd/lib/upload';
 import { isArray } from 'lodash';
+import * as monaco from 'monaco-editor';
 import React, { useEffect, useRef } from 'react';
-import MonacoEditor, { MonacoDiffEditor } from 'react-monaco-editor';
 import { useHistory, useIntl, useLocation } from 'umi';
 import EditFormItems from '../definition/edit-form-items';
 import definitionJsonSchema from './definition-json-schema';
@@ -43,6 +34,8 @@ import NodePropForm from './node-prop-form';
 import {
     conventToGraphData,
     conventToServerData,
+    getCSharpEditorLanguageProvider,
+    getJavascriptEditorDefinitonsContent,
     getNodeTypeRawData,
     getPropertySyntaxes,
 } from './service';
@@ -53,6 +46,8 @@ import type {
     NodeUpdateData,
     NodeUpdatePropData,
 } from './type';
+
+let codeAnalysisTimer = 0;
 
 const Index: React.FC = () => {
     const location = useLocation();
@@ -90,9 +85,9 @@ const Index: React.FC = () => {
 
     const [editNodeId, setEditNodeId] = React.useState<string>('');
     const [editNodeFormData, setEditNodeFormData] = React.useState<NodeEditFormData>();
-    const [editNodeFormRef] = Form.useForm();
+    const [editNodeFormRef] = ProForm.useForm();
 
-    const [editForm] = Form.useForm();
+    const [editForm] = ProForm.useForm();
 
     const [versionListModalVisible, setVersionListModalVisible] = React.useState<boolean>(false);
 
@@ -103,7 +98,6 @@ const Index: React.FC = () => {
 
     const [jsonEditorVisible, setJsonEditorVisible] = React.useState<boolean>(false);
     const [jsonEditorValue, setJsonEditorValue] = React.useState<string>('');
-    const jsonEditorRef = React.createRef<MonacoEditor>();
 
     const [importModalVisible, setImportModalVisible] = React.useState<boolean>(false);
 
@@ -198,7 +192,7 @@ const Index: React.FC = () => {
             <Space>
                 {intl.formatMessage({ id: 'page.designer.settings.title' })}
                 <span>{` - ${nodeConfig.displayName}`}</span>
-                <small>({nodeConfig.type})</small>
+                <Tag>{nodeConfig.type}</Tag>
             </Space>,
         );
 
@@ -345,7 +339,8 @@ const Index: React.FC = () => {
 
         console.debug('load form data: ', nodeData);
 
-        editNodeFormRef.resetFields();
+        // force update form value
+        // editNodeFormRef.resetFields();
         editNodeFormRef.setFieldsValue(nodeData);
 
         // show
@@ -641,6 +636,276 @@ const Index: React.FC = () => {
         setLoading(false);
     };
 
+    const updateMonacorEditorSciptProvider = () => {
+        const updateEditorScriptExtraLibs = async () => {
+            if (!definitionId) return;
+            console.debug('update javascript libs');
+
+            // update
+            const libContent = await getJavascriptEditorDefinitonsContent(definitionId);
+            if (libContent) {
+                const libs: {
+                    content: string;
+                    filePath: string;
+                }[] = [{ content: libContent, filePath: 'definiton.d.ts' }];
+                monaco.languages.typescript.javascriptDefaults.setExtraLibs(libs);
+
+                libs.forEach((x) => {
+                    const oldModel = monaco.editor.getModel(monaco.Uri.parse(x.filePath));
+
+                    if (oldModel) oldModel.dispose();
+
+                    monaco.editor.createModel(
+                        x.content,
+                        'typescript',
+                        monaco.Uri.parse(x.filePath),
+                    );
+                });
+            }
+
+            // update default
+            monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+                target: monaco.languages.typescript.ScriptTarget.ES5,
+                moduleResolution: monaco.languages.typescript.ModuleResolutionKind.Classic,
+                module: monaco.languages.typescript.ModuleKind.ES2015,
+                allowNonTsExtensions: true,
+                allowJs: true,
+                checkJs: true,
+            });
+        };
+
+        const registerCSharpLanguageProvider = () => {
+            console.debug('register CSharp language provider ');
+
+            const completionProvider = monaco.languages.registerCompletionItemProvider('csharp', {
+                triggerCharacters: [' ', '.'],
+                provideCompletionItems: async (model, position) => {
+                    const result = await getCSharpEditorLanguageProvider(
+                        definitionId!,
+                        'completion',
+                        {
+                            code: model.getValue(),
+                            position: model.getOffsetAt(position),
+                        },
+                    );
+
+                    const word = model.getWordUntilPosition(position);
+                    const range: monaco.IRange = {
+                        startLineNumber: position.lineNumber,
+                        endLineNumber: position.lineNumber,
+                        startColumn: word.startColumn,
+                        endColumn: word.endColumn,
+                    };
+
+                    if (result) {
+                        const suggestions: monaco.languages.CompletionItem[] = (
+                            result as API.MonacoCompletionItem[]
+                        ).map((x) => {
+                            return {
+                                label: {
+                                    label: x.suggestion!,
+                                    description: x.description,
+                                },
+                                insertText: x.suggestion ?? '',
+                                range: range,
+                                kind:
+                                    x.itemKind == MonacoCompletionItemKind.Function
+                                        ? monaco.languages.CompletionItemKind.Method
+                                        : x.itemKind == MonacoCompletionItemKind.Class
+                                        ? monaco.languages.CompletionItemKind.Class
+                                        : x.itemKind == MonacoCompletionItemKind.Field
+                                        ? monaco.languages.CompletionItemKind.Field
+                                        : x.itemKind == MonacoCompletionItemKind.Variable
+                                        ? monaco.languages.CompletionItemKind.Variable
+                                        : x.itemKind == MonacoCompletionItemKind.Property
+                                        ? monaco.languages.CompletionItemKind.Property
+                                        : x.itemKind == MonacoCompletionItemKind.Enum
+                                        ? monaco.languages.CompletionItemKind.Enum
+                                        : monaco.languages.CompletionItemKind.Text,
+                            };
+                        });
+                        return { suggestions: suggestions, dispose: () => {} };
+                    } else {
+                        return { suggestions: [] };
+                    }
+                },
+            });
+
+            const hoverProvider = monaco.languages.registerHoverProvider('csharp', {
+                provideHover: async (model, position) => {
+                    const result = (await getCSharpEditorLanguageProvider(
+                        definitionId!,
+                        'hoverinfo',
+                        {
+                            code: model.getValue(),
+                            position: model.getOffsetAt(position),
+                        },
+                    )) as API.WorkflowDesignerCSharpLanguageHoverProviderResult;
+                    if (result) {
+                        const posStart = model.getPositionAt(result.offsetFrom!);
+                        const posEnd = model.getPositionAt(result.offsetTo!);
+
+                        return {
+                            range: new monaco.Range(
+                                posStart.lineNumber,
+                                posStart.column,
+                                posEnd.lineNumber,
+                                posEnd.column,
+                            ),
+                            contents: [
+                                {
+                                    value: result.information!,
+                                },
+                            ],
+                        };
+                    } else {
+                        return null;
+                    }
+                },
+            });
+
+            const signatureProvider = monaco.languages.registerSignatureHelpProvider('csharp', {
+                signatureHelpTriggerCharacters: ['('],
+                signatureHelpRetriggerCharacters: [','],
+                provideSignatureHelp: async (model, position) => {
+                    const result = (await getCSharpEditorLanguageProvider(
+                        definitionId!,
+                        'signature',
+                        {
+                            code: model.getValue(),
+                            position: model.getOffsetAt(position),
+                        },
+                    )) as API.WorkflowDesignerCSharpLanguageSignatureProviderResult;
+                    if (result) {
+                        return {
+                            value: {
+                                activeParameter: result.activeParameter,
+                                activeSignature: result.activeSignature,
+                                signatures: (result.signatures ?? []).map((item) => {
+                                    return {
+                                        label: item.label ?? '',
+                                        documentation: item.documentation ?? '',
+                                        parameters: item.parameters,
+                                    };
+                                }) as monaco.languages.SignatureInformation[],
+                            },
+                            dispose: () => {},
+                        };
+                    } else {
+                        return null;
+                    }
+                },
+            });
+
+            const formamttingProvider = monaco.languages.registerDocumentFormattingEditProvider(
+                'csharp',
+                {
+                    provideDocumentFormattingEdits: async (model, options, token) => {
+                        const loading = message.loading('Formatting');
+                        const result = (await getCSharpEditorLanguageProvider(
+                            definitionId!,
+                            'format',
+                            {
+                                code: model.getValue(),
+                            },
+                        )) as API.WorkflowDesignerCSharpLanguageFormatterResult;
+
+                        loading();
+
+                        let formatted: monaco.languages.TextEdit;
+                        if (result) {
+                            formatted = {
+                                text: result.code ?? '',
+                                range: {
+                                    startColumn: 1,
+                                    startLineNumber: 1,
+                                    endColumn: model.getFullModelRange().endColumn,
+                                    endLineNumber: model.getFullModelRange().endLineNumber,
+                                },
+                            };
+                        } else {
+                            formatted = {
+                                text: model.getValue() ?? '',
+                                range: {
+                                    startColumn: 1,
+                                    startLineNumber: 1,
+                                    endColumn: model.getFullModelRange().endColumn,
+                                    endLineNumber: model.getFullModelRange().endLineNumber,
+                                },
+                            };
+                        }
+
+                        return [formatted] as monaco.languages.TextEdit[];
+                    },
+                },
+            );
+
+            //
+            const codeAnalysis = async (model: monaco.editor.ITextModel) => {
+                // check is dispose
+                if (model.isDisposed()) return;
+
+                const data = (await getCSharpEditorLanguageProvider(definitionId!, 'analysis', {
+                    code: model.getValue(),
+                })) as API.MonacoCodeAnalysisItem[];
+
+                // check again
+                if (model.isDisposed()) return;
+
+                const markers = (data ?? []).map((item: any) => {
+                    const fromPosition = model.getPositionAt(item.offsetFrom);
+                    const toPosition = model.getPositionAt(item.offsetTo);
+                    return {
+                        severity: item.severity,
+                        startLineNumber: fromPosition.lineNumber,
+                        startColumn: fromPosition.column,
+                        endLineNumber: toPosition.lineNumber,
+                        endColumn: toPosition.column,
+                        message: item.message,
+                        code: item.id,
+                    } as unknown as monaco.editor.IMarkerData;
+                });
+
+                // update markers
+                console.info('update markers: ', model.id, markers);
+                monaco.editor.setModelMarkers(model, 'csharp', markers);
+            };
+
+            const codeAnalysisProvider = monaco.editor.onDidCreateModel((model) => {
+                if (model.getLanguageId() != 'csharp') return;
+
+                // when content changed
+                model.onDidChangeContent(() => {
+                    // clear markers
+                    monaco.editor.setModelMarkers(model, 'csharp', []);
+                    // delay
+                    if (codeAnalysisTimer) window.clearTimeout(codeAnalysisTimer);
+                    codeAnalysisTimer = window.setTimeout(function () {
+                        monaco.editor.getModels().forEach((m) => {
+                            if (m.getLanguageId() == 'csharp') {
+                                codeAnalysis(m);
+                            }
+                        });
+                    }, 1500);
+                });
+
+                // call when create
+                codeAnalysis(model);
+            });
+
+            return {
+                completionProvider,
+                hoverProvider,
+                signatureProvider,
+                codeAnalysisProvider,
+                formamttingProvider,
+            };
+        };
+
+        updateEditorScriptExtraLibs();
+        return registerCSharpLanguageProvider();
+    };
+
     const loadData = async (did: string, version?: number) => {
         setLoading(true);
         let definitonVersion: API.WorkflowDefinitionVersion;
@@ -675,7 +940,7 @@ const Index: React.FC = () => {
         let timer: number | undefined = undefined;
         if (autoSaveEnabled) {
             timer = window.setInterval(() => {
-                console.info('auto save on ' + new Date());
+                console.debug('auto save on ' + new Date());
                 handleSaveGraphData(false);
             }, 10 * 1000);
         } else {
@@ -694,6 +959,22 @@ const Index: React.FC = () => {
     }, [fromDefinition]);
 
     useEffect(() => {
+        if (definitionId) {
+            const dispose = updateMonacorEditorSciptProvider();
+
+            return () => {
+                dispose.codeAnalysisProvider?.dispose();
+                dispose.completionProvider?.dispose();
+                dispose.hoverProvider?.dispose();
+                dispose.signatureProvider?.dispose();
+                dispose.formamttingProvider?.dispose();
+            };
+        }
+
+        return () => {};
+    }, [definitionId]);
+
+    useEffect(() => {
         // @ts-ignore
         const _id = (location.query?.id ?? '') as string | undefined;
         // @ts-ignore
@@ -709,7 +990,7 @@ const Index: React.FC = () => {
         if (!_id && !_fromId) {
             showCreateModal();
         }
-    }, []);
+    }, [0]);
 
     return (
         <PageContainer>
@@ -864,24 +1145,16 @@ const Index: React.FC = () => {
                     {jsonEditorVisible ? (
                         <div key="jsonEditorWapper" style={{ height: 'calc(100vh - 210px)' }}>
                             <MonacoEditor
-                                ref={jsonEditorRef}
                                 language="json"
-                                defaultValue={jsonEditorValue}
+                                minimap={true}
+                                value={jsonEditorValue}
                                 onChange={(value) => {
                                     setJsonEditorValue(value);
                                 }}
                                 options={{
-                                    minimap: { enabled: true },
-                                    wordWrap: 'bounded',
-                                    wordWrapColumn: 1024,
-                                    automaticLayout: true,
-                                    autoIndent: 'full',
-                                    tabSize: 2,
-                                    autoClosingBrackets: 'languageDefined',
-                                    foldingStrategy: 'auto',
                                     readOnly: false,
                                 }}
-                                editorDidMount={(e, m) => {
+                                onMount={(e, m) => {
                                     m.languages.json.jsonDefaults.setDiagnosticsOptions({
                                         validate: true,
                                         schemas: [
@@ -904,7 +1177,7 @@ const Index: React.FC = () => {
                     )}
                 </Spin>
             </Card>
-            {/*  */}
+            {/* settings */}
             <ModalForm
                 form={editForm}
                 layout="horizontal"
@@ -935,7 +1208,7 @@ const Index: React.FC = () => {
             >
                 <EditFormItems />
             </ModalForm>
-            {/*  */}
+            {/* node property */}
             <ModalForm
                 form={editNodeFormRef}
                 layout="horizontal"
@@ -946,35 +1219,22 @@ const Index: React.FC = () => {
                 labelCol={{ span: 5 }}
                 grid={true}
                 width={800}
-                // request={async () => {
-                //     return { success: true, data: editNodeData };
-                // }}
                 initialValues={editNodeFormData}
                 visible={nodeTypePropFormVisible}
                 scrollToFirstError
                 onVisibleChange={setNodeTypePropFormVisible}
+                autoFocusFirstInput
                 onFinish={async (formData) => {
-                    handleUpdateNodeProperties({
+                    await handleUpdateNodeProperties({
                         ...editNodeFormData,
                         ...formData,
                     } as NodeEditFormData);
                     return true;
                 }}
-                // onValuesChange={(v) => {
-                //     console.log(v);
-                // }}
             >
-                <NodePropForm
-                    workflowDefinitionId={definitionId}
-                    properties={nodeTypePropList}
-                    getFieldValue={editNodeFormRef.getFieldValue}
-                    setFieldsValue={editNodeFormRef.setFieldsValue}
-                    setFieldValue={(k, v) => {
-                        editNodeFormRef.setFields([{ name: k, value: v }]);
-                    }}
-                />
+                <NodePropForm workflowDefinitionId={definitionId} properties={nodeTypePropList} />
             </ModalForm>
-            {/*  */}
+            {/* version list */}
             <Modal
                 title={intl.formatMessage({ id: 'page.definition.versions' })}
                 destroyOnClose
@@ -1128,7 +1388,7 @@ const Index: React.FC = () => {
                     }}
                 />
             </Modal>
-            {/*  */}
+            {/* version diff */}
             <Modal
                 title={versionDiffModalTitle}
                 visible={versionDiffModalVisible}
@@ -1138,15 +1398,17 @@ const Index: React.FC = () => {
                 destroyOnClose
             >
                 <div style={{ height: 'calc(100vh - 150px)' }}>
-                    <MonacoDiffEditor
+                    <DiffEditor
                         language="json"
                         original={versionDiffData?.source}
-                        value={versionDiffData?.target}
+                        modified={versionDiffData?.target}
                         options={{
                             automaticLayout: true,
                             autoIndent: 'keep',
                             autoClosingBrackets: 'languageDefined',
                             foldingStrategy: 'auto',
+                            readOnly: true,
+                            minimap: { enabled: true },
                         }}
                     />
                 </div>
@@ -1190,7 +1452,7 @@ const Index: React.FC = () => {
                     fieldProps={{
                         multiple: false,
                         maxCount: 1,
-                        beforeUpload: (file) => {
+                        beforeUpload: () => {
                             return false;
                         },
                     }}

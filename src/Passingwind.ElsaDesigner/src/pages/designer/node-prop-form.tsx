@@ -1,5 +1,4 @@
 import { getDesignerRuntimeSelectListItems } from '@/services/Designer';
-import { API } from '@/services/typings';
 import { getWorkflowStorageProviders } from '@/services/Workflow';
 import ProForm, {
     ProFormCheckbox,
@@ -12,28 +11,151 @@ import ProForm, {
 } from '@ant-design/pro-form';
 import { Col, Divider, Row, Tabs } from 'antd';
 import type { NamePath } from 'antd/lib/form/interface';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useIntl } from 'umi';
 import CaseEditorInput from './form-input/case-editor-builder-input';
 import MonacorEditorInput from './form-input/monacor-editor-input';
-import {
-    getCSharpEditorLanguageProvider,
-    getEditorLanguage,
-    getJavascriptEditorDefinitonsContent,
-    getPropertySyntaxes,
-} from './service';
+import { getEditorLanguage, getPropertySyntaxes } from './service';
 import type { NodeTypeProperty } from './type';
 
 const defaultInputSpan = 20;
 const defaultSyntaxSpan = 4;
 
+const NodePropFormItem = (
+    inputName: NamePath,
+    value: any,
+    uiEditor: string,
+    propItem: NodeTypeProperty,
+    inputProps: any,
+    optionList: any,
+) => {
+    if (uiEditor == 'Default') {
+        switch (propItem.uiHint) {
+            case 'check-list':
+                return (
+                    <ProFormCheckbox.Group
+                        {...inputProps}
+                        name={inputName}
+                        options={optionList}
+                        rules={[{ required: propItem.isRequired }]}
+                    />
+                );
+            case 'checkbox':
+                return (
+                    <ProFormSwitch
+                        {...inputProps}
+                        name={inputName}
+                        rules={[{ required: propItem.isRequired }]}
+                    />
+                );
+            case 'dropdown':
+                return (
+                    <ProFormSelect
+                        {...inputProps}
+                        name={inputName}
+                        options={optionList}
+                        rules={[{ required: propItem.isRequired }]}
+                        fieldProps={{ showSearch: true }}
+                    />
+                );
+            case 'multi-text':
+                return (
+                    <ProFormSelect
+                        {...inputProps}
+                        name={inputName}
+                        options={optionList}
+                        fieldProps={{ mode: 'tags' }}
+                        rules={[{ required: propItem.isRequired }]}
+                    />
+                );
+            case 'multi-line':
+                return (
+                    <ProFormTextArea
+                        {...inputProps}
+                        name={inputName}
+                        fieldProps={{
+                            rows: 2,
+                            autoSize: { minRows: 2, maxRows: 10 },
+                            showCount: false,
+                        }}
+                        rules={[{ required: propItem.isRequired }]}
+                    />
+                );
+            case 'code-editor':
+                return (
+                    <Col span={defaultInputSpan}>
+                        <ProForm.Item
+                            label={inputProps.label}
+                            name={inputName}
+                            required={propItem.isRequired}
+                            rules={[{ required: propItem.isRequired }]}
+                        >
+                            <MonacorEditorInput
+                                height={150}
+                                language={getEditorLanguage(uiEditor)}
+                            />
+                        </ProForm.Item>
+                    </Col>
+                );
+            case 'switch-case-builder':
+                return (
+                    <Col span={defaultInputSpan}>
+                        <ProForm.Item
+                            label={inputProps.label}
+                            name={inputName}
+                            required={propItem.isRequired}
+                            rules={[{ required: propItem.isRequired }]}
+                        >
+                            <CaseEditorInput />
+                        </ProForm.Item>
+                    </Col>
+                );
+            default:
+                return (
+                    <ProFormText
+                        {...inputProps}
+                        name={inputName}
+                        rules={[{ required: propItem.isRequired }]}
+                    />
+                );
+        }
+    } else if (uiEditor == 'Switch') {
+        return (
+            <Col span={defaultInputSpan}>
+                <ProForm.Item
+                    label={inputProps.label}
+                    name={inputName}
+                    extra={inputProps.extra}
+                    required={propItem.isRequired}
+                    rules={[{ required: propItem.isRequired }]}
+                >
+                    <CaseEditorInput />
+                </ProForm.Item>
+            </Col>
+        );
+    }
+    return (
+        <Col span={defaultInputSpan}>
+            <ProForm.Item
+                label={inputProps.label}
+                name={inputName}
+                extra={inputProps.extra}
+                required={propItem.isRequired}
+                rules={[{ required: propItem.isRequired }]}
+            >
+                <MonacorEditorInput height={150} language={getEditorLanguage(uiEditor)} />
+            </ProForm.Item>
+        </Col>
+    );
+};
+
 type NodePropFormProps = {
     workflowDefinitionId?: string;
     properties: NodeTypeProperty[];
     // initialValues: object | undefined;
-    setFieldsValue: (value: any) => void;
-    setFieldValue: (key: NamePath, value: any) => void;
-    getFieldValue: (key: NamePath) => any;
+    // setFieldsValue: (value: any) => void;
+    // setFieldValue: (key: NamePath, value: any) => void;
+    // getFieldValue: (key: NamePath) => any;
 };
 
 const NodePropForm: React.FC<NodePropFormProps> = (props) => {
@@ -50,177 +172,12 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
         }
     }, []);
 
-    const getScriptDefinitonsContent = async () => {
-        if (!props.workflowDefinitionId) return '';
-        const result = await getJavascriptEditorDefinitonsContent(props.workflowDefinitionId);
-        return result;
-    };
-
-    const getCSharpLanguageProvider = async (provider: string, payload: any) => {
-        if (!props.workflowDefinitionId) return '';
-        const result = await getCSharpEditorLanguageProvider(
-            props.workflowDefinitionId,
-            provider,
-            payload,
-        );
-        return result;
-    };
-
     const loadStorageProviders = async () => {
         const result = await getWorkflowStorageProviders();
         setStorageProviders(result?.items ?? []);
     };
 
-    const renderItemInput = (
-        inputName: NamePath,
-        value: any,
-        uiEditor: string,
-        propItem: NodeTypeProperty,
-        inputProps: any,
-        optionList: any,
-    ) => {
-        if (uiEditor == 'Default') {
-            switch (propItem.uiHint) {
-                case 'check-list':
-                    return (
-                        <ProFormCheckbox.Group
-                            {...inputProps}
-                            name={inputName}
-                            options={optionList}
-                            rules={[{ required: propItem.isRequired }]}
-                        />
-                    );
-                case 'checkbox':
-                    return (
-                        <ProFormSwitch
-                            {...inputProps}
-                            name={inputName}
-                            rules={[{ required: propItem.isRequired }]}
-                        />
-                    );
-                case 'dropdown':
-                    return (
-                        <ProFormSelect
-                            {...inputProps}
-                            name={inputName}
-                            options={optionList}
-                            rules={[{ required: propItem.isRequired }]}
-                            fieldProps={{ showSearch: true }}
-                        />
-                    );
-                case 'multi-text':
-                    return (
-                        <ProFormSelect
-                            {...inputProps}
-                            name={inputName}
-                            options={optionList}
-                            fieldProps={{ mode: 'tags' }}
-                            rules={[{ required: propItem.isRequired }]}
-                        />
-                    );
-                case 'multi-line':
-                    return (
-                        <ProFormTextArea
-                            {...inputProps}
-                            name={inputName}
-                            fieldProps={{
-                                rows: 2,
-                                autoSize: { minRows: 2, maxRows: 10 },
-                                showCount: false,
-                            }}
-                            rules={[{ required: propItem.isRequired }]}
-                        />
-                    );
-                case 'code-editor':
-                    return (
-                        <Col span={defaultInputSpan}>
-                            <ProForm.Item
-                                label={inputProps.label}
-                                name={inputName}
-                                required={propItem.isRequired}
-                                rules={[{ required: propItem.isRequired }]}
-                            >
-                                <MonacorEditorInput
-                                    height={150}
-                                    language={getEditorLanguage(uiEditor)}
-                                    getJavaScriptLibs={async () => {
-                                        return [
-                                            {
-                                                content: await getScriptDefinitonsContent(),
-                                                filePath: 'script.d.ts',
-                                            },
-                                        ];
-                                    }}
-                                    getCSharpLanguageProviderRequest={getCSharpLanguageProvider}
-                                />
-                            </ProForm.Item>
-                        </Col>
-                    );
-                case 'switch-case-builder':
-                    return (
-                        <Col span={defaultInputSpan}>
-                            <ProForm.Item
-                                label={inputProps.label}
-                                name={inputName}
-                                required={propItem.isRequired}
-                                rules={[{ required: propItem.isRequired }]}
-                            >
-                                <CaseEditorInput />
-                            </ProForm.Item>
-                        </Col>
-                    );
-                default:
-                    return (
-                        <ProFormText
-                            {...inputProps}
-                            name={inputName}
-                            rules={[{ required: propItem.isRequired }]}
-                        />
-                    );
-            }
-        } else if (uiEditor == 'Switch') {
-            return (
-                <Col span={defaultInputSpan}>
-                    <ProForm.Item
-                        label={inputProps.label}
-                        name={inputName}
-                        extra={inputProps.extra}
-                        required={propItem.isRequired}
-                        rules={[{ required: propItem.isRequired }]}
-                    >
-                        <CaseEditorInput />
-                    </ProForm.Item>
-                </Col>
-            );
-        }
-        return (
-            <Col span={defaultInputSpan}>
-                <ProForm.Item
-                    label={inputProps.label}
-                    name={inputName}
-                    extra={inputProps.extra}
-                    required={propItem.isRequired}
-                    rules={[{ required: propItem.isRequired }]}
-                >
-                    <MonacorEditorInput
-                        height={150}
-                        language={getEditorLanguage(uiEditor)}
-                        getJavaScriptLibs={async () => {
-                            return [
-                                {
-                                    content: await getScriptDefinitonsContent(),
-                                    filePath: 'script.d.ts',
-                                },
-                            ];
-                        }}
-                        getCSharpLanguageProviderRequest={getCSharpLanguageProvider}
-                    />
-                </ProForm.Item>
-            </Col>
-        );
-    };
-
-    const renderFormItems = () => {
+    const renderProperties = () => {
         const formItems: React.ReactNode[] = [];
 
         (properties ?? []).forEach(async (propItem) => {
@@ -252,6 +209,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
             };
             if (isDynamicOptionItems) {
                 // provider request configure if 'runtimeSelectListProviderType' set.
+                //@ts-ignore
                 inputProps.request = async () => {
                     if (!isDynamicOptionItems) return fieldOptionItems;
                     //
@@ -267,6 +225,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                         };
                     });
                 };
+                //@ts-ignore
                 inputProps.fieldProps = { showSearch: true };
             }
 
@@ -293,7 +252,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
             formItems.push(
                 <ProFormGroup key={propItem.name}>
                     {propSyntax.editor ? (
-                        renderItemInput(
+                        NodePropFormItem(
                             [
                                 'props',
                                 propItem.name,
@@ -311,7 +270,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                             <ProFormDependency name={['name', ['props', propItem.name, 'syntax']]}>
                                 {({ props }) => {
                                     const syntax = props?.[propItem.name]?.syntax;
-                                    return renderItemInput(
+                                    return NodePropFormItem(
                                         ['props', propItem.name, 'expressions', syntax],
                                         propItem.defaultValue,
                                         syntax,
@@ -344,8 +303,6 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
         return formItems;
     };
 
-    const renderFormItemMemo = useMemo(() => renderFormItems(), [properties]);
-
     const getTabItems = () => {
         const items = [];
 
@@ -353,7 +310,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
             items.push({
                 key: 'properties',
                 label: intl.formatMessage({ id: 'page.designer.settings.properties' }),
-                children: <Row>{renderFormItemMemo}</Row>,
+                children: <Row>{renderProperties()}</Row>,
             });
         }
 
@@ -494,8 +451,6 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
 
         return items;
     };
-
-    useEffect(() => {}, []);
 
     useEffect(() => {
         loadStorageProviders();

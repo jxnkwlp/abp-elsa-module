@@ -4,35 +4,64 @@ using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 using Volo.Abp.Content;
 
-namespace Passingwind.Abp.ElsaModule.Workflow
+namespace Passingwind.Abp.ElsaModule.Workflow;
+
+[RemoteService]
+[Route("api/elsa/designer")]
+public class DesignerController : ElsaModuleController, IDesignerAppService
 {
-    [RemoteService]
-    [Route("api/elsa/designer")]
-    public class DesignerController : ElsaModuleController, IDesignerAppService
+    private readonly IDesignerAppService _service;
+
+    public DesignerController(IDesignerAppService service)
     {
-        private readonly IDesignerAppService _service;
+        _service = service;
+    }
 
-        public DesignerController(IDesignerAppService service)
-        {
-            _service = service;
-        }
+    [HttpGet("activity-types")]
+    public Task<ActivityTypeDescriptorListResultDto> GetActivityTypesAsync()
+    {
+        return _service.GetActivityTypesAsync();
+    }
 
-        [HttpGet("activity-types")]
-        public Task<ActivityTypeDescriptorListResultDto> GetActivityTypesAsync()
-        {
-            return _service.GetActivityTypesAsync();
-        }
+    [HttpPost("runtime-select-list")]
+    public Task<RuntimeSelectListResultDto> GetRuntimeSelectListItems(RuntimeSelectListContextDto input)
+    {
+        return _service.GetRuntimeSelectListItems(input);
+    }
 
-        [HttpPost("runtime-select-list")]
-        public Task<RuntimeSelectListResultDto> GetRuntimeSelectListItems(RuntimeSelectListContextDto input)
-        {
-            return _service.GetRuntimeSelectListItems(input);
-        }
+    [HttpGet("scripting/javascript/type-definitions/{id}")]
+    public Task<IRemoteStreamContent> GetJavaScriptTypeDefinitionAsync(Guid id)
+    {
+        return _service.GetJavaScriptTypeDefinitionAsync(id);
+    }
 
-        [HttpGet("scripting/javascript/type-definitions/{id}")]
-        public Task<IRemoteStreamContent> GetScriptTypeDefinitionAsync(Guid id)
-        {
-            return _service.GetScriptTypeDefinitionAsync(id);
-        }
+    [HttpPost("scripting/csharp/completions/{id}")]
+    public Task<WorkflowDesignerCSharpLanguageCompletionProviderResultDto> CSharpLanguageCompletionProviderAsync(Guid id, WorkflowDesignerCSharpLanguageCompletionProviderRequestDto input)
+    {
+        return _service.CSharpLanguageCompletionProviderAsync(id, input);
+    }
+
+    [HttpPost("scripting/csharp/hovers/{id}")]
+    public Task<WorkflowDesignerCSharpLanguageHoverProviderResultDto> CSharpLanguageHoverProviderAsync(Guid id, WorkflowDesignerCSharpLanguageHoverProviderRequestDto input)
+    {
+        return _service.CSharpLanguageHoverProviderAsync(id, input);
+    }
+
+    [HttpPost("scripting/csharp/signatures/{id}")]
+    public Task<WorkflowDesignerCSharpLanguageSignatureProviderResultDto> CSharpLanguageSignatureProviderAsync(Guid id, WorkflowDesignerCSharpLanguageSignatureProviderRequestDto input)
+    {
+        return _service.CSharpLanguageSignatureProviderAsync(id, input);
+    }
+
+    [HttpPost("scripting/csharp/analysis/{id}")]
+    public Task<WorkflowDesignerCSharpLanguageAnalysisResultDto> CSharpLanguageCodeAnalysisAsync(Guid id, WorkflowDesignerCSharpLanguageAnalysisRequestDto input)
+    {
+        return _service.CSharpLanguageCodeAnalysisAsync(id, input);
+    }
+
+    [HttpPost("scripting/csharp/format")]
+    public Task<WorkflowDesignerCSharpLanguageFormatterResult> CSharpLanguageCodeFormatterAsync(WorkflowDesignerCSharpLanguageFormatterRequestDto input)
+    {
+        return _service.CSharpLanguageCodeFormatterAsync(input);
     }
 }

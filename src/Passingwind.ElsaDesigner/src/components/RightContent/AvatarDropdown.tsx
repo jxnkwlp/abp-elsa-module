@@ -1,3 +1,4 @@
+import { getAbpApplicationConfiguration } from '@/services/AbpApplicationConfiguration';
 import { loginLogout } from '@/services/Login';
 import {
     KeyOutlined,
@@ -24,6 +25,8 @@ export type GlobalHeaderRightProps = {
  */
 const loginOut = async () => {
     await loginLogout();
+    // reload
+    await getAbpApplicationConfiguration();
     // const { query = {}, search, pathname } = history.location;
     // Note: There may be security issues, please note
     if (window.location.pathname !== '/auth/login') {

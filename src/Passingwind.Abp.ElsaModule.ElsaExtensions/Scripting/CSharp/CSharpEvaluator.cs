@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +26,7 @@ public class CSharpEvaluator : ICSharpEvaluator
     {
         string programText = text;
 
-        var scriptOptions = CreateDefaultOptions();
+        var scriptOptions = CreateOptions(evaluationContext.ScriptOptions.Imports, evaluationContext.ScriptOptions.Assemblies);
 
         optionsConfigure?.Invoke(scriptOptions);
 
@@ -52,7 +54,7 @@ public class CSharpEvaluator : ICSharpEvaluator
     {
         string programText = text;
 
-        var scriptOptions = CreateDefaultOptions();
+        var scriptOptions = CreateOptions(evaluationContext.ScriptOptions.Imports, evaluationContext.ScriptOptions.Assemblies);
 
         optionsConfigure?.Invoke(scriptOptions);
 
@@ -72,16 +74,17 @@ public class CSharpEvaluator : ICSharpEvaluator
         }
     }
 
-    private static ScriptOptions CreateDefaultOptions()
+    private static ScriptOptions CreateOptions(IEnumerable<string> imports, IEnumerable<Assembly> assemblies)
     {
         // default imports
-        var imports = new string[] {
+        var defaultImports = new string[] {
             "System",
-            "System.Dynamic",
-            "System.Collections",
-            "System.Collections.Concurrent",
-            "System.Linq",
             "System.Console",
+            "System.Collections",
+            "System.Collections.Generic",
+            "System.Collections.Concurrent",
+            "System.Dynamic",
+            "System.Linq",
             "System.Globalization",
             "System.IO",
             "System.Text",
@@ -92,19 +95,29 @@ public class CSharpEvaluator : ICSharpEvaluator
             "System.Threading.Tasks.Parallel",
             "System.Threading.Thread",
             "System.ValueTuple",
+            "System.Reflection",
         };
 
-        // add default references
+        // default references
+        var defaultReferences = new[] {
+            Assembly.Load("System.Runtime"), // System.Runtime.dll
+            Assembly.Load("netstandard"), // netstandard.dll
+            typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly,  // Microsoft.CSharp
+            typeof(System.Object).Assembly, // System.Private.CoreLib.dll
+            typeof(System.Console).Assembly,  // System.Console.dll 
+            typeof(System.Collections.Hashtable).Assembly,
+            typeof(System.Collections.Generic.List<>).Assembly,
+            typeof(System.ComponentModel.DescriptionAttribute).Assembly, // System.ComponentModel.Primitives.dll
+            typeof(System.Data.DataSet).Assembly, // System.Data.Common.dll
+            typeof(System.Xml.XmlDocument).Assembly, // System.Private.Xml.dll
+            typeof(System.ComponentModel.INotifyPropertyChanged).Assembly, // System.ObjectModel.dll
+            typeof(System.Linq.Enumerable).Assembly, // System.Linq.dll
+            typeof(System.Linq.Expressions.Expression).Assembly, // System.Linq.Expressions.dll
+        };
+
         var options = ScriptOptions.Default
-            .AddReferences(
-                typeof(System.Object).GetTypeInfo().Assembly,  // Add reference to mscorlib
-                typeof(System.Linq.Enumerable).GetTypeInfo().Assembly, // System.Linq
-                typeof(System.Dynamic.DynamicObject).Assembly,  // System.Code
-                typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly,  // Microsoft.CSharp
-                typeof(System.Dynamic.ExpandoObject).Assembly  // System.Dynamic 
-            )
-            .AddImports(imports)
-            ;
+            .AddReferences(defaultReferences.Concat(assemblies))
+            .AddImports(defaultImports.Concat(imports));
 
         return options;
     }

@@ -1,8 +1,8 @@
+import MonacoEditor from '@/components/MonacoEditor';
 import { ExpandOutlined } from '@ant-design/icons';
-import { Modal } from 'antd';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import type * as monaco from 'monaco-editor';
+import { Modal, Tag } from 'antd';
 import React, { useEffect } from 'react';
-import MonacoEditor from 'react-monaco-editor';
 import './monacor-editor-input.less';
 
 type MonacorEditorInputProps = {
@@ -13,28 +13,20 @@ type MonacorEditorInputProps = {
     width?: number;
     height?: number;
     options?: monaco.editor.IStandaloneEditorConstructionOptions;
-    getJavaScriptLibs?: () => Promise<{ content: string; filePath: string }[]>;
-    getCSharpLanguageProviderRequest?: (
-        provider: 'completion' | 'hoverinfo',
-        payload: any,
-    ) =>
-        | Promise<any>
-        | Promise<{ suggestion: string; description?: string }[]>
-        | Promise<{ description?: string }>;
 };
 
 const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
-    const ref = React.createRef<MonacoEditor>();
-    const ref2 = React.createRef<MonacoEditor>();
+    const { options } = props;
 
+    const [language] = React.useState(props.language || 'plaintext');
     const [value, setValue] = React.useState(props.value || '');
     const [isFullscreen, setIsFullscreen] = React.useState(false);
 
-    const [currentSize, setCurrentSize] = React.useState<{ w?: number; h: number }>();
+    const [currentSize] = React.useState<{ w?: number; h: number }>({ h: 150 });
 
     const handleValueChanged = (v: string) => {
-        props?.onChange?.(v);
         setValue(v);
+        props?.onChange?.(v);
     };
 
     const handleToggleFullScreen = () => {
@@ -42,95 +34,13 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
             setIsFullscreen(false);
         } else {
             setIsFullscreen(true);
-            ref2.current?.editor?.setValue(value);
-        }
-    };
-
-    const updateEditorScriptExtraLibs = async () => {
-        if (!props?.getJavaScriptLibs) return;
-
-        const libs = await props.getJavaScriptLibs();
-        if (libs?.length > 0) {
-            monaco.languages.typescript.javascriptDefaults.setExtraLibs(libs ?? []);
-
-            libs.forEach((x) => {
-                const oldModel = monaco.editor.getModel(monaco.Uri.parse(x.filePath));
-
-                if (oldModel) oldModel.dispose();
-
-                monaco.editor.createModel(x.content, 'typescript', monaco.Uri.parse(x.filePath));
-            });
-        }
-    };
-
-    const registerCSharpLanguageProvider = (monacoInstance: typeof monaco) => {
-        if (!props?.getCSharpLanguageProviderRequest) return;
-
-        // // monaco.languages.registerCompletionItemProvider;
-        // console.log(1);
-        // monacoInstance.languages.registerCompletionItemProvider('csharp', {
-        //     triggerCharacters: [' ', '.'],
-        //     provideCompletionItems: async (model, position) => {
-        //         console.log(model);
-        //         const result = await props?.getCSharpLanguageProviderRequest?.('completion', {
-        //             code: model.getValue(),
-        //             position: model.getOffsetAt(position),
-        //         });
-
-        //         if (result) {
-        //             const suggestions = result.map((x) => {
-        //                 return {
-        //                     label: {
-        //                         label: x.suggestion,
-        //                         description: x.description,
-        //                     },
-        //                     kind: monaco.languages.CompletionItemKind.Function,
-        //                     insertText: x.Suggestion,
-        //                 };
-        //             });
-        //             return { suggestions: suggestions };
-        //         } else {
-        //             return { suggestions: [] };
-        //         }
-        //     },
-        // });
-
-        // monacoInstance.languages.registerHoverProvider('csharp', {
-        //     provideHover: async (model, position, token) => {
-        //         const result = await props?.getCSharpLanguageProviderRequest?.('hoverinfo', {
-        //             code: model.getValue(),
-        //             position: model.getOffsetAt(position),
-        //         });
-
-        //         return { contents: [] };
-        //     },
-        // });
-    };
-
-    const onEditorMount = (
-        editor: monaco.editor.IStandaloneCodeEditor,
-        monacoInstance: typeof monaco,
-    ) => {
-        editor.setValue(value?.toString());
-
-        if (props.language == 'csharp') {
-            registerCSharpLanguageProvider(monacoInstance);
         }
     };
 
     useEffect(() => {
-        // setOriginSize({ w: props.width, h: props.height ?? 150 });
-        setCurrentSize({ w: props.width, h: props.height ?? 150 });
-    }, [0]);
-
-    useEffect(() => {
-        if (props.language == 'javascript') {
-            updateEditorScriptExtraLibs();
-        }
-        //  else if (props.language == 'csharp') {
-        // registerCSharpLanguageProvider();
-        // }
-    }, [props.language]);
+        // update
+        setValue(props?.value || '');
+    }, [props.value]);
 
     return (
         <div
@@ -149,24 +59,12 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
             }}
         >
             <MonacoEditor
-                ref={ref}
-                language={props.language}
-                onChange={(v) => {
-                    handleValueChanged(v);
-                }}
-                options={{
-                    minimap: { enabled: isFullscreen },
-                    wordWrap: 'bounded',
-                    wordWrapColumn: 1024,
-                    automaticLayout: true,
-                    autoIndent: 'full',
-                    tabSize: 2,
-                    autoClosingBrackets: 'languageDefined',
-                    foldingStrategy: 'auto',
-                    ...props?.options,
-                }}
-                editorDidMount={(e, m) => {
-                    onEditorMount(e, m);
+                value={value}
+                language={language}
+                minimap={false}
+                options={options}
+                onChange={(value) => {
+                    handleValueChanged(value);
                 }}
             />
             <div className="fullscreen-toggle">
@@ -176,8 +74,12 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
             </div>
 
             <Modal
-                title="Edit"
-                visible={isFullscreen}
+                title={
+                    <>
+                        Edit <Tag>{language}</Tag>
+                    </>
+                }
+                open={isFullscreen}
                 onCancel={() => setIsFullscreen(false)}
                 onOk={() => {
                     setIsFullscreen(false);
@@ -203,24 +105,12 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                     }}
                 >
                     <MonacoEditor
-                        ref={ref2}
-                        language={props.language}
-                        onChange={(v) => {
-                            ref.current?.editor?.setValue(v);
-                        }}
-                        options={{
-                            minimap: { enabled: isFullscreen },
-                            wordWrap: 'bounded',
-                            wordWrapColumn: 1024,
-                            automaticLayout: true,
-                            autoIndent: 'full',
-                            tabSize: 2,
-                            autoClosingBrackets: 'languageDefined',
-                            foldingStrategy: 'auto',
-                            ...props?.options,
-                        }}
-                        editorDidMount={(e, m) => {
-                            onEditorMount(e, m);
+                        value={value}
+                        language={language}
+                        minimap={true}
+                        options={options}
+                        onChange={(value) => {
+                            handleValueChanged(value);
                         }}
                     />
                 </div>

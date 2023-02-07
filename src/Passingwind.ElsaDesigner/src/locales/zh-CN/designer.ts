@@ -4,7 +4,7 @@ export default {
     'page.designer.settings.properties': '属性',
     'page.designer.settings.common': '通用',
     'page.designer.settings.storage': '存储',
-    'page.designer.settings.activityOutputStorageProvider': '活动输出存储',
+    'page.designer.settings.activityOutputStorageProvider': '存储选项',
     'page.designer.settings.field.name': '名称',
     'page.designer.settings.field.name.tips': '活动的技术名称。',
     'page.designer.settings.field.displayName': '显示名称',
