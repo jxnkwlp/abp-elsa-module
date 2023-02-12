@@ -1,7 +1,7 @@
 import { createApiKey, deleteApiKey, getApiKeyList } from '@/services/ApiKey';
 import type { API } from '@/services/typings';
 import { formatDateTimeToUtc, randString } from '@/services/utils';
-import type { ActionType, ProColumnType } from '@ant-design/pro-components';
+import { ActionType, ProColumnType, ProForm } from '@ant-design/pro-components';
 import {
     ModalForm,
     PageContainer,

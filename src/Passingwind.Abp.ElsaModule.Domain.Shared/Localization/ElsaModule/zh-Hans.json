@@ -1,8 +1,25 @@
 {
   "culture": "zh-Hans",
   "texts": {
-    "MyAccount": "我的账户",
-    "SamplePageMessage": "ElsaModule模块的示例页面",
-    "ElsaModule:WorkflowDefinition:NameExists": "定义名称'{name}'已经存在"
+    "WorkflowDefinition.NameExists": "定义名称'{name}'已经存在",
+
+    "Permission:ElsaModule": "Workflow(Elsa) 模块",
+
+    "Permission:Create": "创建",
+    "Permission:Update": "编辑",
+    "Permission:Delete": "删除",
+
+    "Permission:Instance": "实例管理",
+    "Permission:Instance.Acton": "操作",
+    "Permission:Instance.Statistic": "统计",
+    "Permission:Instance.Data": "查看详细数据",
+
+    "Permission:Definition": "定义管理",
+    "Permission:Definition.Publish": "保存或发布",
+    "Permission:Definition.Dispatch": "触发或发起",
+    "Permission:Definition.Export": "导出",
+    "Permission:Definition.Import": "导入",
+
+    "Permission:GlobalVariables": "全局变量管理"
   }
 }

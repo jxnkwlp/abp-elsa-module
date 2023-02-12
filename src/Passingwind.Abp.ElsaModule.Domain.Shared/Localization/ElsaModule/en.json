@@ -1,8 +1,25 @@
 {
   "culture": "en",
   "texts": {
-    "MyAccount": "My account",
-    "SamplePageMessage": "A sample page for the ElsaModule module",
-    "ElsaModule:WorkflowDefinition:NameExists": "Workflow definition name '{name}' exists"
+    "WorkflowDefinition.NameExists": "Workflow definition name '{name}' exists",
+
+    "Permission:ElsaModule": "Workflow(Elsa) management",
+
+    "Permission:Create": "Create",
+    "Permission:Update": "Edit",
+    "Permission:Delete": "Delete",
+
+    "Permission:Instance": "Instance management",
+    "Permission:Instance.Acton": "Acton",
+    "Permission:Instance.Statistic": "Statistic",
+    "Permission:Instance.Data": "View data",
+
+    "Permission:Definition": "Definition management",
+    "Permission:Definition.Publish": "Publish or save",
+    "Permission:Definition.Dispatch": "Dispatch",
+    "Permission:Definition.Export": "Export",
+    "Permission:Definition.Import": "Import",
+
+    "Permission:GlobalVariables": "Global variables management"
   }
 }

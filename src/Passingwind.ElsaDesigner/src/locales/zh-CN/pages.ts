@@ -63,6 +63,7 @@ export default {
     'page.dashboard.statistics.status.running': '运行中',
     'page.dashboard.statistics.status.suspended': '挂起',
     //
+    'page.definitions.view': '查看',
     'page.definition.edit.basic': '基本信息',
     'page.definition.edit.variables': '变量',
     'page.definition.edit.workflowContext': '上下文',
@@ -162,6 +163,7 @@ export default {
     'page.instance.status.cancelled': '已取消',
     'page.instance.notFound': '工作流程实例不存在',
     'page.instance.reload': '刷新',
+    'page.instance.toDefinition': '转到定义',
     //
     'page.variable.field.key': '名称',
     'page.variable.field.value': '值',

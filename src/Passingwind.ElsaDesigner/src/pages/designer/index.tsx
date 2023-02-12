@@ -24,7 +24,7 @@ import type { RcFile } from 'antd/lib/upload';
 import { isArray } from 'lodash';
 import * as monaco from 'monaco-editor';
 import React, { useEffect, useRef } from 'react';
-import { useHistory, useIntl, useLocation } from 'umi';
+import { useAccess, useHistory, useIntl, useLocation } from 'umi';
 import EditFormItems from '../definition/edit-form-items';
 import definitionJsonSchema from './definition-json-schema';
 import type { FlowActionType } from './flow';
@@ -52,6 +52,7 @@ let codeAnalysisTimer = 0;
 const Index: React.FC = () => {
     const location = useLocation();
     const history = useHistory();
+    const access = useAccess();
 
     const intl = useIntl();
 
@@ -1026,28 +1027,34 @@ const Index: React.FC = () => {
                 }
                 extra={
                     <Space>
-                        <Button
-                            type="primary"
-                            disabled={!definition?.name}
-                            loading={submiting}
-                            icon={<GlobalOutlined />}
-                            onClick={async () => {
-                                await handleSaveGraphData(true);
-                            }}
-                        >
-                            {intl.formatMessage({ id: 'page.definition.publish' })}
-                        </Button>
-                        <Button
-                            type="default"
-                            disabled={!definition?.name}
-                            loading={submiting}
-                            icon={<SaveOutlined />}
-                            onClick={async () => {
-                                await handleSaveGraphData();
-                            }}
-                        >
-                            {intl.formatMessage({ id: 'common.dict.save' })}
-                        </Button>
+                        {access['ElsaModule.Definitions.Publish'] ? (
+                            <>
+                                <Button
+                                    type="primary"
+                                    disabled={!definition?.name}
+                                    loading={submiting}
+                                    icon={<GlobalOutlined />}
+                                    onClick={async () => {
+                                        await handleSaveGraphData(true);
+                                    }}
+                                >
+                                    {intl.formatMessage({ id: 'page.definition.publish' })}
+                                </Button>
+                                <Button
+                                    type="default"
+                                    disabled={!definition?.name}
+                                    loading={submiting}
+                                    icon={<SaveOutlined />}
+                                    onClick={async () => {
+                                        await handleSaveGraphData();
+                                    }}
+                                >
+                                    {intl.formatMessage({ id: 'common.dict.save' })}
+                                </Button>
+                            </>
+                        ) : (
+                            <></>
+                        )}
 
                         <Dropdown.Button
                             disabled={submiting || !definition?.name}
@@ -1090,6 +1097,7 @@ const Index: React.FC = () => {
                                     <Menu.Divider />
                                     <Menu.Item
                                         key="export"
+                                        disabled={!access['ElsaModule.Definitions.Export']}
                                         onClick={() => {
                                             handleOnExport();
                                         }}
@@ -1098,6 +1106,7 @@ const Index: React.FC = () => {
                                     </Menu.Item>
                                     <Menu.Item
                                         key="import"
+                                        disabled={!access['ElsaModule.Definitions.Import']}
                                         onClick={() => {
                                             setImportModalVisible(true);
                                         }}
@@ -1107,6 +1116,7 @@ const Index: React.FC = () => {
                                     <Menu.Divider />
                                     <Menu.Item
                                         key="autoSave"
+                                        disabled={!access['ElsaModule.Definitions.Publish']}
                                         onClick={() => {
                                             if (autoSaveEnabled) {
                                                 message.info(
@@ -1322,6 +1332,7 @@ const Index: React.FC = () => {
                             valueType: 'option',
                             width: 80,
                             align: 'center',
+                            hideInTable: !access['ElsaModule.Definitions.Delete'],
                             render: (text, record, _, action) => {
                                 return (
                                     <Popconfirm

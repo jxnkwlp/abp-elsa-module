@@ -46,6 +46,7 @@ export default {
     'common.http.response.error.requestFailed': 'Request failed',
     'common.http.response.error.networkError1': 'network anomaly',
     'common.http.response.error.networkError2': 'Your network is abnormal, unable to connect to the server',
+    'common.noaccess': 'You do not have the necessary permission to view this area or page.',
     ...globalHeader,
     ...menu,
     ...settingDrawer,

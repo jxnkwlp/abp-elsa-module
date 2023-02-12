@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import { FormattedMessage, history, SelectLang, useIntl, useModel } from 'umi';
 
 import { loginLogin } from '@/services/Login';
-import type { API } from '@/services/typings';
 import styles from './index.less';
 
 const LoginMessage: React.FC<{
@@ -24,18 +23,12 @@ const LoginMessage: React.FC<{
 
 const Login: React.FC = () => {
     const [type, setType] = useState<string>('account');
-    const { initialState, setInitialState } = useModel('@@initialState');
+    const { initialState, setInitialState, refresh } = useModel('@@initialState');
 
     const intl = useIntl();
 
     const fetchUserInfo = async () => {
-        const userInfo = await initialState?.fetchUserInfo?.();
-        if (userInfo) {
-            await setInitialState((s) => ({
-                ...s,
-                currentUser: userInfo,
-            }));
-        }
+        await refresh();
     };
 
     const handleSubmit = async (values: any) => {

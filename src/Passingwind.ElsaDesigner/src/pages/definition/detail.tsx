@@ -9,7 +9,7 @@ import { DownOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Card, Dropdown, Modal, Space, Tag } from 'antd';
 import React, { useEffect, useRef } from 'react';
-import { useHistory, useIntl, useParams } from 'umi';
+import { useAccess, useHistory, useIntl, useParams } from 'umi';
 import type { FlowActionType } from '../designer/flow';
 import Flow from '../designer/flow';
 import { conventToGraphData } from '../designer/service';
@@ -20,6 +20,7 @@ const Index: React.FC = () => {
     const history = useHistory();
     const params = useParams();
     const intl = useIntl();
+    const access = useAccess();
 
     const flowAction = useRef<FlowActionType>();
 
@@ -109,19 +110,23 @@ const Index: React.FC = () => {
             title={title}
             extra={
                 <Space>
-                    <Button
-                        type="primary"
-                        disabled={!data}
-                        onClick={() => history.push(`/designer?id=${data!.id}`)}
-                    >
-                        {intl.formatMessage({ id: 'page.definition.designer' })}
-                    </Button>
+                    {access['ElsaModule.Definitions.Publish'] ? (
+                        <Button
+                            type="primary"
+                            disabled={!data}
+                            onClick={() => history.push(`/designer?id=${data!.id}`)}
+                        >
+                            {intl.formatMessage({ id: 'page.definition.designer' })}
+                        </Button>
+                    ) : (
+                        <></>
+                    )}
                 </Space>
             }
         >
             <Card
                 loading={loading}
-                title={<Tag>{`version: ${versionData?.version}`}</Tag>}
+                title={<Tag>{`version: ${versionData?.version ?? '-'}`}</Tag>}
                 extra={
                     <Dropdown
                         menu={{

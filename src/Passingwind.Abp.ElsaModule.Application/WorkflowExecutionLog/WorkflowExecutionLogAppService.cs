@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Passingwind.Abp.ElsaModule.Permissions;
 using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Common;
 
-[Authorize]
+[Authorize(Policy = ElsaModulePermissions.Instances.Default)]
 public class WorkflowExecutionLogAppService : ElsaModuleAppService, IWorkflowExecutionLogAppService
 {
     private readonly IWorkflowExecutionLogRepository _workflowExecutionLogRepository;

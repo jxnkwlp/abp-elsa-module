@@ -4,12 +4,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.GlobalVariables;
+using Passingwind.Abp.ElsaModule.Permissions;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Workflow;
 
-[Authorize]
+[Authorize(Policy = ElsaModulePermissions.GlobalVariables.Default)]
 public class GlobalVariableAppService : ElsaModuleAppService, IGlobalVariableAppService
 {
     private readonly IGlobalVariableRepository _globalVariableRepository;
@@ -19,6 +20,7 @@ public class GlobalVariableAppService : ElsaModuleAppService, IGlobalVariableApp
         _globalVariableRepository = globalVariableRepository;
     }
 
+    [Authorize(Policy = ElsaModulePermissions.GlobalVariables.Create)]
     public async Task<GlobalVariableDto> CreateAsync(GlobalVariableCreateOrUpdateDto input)
     {
         var exists = await _globalVariableRepository.FindAsync(input.Key);
@@ -38,6 +40,7 @@ public class GlobalVariableAppService : ElsaModuleAppService, IGlobalVariableApp
         return ObjectMapper.Map<GlobalVariable, GlobalVariableDto>(entity);
     }
 
+    [Authorize(Policy = ElsaModulePermissions.GlobalVariables.Delete)]
     public async Task DeleteAsync(Guid id)
     {
         await _globalVariableRepository.DeleteAsync(id);
@@ -83,6 +86,7 @@ public class GlobalVariableAppService : ElsaModuleAppService, IGlobalVariableApp
         return new PagedResultDto<GlobalVariableDto>(count, result);
     }
 
+    [Authorize(Policy = ElsaModulePermissions.GlobalVariables.Update)]
     public async Task<GlobalVariableDto> UpdateAsync(Guid id, GlobalVariableCreateOrUpdateDto input)
     {
         var entity = await _globalVariableRepository.GetAsync(id);

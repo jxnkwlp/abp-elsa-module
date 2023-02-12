@@ -36,12 +36,13 @@ export const initialStateConfig = {
 export async function getInitialState(): Promise<{
     settings?: Partial<LayoutSettings>;
     currentUser?: API.CurrentUser;
+    grantedPolicies?: Record<string, boolean>;
     loading?: boolean;
     fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
     const loadData = async () => {
         const result = await getAbpApplicationConfiguration();
-        return result?.currentUser;
+        return result;
     };
 
     // if (isDev) {
@@ -58,22 +59,34 @@ export async function getInitialState(): Promise<{
     //     };
     // }
 
-    const user = await loadData();
+    const { currentUser, auth } = await loadData();
 
-    if (!user?.isAuthenticated) {
+    if (!currentUser?.isAuthenticated) {
         history.replace('/auth/login');
         return {
             settings: defaultSettings,
-            currentUser: user,
+            currentUser: currentUser,
+            grantedPolicies: {},
             loading: true,
-            fetchUserInfo: loadData,
+            fetchUserInfo: async () => (await loadData())?.currentUser,
         };
     }
 
+    const allPolicies: Record<string, boolean> = auth?.policies ?? {};
+    const grantedPolicies: Record<string, boolean> = auth?.grantedPolicies ?? {};
+
+    let currentPolicies = Object.fromEntries(
+        Object.keys(allPolicies).map((x) => {
+            return [[x], false];
+        }),
+    );
+    currentPolicies = Object.assign({}, currentPolicies, grantedPolicies);
+
     return {
         settings: defaultSettings,
-        currentUser: user,
-        fetchUserInfo: loadData,
+        currentUser: currentUser,
+        grantedPolicies: currentPolicies,
+        fetchUserInfo: async () => (await loadData())?.currentUser,
     };
 }
 
@@ -85,7 +98,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         footerRender: () => <Footer />,
         onPageChange: () => {
             const { location } = history;
-            if (isDev) console.log(location);
+            console.debug(location);
             // 如果没有登录，重定向到 login
             if (!initialState?.currentUser && location.pathname !== loginPath) {
                 history.push(loginPath);
@@ -132,25 +145,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     };
 };
 
-// const httpRequestCodeMessage: Record<number, string> = {
-//     200: '服务器成功返回请求的数据。',
-//     201: '新建或修改数据成功。',
-//     202: '一个请求已经进入后台排队（异步任务）。',
-//     204: '删除数据成功。',
-//     400: '发出的请求有错误。',
-//     401: '未授权，请先登录',
-//     403: '无权访问',
-//     404: '请求的资源不存在',
-//     406: '请求的格式不可得。',
-//     410: '请求的资源被永久删除，且不会再得到的。',
-//     422: '当创建一个对象时，发生一个验证错误。',
-//     500: '服务器发生错误，请检查服务器。',
-//     501: '网关错误。',
-//     502: '网关错误。',
-//     503: '服务不可用，服务器暂时过载或维护。',
-//     504: '网关超时。',
-// };
-
 const httpRequestCodeMessageDefaults: Record<number, string> = {
     200: 'The server successfully returned the requested data. ',
     201: 'Create or modify data successfully. ',
@@ -158,7 +152,7 @@ const httpRequestCodeMessageDefaults: Record<number, string> = {
     204: 'Delete data successfully. ',
     400: 'There was an error in the request issued. ',
     401: 'Unauthorized, please log in first. ',
-    403: 'No access. ',
+    403: 'Do not have the necessary permission. ',
     404: 'The requested resource does not exist. ',
     406: 'The requested format is not available. ',
     410: 'The requested resource has been permanently deleted and will no longer be available. ',

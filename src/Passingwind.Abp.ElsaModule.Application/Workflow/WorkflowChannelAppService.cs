@@ -3,11 +3,12 @@ using System.Threading.Tasks;
 using Elsa.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using Passingwind.Abp.ElsaModule.Permissions;
 using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Workflow;
 
-[Authorize]
+[Authorize(Policy = ElsaModulePermissions.Definitions.Publish)]
 public class WorkflowChannelAppService : ElsaModuleAppService, IWorkflowChannelAppService
 {
     private readonly ElsaOptions _elsaOptions;

@@ -65,6 +65,7 @@ export default {
     'page.dashboard.statistics.status.running': 'Running',
     'page.dashboard.statistics.status.suspended': 'Suspended',
     //
+    'page.definitions.view': 'View',
     'page.definition.edit.basic': 'Basic',
     'page.definition.edit.variables': 'Variables',
     'page.definition.edit.workflowContext': 'Workflow Context',
@@ -164,6 +165,7 @@ export default {
     'page.instance.status.cancelled': 'Cancelled',
     'page.instance.notFound': 'The workflow instance does not exist',
     'page.instance.reload': 'Reload',
+    'page.instance.toDefinition': 'Go to definition',
     //
     'page.variable.field.key': 'Key',
     'page.variable.field.value': 'Value',

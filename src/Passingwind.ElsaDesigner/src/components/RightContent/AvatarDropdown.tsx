@@ -23,12 +23,9 @@ export type GlobalHeaderRightProps = {
 /**
  * 退出登录，并且将当前的 url 保存
  */
-const loginOut = async () => {
+const loginOut = async (refresh: any) => {
     await loginLogout();
-    // reload
-    await getAbpApplicationConfiguration();
-    // const { query = {}, search, pathname } = history.location;
-    // Note: There may be security issues, please note
+    refresh();
     if (window.location.pathname !== '/auth/login') {
         history.replace({
             pathname: '/auth/login',
@@ -37,20 +34,19 @@ const loginOut = async () => {
 };
 
 const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
-    const { initialState, setInitialState } = useModel('@@initialState');
+    const { initialState, setInitialState, refresh } = useModel('@@initialState');
     const intl = useIntl();
 
     const onMenuClick = useCallback(
         (event: MenuInfo) => {
             const { key } = event;
             if (key === 'logout') {
-                setInitialState((s) => ({ ...s, currentUser: undefined }));
-                loginOut();
+                loginOut(refresh);
                 return;
             }
             history.push(`/account/${key}`);
         },
-        [setInitialState],
+        [0],
     );
 
     const loading = (

@@ -12,6 +12,7 @@ using Elsa.Services;
 using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Monacos.Providers;
+using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.Stores;
 using Volo.Abp.Auditing;
 using Volo.Abp.Content;
@@ -19,7 +20,7 @@ using Volo.Abp.Content;
 namespace Passingwind.Abp.ElsaModule.Workflow;
 
 [DisableAuditing]
-[Authorize]
+[Authorize(Policy = ElsaModulePermissions.Definitions.Publish)]
 public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 {
     private readonly IActivityTypeService _activityTypeService;

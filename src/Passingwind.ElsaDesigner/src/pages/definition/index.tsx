@@ -17,7 +17,7 @@ import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import { Button, Form, message, Modal, Typography } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import { formatMessage, Link, useHistory, useIntl } from 'umi';
+import { formatMessage, Link, useAccess, useHistory, useIntl } from 'umi';
 import EditFormItems from './edit-form-items';
 
 const handleEdit = async (id: string, data: any) => {
@@ -40,6 +40,7 @@ const handleDelete = async (id: string) => {
 
 const Index: React.FC = () => {
     const intl = useIntl();
+    const access = useAccess();
 
     const searchFormRef = useRef<ProFormInstance>();
     const tableActionRef = useRef<ActionType>();
@@ -137,20 +138,27 @@ const Index: React.FC = () => {
         {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
-            width: 110,
+            width: 120,
             align: 'center',
             fixed: 'right',
             render: (text, record, _, action) => [
-                <a
-                    key="designer"
-                    onClick={() => {
-                        history.push('/designer?id=' + record.id);
+                <Link
+                    key="view"
+                    to={{
+                        pathname: `/definitions/${record.id}`,
                     }}
                 >
-                    {intl.formatMessage({
-                        id: 'page.definition.designer',
-                    })}
-                </a>,
+                    {intl.formatMessage({ id: 'page.definitions.view' })}
+                </Link>,
+                access['ElsaModule.Definitions.Publish'] ? (
+                    <Link to={'/designer?id=' + record.id}>
+                        {intl.formatMessage({
+                            id: 'page.definition.designer',
+                        })}
+                    </Link>
+                ) : (
+                    <></>
+                ),
                 <TableDropdown
                     key="actionGroup"
                     onSelect={async (key) => {
@@ -213,11 +221,14 @@ const Index: React.FC = () => {
                         {
                             key: 'edit',
                             name: intl.formatMessage({ id: 'page.definition.settings' }),
+                            disabled: !access['ElsaModule.Definitions.Publish'],
                         },
                         {
                             key: 'dispatch',
                             name: intl.formatMessage({ id: 'page.definition.dispatch' }),
-                            disabled: !record.publishedVersion,
+                            disabled:
+                                !record.publishedVersion ||
+                                !access['ElsaModule.Definitions.Dispatch'],
                         },
                         {
                             type: 'divider',
@@ -225,12 +236,16 @@ const Index: React.FC = () => {
                         {
                             key: 'publish',
                             name: intl.formatMessage({ id: 'page.definition.publish' }),
-                            disabled: record.publishedVersion != null,
+                            disabled:
+                                record.publishedVersion != null ||
+                                !access['ElsaModule.Definitions.Publish'],
                         },
                         {
                             key: 'unpublish',
                             name: intl.formatMessage({ id: 'page.definition.unpublish' }),
-                            disabled: record.publishedVersion == null,
+                            disabled:
+                                record.publishedVersion == null ||
+                                !access['ElsaModule.Definitions.Publish'],
                         },
                         {
                             type: 'divider',
@@ -238,6 +253,7 @@ const Index: React.FC = () => {
                         {
                             key: 'copyable',
                             name: intl.formatMessage({ id: 'page.definition.copyable' }),
+                            disabled: !access['ElsaModule.Definitions.Publish'],
                         },
                         {
                             type: 'divider' as const,
@@ -246,6 +262,7 @@ const Index: React.FC = () => {
                             key: 'delete',
                             name: intl.formatMessage({ id: 'common.dict.delete' }),
                             danger: true,
+                            disabled: !access['ElsaModule.Definitions.Delete'],
                         },
                     ]}
                 />,
@@ -275,15 +292,19 @@ const Index: React.FC = () => {
                 scroll={{ x: 1300 }}
                 rowKey="id"
                 toolBarRender={() => [
-                    <Button
-                        key="add"
-                        type="primary"
-                        onClick={() => {
-                            history.push('/designer');
-                        }}
-                    >
-                        {intl.formatMessage({ id: 'common.dict.create' })}
-                    </Button>,
+                    access['ElsaModule.Definitions.Publish'] ? (
+                        <Button
+                            key="add"
+                            type="primary"
+                            onClick={() => {
+                                history.push('/designer');
+                            }}
+                        >
+                            {intl.formatMessage({ id: 'common.dict.create' })}
+                        </Button>
+                    ) : (
+                        <></>
+                    ),
                 ]}
                 onReset={() => {
                     // clear filter & pagination & sorting

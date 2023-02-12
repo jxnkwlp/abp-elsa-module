@@ -3,5 +3,5 @@
 public static class ElsaModuleErrorCodes
 {
     //Add your business exception error codes here...
-    public const string WorkflowDefinitionNameExists = "ElsaModule:WorkflowDefinition:NameExists";
+    public const string WorkflowDefinitionNameExists = "WorkflowDefinition.NameExists";
 }

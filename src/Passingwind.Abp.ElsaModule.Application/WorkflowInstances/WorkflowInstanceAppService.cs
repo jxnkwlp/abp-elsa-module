@@ -4,16 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Elsa.Services;
 using Microsoft.AspNetCore.Authorization;
+using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.Stores;
-using Passingwind.Abp.ElsaModule.WorkflowInstances;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
 using Volo.Abp.Json;
+using WorkflowExecutionLog = Passingwind.Abp.ElsaModule.Common.WorkflowExecutionLog;
 
-namespace Passingwind.Abp.ElsaModule.Common;
+namespace Passingwind.Abp.ElsaModule.WorkflowInstances;
 
-[Authorize]
+[Authorize(Policy = ElsaModulePermissions.Instances.Default)]
 public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanceAppService
 {
     private readonly IJsonSerializer _jsonSerializer;
@@ -51,6 +53,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         _workflowInstanceStatusCountStatisticsDistributedCache = workflowInstanceStatusCountStatisticsDistributedCache;
     }
 
+    [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
     public async Task CancelAsync(Guid id)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id);
@@ -60,14 +63,13 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
             var result = await _workflowInstanceCanceller.CancelAsync(id.ToString());
 
             if (result.Status == CancelWorkflowInstanceResultStatus.InvalidStatus)
-            {
                 throw new UserFriendlyException($"Cannot cancel a workflow instance with status {result.WorkflowInstance!.WorkflowStatus}");
-            }
         }
         else
             throw new UserFriendlyException($"Cannot cancel a workflow instance with status {entity.WorkflowStatus}");
     }
 
+    [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
     public virtual async Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id);
@@ -76,19 +78,18 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
         if (input.RunImmediately == false)
         {
-            var workflowInstance = await _workflowReviver.ReviveAndQueueAsync(instance);
+            await _workflowReviver.ReviveAndQueueAsync(instance);
         }
         else
         {
             var result = await _workflowReviver.ReviveAndRunAsync(instance);
 
             if (result.WorkflowInstance.WorkflowStatus == Elsa.Models.WorkflowStatus.Faulted)
-            {
                 throw new UserFriendlyException($"Workflow instance {result.WorkflowInstance.Id} has faulted");
-            }
         }
     }
 
+    [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
     public virtual async Task DispatchAsync(Guid id, WorkflowInstanceDispatchRequestDto input)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id);
@@ -97,6 +98,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         await _workflowLaunchpad.DispatchPendingWorkflowAsync(id.ToString(), input.ActivityId?.ToString(), input.Input);
     }
 
+    [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
     public async Task ExecuteAsync(Guid id, WorkflowInstanceExecuteRequestDto input)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id);
@@ -106,10 +108,20 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
     public async Task<WorkflowInstanceDto> GetAsync(Guid id)
     {
-        var entity = await _workflowInstanceRepository.GetAsync(id);
+        // check can read details data
+        var fullDataAccess = await AuthorizationService.IsGrantedAsync(ElsaModulePermissions.Instances.Data);
+
+        var entity = await _workflowInstanceRepository.GetAsync(id, fullDataAccess);
         return ObjectMapper.Map<WorkflowInstance, WorkflowInstanceDto>(entity);
     }
 
+    public async Task<WorkflowInstanceBasicDto> GetBasicAsync(Guid id)
+    {
+        var entity = await _workflowInstanceRepository.GetAsync(id, false);
+        return ObjectMapper.Map<WorkflowInstance, WorkflowInstanceBasicDto>(entity);
+    }
+
+    [Authorize(Policy = ElsaModulePermissions.Instances.Data)]
     public async Task<ListResultDto<WorkflowExecutionLogDto>> GetExecutionLogsAsync(Guid id)
     {
         var list = await _workflowExecutionLogRepository.GetListAsync(workflowInstanceId: id);
@@ -147,11 +159,13 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         return new PagedResultDto<WorkflowInstanceBasicDto>(count, ObjectMapper.Map<List<WorkflowInstance>, List<WorkflowInstanceBasicDto>>(list));
     }
 
+    [Authorize(Policy = ElsaModulePermissions.Instances.Delete)]
     public async Task DeleteAsync(Guid id)
     {
         await _workflowInstanceRepository.DeleteAsync(id);
     }
 
+    [Authorize(Policy = ElsaModulePermissions.Instances.Delete)]
     public async Task BatchDeleteAsync(WorkflowInstancesBatchActionRequestDto input)
     {
         if (input?.Ids?.Any() == true)
@@ -165,6 +179,8 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
     public async Task<WorkflowInstanceExecutionLogSummaryDto> GetLogSummaryAsync(Guid id)
     {
+        var fullDataAccess = await AuthorizationService.IsGrantedAsync(ElsaModulePermissions.Instances.Data);
+
         var entity = await _workflowInstanceRepository.GetAsync(id);
 
         var allLogs = await _workflowExecutionLogRepository.GetListAsync(workflowInstanceId: id);
@@ -196,10 +212,9 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
                 Outcomes = logs.Where(x => x.Data?.ContainsKey("Outcomes") == true).SelectMany(x => x.Data.SafeGetValue<string, object, string[]>("Outcomes")).ToArray(),
 
-                StateData = entity.ActivityData.FirstOrDefault(x => x.ActivityId == itemLogs.Key)?.Data ?? default,
-                JournalData = logs.First().Data?.Where(x => x.Key != "Outcomes")?.ToDictionary(x => x.Key, x => x.Value),
-
-                Message = logs.First().Message,
+                StateData = !fullDataAccess ? null : entity.ActivityData.FirstOrDefault(x => x.ActivityId == itemLogs.Key)?.Data ?? default,
+                JournalData = !fullDataAccess ? null : logs.First().Data?.Where(x => x.Key != "Outcomes")?.ToDictionary(x => x.Key, x => x.Value),
+                Message = !fullDataAccess ? null : logs.First().Message,
             };
 
             dto.Activities.Add(summary);
@@ -211,6 +226,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         return dto;
     }
 
+    [Authorize(Policy = ElsaModulePermissions.Instances.Statistic)]
     public async Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(WorkflowInstanceGetStatusDateCountStatisticsRequestDto input)
     {
         var datePeriod = input.DatePeriod ?? 30;
@@ -249,6 +265,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         return dto;
     }
 
+    [Authorize(Policy = ElsaModulePermissions.Instances.Statistic)]
     public async Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync()
     {
         return await _workflowInstanceStatusCountStatisticsDistributedCache.GetOrAddAsync("workflow:instance:status:count:statistic", async () =>
@@ -273,6 +290,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
                });
     }
 
+    [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
     public async Task BatchCancelAsync(WorkflowInstancesBatchActionRequestDto input)
     {
         if (input?.Ids?.Any() == true)
@@ -284,6 +302,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         }
     }
 
+    [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
     public async Task BatchRetryAsync(WorkflowInstancesBatchActionRequestDto input)
     {
         if (input?.Ids?.Any() == true)

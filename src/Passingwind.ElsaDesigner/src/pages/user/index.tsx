@@ -21,7 +21,7 @@ import {
 import { Button, message, Popconfirm, Tag } from 'antd';
 import moment from 'moment';
 import React, { useRef, useState } from 'react';
-import { formatMessage, useIntl } from 'umi';
+import { formatMessage, useAccess, useIntl } from 'umi';
 
 const handleAdd = async (data: any) => {
     const response = await createUser(data);
@@ -53,6 +53,7 @@ const handleDelete = async (id: string) => {
 const Index: React.FC = () => {
     const actionRef = useRef<ActionType>();
     const intl = useIntl();
+    const access = useAccess();
 
     const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
     const [editModalTitle, setEditModalTitle] = useState<string>('');
@@ -62,11 +63,6 @@ const Index: React.FC = () => {
     const [editRolesModalVisible, setEditRolesModalVisible] = useState<boolean>(false);
 
     const columns: ProColumnType<API.IdentityUser>[] = [
-        {
-            valueType: 'index',
-            title: '#',
-            width: 50,
-        },
         {
             dataIndex: 'filter',
             title: intl.formatMessage({ id: 'page.user.filter' }),
@@ -147,42 +143,48 @@ const Index: React.FC = () => {
             align: 'center',
             width: 160,
             render: (text, record, _, action) => [
-                <a
-                    key="edit"
-                    onClick={() => {
-                        setEditModalData(record);
-                        setEditModalDataId(record.id);
-                        setEditModalVisible(true);
-                        setEditModalTitle(
-                            `${intl.formatMessage({ id: 'common.dict.edit' })} - ${
-                                record.userName
-                            }`,
-                        );
-                    }}
-                >
-                    {intl.formatMessage({ id: 'common.dict.edit' })}
-                </a>,
-                <a
-                    key="roles"
-                    onClick={async () => {
-                        setEditModalData(record);
-                        setEditModalDataId(record.id);
-                        setEditRolesModalVisible(true);
-                    }}
-                >
-                    {intl.formatMessage({ id: 'page.user.role' })}
-                </a>,
-                <Popconfirm
-                    key="delete"
-                    title={intl.formatMessage({ id: 'common.dict.delete.confirm' })}
-                    onConfirm={async () => {
-                        if (await handleDelete(record.id)) {
-                            action?.reload();
-                        }
-                    }}
-                >
-                    <a>{intl.formatMessage({ id: 'common.dict.delete' })}</a>
-                </Popconfirm>,
+                access['AbpIdentity.Users.Update'] && (
+                    <a
+                        key="edit"
+                        onClick={() => {
+                            setEditModalData(record);
+                            setEditModalDataId(record.id);
+                            setEditModalVisible(true);
+                            setEditModalTitle(
+                                `${intl.formatMessage({ id: 'common.dict.edit' })} - ${
+                                    record.userName
+                                }`,
+                            );
+                        }}
+                    >
+                        {intl.formatMessage({ id: 'common.dict.edit' })}
+                    </a>
+                ),
+                access['AbpIdentity.Users.Update'] && (
+                    <a
+                        key="roles"
+                        onClick={async () => {
+                            setEditModalData(record);
+                            setEditModalDataId(record.id);
+                            setEditRolesModalVisible(true);
+                        }}
+                    >
+                        {intl.formatMessage({ id: 'page.user.role' })}
+                    </a>
+                ),
+                access['AbpIdentity.Users.Delete'] && (
+                    <Popconfirm
+                        key="delete"
+                        title={intl.formatMessage({ id: 'common.dict.delete.confirm' })}
+                        onConfirm={async () => {
+                            if (await handleDelete(record.id)) {
+                                action?.reload();
+                            }
+                        }}
+                    >
+                        <a>{intl.formatMessage({ id: 'common.dict.delete' })}</a>
+                    </Popconfirm>
+                ),
             ],
         },
     ];
@@ -195,18 +197,20 @@ const Index: React.FC = () => {
                 search={{ labelWidth: 140 }}
                 rowKey="id"
                 toolBarRender={() => [
-                    <Button
-                        key="add"
-                        type="primary"
-                        onClick={() => {
-                            setEditModalData(undefined);
-                            setEditModalDataId('');
-                            setEditModalVisible(true);
-                            setEditModalTitle(intl.formatMessage({ id: 'common.dict.create' }));
-                        }}
-                    >
-                        {intl.formatMessage({ id: 'common.dict.create' })}
-                    </Button>,
+                    access['AbpIdentity.Users.Create'] && (
+                        <Button
+                            key="add"
+                            type="primary"
+                            onClick={() => {
+                                setEditModalData(undefined);
+                                setEditModalDataId('');
+                                setEditModalVisible(true);
+                                setEditModalTitle(intl.formatMessage({ id: 'common.dict.create' }));
+                            }}
+                        >
+                            {intl.formatMessage({ id: 'common.dict.create' })}
+                        </Button>
+                    ),
                 ]}
                 request={async (params) => {
                     const { current, pageSize } = params;
@@ -320,7 +324,7 @@ const Index: React.FC = () => {
                             return (result?.items ?? []).map((x) => {
                                 return {
                                     label: x.name,
-                                    value: x.id,
+                                    value: x.name,
                                 };
                             });
                         }}

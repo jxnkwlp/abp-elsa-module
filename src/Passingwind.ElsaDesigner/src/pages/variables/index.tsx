@@ -16,7 +16,7 @@ import {
 } from '@ant-design/pro-components';
 import { Button, message, Popconfirm } from 'antd';
 import React, { useRef, useState } from 'react';
-import { formatMessage, useIntl } from 'umi';
+import { formatMessage, useAccess, useIntl } from 'umi';
 
 const handleAdd = async (data: any) => {
     const response = await createGlobalVariable(data);
@@ -48,6 +48,7 @@ const handleDelete = async (id: string) => {
 const Index: React.FC = () => {
     const tableActionRef = useRef<ActionType>();
     const intl = useIntl();
+    const access = useAccess();
 
     const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
     const [editModalTitle, setEditModalTitle] = useState<string>('');
@@ -91,30 +92,34 @@ const Index: React.FC = () => {
             align: 'center',
             fixed: 'right',
             render: (text, record, _, action) => [
-                <a
-                    key="edit"
-                    onClick={() => {
-                        setEditModalData(record);
-                        setEditModalDataId(record.id);
-                        setEditModalVisible(true);
-                        setEditModalTitle(
-                            `${intl.formatMessage({ id: 'common.dict.edit' })} - ${record.key}`,
-                        );
-                    }}
-                >
-                    {intl.formatMessage({ id: 'common.dict.edit' })}
-                </a>,
-                <Popconfirm
-                    key="delete"
-                    title={intl.formatMessage({ id: 'common.dict.delete.confirm' })}
-                    onConfirm={async () => {
-                        if (await handleDelete(record.id!)) {
-                            action?.reload();
-                        }
-                    }}
-                >
-                    <a>{intl.formatMessage({ id: 'common.dict.delete' })}</a>
-                </Popconfirm>,
+                access['ElsaModule.GlobalVariables.Update'] && (
+                    <a
+                        key="edit"
+                        onClick={() => {
+                            setEditModalData(record);
+                            setEditModalDataId(record.id);
+                            setEditModalVisible(true);
+                            setEditModalTitle(
+                                `${intl.formatMessage({ id: 'common.dict.edit' })} - ${record.key}`,
+                            );
+                        }}
+                    >
+                        {intl.formatMessage({ id: 'common.dict.edit' })}
+                    </a>
+                ),
+                access['ElsaModule.GlobalVariables.Delete'] && (
+                    <Popconfirm
+                        key="delete"
+                        title={intl.formatMessage({ id: 'common.dict.delete.confirm' })}
+                        onConfirm={async () => {
+                            if (await handleDelete(record.id!)) {
+                                action?.reload();
+                            }
+                        }}
+                    >
+                        <a>{intl.formatMessage({ id: 'common.dict.delete' })}</a>
+                    </Popconfirm>
+                ),
             ],
         },
     ];
@@ -128,18 +133,20 @@ const Index: React.FC = () => {
                 scroll={{ x: 800 }}
                 rowKey="id"
                 toolBarRender={() => [
-                    <Button
-                        key="add"
-                        type="primary"
-                        onClick={() => {
-                            setEditModalData(undefined);
-                            setEditModalDataId('');
-                            setEditModalVisible(true);
-                            setEditModalTitle(intl.formatMessage({ id: 'common.dict.create' }));
-                        }}
-                    >
-                        {intl.formatMessage({ id: 'common.dict.create' })}
-                    </Button>,
+                    access['ElsaModule.GlobalVariables.Create'] && (
+                        <Button
+                            key="add"
+                            type="primary"
+                            onClick={() => {
+                                setEditModalData(undefined);
+                                setEditModalDataId('');
+                                setEditModalVisible(true);
+                                setEditModalTitle(intl.formatMessage({ id: 'common.dict.create' }));
+                            }}
+                        >
+                            {intl.formatMessage({ id: 'common.dict.create' })}
+                        </Button>
+                    ),
                 ]}
                 request={async (params) => {
                     const { current, pageSize } = params;

@@ -32,7 +32,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { useHistory, useIntl, useParams } from 'umi';
+import { Access, useAccess, useHistory, useIntl, useParams } from 'umi';
 import type { FlowActionType } from '../designer/flow';
 import Flow from '../designer/flow';
 import { conventToGraphData } from '../designer/service';
@@ -59,6 +59,7 @@ const Index: React.FC = () => {
     const history = useHistory();
     const params = useParams();
     const intl = useIntl();
+    const access = useAccess();
 
     const flowAction = useRef<FlowActionType>();
 
@@ -68,7 +69,6 @@ const Index: React.FC = () => {
     const [loading, setLoading] = React.useState<boolean>(false);
     const [definition, setDefinition] = React.useState<API.WorkflowDefinitionVersion>();
     const [graphData, setGraphData] = React.useState<IGraphData>();
-    const [logs, setLogs] = React.useState<API.WorkflowExecutionLog[]>([]);
     const [logSummary, setLogSummary] = useState<API.WorkflowInstanceExecutionLogSummary>();
 
     const [activitiesSummary, setActivitiesSummary] = useState<
@@ -173,12 +173,6 @@ const Index: React.FC = () => {
         setGraphData(data);
     };
 
-    const loadLogs = async (id: string) => {
-        const result = await getWorkflowInstanceExecutionLogs(id);
-
-        setLogs(result?.items ?? []);
-    };
-
     const loadLogsSummary = async (id: string) => {
         const result = await getWorkflowInstanceLogSummary(id);
 
@@ -203,7 +197,6 @@ const Index: React.FC = () => {
             return;
         }
 
-        await loadLogs(id);
         await loadLogsSummary(id);
         await loadWorkflowDefinition(result.workflowDefinitionId!, result.version!);
 
@@ -293,7 +286,7 @@ const Index: React.FC = () => {
         if (graphInit && data) {
             updateGraph();
         }
-    }, [graphInit, data, definition, logs, logSummary]);
+    }, [graphInit, data, definition, logSummary]);
 
     useEffect(() => {
         const sid = params.id ?? '';
@@ -311,6 +304,16 @@ const Index: React.FC = () => {
             title={title}
             loading={loading}
             extra={[
+                <Button
+                    key="definition"
+                    type="link"
+                    disabled={!definition || loading}
+                    onClick={() => {
+                        history.push('/definitions/' + definition?.definition?.id ?? '');
+                    }}
+                >
+                    {intl.formatMessage({ id: 'page.instance.toDefinition' })}
+                </Button>,
                 <Button
                     key="reload"
                     type="primary"
@@ -463,7 +466,23 @@ const Index: React.FC = () => {
                                     />
                                 )}
                                 {selectActivityId && selectActivityData && (
-                                    <Tabs items={getActivityTabItems()} />
+                                    <Access
+                                        accessible={access['ElsaModule.Instances.Data']}
+                                        fallback={
+                                            <Alert
+                                                type="error"
+                                                message={intl.formatMessage(
+                                                    { id: 'common.noaccess' },
+                                                    {
+                                                        permission:
+                                                            'ElsaModule.Instances.Statistics',
+                                                    },
+                                                )}
+                                            />
+                                        }
+                                    >
+                                        <Tabs items={getActivityTabItems()} />
+                                    </Access>
                                 )}
                             </div>
                         )}
@@ -533,36 +552,86 @@ const Index: React.FC = () => {
                                 <Empty />
                             ))}
 
-                        {tabKey === 'input' &&
-                            (data?.input ? (
-                                <>
-                                    <div className="data-render-container">
-                                        {dataRender(JSON.stringify(data.input ?? {}, null, 2))}
-                                    </div>
-                                </>
-                            ) : (
-                                <Empty />
-                            ))}
-                        {tabKey === 'fault' &&
-                            (data?.faults?.length ? (
-                                <>
-                                    <div className="data-render-container">
-                                        {dataRender(JSON.stringify(data.faults ?? [], null, 2))}
-                                    </div>
-                                </>
-                            ) : (
-                                <Empty />
-                            ))}
-                        {tabKey === 'variables' &&
-                            (Object.keys(data?.variables ?? {}).length ? (
-                                <>
-                                    <div className="data-render-container">
-                                        {dataRender(JSON.stringify(data?.variables ?? {}, null, 2))}
-                                    </div>
-                                </>
-                            ) : (
-                                <Empty />
-                            ))}
+                        {tabKey === 'input' && (
+                            <Access
+                                accessible={access['ElsaModule.Instances.Data']}
+                                fallback={
+                                    <Alert
+                                        type="error"
+                                        message={intl.formatMessage(
+                                            { id: 'common.noaccess' },
+                                            {
+                                                permission: 'ElsaModule.Instances.Statistics',
+                                            },
+                                        )}
+                                    />
+                                }
+                            >
+                                {data?.input ? (
+                                    <>
+                                        <div className="data-render-container">
+                                            {dataRender(JSON.stringify(data.input ?? {}, null, 2))}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <Empty />
+                                )}
+                            </Access>
+                        )}
+                        {tabKey === 'fault' && (
+                            <Access
+                                accessible={access['ElsaModule.Instances.Data']}
+                                fallback={
+                                    <Alert
+                                        type="error"
+                                        message={intl.formatMessage(
+                                            { id: 'common.noaccess' },
+                                            {
+                                                permission: 'ElsaModule.Instances.Statistics',
+                                            },
+                                        )}
+                                    />
+                                }
+                            >
+                                {data?.faults?.length ? (
+                                    <>
+                                        <div className="data-render-container">
+                                            {dataRender(JSON.stringify(data.faults ?? [], null, 2))}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <Empty />
+                                )}
+                            </Access>
+                        )}
+                        {tabKey === 'variables' && (
+                            <Access
+                                accessible={access['ElsaModule.Instances.Data']}
+                                fallback={
+                                    <Alert
+                                        type="error"
+                                        message={intl.formatMessage(
+                                            { id: 'common.noaccess' },
+                                            {
+                                                permission: 'ElsaModule.Instances.Statistics',
+                                            },
+                                        )}
+                                    />
+                                }
+                            >
+                                {Object.keys(data?.variables ?? {}).length ? (
+                                    <>
+                                        <div className="data-render-container">
+                                            {dataRender(
+                                                JSON.stringify(data?.variables ?? {}, null, 2),
+                                            )}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <Empty />
+                                )}
+                            </Access>
+                        )}
                     </Card>
                 </Col>
             </Row>

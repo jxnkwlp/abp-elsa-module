@@ -287,10 +287,14 @@ public partial class DemoHttpApiHostModule : AbpModule
             ;
         context.Services.ConfigureApplicationCookie(optopns =>
         {
+            optopns.LoginPath = "/auth/login";
             optopns.Events.OnRedirectToLogin = (context) =>
             {
                 if (context.Request.Path.StartsWithSegments("/api"))
                 {
+                    //var converter = context.HttpContext.RequestServices.GetRequiredService<IExceptionToErrorInfoConverter>();
+                    // TODO
+                    //context.Response.WriteAsJsonAsync(new RemoteServiceErrorResponse(new RemoteServiceErrorInfo()));
                     context.Response.StatusCode = 401;
                 }
                 return Task.CompletedTask;
@@ -299,6 +303,8 @@ public partial class DemoHttpApiHostModule : AbpModule
             {
                 if (context.Request.Path.StartsWithSegments("/api"))
                 {
+                    // TODO
+                    //context.Response.WriteAsJsonAsync(new RemoteServiceErrorResponse(new RemoteServiceErrorInfo()));
                     context.Response.StatusCode = 403;
                 }
                 return Task.CompletedTask;
@@ -495,10 +501,6 @@ public partial class DemoHttpApiHostModule : AbpModule
         var env = context.GetEnvironment();
 
         app.UseStatusCodePages();
-        //if (env.IsDevelopment())
-        //{
-        //    app.UseDeveloperExceptionPage();
-        //}
 
         app.UseForwardedHeaders();
         app.UseOwlRequestLocalization();
@@ -536,11 +538,6 @@ public partial class DemoHttpApiHostModule : AbpModule
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Demo API");
             options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
-
-            var configuration = context.GetConfiguration();
-            options.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
-            options.OAuthClientSecret(configuration["AuthServer:SwaggerClientSecret"]);
-            options.OAuthScopes("Demo");
         });
 
         app.UseAuditing();

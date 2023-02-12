@@ -12,7 +12,7 @@ import {
 } from '@ant-design/pro-components';
 import { Button, Checkbox, Col, Collapse, message, Popconfirm, Row } from 'antd';
 import React, { useRef, useState } from 'react';
-import { formatMessage, useIntl } from 'umi';
+import { formatMessage, useAccess, useIntl } from 'umi';
 
 const handleAdd = async (data: any) => {
     const response = await createRole(data);
@@ -44,6 +44,7 @@ const handleDelete = async (id: string) => {
 const Index: React.FC = () => {
     const actionRef = useRef<ActionType>();
     const intl = useIntl();
+    const access = useAccess();
 
     const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
     const [editModalTitle, setEditModalTitle] = useState<string>('');
@@ -99,11 +100,6 @@ const Index: React.FC = () => {
     };
 
     const columns: ProColumnType<API.IdentityRole>[] = [
-        {
-            valueType: 'index',
-            title: '#',
-            width: 50,
-        },
         {
             dataIndex: 'filter',
             title: intl.formatMessage({ id: 'page.role.field.name' }),
@@ -161,7 +157,7 @@ const Index: React.FC = () => {
             align: 'center',
             width: 160,
             render: (text, record, _, action) => [
-                !record.isStatic && (
+                !record.isStatic && access['AbpIdentity.Roles.Update'] && (
                     <a
                         key="edit"
                         onClick={() => {
@@ -178,28 +174,32 @@ const Index: React.FC = () => {
                         {intl.formatMessage({ id: 'common.dict.edit' })}
                     </a>
                 ),
-                <a
-                    key="permission"
-                    onClick={async () => {
-                        setEditModalData(record);
-                        setEditModalDataId(record.id);
-                        await loadRolePermission(record.name);
-                        setPermissionModalVisible(true);
-                    }}
-                >
-                    {intl.formatMessage({ id: 'page.role.permissions' })}
-                </a>,
-                <Popconfirm
-                    key="delete"
-                    title={intl.formatMessage({ id: 'common.dict.delete.confirm' })}
-                    onConfirm={async () => {
-                        if (await handleDelete(record.id)) {
-                            action?.reload();
-                        }
-                    }}
-                >
-                    <a>{intl.formatMessage({ id: 'common.dict.delete' })}</a>
-                </Popconfirm>,
+                access['AbpIdentity.Roles.ManagePermissions'] && (
+                    <a
+                        key="permission"
+                        onClick={async () => {
+                            setEditModalData(record);
+                            setEditModalDataId(record.id);
+                            await loadRolePermission(record.name);
+                            setPermissionModalVisible(true);
+                        }}
+                    >
+                        {intl.formatMessage({ id: 'page.role.permissions' })}
+                    </a>
+                ),
+                access['AbpIdentity.Roles.Delete'] && (
+                    <Popconfirm
+                        key="delete"
+                        title={intl.formatMessage({ id: 'common.dict.delete.confirm' })}
+                        onConfirm={async () => {
+                            if (await handleDelete(record.id)) {
+                                action?.reload();
+                            }
+                        }}
+                    >
+                        <a>{intl.formatMessage({ id: 'common.dict.delete' })}</a>
+                    </Popconfirm>
+                ),
             ],
         },
     ];
@@ -212,18 +212,20 @@ const Index: React.FC = () => {
                 search={{ labelWidth: 140 }}
                 rowKey="id"
                 toolBarRender={() => [
-                    <Button
-                        key="add"
-                        type="primary"
-                        onClick={() => {
-                            setEditModalData(undefined);
-                            setEditModalDataId('');
-                            setEditModalVisible(true);
-                            setEditModalTitle(intl.formatMessage({ id: 'common.dict.create' }));
-                        }}
-                    >
-                        {intl.formatMessage({ id: 'common.dict.create' })}
-                    </Button>,
+                    access['AbpIdentity.Roles.Create'] && (
+                        <Button
+                            key="add"
+                            type="primary"
+                            onClick={() => {
+                                setEditModalData(undefined);
+                                setEditModalDataId('');
+                                setEditModalVisible(true);
+                                setEditModalTitle(intl.formatMessage({ id: 'common.dict.create' }));
+                            }}
+                        >
+                            {intl.formatMessage({ id: 'common.dict.create' })}
+                        </Button>
+                    ),
                 ]}
                 request={async (params) => {
                     const { current, pageSize } = params;

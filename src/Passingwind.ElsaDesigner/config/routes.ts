@@ -29,18 +29,21 @@
         icon: 'ClusterOutlined',
         path: '/instances',
         component: './instance',
+        access: 'ElsaModule.Instances'
     },
     {
         name: 'InstanceDetail',
         path: '/instances/:id',
         component: './instance/detail',
         hideInMenu: true,
+        access: 'ElsaModule.Instances'
     },
     {
         name: 'Definitions',
         icon: 'BranchesOutlined',
         path: '/definitions',
         component: './definition',
+        access: 'ElsaModule.Definitions'
     },
     {
         name: 'DefinitionDetail',
@@ -49,18 +52,19 @@
         hideInMenu: true,
     },
     {
-        name: 'Variables',
-        icon: 'KeyOutlined',
-        path: '/variables',
-        component: './variables',
-    },
-    {
         name: 'Designer',
         icon: 'DeploymentUnitOutlined',
         path: '/designer',
         component: './designer',
+        access: 'ElsaModule.Definitions.Publish'
     },
-
+    {
+        name: 'Variables',
+        icon: 'KeyOutlined',
+        path: '/variables',
+        component: './variables',
+        access: 'ElsaModule.GlobalVariables'
+    },
     //
     {
         path: '/account',
@@ -93,27 +97,29 @@
                 path: 'users',
                 name: 'users',
                 component: './user',
+                access: 'AbpIdentity.Users'
             },
             {
                 path: 'roles',
                 name: 'roles',
                 component: './role',
+                access: 'AbpIdentity.Roles'
             },
             {
                 path: 'settings',
                 name: 'settings',
                 component: './setting',
             },
-            {
-                path: 'audit/logs',
-                name: 'auditLogs',
-                component: './audit/logs',
-            },
-            {
-                path: 'security/logs',
-                name: 'securityLogs',
-                component: './security/logs',
-            },
+            // {
+            //     path: 'audit/logs',
+            //     name: 'auditLogs',
+            //     component: './audit/logs',
+            // },
+            // {
+            //     path: 'security/logs',
+            //     name: 'securityLogs',
+            //     component: './security/logs',
+            // },
             {
                 component: './404',
             },
