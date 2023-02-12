@@ -9,7 +9,7 @@
 export default {
     dev: {
         '/api/': {
-            target: 'https://localhost:44315',
+            target: 'https://localhost:44345',
             changeOrigin: true,
             secure: false,
         },

@@ -253,8 +253,9 @@ paket-files/
 
 # 
 /host/**/Logs/*
-/demo-app/**/Logs/*
-/demo-app/**/wwwroot/dist/*
-!/demo-app/**/wwwroot/dist/README.md
-/demo-app/src/Demo.HttpApi.Host/storage/*
 **/appsettings.*.json
+
+/app/**/Logs/*
+/app/**/wwwroot/dist/*
+!/app/**/wwwroot/dist/README.md
+/app/src/Demo.HttpApi.Host/storage/*
