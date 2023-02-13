@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Web;
+using Passingwind.WorkflowApp.Account;
 using Passingwind.WorkflowApp.Data;
 
 namespace Passingwind.WorkflowApp.Web;
@@ -41,6 +42,13 @@ public static class Program
             }
 
             await app.InitializeApplicationAsync();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var sp = scope.ServiceProvider;
+                await sp.GetRequiredService<IExternalLoginProviderManager>().RegisterAllAsync();
+            }
+             
             await app.RunAsync();
             return 0;
         }

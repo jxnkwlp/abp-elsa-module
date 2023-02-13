@@ -18,6 +18,7 @@ using Medallion.Threading.FileSystem;
 using Medallion.Threading.Redis;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection;
@@ -98,9 +99,9 @@ public class WorkflowAppWebModule : AbpModule
         var configuration = context.Services.GetConfiguration();
 
         ConfigureCache(context, configuration);
+        ConfigureDistributedLocking(context, configuration);
         ConfigureLocalization();
         ConfigureDataProtection(context, configuration, hostingEnvironment);
-        ConfigureDistributedLocking(context, configuration);
         ConfigureUrls(configuration);
         ConfigureAuthentication(context, configuration);
         ConfigureAutoMapper();
@@ -128,7 +129,7 @@ public class WorkflowAppWebModule : AbpModule
         // Config default 'JsonSerializerSettings'
         JsonConvert.DefaultSettings = () =>
         {
-            var settings = new JsonSerializerSettings();
+            JsonSerializerSettings settings = new JsonSerializerSettings();
             ConfigureNewtonsoftJsonSerializerSettings(settings);
             return settings;
         };
@@ -199,12 +200,15 @@ public class WorkflowAppWebModule : AbpModule
         {
             options.KeyPrefix = GetAppName(configuration) + ":";
         });
+    }
 
+    private void ConfigureDistributedLocking(ServiceConfigurationContext context, IConfiguration configuration)
+    {
         context.Services.AddSingleton<IDistributedLockProvider>(sp =>
         {
             if (configuration.GetValue<bool>("Redis:IsEnabled"))
             {
-                var connection = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
+                ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
                 return new RedisDistributedSynchronizationProvider(connection.GetDatabase());
             }
             else
@@ -232,6 +236,8 @@ public class WorkflowAppWebModule : AbpModule
 
     private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)
     {
+        context.Services.AddSingleton<OpenIdConnectPostConfigureOptions>();
+
         context.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = IdentityConstants.ApplicationScheme;
@@ -352,13 +358,13 @@ public class WorkflowAppWebModule : AbpModule
                 {
                     if (type.IsGenericType)
                     {
-                        var part1 = type.FullName.Substring(0, type.FullName.IndexOf("`")).RemovePostFix("Dto");
-                        var part2 = string.Concat(type.GetGenericArguments().Select(x => x.Name.RemovePostFix("Dto")));
+                        string part1 = type.FullName.Substring(0, type.FullName.IndexOf("`")).RemovePostFix("Dto");
+                        string part2 = string.Concat(type.GetGenericArguments().Select(x => x.Name.RemovePostFix("Dto")));
 
                         if (part1.EndsWith("ListResult") || part1.EndsWith("PagedResult"))
                         {
-                            var temp1 = part1.Substring(0, part1.LastIndexOf("."));
-                            var temp2 = part1.Substring(part1.LastIndexOf(".") + 1);
+                            string temp1 = part1.Substring(0, part1.LastIndexOf("."));
+                            string temp2 = part1.Substring(part1.LastIndexOf(".") + 1);
                             return $"{temp1}.{part2}{temp2}";
                         }
 
@@ -370,9 +376,9 @@ public class WorkflowAppWebModule : AbpModule
 
                 options.CustomOperationIds(e =>
                 {
-                    var action = e.ActionDescriptor.RouteValues["action"];
-                    var controller = e.ActionDescriptor.RouteValues["controller"];
-                    var method = e.HttpMethod;
+                    string action = e.ActionDescriptor.RouteValues["action"];
+                    string controller = e.ActionDescriptor.RouteValues["controller"];
+                    string method = e.HttpMethod;
 
                     if (action == "GetList")
                         return $"Get{controller}List";
@@ -419,7 +425,7 @@ public class WorkflowAppWebModule : AbpModule
 
         Configure<OwlCultureMapOptions>(options =>
         {
-            var zhHansCultureMapInfo = new CultureMapInfo
+            CultureMapInfo zhHansCultureMapInfo = new CultureMapInfo
             {
                 TargetCulture = "zh-Hans",
                 SourceCultures = new List<string>
@@ -438,26 +444,16 @@ public class WorkflowAppWebModule : AbpModule
         IConfiguration configuration,
         IWebHostEnvironment hostingEnvironment)
     {
-        var appName = GetAppName(configuration);
-        var dataProtectionBuilder = context.Services.AddDataProtection().SetApplicationName(appName);
+        string appName = GetAppName(configuration);
+        IDataProtectionBuilder dataProtectionBuilder = context.Services.AddDataProtection().SetApplicationName(appName);
         if (!hostingEnvironment.IsDevelopment() && configuration.GetValue<bool>("Redis:IsEnabled"))
         {
-            var redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
             dataProtectionBuilder.PersistKeysToStackExchangeRedis(redis, $"{appName}-Protection-Keys");
         }
     }
 
-    private void ConfigureDistributedLocking(
-        ServiceConfigurationContext context,
-        IConfiguration configuration)
-    {
-        context.Services.AddSingleton<IDistributedLockProvider>(sp =>
-        {
-            var connection = ConnectionMultiplexer
-                .Connect(configuration["Redis:Configuration"]);
-            return new RedisDistributedSynchronizationProvider(connection.GetDatabase());
-        });
-    }
+
 
     private void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)
     {
@@ -483,7 +479,7 @@ public class WorkflowAppWebModule : AbpModule
 
     private void ConfigureHangfire(ServiceConfigurationContext context, IConfiguration configuration)
     {
-        var appName = GetAppName(configuration);
+        string appName = GetAppName(configuration);
 
         context.Services.AddHangfire(config =>
         {
@@ -545,8 +541,8 @@ public class WorkflowAppWebModule : AbpModule
         context.Services.AddTransient<IRoleLookupService, UserAndRoleLookupService>();
 
         // Configure blob storage for blob storage workflow storage provider. 
-        var hostEnvironment = context.Services.GetHostingEnvironment();
-        var root = Path.Combine(hostEnvironment.ContentRootPath, "storage", "workflows");
+        IWebHostEnvironment hostEnvironment = context.Services.GetHostingEnvironment();
+        string root = Path.Combine(hostEnvironment.ContentRootPath, "storage", "workflows");
         if (!Directory.Exists(root))
         {
             Directory.CreateDirectory(root);
@@ -557,8 +553,8 @@ public class WorkflowAppWebModule : AbpModule
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
-        var app = context.GetApplicationBuilder();
-        var env = context.GetEnvironment();
+        IApplicationBuilder app = context.GetApplicationBuilder();
+        IWebHostEnvironment env = context.GetEnvironment();
 
         if (env.IsDevelopment())
         {
@@ -607,6 +603,8 @@ public class WorkflowAppWebModule : AbpModule
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "WorkflowApp API");
             options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+            options.DisplayOperationId();
+            options.DisplayRequestDuration();
         });
 
         app.UseConfiguredEndpoints();

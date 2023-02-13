@@ -62,7 +62,9 @@ export async function getInitialState(): Promise<{
     const { currentUser, auth } = await loadData();
 
     if (!currentUser?.isAuthenticated) {
-        history.replace('/auth/login');
+        if (!location.pathname.startsWith('/auth/')) {
+            history.replace('/auth/login');
+        }
         return {
             settings: defaultSettings,
             currentUser: currentUser,
@@ -99,8 +101,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         onPageChange: () => {
             const { location } = history;
             console.debug(location);
-            // 如果没有登录，重定向到 login
-            if (!initialState?.currentUser && location.pathname !== loginPath) {
+            if (!initialState?.currentUser && !location.pathname.startsWith('/auth/')) {
                 history.push(loginPath);
             }
         },
@@ -166,7 +167,11 @@ const httpRequestCodeMessageDefaults: Record<number, string> = {
 
 export const request: RequestConfig = {
     errorHandler: (error) => {
-        const { data, response } = error;
+        const { request, data, response } = error;
+        const passError = request.options['passError'];
+        if (passError == true) {
+            return response;
+        }
         if (response && response.status >= 300) {
             const errorMessage = formatMessage({
                 id: `common.http.response.statusCode.${response.status}`,

@@ -1,8 +1,9 @@
 export default {
     'pages.layouts.userLayout.title':
         'Elsa workflow demo',
-    'pages.login.accountLogin.tab': 'Account Login',
+    'pages.login.accountLogin.tab': 'Account',
     'pages.login.accountLogin.errorMessage': 'Incorrect username/password(admin/ant.design)',
+    'pages.login.ssoLogin.tab': 'SSO',
     'pages.login.failure': 'Login failed, please try again!',
     'pages.login.success': 'Login successful!',
     'pages.login.username.placeholder': 'Please enter username',
@@ -172,6 +173,7 @@ export default {
     'page.variable.field.isSecret': 'Secret',
     'page.variable.field.isSecret.tooltip': 'Set as secret, the value will not be visible in the list and editing, only modify or delete operations',
     //
+    'page.settings.email': 'Emailing',
     'page.settings.email.smtpHost': 'Host',
     'page.settings.email.smtpPort': 'Port',
     'page.settings.email.smtpUserName': 'User Name',
@@ -188,6 +190,14 @@ export default {
     'page.settings.email.test.form.targetEmailAddress': 'To Address',
     'page.settings.email.test.form.subject': 'Subject',
     'page.settings.email.test.form.body': 'Body',
+    'page.settings.oauth2': 'OAuth2',
+    'page.settings.oauth2.enabled': 'Enabled',
+    'page.settings.oauth2.displayName': 'Display Name',
+    'page.settings.oauth2.authority': 'Authority',
+    'page.settings.oauth2.metadataAddress': 'Metadata Address',
+    'page.settings.oauth2.clientId': 'Client Id',
+    'page.settings.oauth2.clientSecret': 'Client Secret',
+    'page.settings.oauth2.scope': 'Scope',
     //
     'page.apikey.field.name': 'Name',
     'page.apikey.field.expirationTime': 'Expiration Time',

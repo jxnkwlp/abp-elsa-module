@@ -1,33 +1,11 @@
 ﻿/**
- * Generate from url: https://localhost:44315/swagger/v1/swagger.json
+ * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 169
+ * Total count: 168
  **/
 import * as Enum from "./enums";
 
 declare namespace API {
-    /**
-     * *TODO*
-     **/
-    type ApiKey = {
-        id: string;
-        creationTime: string;
-        creatorId?: string | undefined;
-        lastModificationTime?: string | undefined;
-        lastModifierId?: string | undefined;
-        name?: string | undefined;
-        expirationTime?: string | undefined;
-        secret?: string | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type ApiKeyCreateOrUpdate = {
-        name: string;
-        expirationTime?: string | undefined;
-    };
-
     /**
      * *TODO*
      **/
@@ -735,6 +713,78 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type ApiKey = {
+        id: string;
+        creationTime: string;
+        creatorId?: string | undefined;
+        lastModificationTime?: string | undefined;
+        lastModifierId?: string | undefined;
+        name?: string | undefined;
+        expirationTime?: string | undefined;
+        secret?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type ApiKeyCreateOrUpdate = {
+        name: string;
+        expirationTime?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type OAuth2SettingUpdate = {
+        enabled?: boolean | undefined;
+        displayName: string;
+        authority: string;
+        metadataAddress: string;
+        clientId: string;
+        clientSecret?: string | undefined;
+        scope?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type OAuth2Settings = {
+        enabled?: boolean | undefined;
+        displayName?: string | undefined;
+        authority?: string | undefined;
+        metadataAddress?: string | undefined;
+        clientId?: string | undefined;
+        clientSecret?: string | undefined;
+        scope?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type AbpLoginResult = {
+        result: Enum.LoginResultType;
+        description?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type AccountResult = {
+        enableLocalLogin?: boolean | undefined;
+        externalProviders?: ExternalProvider[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type ExternalProvider = {
+        displayName?: string | undefined;
+        authenticationScheme?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type ChangePasswordInput = {
         currentPassword?: string | undefined;
         newPassword: string;
@@ -1212,61 +1262,18 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type FindTenantResult = {
+        success?: boolean | undefined;
+        tenantId?: string | undefined;
+        name?: string | undefined;
+        isActive?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type MultiTenancyInfo = {
         isEnabled?: boolean | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type Feature = {
-        name?: string | undefined;
-        displayName?: string | undefined;
-        value?: string | undefined;
-        provider: FeatureProvider;
-        description?: string | undefined;
-        valueType: IStringValueType;
-        depth: number;
-        parentName?: string | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type FeatureGroup = {
-        name?: string | undefined;
-        displayName?: string | undefined;
-        features?: Feature[] | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type FeatureProvider = {
-        name?: string | undefined;
-        key?: string | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type GetFeatureListResult = {
-        groups?: FeatureGroup[] | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type UpdateFeature = {
-        name?: string | undefined;
-        value?: string | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type UpdateFeatures = {
-        features?: UpdateFeature[] | undefined;
     };
 
     /**
@@ -1637,23 +1644,6 @@ declare namespace API {
         emailConfirmed?: boolean | undefined;
         phoneNumber?: string | undefined;
         phoneNumberConfirmed?: boolean | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type IStringValueType = {
-        name?: string | undefined;
-        properties?: any | undefined;
-        validator: IValueValidator;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type IValueValidator = {
-        name?: string | undefined;
-        properties?: any | undefined;
     };
 
 

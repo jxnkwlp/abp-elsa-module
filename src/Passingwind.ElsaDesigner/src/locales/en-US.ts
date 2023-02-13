@@ -27,6 +27,7 @@ export default {
     'common.dict.delete.confirm': "Are you sure delete?",
     'common.dict.delete.success': "Deleted successfully",
     'common.dict.save': 'Save',
+    'common.dict.save.success': 'Saved successfully',
     'common.dict.submit': 'Submit',
     'common.dict.created.success': 'Added successfully',
     'common.dict.modified.success': 'Successfully modified',

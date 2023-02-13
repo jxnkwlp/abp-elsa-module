@@ -1,5 +1,5 @@
 ﻿/**
- * Generate from url: https://localhost:44315/swagger/v1/swagger.json
+ * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
  **/
 //
@@ -12,6 +12,17 @@ export enum ActivityTraits {
     Action = 1,
     Trigger = 2,
     Job = 4,
+}
+
+/**
+ * *TODO*
+ **/
+export enum LoginResultType {
+    Success = 1,
+    InvalidUserNameOrPassword = 2,
+    NotAllowed = 3,
+    LockedOut = 4,
+    RequiresTwoFactor = 5,
 }
 
 /**

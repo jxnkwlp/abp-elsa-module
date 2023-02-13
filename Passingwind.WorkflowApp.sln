@@ -41,6 +41,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.WorkflowApp.Htt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.WorkflowApp.Web", "app\src\Passingwind.WorkflowApp.Web\Passingwind.WorkflowApp.Web.csproj", "{B00128BF-E5BA-4FF6-953E-9788C10B1277}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.WorkflowApp.DbMigrator", "app\src\Passingwind.WorkflowApp.DbMigrator\Passingwind.WorkflowApp.DbMigrator.csproj", "{18944C79-D798-40C4-9397-47F41B18D2C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +117,10 @@ Global
 		{B00128BF-E5BA-4FF6-953E-9788C10B1277}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B00128BF-E5BA-4FF6-953E-9788C10B1277}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B00128BF-E5BA-4FF6-953E-9788C10B1277}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18944C79-D798-40C4-9397-47F41B18D2C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18944C79-D798-40C4-9397-47F41B18D2C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18944C79-D798-40C4-9397-47F41B18D2C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18944C79-D798-40C4-9397-47F41B18D2C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -137,6 +143,7 @@ Global
 		{937FD205-032F-44CE-A669-0A64956B08DC} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 		{0BB7F750-4CF9-47D4-8192-8A53C1EE6C6E} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 		{B00128BF-E5BA-4FF6-953E-9788C10B1277} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
+		{18944C79-D798-40C4-9397-47F41B18D2C9} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28315BFD-90E7-4E14-A2EA-F3D23AF4126F}

@@ -9,6 +9,11 @@
                 component: './auth/login',
             },
             {
+                name: 'login',
+                path: '/auth/login/external/callback',
+                component: './auth/login/callback',
+            },
+            {
                 component: './404',
             },
         ],

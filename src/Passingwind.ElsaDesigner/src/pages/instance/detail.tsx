@@ -471,13 +471,9 @@ const Index: React.FC = () => {
                                         fallback={
                                             <Alert
                                                 type="error"
-                                                message={intl.formatMessage(
-                                                    { id: 'common.noaccess' },
-                                                    {
-                                                        permission:
-                                                            'ElsaModule.Instances.Statistics',
-                                                    },
-                                                )}
+                                                message={intl.formatMessage({
+                                                    id: 'common.noaccess',
+                                                })}
                                             />
                                         }
                                     >
@@ -558,12 +554,7 @@ const Index: React.FC = () => {
                                 fallback={
                                     <Alert
                                         type="error"
-                                        message={intl.formatMessage(
-                                            { id: 'common.noaccess' },
-                                            {
-                                                permission: 'ElsaModule.Instances.Statistics',
-                                            },
-                                        )}
+                                        message={intl.formatMessage({ id: 'common.noaccess' })}
                                     />
                                 }
                             >
@@ -584,12 +575,7 @@ const Index: React.FC = () => {
                                 fallback={
                                     <Alert
                                         type="error"
-                                        message={intl.formatMessage(
-                                            { id: 'common.noaccess' },
-                                            {
-                                                permission: 'ElsaModule.Instances.Statistics',
-                                            },
-                                        )}
+                                        message={intl.formatMessage({ id: 'common.noaccess' })}
                                     />
                                 }
                             >
@@ -610,12 +596,7 @@ const Index: React.FC = () => {
                                 fallback={
                                     <Alert
                                         type="error"
-                                        message={intl.formatMessage(
-                                            { id: 'common.noaccess' },
-                                            {
-                                                permission: 'ElsaModule.Instances.Statistics',
-                                            },
-                                        )}
+                                        message={intl.formatMessage({ id: 'common.noaccess' })}
                                     />
                                 }
                             >
