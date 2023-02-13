@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Settings;
@@ -20,6 +19,7 @@ using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Settings;
 using IdentityUser = Volo.Abp.Identity.IdentityUser;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Passingwind.WorkflowApp.Web.Controllers;
 
@@ -28,6 +28,7 @@ namespace Passingwind.WorkflowApp.Web.Controllers;
 [ControllerName("Login")]
 [Area("account")]
 [Route("api/account")]
+[AllowAnonymous]
 public class AccountController : AbpController
 {
     private readonly ISettingProvider _settingsProvider;
@@ -52,7 +53,6 @@ public class AccountController : AbpController
     }
 
     [HttpGet("login")]
-    [AllowAnonymous]
     public async Task<AccountResultDto> GetAsync()
     {
         AccountResultDto dto = new AccountResultDto
@@ -108,6 +108,8 @@ public class AccountController : AbpController
             Action = "Login" + signInResult
         });
 
+        Logger.LogDebug("External login user claims: \n{0}", string.Join(", ", loginInfo.Principal?.Claims?.Select(x => $"{x.Type}:{x.Value}")));
+
         string email = loginInfo.Principal.FindFirstValue(AbpClaimTypes.Email);
 
         if (email.IsNullOrWhiteSpace())
@@ -129,12 +131,15 @@ public class AccountController : AbpController
             }
         }
 
-        if (signInResult.RequiresTwoFactor)
+        if (signInResult.RequiresTwoFactor || signInResult.IsNotAllowed || signInResult.IsLockedOut)
         {
             return LoginHelper.GetAbpLoginResult(signInResult);
         }
         else
         {
+            signInResult = SignInResult.Success;
+
+            // success
             await _signInManager.SignInAsync(user, false);
         }
 
@@ -189,7 +194,7 @@ public class AccountController : AbpController
             user.SetPhoneNumber(phoneNumber, phoneNumberConfirmed);
         }
 
-        await _userManager.UpdateAsync(user);
+        CheckIdentityErrors(await _userManager.UpdateAsync(user));
 
         return user;
     }

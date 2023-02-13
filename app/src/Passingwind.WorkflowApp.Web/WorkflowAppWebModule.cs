@@ -150,6 +150,14 @@ public class WorkflowAppWebModule : AbpModule
             options.UseHybridSerializer = false;
         });
 
+        Configure<CookiePolicyOptions>(options =>
+        {
+            options.Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
+            options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
+        });
+
+        context.Services.AddResponseCompression();
+
         context.Services.AddSpaStaticFiles(options =>
         {
             options.RootPath = "wwwroot/dist";
@@ -561,6 +569,10 @@ public class WorkflowAppWebModule : AbpModule
             app.UseDeveloperExceptionPage();
         }
 
+        app.UseCors();
+
+        app.UseResponseCompression();
+
         app.UseStatusCodePages();
 
         app.UseForwardedHeaders();
@@ -581,8 +593,6 @@ public class WorkflowAppWebModule : AbpModule
         });
 
         app.UseRouting();
-
-        app.UseCors();
 
         app.UseAuthentication();
 

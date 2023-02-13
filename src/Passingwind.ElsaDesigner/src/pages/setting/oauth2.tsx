@@ -37,7 +37,7 @@ const OAuth2: React.FC = () => {
     return (
         <>
             <Access
-                accessible={true}
+                accessible={access['SettingManagement.OAuth2']}
                 fallback={
                     <Alert type="error" message={intl.formatMessage({ id: 'common.noaccess' })} />
                 }
