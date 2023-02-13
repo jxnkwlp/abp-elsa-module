@@ -67,8 +67,8 @@ const Login: React.FC = () => {
                 <Spin spinning={loading}>
                     <LoginForm
                         logo={<img alt="logo" src="/logo.svg" />}
-                        title="Workflow"
-                        subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
+                        title={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
+                        subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.subTitle' })}
                         initialValues={{
                             autoLogin: true,
                         }}

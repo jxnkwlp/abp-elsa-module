@@ -1,5 +1,6 @@
 export default {
     'pages.layouts.userLayout.title': 'Workflow',
+    'pages.layouts.userLayout.subTitle': 'Workflow app',
     'pages.login.accountLogin.tab': 'Account',
     'pages.login.accountLogin.errorMessage': 'Incorrect username/password(admin/ant.design)',
     'pages.login.ssoLogin.tab': 'SSO',
