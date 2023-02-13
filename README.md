@@ -22,7 +22,7 @@ Elsa module integration for abp. [![NuGet](https://img.shields.io/nuget/v/Passin
   - [x] Http authorization
   - [ ] Send sms
   - [x] Run CSharp code as script
-    - [ ] Editor intellisense
+    - [x] Editor intellisense
 
 ## Screenshots
 
