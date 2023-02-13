@@ -1,5 +1,5 @@
 export default {
-    'pages.layouts.userLayout.title': 'Elsa workflow demo',
+    'pages.layouts.userLayout.title': 'Workflow',
     'pages.login.accountLogin.tab': '账户密码登录',
     'pages.login.accountLogin.errorMessage': '错误的用户名和密码',
     'pages.login.ssoLogin.tab': 'SSO登录',

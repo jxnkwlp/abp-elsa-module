@@ -1,6 +1,5 @@
 export default {
-    'pages.layouts.userLayout.title':
-        'Elsa workflow demo',
+    'pages.layouts.userLayout.title': 'Workflow',
     'pages.login.accountLogin.tab': 'Account',
     'pages.login.accountLogin.errorMessage': 'Incorrect username/password(admin/ant.design)',
     'pages.login.ssoLogin.tab': 'SSO',
@@ -29,8 +28,7 @@ export default {
     'pages.welcome.advancedLayout': 'Advanced Layout',
     'pages.welcome.alertMessage': 'Faster and stronger heavy-duty components have been released.',
     'pages.admin.subPage.title': 'This page can only be viewed by Admin',
-    'pages.admin.subPage.alertMessage':
-        'Umi ui is now released, welcome to use npm run ui to start the experience.',
+    'pages.admin.subPage.alertMessage': 'Umi ui is now released, welcome to use npm run ui to start the experience.',
     //
     'page.change-password.title': 'Change Password',
     'page.change-password.field.currentPassword': 'Current Password',
