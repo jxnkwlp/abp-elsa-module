@@ -7,7 +7,7 @@ using Elsa.Attributes;
 using Elsa.Expressions;
 using Elsa.Services;
 using Elsa.Services.Models;
-using Microsoft.Extensions.Caching.Distributed;
+using Volo.Abp.Caching;
 
 namespace Passingwind.Abp.ElsaModule.Activities.Caching;
 
@@ -27,9 +27,9 @@ public class RemoveCache : Activity
     public string Key { get; set; }
 
 
-    private readonly IDistributedCache _distributedCache;
+    private readonly IDistributedCache<CacheActivityCacheItem> _distributedCache;
 
-    public RemoveCache(IDistributedCache distributedCache)
+    public RemoveCache(IDistributedCache<CacheActivityCacheItem> distributedCache)
     {
         _distributedCache = distributedCache;
     }
@@ -39,7 +39,7 @@ public class RemoveCache : Activity
         if (string.IsNullOrEmpty(Key))
             throw new ArgumentNullException(nameof(Key));
 
-        await _distributedCache.RemoveAsync(Key, context.CancellationToken);
+        await _distributedCache.RemoveAsync(Key, token: context.CancellationToken);
 
         return Done();
     }

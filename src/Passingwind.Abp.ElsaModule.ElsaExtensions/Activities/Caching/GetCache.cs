@@ -7,7 +7,7 @@ using Elsa.Attributes;
 using Elsa.Expressions;
 using Elsa.Services;
 using Elsa.Services.Models;
-using Microsoft.Extensions.Caching.Distributed;
+using Volo.Abp.Caching;
 
 namespace Passingwind.Abp.ElsaModule.Activities.Caching;
 
@@ -29,9 +29,9 @@ public class GetCache : Activity
     [ActivityOutput]
     public string Value { get; set; }
 
-    private readonly IDistributedCache _distributedCache;
+    private readonly IDistributedCache<CacheActivityCacheItem> _distributedCache;
 
-    public GetCache(IDistributedCache distributedCache)
+    public GetCache(IDistributedCache<CacheActivityCacheItem> distributedCache)
     {
         _distributedCache = distributedCache;
     }
@@ -41,7 +41,9 @@ public class GetCache : Activity
         if (string.IsNullOrEmpty(Key))
             throw new ArgumentNullException(nameof(Key));
 
-        Value = await _distributedCache.GetStringAsync(Key, context.CancellationToken);
+        var result = await _distributedCache.GetAsync(Key, token: context.CancellationToken);
+
+        this.Value = result.Value;
 
         return Done();
     }

@@ -216,8 +216,9 @@ public class WorkflowAppWebModule : AbpModule
         {
             if (configuration.GetValue<bool>("Redis:IsEnabled"))
             {
+                var database = configuration.GetValue<int>("Redis:DefaultDatabase", 0);
                 ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
-                return new RedisDistributedSynchronizationProvider(connection.GetDatabase());
+                return new RedisDistributedSynchronizationProvider(connection.GetDatabase(database));
             }
             else
             {
@@ -355,7 +356,7 @@ public class WorkflowAppWebModule : AbpModule
         services.AddAbpSwaggerGen(
             options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "WorkflowApp API", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Workflow App API", Version = "v1" });
                 options.DocInclusionPredicate((docName, description) => true);
                 options.CustomSchemaIds(type => type.FullName);
                 // 
@@ -447,21 +448,16 @@ public class WorkflowAppWebModule : AbpModule
         });
     }
 
-    private void ConfigureDataProtection(
-        ServiceConfigurationContext context,
-        IConfiguration configuration,
-        IWebHostEnvironment hostingEnvironment)
+    private void ConfigureDataProtection(ServiceConfigurationContext context, IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
     {
         string appName = GetAppName(configuration);
         IDataProtectionBuilder dataProtectionBuilder = context.Services.AddDataProtection().SetApplicationName(appName);
         if (!hostingEnvironment.IsDevelopment() && configuration.GetValue<bool>("Redis:IsEnabled"))
         {
             ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
-            dataProtectionBuilder.PersistKeysToStackExchangeRedis(redis, $"{appName}-Protection-Keys");
+            dataProtectionBuilder.PersistKeysToStackExchangeRedis(redis, $"{appName}:Protection-Keys");
         }
     }
-
-
 
     private void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)
     {

@@ -8,6 +8,7 @@ using Elsa.Expressions;
 using Elsa.Services;
 using Elsa.Services.Models;
 using Microsoft.Extensions.Caching.Distributed;
+using Volo.Abp.Caching;
 
 namespace Passingwind.Abp.ElsaModule.Activities.Caching;
 
@@ -38,9 +39,10 @@ public class SetCache : Activity
         SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript })]
     public double? Expiration { get; set; }
 
-    private readonly IDistributedCache _distributedCache;
 
-    public SetCache(IDistributedCache distributedCache)
+    private readonly IDistributedCache<CacheActivityCacheItem> _distributedCache;
+
+    public SetCache(IDistributedCache<CacheActivityCacheItem> distributedCache)
     {
         _distributedCache = distributedCache;
     }
@@ -57,7 +59,7 @@ public class SetCache : Activity
             options.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(Expiration.Value);
         }
 
-        await _distributedCache.SetStringAsync(Key, Value ?? string.Empty, options, context.CancellationToken);
+        await _distributedCache.SetAsync(Key, new CacheActivityCacheItem { Value = Value }, options, token: context.CancellationToken);
 
         return Done();
     }

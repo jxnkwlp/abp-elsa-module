@@ -25,10 +25,11 @@ namespace Passingwind.Abp.ElsaModule.Activities.OAuth2;
 public class OAuth2Client : Activity, IActivityPropertyOptionsProvider
 {
     [ActivityInput(
-        Label = "Access Token URL",
+        Label = "Token Url",
         Hint = "",
-        SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid })]
-    public string AccessTokenURL { get; set; }
+        SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid },
+        IsDesignerCritical = true)]
+    public string TokenUrl { get; set; }
 
     [ActivityInput(
         Label = "Grant Type",
@@ -60,8 +61,8 @@ public class OAuth2Client : Activity, IActivityPropertyOptionsProvider
     public string Scope { get; set; }
 
     [ActivityInput(
-        Label = "UserName",
-        Hint = "The username for password grant type",
+        Label = "User Name",
+        Hint = "The username for password type",
         SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid },
         DependsOnEvents = new[] { "GrantType" },
         DependsOnValues = new[] { "password" })]
@@ -69,13 +70,32 @@ public class OAuth2Client : Activity, IActivityPropertyOptionsProvider
 
     [ActivityInput(
         Label = "Password",
-        Hint = "The password for password grant type",
+        Hint = "The password for password type",
         SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid })]
     public string Password { get; set; }
 
     [ActivityInput(
+        Label = "Code",
+        Hint = "The code for authorization_code type",
+        SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid })]
+    public string Code { get; set; }
+
+    [ActivityInput(
+        Label = "Redirect Url",
+        Hint = "The redirect url for authorization_code type",
+        SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid })]
+    public Uri RedirectUrl { get; set; }
+
+    [ActivityInput(
+        Label = "Refresh Token ",
+        Hint = "The refresh token for refresh_token type",
+        SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid })]
+    public string RefreshToken { get; set; }
+
+
+    [ActivityInput(
         Label = "Request Timeout",
-        Hint = "The request timeout(seconds)",
+        Hint = "The request timeout (seconds)",
         SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid })]
     public int? RequestTimeout { get; set; }
 
@@ -104,8 +124,8 @@ public class OAuth2Client : Activity, IActivityPropertyOptionsProvider
         {
             tokenResponse = await _httpClient.RequestPasswordTokenAsync(new PasswordTokenRequest()
             {
-                Address = AccessTokenURL,
-                GrantType = GrantType,
+                Address = TokenUrl,
+
                 ClientId = ClientId,
                 ClientSecret = ClientSecret,
                 Scope = Scope,
@@ -118,11 +138,36 @@ public class OAuth2Client : Activity, IActivityPropertyOptionsProvider
         {
             tokenResponse = await _httpClient.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest()
             {
-                Address = AccessTokenURL,
-                GrantType = GrantType,
+                Address = TokenUrl,
+
                 ClientId = ClientId,
                 ClientSecret = ClientSecret,
                 Scope = Scope,
+            });
+        }
+        else if (GrantType == "authorization_code")
+        {
+            tokenResponse = await _httpClient.RequestAuthorizationCodeTokenAsync(new AuthorizationCodeTokenRequest()
+            {
+                Address = TokenUrl,
+
+                ClientId = ClientId,
+                ClientSecret = ClientSecret,
+
+                Code = Code,
+                RedirectUri = RedirectUrl.ToString(),
+            });
+        }
+        else if (GrantType == "refresh_token")
+        {
+            tokenResponse = await _httpClient.RequestRefreshTokenAsync(new RefreshTokenRequest()
+            {
+                Address = TokenUrl,
+
+                ClientId = ClientId,
+                ClientSecret = ClientSecret,
+
+                RefreshToken = RefreshToken,
             });
         }
         else
@@ -160,7 +205,9 @@ public class OAuth2Client : Activity, IActivityPropertyOptionsProvider
         {
             return new List<SelectListItem>() {
                 new SelectListItem("Client Credentials", "client_credentials"),
-                new SelectListItem("Password Credentials", "password")
+                new SelectListItem("Password Credentials", "password"),
+                new SelectListItem("Authorization Code", "authorization_code"),
+                new SelectListItem("Refresh Token", "refresh_token"),
             };
         }
 
