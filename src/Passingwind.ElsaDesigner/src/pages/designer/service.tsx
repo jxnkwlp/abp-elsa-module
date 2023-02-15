@@ -25,7 +25,6 @@ import type {
     NodeTypeGroup,
     NodeTypeProperty,
 } from './type';
-import Request from 'umi-request';
 
 export const getNodeIconByType = (type: string) => {
     const dict = {
@@ -190,7 +189,7 @@ export const getPropertySyntaxes = (property: NodeTypeProperty): NodePropertySyn
 export const getNodeOutcomes = () => {};
 
 // 更新节点输出端口
-export const setNodeOutPorts = (node: Node<Node.Properties>, outcomes: string[]) => {
+export const setNodeOutPorts = (node: Node<Node.Properties>) => {
     // remove out ports
     const buttomPorts = node.getPortsByGroup('bottom');
 
@@ -274,7 +273,7 @@ export const getNextEdgeName = (node: Node, outEdges: Edge<Edge.Properties>[]) =
  *  获取输出边的差异
  */
 export const compareOutputEdges = (
-    node: Node,
+    _node: Node,
     outcomes: string[],
     outEdges: Edge<Edge.Properties>[],
 ): string[] => {
@@ -285,15 +284,15 @@ export const compareOutputEdges = (
 
 /**
  *  统一创建节点配置信息
+ *  节点属性只设置 id/label/name/icon/outcomes/type/x/y, 其他统一保存到 data
  */
 export const createNodeConfig = (config: Node.Metadata): Node.Metadata => {
-    const { id, label, name, type, displayName } = config;
+    const { id, label, name, type } = config;
     const nodeId = id || uuid();
     const nodeLabel = label ?? type;
     const nodeConfig = {
         id: nodeId,
         label: nodeLabel,
-        displayName: displayName ?? nodeLabel,
         name: name ?? randString(type),
         icon: getNodeIconByType(type),
     };
@@ -303,6 +302,7 @@ export const createNodeConfig = (config: Node.Metadata): Node.Metadata => {
         ...config,
         ...nodeConfig,
         data: {
+            ...config.data,
             ...nodeConfig,
         },
     };
@@ -321,7 +321,6 @@ export const createEdgeConfig = (config: Edge.Metadata): Edge.Metadata => {
         shape: edgeShapeName,
         ...config,
         id: edgeId,
-        name: edgeName,
         label: edgeName,
         outcome: edgeName,
     };
@@ -354,19 +353,11 @@ export const conventToServerData = (data: IGraphData) => {
         // if (!outcomes || !outcomes.length) {
         //     outcomes = ['Done'];
         // }
+        const data = item.data;
+
         return {
-            ...(item.data ?? {}),
+            ...data,
             activityId: item.id as string,
-            type: item.type,
-            name: item.name ?? randString(item.type),
-            displayName: item.displayName ?? item.label ?? item.type,
-            description: item.description,
-            properties: item.properties,
-            attributes: {
-                x: Math.round(item.position?.x ?? 0),
-                y: Math.round(item.position?.y ?? 0),
-                outcomes: outcomes,
-            },
         } as API.ActivityCreateOrUpdate;
     });
 
@@ -394,11 +385,8 @@ export const conventToGraphData = async (
                 y: parseInt(item.attributes?.y ?? 0),
                 outcomes: item.attributes?.outcomes ?? [],
                 label: item.displayName ?? item.type,
-                displayName: item.displayName,
                 name: item.name,
                 type: item.type,
-                description: item.description,
-                properties: item.properties,
             }) as Node.Properties,
         );
     });
@@ -526,7 +514,7 @@ export const getCSharpEditorLanguageProvider = async (
 };
 
 export const graphValidateMagnet = (graph: Graph, args: any) => {
-    const { cell, view, magnet } = args;
+    const { cell, magnet } = args;
 
     if (!magnet) return false;
 
@@ -540,7 +528,7 @@ export const graphValidateMagnet = (graph: Graph, args: any) => {
     return true;
 };
 
-export const graphValidateConnection = (graph: Graph, args: any) => {
+export const graphValidateConnection = (_graph: Graph, args: any) => {
     const { targetMagnet } = args;
 
     if (!targetMagnet) {
@@ -550,8 +538,8 @@ export const graphValidateConnection = (graph: Graph, args: any) => {
     return true;
 };
 
-export const graphValidateEdge = (graph: Graph, args: any) => {
-    const { edge, type } = args;
+export const graphValidateEdge = (_graph: Graph, args: any) => {
+    const { edge } = args;
 
     if (edge.getProp('shape') != 'elsa-edge') {
         return false;
@@ -569,7 +557,7 @@ export const graphValidateEdge = (graph: Graph, args: any) => {
 };
 
 export const graphCreateEdge = (graph: Graph, args: any) => {
-    const { sourceCell, sourceMagnet } = args;
+    const { sourceCell } = args;
 
     //
     if (sourceCell.isNode()) {
@@ -583,9 +571,9 @@ export const graphCreateEdge = (graph: Graph, args: any) => {
     } else return null;
 };
 
-export const createGraph = (options?: any) => {
+export const createDefaultGraph = (ele: HTMLElement | null, options: any = null) => {
     return new Graph({
-        container: document.getElementById('graphContainer')!,
+        container: ele,
         autoResize: true,
         grid: {
             size: 10,

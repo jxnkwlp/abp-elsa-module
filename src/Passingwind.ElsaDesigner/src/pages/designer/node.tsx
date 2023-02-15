@@ -28,13 +28,13 @@ export class ElsaNode extends React.Component<{ node?: Node }> {
         const { node } = this.props;
         const data = node?.getData() as NodeData;
         const prop = node?.getProp();
-        const { displayName = '', icon } = prop as NodeData;
+        const { label = '', icon } = prop as NodeData;
         const { status = 'default' } = data as NodeData;
 
         return (
             <div className={`node ${status}`}>
                 <span className="icon">{icon ? { ...icon } : <ApiOutlined />}</span>
-                <span className="label">{displayName}</span>
+                <span className="label">{label}</span>
                 <span className="status">
                     {status == 'success' && <CheckCircleOutlined />}
                     {status == 'failed' && <CloseCircleOutlined />}

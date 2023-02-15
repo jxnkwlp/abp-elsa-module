@@ -50,7 +50,7 @@ export type NodeUpdateData = {
     description?: string;
     properties: NodeUpdatePropData[];
     outcomes: string[];
-    attribtues?: Record<string, any>;
+    attributes?: Record<string, any>;
     [key: string]: any;
 };
 
@@ -76,11 +76,13 @@ export type NodeData = {
  *  表单数据类型
  */
 export type NodeEditFormData = {
+    id: string;
     name: string;
     displayName: string;
     description?: string;
     props: NodeEditFormPropData;
-    // attribtues?: Record<string, any>;
+    properties: NodeUpdatePropData[];
+    propertyStorageProviders: Record<string, any>;
     [key: string]: any;
 };
 

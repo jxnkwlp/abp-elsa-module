@@ -156,26 +156,23 @@ type NodePropFormProps = {
     // setFieldsValue: (value: any) => void;
     // setFieldValue: (key: NamePath, value: any) => void;
     // getFieldValue: (key: NamePath) => any;
+    storageProviders: Record<string, any>;
 };
 
 const NodePropForm: React.FC<NodePropFormProps> = (props) => {
-    const { properties } = props;
+    const { properties, storageProviders } = props;
 
     const intl = useIntl();
 
     const [tabKey, setTabKey] = React.useState<string>('properties');
-    const [storageProviders, setStorageProviders] = React.useState<any[]>([]);
 
     useEffect(() => {
         if (properties.length > 0) {
+            setTabKey('properties');
+        } else {
             setTabKey('common');
         }
-    }, []);
-
-    const loadStorageProviders = async () => {
-        const result = await getWorkflowStorageProviders();
-        setStorageProviders(result?.items ?? []);
-    };
+    }, [props, properties]);
 
     const renderProperties = () => {
         const formItems: React.ReactNode[] = [];
@@ -452,14 +449,11 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
         return items;
     };
 
-    useEffect(() => {
-        loadStorageProviders();
-    }, []);
-
     return (
         <>
             <Tabs
-                defaultActiveKey={tabKey}
+                activeKey={tabKey}
+                onChange={setTabKey}
                 type="line"
                 style={{ width: '100%', flex: 1 }}
                 items={getTabItems()}

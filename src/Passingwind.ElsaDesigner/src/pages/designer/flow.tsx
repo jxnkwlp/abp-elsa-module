@@ -16,14 +16,14 @@ import '@antv/x6-react-components/es/menu/style/index.css';
 import '@antv/x6-react-components/es/toolbar/style/index.css';
 import type { Dnd } from '@antv/x6/lib/addon';
 import { message } from 'antd';
-import React, { useEffect, useImperativeHandle, useRef } from 'react';
+import React, { useEffect, useImperativeHandle } from 'react';
 import { useIntl } from 'umi';
 import './flow.less';
 import { registerNodeTypes } from './node';
 import NodeTypesPanel from './node-types';
 import {
     compareOutputEdges,
-    createGraph,
+    createDefaultGraph,
     createNodeConfig,
     getNodeTypeRawData,
     graphCreateEdge,
@@ -34,6 +34,21 @@ import {
     updateEdgeStatus,
 } from './service';
 import type { IGraphData, NodeStatus, NodeUpdateData, ToolBarGroupData } from './type';
+
+export type FlowActionType = {
+    getGraphData: () => Promise<IGraphData>;
+    updateNodeProperties: (id: string, value: NodeUpdateData) => void;
+    updateNodeOutPorts: (id: string, outNames: string[]) => void;
+    //
+    setNodeStatus: (id: string, status: NodeStatus) => void;
+    setAllNodeStatus: (status: NodeStatus) => void;
+    setEdgeStyle: (id: string, status: NodeStatus) => void;
+    setAllEdgesStyle: (status: NodeStatus) => void;
+    //
+    // setNodeIncomingEdgesStyle: (id: string, status: NodeStatus) => void;
+    // setNodeOutgoingEdgesStyle: (id: string, status: NodeStatus) => void;
+    setNodeOutgoingEdgeStyle: (id: string, edgeId: string, status: NodeStatus) => void;
+};
 
 type IFlowProps = {
     height?: number;
@@ -56,26 +71,13 @@ type IFlowProps = {
     onBlankClick?: () => void;
 };
 
-export type FlowActionType = {
-    getGraphData: () => Promise<IGraphData>;
-    updateNodeProperties: (id: string, value: NodeUpdateData) => void;
-    updateNodeOutPorts: (id: string, outNames: string[]) => void;
-    //
-    setNodeStatus: (id: string, status: NodeStatus) => void;
-    setAllNodeStatus: (status: NodeStatus) => void;
-    setEdgeStyle: (id: string, status: NodeStatus) => void;
-    setAllEdgesStyle: (status: NodeStatus) => void;
-    //
-    // setNodeIncomingEdgesStyle: (id: string, status: NodeStatus) => void;
-    // setNodeOutgoingEdgesStyle: (id: string, status: NodeStatus) => void;
-    setNodeOutgoingEdgeStyle: (id: string, edgeId: string, status: NodeStatus) => void;
-};
-
 const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
     const { actionRef, graphData } = props;
-    const intl = useIntl();
 
-    const graphInstance = useRef<Graph>();
+    const graphElementRef = React.useRef<HTMLDivElement>(null);
+    const graphRef = React.useRef<Graph>();
+
+    const intl = useIntl();
 
     const [toolbarItemData, setToolbarItemData] = React.useState<ToolBarGroupData[]>([]);
 
@@ -83,13 +85,13 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
 
     useImperativeHandle(actionRef, () => ({
         getGraphData: async () => {
-            const cells = graphInstance.current?.toJSON().cells;
+            const cells = graphRef.current?.toJSON().cells;
             const edges = cells?.filter((x) => x.shape == 'edge' || x.shape == 'elsa-edge');
             const nodes = cells?.filter((x) => x.shape != 'edge' && x.shape != 'elsa-edge');
             return { nodes, edges } as IGraphData;
         },
         updateNodeProperties: (id, values) => {
-            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
+            const node = graphRef.current?.getNodes().find((x) => x.id == id);
             if (!node) {
                 message.error(`node id '${id}' not found`);
                 return;
@@ -98,28 +100,30 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                 //
                 // node.attr('label', { text: values.displayName });
                 //
+                // node.prop('id', values.name);
                 node.prop('name', values.name);
-                node.prop('displayName', values.displayName);
-                node.prop('description', values.description);
+                node.prop('label', values.label);
                 //
                 node.prop('outcomes', values.outcomes);
                 //
                 node.prop('properties', values.properties);
-                node.updateData(values.attribtues);
+
+                // save data
+                node.replaceData(values);
 
                 //
                 const beRemoveEdges = compareOutputEdges(
                     node,
                     values.outcomes,
-                    graphInstance.current?.getOutgoingEdges(node) ?? [],
+                    graphRef.current?.getOutgoingEdges(node) ?? [],
                 );
                 beRemoveEdges.forEach((item) => {
-                    graphInstance.current?.removeEdge(item);
+                    graphRef.current?.removeEdge(item);
                 });
             }
         },
         updateNodeOutPorts: (id, values) => {
-            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
+            const node = graphRef.current?.getNodes().find((x) => x.id == id);
             if (!node) {
                 message.error(`node id '${id}' not found`);
                 return;
@@ -131,24 +135,24 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         },
         //
         setAllNodeStatus: (status) => {
-            const allNodes = graphInstance.current?.getNodes() ?? [];
+            const allNodes = graphRef.current?.getNodes() ?? [];
             allNodes.forEach((node) => {
                 node?.updateData({ status: status });
             });
         },
         setNodeStatus: (id, status) => {
-            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
+            const node = graphRef.current?.getNodes().find((x) => x.id == id);
             node?.updateData({ status: status });
         },
         setAllEdgesStyle: (status) => {
-            const allEdges = graphInstance.current?.getEdges() ?? [];
+            const allEdges = graphRef.current?.getEdges() ?? [];
             allEdges.forEach((edge) => {
                 edge?.updateData({ status: status });
                 updateEdgeStatus(edge, status);
             });
         },
         setEdgeStyle: (id, status) => {
-            const edge = graphInstance.current?.getEdges().find((x) => x.id == id);
+            const edge = graphRef.current?.getEdges().find((x) => x.id == id);
             if (edge) {
                 edge?.updateData({ status: status });
                 updateEdgeStatus(edge!, status);
@@ -156,31 +160,31 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         },
         //
         // setNodeIncomingEdgesStyle: (id, status) => {
-        //     const node = graphInstance.current?.getNodes().find((x) => x.id == id);
+        //     const node = graphRef.current?.getNodes().find((x) => x.id == id);
         //     if (node) {
-        //         const edges = graphInstance.current?.getIncomingEdges(node);
+        //         const edges = graphRef.current?.getIncomingEdges(node);
         //         edges?.forEach((edge) => {
-        //             const view = edge.findView(graphInstance.current!);
+        //             const view = edge.findView(graphRef.current!);
         //             view?.removeClass(NodeTypeStyleNames);
         //             view?.addClass(style);
         //         });
         //     }
         // },
         // setNodeOutgoingEdgesStyle: (id, style) => {
-        //     const node = graphInstance.current?.getNodes().find((x) => x.id == id);
+        //     const node = graphRef.current?.getNodes().find((x) => x.id == id);
         //     if (node) {
-        //         const edges = graphInstance.current?.getOutgoingEdges(node);
+        //         const edges = graphRef.current?.getOutgoingEdges(node);
         //         edges?.forEach((edge) => {
-        //             const view = edge.findView(graphInstance.current!);
+        //             const view = edge.findView(graphRef.current!);
         //             view?.removeClass(NodeTypeStyleNames);
         //             view?.addClass(style);
         //         });
         //     }
         // },
         setNodeOutgoingEdgeStyle: (id, edgeId, status) => {
-            const node = graphInstance.current?.getNodes().find((x) => x.id == id);
+            const node = graphRef.current?.getNodes().find((x) => x.id == id);
             if (node) {
-                const edges = graphInstance.current?.getOutgoingEdges(node);
+                const edges = graphRef.current?.getOutgoingEdges(node);
                 edges?.forEach((edge) => {
                     if (edge.getProp('outcome') == edgeId || edge.id == edgeId) {
                         edge?.updateData({ status: status });
@@ -282,21 +286,11 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         }
     };
 
-    // const handleOnNodeClick = useCallback((nodeConfig: Node.Properties, node: Node) => {
-    //     props?.onNodeClick?.(nodeConfig, node);
-    // }, []);
-
-    const loadGraphData = (data: IGraphData) => {
-        // console.log(graphInstance.current);
-        if (!graphInstance?.current) {
-            console.error('graph never initial.');
-            // message.error('');
-            return;
-        }
+    const loadGraphData = (graph: Graph, data: IGraphData) => {
+        props?.onDataUpdate?.(graph);
+        graph.fromJSON(data);
         // @ts-ignore
-        graphInstance?.current?.fromJSON(data);
-        graphInstance?.current?.centerContent({ padding: 50 });
-        props?.onDataUpdate?.(graphInstance.current!);
+        graph.centerContent({ padding: 50 });
     };
 
     const handleOnDrag = async (type: string, e: any) => {
@@ -306,7 +300,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         //     label: type,
         // });
 
-        if (!graphInstance.current) {
+        if (!graphRef.current) {
             return;
         }
 
@@ -326,22 +320,23 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             typeDescriptor: type,
         });
 
-        const node = graphInstance.current?.createNode(nodeConfig);
+        const node = graphRef.current?.createNode(nodeConfig);
 
         if (node) dnd?.start(node!, e);
     };
 
-    const initial = async () => {
-        const readonly = props.readonly ?? false;
+    useEffect(() => {
+        if (graphData && graphRef.current) {
+            console.debug('graph load: ', graphData);
+            loadGraphData(graphRef.current, graphData);
+        }
+    }, [graphData, graphRef.current]);
 
-        let graph: Graph;
-        if (!graphInstance.current) {
-            console.debug('graph initial...');
-
+    useEffect(() => {
+        const configeGraph = (graph: Graph) => {
             registerNodeTypes();
 
-            // 创建 graph
-            graph = createGraph();
+            const readonly = props.readonly ?? false;
 
             // 是否可以新增边
             graph.options.connecting.validateMagnet = (e) => graphValidateMagnet(graph, e);
@@ -352,122 +347,114 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             // 创建边
             graph.options.connecting.createEdge = (e) => graphCreateEdge(graph, e);
 
-            // set instance
-            graphInstance.current = graph;
-            props?.onGraphInitial?.(graph);
-        } else {
-            graph = graphInstance.current!;
-        }
-
-        if (readonly) {
-            graph.disableClipboard();
-            graph.disableHistory();
-            graph.disableSnapline();
-            // graph.disableSelection();
-            graph.disableRubberband();
-            // @ts-ignore
-            graph.options.interacting.nodeMovable = false;
-        }
-
-        const dnd = new Addon.Dnd({
-            target: graph!,
-            scaled: false,
-            animation: true,
-            // getDragNode: (node) => node.clone({ keepId: true }),
-            // getDropNode: (node) => {
-            //     const node2 = node.clone({ keepId: true });
-            //     // updateNodePorts(node2);
-            //     return node2;
-            // },
-        });
-        setDnd(dnd);
-
-        graph.on('node:click', ({ node }) => {
-            console.debug('node', node);
-            console.debug('node data', node.getData());
-            node.toFront();
-            // handleOnNodeClick(node.getProp() as Node.Properties, node);
-            props?.onNodeClick?.(node.getProp() as Node.Properties, node);
-        });
-
-        graph.on('node:dblclick', ({ node }) => {
-            props.onNodeDoubleClick?.(node.getProp() as Node.Properties, node);
-        });
-
-        graph.on('edge:click', ({ edge }) => {
-            console.debug(edge);
-            edge.toFront();
-            props.onEdgeClick?.({ ...edge });
-        });
-
-        graph.on('edge:dblclick', ({ edge }) => {
-            props.onEdgeDoubleClick?.({ ...edge });
-        });
-
-        graph.on('node:mouseenter', ({ node }) => {
-            if (!readonly) {
-                node.addTools([
-                    {
-                        name: 'button-remove',
-                        args: { x: '100%', y: 0, offset: { x: -5, y: 5 } },
-                    },
-                ]);
-
-                toggleNodePortVisible(node, true);
+            if (readonly) {
+                graph.disableClipboard();
+                graph.disableHistory();
+                graph.disableSnapline();
+                // graph.disableSelection();
+                graph.disableRubberband();
+                // @ts-ignore
+                graph.options.interacting.nodeMovable = false;
             }
-        });
 
-        graph.on('node:mouseleave', ({ node }) => {
-            node.removeTools();
+            const dnd = new Addon.Dnd({
+                target: graph!,
+                scaled: false,
+                animation: true,
+                // getDragNode: (node) => node.clone({ keepId: true }),
+                // getDropNode: (node) => {
+                //     const node2 = node.clone({ keepId: true });
+                //     // updateNodePorts(node2);
+                //     return node2;
+                // },
+            });
+            setDnd(dnd);
 
-            toggleNodePortVisible(node, false);
-        });
+            graph.on('node:click', ({ node }) => {
+                console.debug('node', node);
+                console.debug('node data', node.getData());
+                node.toFront();
+                props?.onNodeClick?.(node.getProp() as Node.Properties, node);
+            });
 
-        graph.on('edge:mouseenter', ({ edge }) => {
-            if (!readonly) {
+            graph.on('node:dblclick', ({ node }) => {
+                props.onNodeDoubleClick?.(node.getProp() as Node.Properties, node);
+            });
+
+            graph.on('edge:click', ({ edge }) => {
+                console.debug(edge);
                 edge.toFront();
-                edge.addTools([
-                    {
-                        name: 'button-remove',
-                        args: { distance: -40 },
-                    },
-                ]);
-            }
-        });
+                props.onEdgeClick?.({ ...edge });
+            });
 
-        graph.on('edge:mouseleave', ({ edge }) => {
-            edge.removeTools();
-            edge.setZIndex(-1);
-        });
+            graph.on('edge:dblclick', ({ edge }) => {
+                props.onEdgeDoubleClick?.({ ...edge });
+            });
 
-        graph.on('blank:click', ({}) => {
-            (graph.getCells() ?? []).forEach((item) => {
-                if (item.isNode()) {
-                    toggleNodePortVisible(item, false);
-                }
-                if (item.isEdge()) {
-                    item.setZIndex(-1);
-                    item.removeTools();
+            graph.on('node:mouseenter', ({ node }) => {
+                if (!readonly) {
+                    node.addTools([
+                        {
+                            name: 'button-remove',
+                            args: { x: '100%', y: 0, offset: { x: -5, y: 5 } },
+                        },
+                    ]);
+
+                    toggleNodePortVisible(node, true);
                 }
             });
 
-            // call
-            props?.onBlankClick?.();
-        });
-    };
+            graph.on('node:mouseleave', ({ node }) => {
+                node.removeTools();
+                toggleNodePortVisible(node, false);
+            });
 
-    useEffect(() => {
-        if (graphData && graphInstance.current) {
-            console.debug('graph load: ', graphData);
-            loadGraphData(graphData);
-        }
-    }, [graphData, graphInstance.current]);
+            graph.on('edge:mouseenter', ({ edge }) => {
+                if (!readonly) {
+                    edge.toFront();
+                    edge.addTools([
+                        {
+                            name: 'button-remove',
+                            args: { distance: -40 },
+                        },
+                    ]);
+                }
+            });
 
-    useEffect(() => {
-        initial();
+            graph.on('edge:mouseleave', ({ edge }) => {
+                edge.removeTools();
+                edge.setZIndex(-1);
+            });
+
+            graph.on('blank:click', ({}) => {
+                (graph.getCells() ?? []).forEach((item) => {
+                    if (item.isNode()) {
+                        toggleNodePortVisible(item, false);
+                    }
+                    if (item.isEdge()) {
+                        item.setZIndex(-1);
+                        item.removeTools();
+                    }
+                });
+
+                // call
+                props?.onBlankClick?.();
+            });
+        };
+
+        // create
+        const graph = createDefaultGraph(graphElementRef.current);
+        graphRef.current = graph;
+
+        // update
+        configeGraph(graph);
+
+        const destroy = () => {
+            graph.dispose();
+        };
 
         return () => {
-            if (graphInstance) graphInstance.current?.dispose();
+            destroy();
         };
     }, [0]);
 
@@ -565,12 +552,11 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
         }
     }, [0]);
 
-    // const height = props.height ?? 600;
-
     return (
         <div className="flow-container">
             {(props.showNodeTypes ?? true) && <NodeTypesPanel key="types" onDrag={handleOnDrag} />}
             <div
+                ref={graphElementRef}
                 id="graphContainer"
                 className="graph-container"
                 style={{
@@ -598,7 +584,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                                                 tooltip={item2.tooltip}
                                                 icon={item2.icon}
                                                 onClick={() => {
-                                                    item2.onClick?.(graphInstance.current!);
+                                                    item2.onClick?.(graphRef.current!);
                                                 }}
                                             />
                                         );

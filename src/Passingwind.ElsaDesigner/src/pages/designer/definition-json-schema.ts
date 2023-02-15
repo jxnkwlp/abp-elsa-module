@@ -1,16 +1,16 @@
 export default
     {
         "$schema": "http://json-schema.org/draft-06/schema#",
-        "$ref": "#/definitions/root",
+        "$ref": "#/definitions/Self",
         "definitions": {
-            "root": {
+            "Self": {
                 "type": "object",
-                "additionalProperties": false,
+                "additionalProperties": true,
                 "properties": {
                     "activities": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/definitions/activity"
+                            "$ref": "#/definitions/Activity"
                         }
                     },
                     "connections": {
@@ -24,17 +24,15 @@ export default
                     "activities",
                     "connections"
                 ],
-                "title": "root"
+                "title": "Self"
             },
-            "activity": {
+            "Activity": {
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                    "displayName": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
+                    "$id": {
+                        "type": "string",
+                        "format": "integer"
                     },
                     "activityId": {
                         "type": "string",
@@ -43,15 +41,26 @@ export default
                     "type": {
                         "type": "string"
                     },
+                    "name": {
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
                     "description": {
-                        "anyOf": [
-                            {
-                                "type": "null"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
+                        "type": "string"
+                    },
+                    "persistWorkflow": {
+                        "type": "boolean"
+                    },
+                    "loadWorkflowContext": {
+                        "type": "boolean"
+                    },
+                    "saveWorkflowContext": {
+                        "type": "boolean"
+                    },
+                    "attributes": {
+                        "$ref": "#/definitions/ActivityAttributes"
                     },
                     "properties": {
                         "type": "array",
@@ -59,64 +68,77 @@ export default
                             "$ref": "#/definitions/Property"
                         }
                     },
-                    "attributes": {
-                        "$ref": "#/definitions/activityAttributes"
+                    "propertyStorageProviders": {
+                        "$ref": "#/definitions/PropertyStorageProviders"
+                    },
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "icon": {
+                        "type": "null"
                     }
                 },
                 "required": [
                     "activityId",
-                    "description",
-                    "displayName",
+                    "attributes",
+                    "id",
+                    "label",
                     "name",
-                    "type",
                     "properties",
-                    "attributes"
+                    "type"
                 ],
-                "title": "activity"
+                "title": "Activity"
             },
-            "activityAttributes": {
+            "ActivityAttributes": {
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
+                    "$id": {
+                        "type": "string",
+                        "format": "integer"
+                    },
                     "x": {
                         "type": "integer"
                     },
                     "y": {
                         "type": "integer"
+                    },
+                    "outcomes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 },
                 "required": [
-                    "outcomes",
-                    "x",
-                    "y"
+                    "outcomes"
                 ],
-                "title": "activityAttributes"
+                "title": "ActivityAttributes"
             },
             "Property": {
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
+                    "$id": {
+                        "type": "string",
+                        "format": "integer"
+                    },
                     "name": {
                         "type": "string"
                     },
-                    "syntax": {
-                        "anyOf": [
-                            {
-                                "type": "null"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
                     "expressions": {
                         "$ref": "#/definitions/Expressions"
+                    },
+                    "syntax": {
+                        "type": "string"
                     }
                 },
                 "required": [
-                    "expressions",
-                    "name",
-                    "syntax"
+                    "expressions"
                 ],
                 "title": "Property"
             },
@@ -124,21 +146,45 @@ export default
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                    "Json": {
+                    "$id": {
+                        "type": "string",
+                        "format": "integer"
+                    },
+                    "Literal": {
                         "type": "string"
                     },
                     "JavaScript": {
                         "type": "string"
                     },
-                    "Literal": {
+                    "C#": {
                         "type": "string"
                     },
-                    "Liquid": {
+                    "Json": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "$id"
+                ],
+                "title": "Expressions"
+            },
+            "PropertyStorageProviders": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "$id": {
+                        "type": "string",
+                        "format": "integer"
+                    },
+                    "Output": {
+                        "type": "string"
+                    },
+                    "Path": {
                         "type": "string"
                     }
                 },
                 "required": [],
-                "title": "Expressions"
+                "title": "PropertyStorageProviders"
             },
             "Connection": {
                 "type": "object",
@@ -152,17 +198,41 @@ export default
                         "type": "string",
                         "format": "uuid"
                     },
+                    "sourceActivityId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "targetActivityId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
                     "outcome": {
                         "type": "string"
+                    },
+                    "attributes": {
+                        "$ref": "#/definitions/ConnectionAttributes"
                     }
                 },
                 "required": [
-                    "attributes",
                     "outcome",
                     "sourceId",
                     "targetId"
                 ],
                 "title": "Connection"
+            },
+            "ConnectionAttributes": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "sourcePort": {
+                        "type": "string"
+                    },
+                    "targetPort": {
+                        "type": "string"
+                    }
+                },
+                "required": [],
+                "title": "ConnectionAttributes"
             }
         }
     }

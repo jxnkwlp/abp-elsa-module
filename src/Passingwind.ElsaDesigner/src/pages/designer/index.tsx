@@ -2,6 +2,7 @@ import MonacoEditor from '@/components/MonacoEditor';
 import { MonacoCompletionItemKind } from '@/services/enums';
 import type { API } from '@/services/typings';
 import { showDownloadJsonFile } from '@/services/utils';
+import { getWorkflowStorageProviders } from '@/services/Workflow';
 import {
     createWorkflowDefinition,
     deleteWorkflowDefinitionVersion,
@@ -39,13 +40,7 @@ import {
     getNodeTypeRawData,
     getPropertySyntaxes,
 } from './service';
-import type {
-    IGraphData,
-    NodeEditFormData,
-    NodeTypeProperty,
-    NodeUpdateData,
-    NodeUpdatePropData,
-} from './type';
+import type { IGraphData, NodeEditFormData, NodeTypeProperty, NodeUpdateData } from './type';
 
 let codeAnalysisTimer = 0;
 
@@ -62,12 +57,15 @@ const Index: React.FC = () => {
 
     const [fromDefinition, setFromDefinition] = React.useState<{ id: string; version: number }>();
 
+    const [storageProviders, setStorageProviders] = React.useState<any[]>([]);
+
     const [submiting, setSubmiting] = React.useState(false);
     //
     const [definitionId, setDefinitionId] = React.useState<string>();
     const [version, setVersion] = React.useState<number>(1);
-    const [, setDefinitionVersion] = React.useState<API.WorkflowDefinitionVersion>();
     const [definition, setDefinition] = React.useState<API.WorkflowDefinition>();
+    const [definitionVersion, setDefinitionVersion] =
+        React.useState<API.WorkflowDefinitionVersion>();
 
     const [oldVersion, setOldVersion] = React.useState<number>();
 
@@ -186,13 +184,13 @@ const Index: React.FC = () => {
 
     // show node edit form
     // 显示节点属性编辑表单
-    const handleOnShowNodeEditForm = async (nodeConfig: Node.Properties, node: Node) => {
+    const handleShowNodeEditForm = async (nodeConfig: Node.Properties, node: Node) => {
         const loading2 = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
         //
         setNodeTypePropFormTitle(
             <Space>
                 {intl.formatMessage({ id: 'page.designer.settings.title' })}
-                <span>{` - ${nodeConfig.displayName}`}</span>
+                <span>{` - ${node.data.label ?? ''}`}</span>
                 <Tag>{nodeConfig.type}</Tag>
             </Space>,
         );
@@ -208,6 +206,8 @@ const Index: React.FC = () => {
             return;
         }
 
+        setNodeTypeDescriptor(nodeType);
+
         const propItems = (nodeType.inputProperties ?? [])
             .filter((x) => x.isBrowsable)
             .map((x) => {
@@ -221,15 +221,13 @@ const Index: React.FC = () => {
         setNodeTypePropList(propItems ?? []);
 
         // build node edit data
-        const nodeData: NodeEditFormData = {
+        const formData: NodeEditFormData = {
             ...(node.getData() ?? {}),
-            name: node.getProp('name') ?? '',
-            displayName: node.getProp('displayName') ?? '',
-            description: node.getProp('description') ?? '',
+            id: node.id ?? '',
+            displayName: node.data.label, // to displayname
+            // new
             props: {},
         };
-
-        setNodeTypeDescriptor(nodeType);
 
         // initial all form fields
         const propertySyntaxs = {};
@@ -253,7 +251,7 @@ const Index: React.FC = () => {
             }
 
             if (defaultSyntax)
-                nodeData.props[propItem.name] = {
+                formData.props[propItem.name] = {
                     syntax: 'Default',
                     value: defaultValue,
                     expressions: {
@@ -263,7 +261,7 @@ const Index: React.FC = () => {
                 };
 
             if (propSyntax.editor) {
-                nodeData.props[propItem.name] = {
+                formData.props[propItem.name] = {
                     syntax: propSyntax.editor,
                     value: defaultValue,
                     noSyntax: true, // special case
@@ -277,8 +275,7 @@ const Index: React.FC = () => {
         setNodePropertySyntaxs(propertySyntaxs);
 
         // property
-        const sourceProperties = (node.getProp('properties') ?? []) as NodeUpdatePropData[];
-        console.debug('activity properties source : ', sourceProperties);
+        const sourceProperties = formData.properties ?? [];
 
         // load form data and overwrite
         sourceProperties.forEach((item) => {
@@ -311,10 +308,10 @@ const Index: React.FC = () => {
                 }
             }
 
-            const current = nodeData.props[item.name] ?? {};
+            const current = formData.props[item.name] ?? {};
             const expressions = current?.expressions ?? {};
             if (current.noSyntax) {
-                nodeData.props[item.name] = {
+                formData.props[item.name] = {
                     ...current,
                     expressions: {
                         ...expressions,
@@ -324,7 +321,7 @@ const Index: React.FC = () => {
                     },
                 };
             } else {
-                nodeData.props[item.name] = {
+                formData.props[item.name] = {
                     ...current,
                     syntax: syntax,
                     expressions: {
@@ -336,13 +333,13 @@ const Index: React.FC = () => {
             }
         });
 
-        setEditNodeFormData(nodeData);
+        setEditNodeFormData(formData);
 
-        console.debug('load form data: ', nodeData);
+        console.debug('load form data: ', formData);
 
         // force update form value
-        // editNodeFormRef.resetFields();
-        editNodeFormRef.setFieldsValue(nodeData);
+        editNodeFormRef.resetFields();
+        editNodeFormRef.setFieldsValue(formData);
 
         // show
         setNodeTypePropFormVisible(true);
@@ -351,18 +348,17 @@ const Index: React.FC = () => {
 
     // handle on node edit form submit
     // 更新节点数据
-    const handleUpdateNodeProperties = async (formData: NodeEditFormData) => {
+    const handleSaveNodeEditForm = async (formData: NodeEditFormData) => {
         console.debug('save form data: ', formData);
         const result: NodeUpdateData = {
             ...formData,
             name: formData.name,
-            displayName: formData.displayName,
-            description: formData.description,
-            properties: [],
-            outcomes: [],
-            attribtues: formData,
+            label: formData.displayName, // to label
+            properties: [], // overwrite
+            outcomes: [], // overwrite
         };
 
+        // update properties
         if (formData.props) {
             // as default, one syntax map one expressions key value
             // if not, use expressions first key as syntax and use expressions first value as value
@@ -460,7 +456,7 @@ const Index: React.FC = () => {
 
         result.outcomes = outcomes;
 
-        console.debug('updated node: ', result);
+        console.debug('update node data: ', result);
         flowAction.current?.updateNodeProperties(editNodeId, result);
     };
 
@@ -603,38 +599,39 @@ const Index: React.FC = () => {
         loading();
     };
 
-    const switchJsonEditor = async () => {
-        setLoading(true);
-        if (!jsonEditorVisible) {
-            const result = await flowAction.current?.getGraphData();
-            if (result) {
-                const result2 = conventToServerData(result);
-                setJsonEditorValue(JSON.stringify(result2, null, 2));
-                setJsonEditorVisible(true);
-            } else {
-                message.error('Get graph data failed');
-            }
+    const handleshowJsonEditor = async () => {
+        message.loading(intl.formatMessage({ id: 'common.dict.loading' }), 1);
+        const result = await flowAction.current?.getGraphData();
+        if (result) {
+            const result2 = conventToServerData(result);
+            setJsonEditorValue(JSON.stringify(result2, null, 2));
+            setJsonEditorVisible(true);
         } else {
-            setJsonEditorVisible(false);
-            try {
-                const data = JSON.parse(jsonEditorValue);
-                const data2 = { connections: [], activities: data.activities };
-                if (data?.connections) {
-                    data2.connections = data.connections?.map((x: any) => {
-                        return {
-                            sourceId: x.sourceId ?? x.sourceActivityId,
-                            targetId: x.targetId ?? x.targetActivityId,
-                            outcome: x.outcome,
-                        };
-                    });
-                }
-
-                await loadServerData(data2 as API.WorkflowDefinition, false);
-            } catch (error) {
-                message.error('Transform json failed');
-            }
+            message.error('Get graph data failed');
         }
-        setLoading(false);
+    };
+
+    const handleUpdateFromJsonEditor = async () => {
+        message.loading(intl.formatMessage({ id: 'common.dict.loading' }), 1);
+        try {
+            const data = JSON.parse(jsonEditorValue);
+            const data2 = { connections: [], activities: data.activities };
+            if (data?.connections) {
+                data2.connections = data.connections?.map((x: any) => {
+                    return {
+                        sourceId: x.sourceId ?? x.sourceActivityId,
+                        targetId: x.targetId ?? x.targetActivityId,
+                        outcome: x.outcome,
+                    };
+                });
+            }
+
+            setJsonEditorVisible(false);
+
+            await loadServerData(data2 as API.WorkflowDefinition, false);
+        } catch (error) {
+            message.error('Transform json failed');
+        }
     };
 
     const updateMonacorEditorSciptProvider = () => {
@@ -907,6 +904,15 @@ const Index: React.FC = () => {
         return registerCSharpLanguageProvider();
     };
 
+    const handleNodeDBClick = (nodeConfig: Node.Properties, node: Node) => {
+        handleShowNodeEditForm(nodeConfig, node);
+    };
+
+    const loadStorageProviders = async () => {
+        const result = await getWorkflowStorageProviders();
+        setStorageProviders(result?.items ?? []);
+    };
+
     const loadData = async (did: string, version?: number) => {
         setLoading(true);
         let definitonVersion: API.WorkflowDefinitionVersion;
@@ -916,6 +922,7 @@ const Index: React.FC = () => {
         setLoading(false);
         if (definitonVersion) {
             setDefinitionVersion(definitonVersion);
+            console.log(definitonVersion);
             //
             setDefinition(definitonVersion.definition);
             setVersion(definitonVersion.version!);
@@ -951,6 +958,10 @@ const Index: React.FC = () => {
             if (timer) window.clearInterval(timer);
         };
     }, [autoSaveEnabled]);
+
+    useEffect(() => {
+        loadStorageProviders();
+    }, [0]);
 
     useEffect(() => {
         if (fromDefinition && !definitionId) {
@@ -1080,27 +1091,16 @@ const Index: React.FC = () => {
                                         {intl.formatMessage({ id: 'page.definition.versions' })}
                                     </Menu.Item>
                                     <Menu.Divider />
-                                    <Menu.Item
-                                        key="jsoneditor"
-                                        onClick={async () => {
-                                            await switchJsonEditor();
-                                        }}
-                                    >
-                                        {jsonEditorVisible
-                                            ? intl.formatMessage({
-                                                  id: 'page.definition.hideJsoneditor',
-                                              })
-                                            : intl.formatMessage({
-                                                  id: 'page.definition.showJsoneditor',
-                                              })}
+                                    <Menu.Item key="jsoneditor" onClick={handleshowJsonEditor}>
+                                        {intl.formatMessage({
+                                            id: 'page.definition.showJsonEditor',
+                                        })}
                                     </Menu.Item>
                                     <Menu.Divider />
                                     <Menu.Item
                                         key="export"
                                         disabled={!access['ElsaModule.Definitions.Export']}
-                                        onClick={() => {
-                                            handleOnExport();
-                                        }}
+                                        onClick={handleOnExport}
                                     >
                                         {intl.formatMessage({ id: 'common.dict.export' })}
                                     </Menu.Item>
@@ -1152,38 +1152,15 @@ const Index: React.FC = () => {
                 }
             >
                 <Spin spinning={loading}>
-                    {jsonEditorVisible ? (
-                        <div key="jsonEditorWapper" style={{ height: 'calc(100vh - 210px)' }}>
-                            <MonacoEditor
-                                language="json"
-                                minimap={true}
-                                value={jsonEditorValue}
-                                onChange={(value) => {
-                                    setJsonEditorValue(value);
-                                }}
-                                options={{
-                                    readOnly: false,
-                                }}
-                                onMount={(e, m) => {
-                                    m.languages.json.jsonDefaults.setDiagnosticsOptions({
-                                        validate: true,
-                                        schemas: [
-                                            {
-                                                uri: 'http://myserver/definitionJsonSchema.json',
-                                                fileMatch: [e.getModel()!.uri?.toString()],
-                                                schema: definitionJsonSchema,
-                                            },
-                                        ],
-                                    });
-                                }}
+                    {React.useMemo(
+                        () => (
+                            <Flow
+                                actionRef={flowAction}
+                                graphData={graphData}
+                                onNodeDoubleClick={handleNodeDBClick}
                             />
-                        </div>
-                    ) : (
-                        <Flow
-                            actionRef={flowAction}
-                            graphData={graphData}
-                            onNodeDoubleClick={handleOnShowNodeEditForm}
-                        />
+                        ),
+                        [graphData],
                     )}
                 </Spin>
             </Card>
@@ -1218,11 +1195,50 @@ const Index: React.FC = () => {
             >
                 <EditFormItems />
             </ModalForm>
+            {/* json editor */}
+            <Modal
+                open={jsonEditorVisible}
+                title={intl.formatMessage({ id: 'page.definition.settings' })}
+                maskClosable={false}
+                width="90%"
+                destroyOnClose
+                bodyStyle={{ padding: 0 }}
+                onCancel={() => setJsonEditorVisible(false)}
+                onOk={async () => {
+                    await handleUpdateFromJsonEditor();
+                }}
+            >
+                <div key="jsonEditorWapper" style={{ height: 'calc(100vh - 230px)' }}>
+                    <MonacoEditor
+                        language="json"
+                        minimap={true}
+                        value={jsonEditorValue}
+                        onChange={(value) => {
+                            setJsonEditorValue(value);
+                        }}
+                        options={{
+                            readOnly: false,
+                        }}
+                        onMount={(e, m) => {
+                            m.languages.json.jsonDefaults.setDiagnosticsOptions({
+                                validate: true,
+                                schemas: [
+                                    {
+                                        uri: 'http://myserver/definitionJsonSchema.json',
+                                        fileMatch: [e.getModel()!.uri?.toString()],
+                                        schema: definitionJsonSchema,
+                                    },
+                                ],
+                            });
+                        }}
+                    />
+                </div>
+            </Modal>
             {/* node property */}
             <ModalForm
                 form={editNodeFormRef}
                 layout="horizontal"
-                modalProps={{ maskClosable: false, destroyOnClose: true }}
+                modalProps={{ maskClosable: false, destroyOnClose: false }}
                 preserve={false}
                 labelWrap={true}
                 title={nodeTypePropFormTitle}
@@ -1235,14 +1251,18 @@ const Index: React.FC = () => {
                 onVisibleChange={setNodeTypePropFormVisible}
                 autoFocusFirstInput
                 onFinish={async (formData) => {
-                    await handleUpdateNodeProperties({
+                    await handleSaveNodeEditForm({
                         ...editNodeFormData,
                         ...formData,
                     } as NodeEditFormData);
                     return true;
                 }}
             >
-                <NodePropForm workflowDefinitionId={definitionId} properties={nodeTypePropList} />
+                <NodePropForm
+                    workflowDefinitionId={definitionId}
+                    properties={nodeTypePropList}
+                    storageProviders={storageProviders}
+                />
             </ModalForm>
             {/* version list */}
             <Modal
