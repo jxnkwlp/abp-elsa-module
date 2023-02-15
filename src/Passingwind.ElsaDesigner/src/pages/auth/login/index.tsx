@@ -12,8 +12,9 @@ const Login: React.FC = () => {
     const intl = useIntl();
     const { refresh } = useModel('@@initialState');
 
-    const [type, setType] = useState<string>('account');
     const [loading, setLoading] = useState<boolean>(false);
+    const [enableLocalLogin, setEnableLocalLogin] = useState<boolean>(true);
+    const [type, setType] = useState<string>('account');
     const [loginInfo, setLoginInfo] = useState<API.AccountResult>();
 
     const fetchUserInfo = async () => {
@@ -42,17 +43,18 @@ const Login: React.FC = () => {
         message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
     };
 
-    useEffect(() => {
-        if (loginInfo && loginInfo.enableLocalLogin == false) {
-        }
-    }, [loginInfo]);
-
     const loadLoginInfo = async () => {
         setLoading(true);
         const result = await getLogin();
         if (result) setLoginInfo(result);
         setLoading(false);
     };
+
+    useEffect(() => {
+        setEnableLocalLogin(
+            loginInfo?.enableLocalLogin || (loginInfo?.externalProviders ?? []).length == 0,
+        );
+    }, [loginInfo]);
 
     useEffect(() => {
         loadLoginInfo();
@@ -78,13 +80,15 @@ const Login: React.FC = () => {
                         submitter={type == 'sso' ? false : {}}
                     >
                         <Tabs activeKey={type} onChange={setType}>
-                            <Tabs.TabPane
-                                key="account"
-                                tab={intl.formatMessage({
-                                    id: 'pages.login.accountLogin.tab',
-                                    defaultMessage: '账户密码登录',
-                                })}
-                            />
+                            {enableLocalLogin && (
+                                <Tabs.TabPane
+                                    key="account"
+                                    tab={intl.formatMessage({
+                                        id: 'pages.login.accountLogin.tab',
+                                        defaultMessage: '账户密码登录',
+                                    })}
+                                />
+                            )}
                             {loginInfo?.externalProviders?.length && (
                                 <Tabs.TabPane
                                     key={'sso'}
@@ -96,7 +100,7 @@ const Login: React.FC = () => {
                             )}
                         </Tabs>
 
-                        {type === 'account' && (
+                        {type === 'account' && enableLocalLogin && (
                             <>
                                 <ProFormText
                                     name="userNameOrEmailAddress"
