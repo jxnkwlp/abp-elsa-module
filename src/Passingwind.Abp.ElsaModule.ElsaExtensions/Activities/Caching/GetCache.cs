@@ -43,7 +43,7 @@ public class GetCache : Activity
 
         var result = await _distributedCache.GetAsync(Key, token: context.CancellationToken);
 
-        this.Value = result.Value;
+        Value = result?.Value;
 
         return Done();
     }
