@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
@@ -24,6 +25,8 @@ public class ElsaModuleDomainModule : AbpModule
         });
 
         context.Services.AddMediatR(typeof(ElsaModuleDomainModule));
+
+        context.Services.AddTransient<IWorkflowCSharpEditorService, NullMonacoEditorService>();
     }
 
     public override void PostConfigureServices(ServiceConfigurationContext context)

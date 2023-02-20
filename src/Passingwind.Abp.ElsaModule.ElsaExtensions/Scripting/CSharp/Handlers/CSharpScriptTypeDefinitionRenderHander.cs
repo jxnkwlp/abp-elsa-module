@@ -5,33 +5,17 @@ using Elsa.Models;
 using Elsa.Options;
 using Elsa.Services.Models;
 using MediatR;
+using NodaTime;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
 
 namespace Passingwind.Abp.ElsaModule.Scripting.CSharp.Handlers;
 
-public class CSharpScriptTypeDefinitionRenderHander : INotificationHandler<CSharpScriptTypeDefinitionNotification>
+public class CSharpScriptTypeDefinitionRenderHander : INotificationHandler<CSharpTypeDefinitionNotification>
 {
-    public Task Handle(CSharpScriptTypeDefinitionNotification notification, CancellationToken cancellationToken)
+    public Task Handle(CSharpTypeDefinitionNotification notification, CancellationToken cancellationToken)
     {
-        var source = notification.CSharpTypeDefinitionSource;
-        var reference = notification.TypeDefinitionReference;
-
-        // properties
-        //definition.AddProperty("Input", typeof(object));
-        //definition.AddProperty("DefinitionId", typeof(string));
-        //definition.AddProperty("DefinitionVersion", typeof(int));
-        //definition.AddProperty("CorrelationId", typeof(string));
-        //definition.AddProperty("CurrentCulture", typeof(CultureInfo));
-        //definition.AddProperty("WorkflowInstance", typeof(WorkflowInstance));
-        //definition.AddProperty("ActivityExecutionContext", typeof(ActivityExecutionContext));
-        //definition.AddProperty("WorkflowExecutionContext", typeof(WorkflowExecutionContext));
-        //definition.AddProperty("WorkflowContext", typeof(object));
-
-        //definition.AddMethod("GetWorkflowContext", typeof(object), null);
-        //definition.AddMethod("GetTransientVariable", typeof(object), new CSharpTypeDefinitions.CSharpParamDefinition("name", typeof(string)));
-        //definition.AddMethod("SetTransientVariable", typeof(object), new CSharpTypeDefinitions.CSharpParamDefinition("name", typeof(string)));
-        //definition.AddMethod("GetVariable", typeof(object), new CSharpTypeDefinitions.CSharpParamDefinition("name", typeof(string)));
-        //definition.AddMethod("SetVariable",  new CSharpTypeDefinitions.CSharpParamDefinition("name", typeof(string)), new CSharpTypeDefinitions.CSharpParamDefinition("value", typeof(object)));
+        var source = notification.DefinitionSource;
+        var reference = notification.Reference;
 
         // methods
         source.AppendLine(@$"
@@ -75,6 +59,10 @@ public static IDictionary<string, Dictionary<string, object>> Activities => thro
         // imports
         reference.Imports.Add("Elsa.Models");
         reference.Imports.Add("Elsa.Services.Models");
+
+        // NodaTime  
+        reference.Assemblies.Add(typeof(Instant).Assembly);
+        reference.Imports.Add("NodaTime");
 
         return Task.CompletedTask;
     }

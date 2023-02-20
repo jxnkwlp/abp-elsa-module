@@ -1,6 +1,9 @@
-﻿namespace Passingwind.Abp.ElsaModule.Workflow;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Passingwind.Abp.ElsaModule.Workflow;
 public class WorkflowDesignerCSharpLanguageAnalysisRequestDto
 {
-    public string SessionId { get; set; }
-    public string Code { get; set; }
+    [Required]
+    public string Id { get; set; }
+    public string Text { get; set; }
 }

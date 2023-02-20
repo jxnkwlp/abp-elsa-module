@@ -5,13 +5,12 @@ using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
 
 namespace Passingwind.Abp.ElsaModule.Services.GlobalVariables;
 
-public class CSharpScriptTypeDefinitionWithGlobalVariableRenderHander : INotificationHandler<CSharpScriptTypeDefinitionNotification>
+public class CSharpScriptTypeDefinitionWithGlobalVariableRenderHander : INotificationHandler<CSharpTypeDefinitionNotification>
 {
-    public Task Handle(CSharpScriptTypeDefinitionNotification notification, CancellationToken cancellationToken)
+    public Task Handle(CSharpTypeDefinitionNotification notification, CancellationToken cancellationToken)
     {
-        var source = notification.CSharpTypeDefinitionSource;
+        var source = notification.DefinitionSource;
 
-        // properties 
         // methods
         source.AppendLine(@" 
 public static string GetGlobalVariable(string name)=> throw new System.NotImplementedException();  

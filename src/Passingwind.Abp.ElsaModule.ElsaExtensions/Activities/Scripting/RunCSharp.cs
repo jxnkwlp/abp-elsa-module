@@ -13,7 +13,6 @@ using Elsa.Metadata;
 using Elsa.Services;
 using Elsa.Services.Models;
 using MediatR;
-using Microsoft.Extensions.Options;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
 
@@ -24,7 +23,7 @@ namespace Passingwind.Abp.ElsaModule.Activities.Scripting;
     Category = "Scripting",
     Description = "Run CSharp code.",
     Outcomes = new[] { OutcomeNames.Done })]
-public class RunCSharp : Activity, IActivityPropertyOptionsProvider, INotificationHandler<CSharpScriptTypeDefinitionNotification>
+public class RunCSharp : Activity, IActivityPropertyOptionsProvider, INotificationHandler<CSharpTypeDefinitionNotification>
 {
     [ActivityInput(Hint = "The CSharp code to run.", UIHint = ActivityInputUIHints.CodeEditor, OptionsProvider = typeof(RunCSharp))]
     public string Script { get; set; }
@@ -43,12 +42,10 @@ public class RunCSharp : Activity, IActivityPropertyOptionsProvider, INotificati
 
 
     private readonly ICSharpService _cSharpService;
-    private readonly IOptions<CSharpScriptOptions> _options;
 
-    public RunCSharp(ICSharpService cSharpService, IOptions<CSharpScriptOptions> options)
+    public RunCSharp(ICSharpService cSharpService)
     {
         _cSharpService = cSharpService;
-        _options = options;
     }
 
     protected override async ValueTask<IActivityExecutionResult> OnExecuteAsync(ActivityExecutionContext context)
@@ -63,20 +60,21 @@ public class RunCSharp : Activity, IActivityPropertyOptionsProvider, INotificati
         var setOutcome = (string value) => outcomes.Add(value);
         var setOutcomes = (IEnumerable<string> values) => outcomes.AddRange(values.Distinct());
 
-        var output = await _cSharpService.EvaluateAsync(script, typeof(object), context, (configure) =>
+        var output = await _cSharpService.EvaluateAsync(script, typeof(object), context, (globalConfigure) =>
         {
-            configure.Context.SetOutcome = setOutcome;
-            configure.Context.SetOutcomes = setOutcomes;
+            globalConfigure.Context.SetOutcome = setOutcome;
+            globalConfigure.Context.SetOutcomes = setOutcomes;
         }, context.CancellationToken);
 
+        Output = output;
+
+        // distinct
         outcomes = outcomes.Distinct().ToList();
 
         if (outcomes.Count == 0)
             outcomes.Add(OutcomeNames.Done);
 
-        Output = output;
-
-        return Outcomes(outcomes.Distinct());
+        return Outcomes(outcomes);
     }
 
     public object GetOptions(PropertyInfo property)
@@ -92,9 +90,9 @@ public class RunCSharp : Activity, IActivityPropertyOptionsProvider, INotificati
         };
     }
 
-    public Task Handle(CSharpScriptTypeDefinitionNotification notification, CancellationToken cancellationToken)
+    public Task Handle(CSharpTypeDefinitionNotification notification, CancellationToken cancellationToken)
     {
-        var source = notification.CSharpTypeDefinitionSource;
+        var source = notification.DefinitionSource;
 
         source.AppendLine("public static void SetOutcome(string value) => throw new System.NotImplementedException(); ");
         source.AppendLine("public static void SetOutcomes(IEnumerable<string> values) => throw new System.NotImplementedException(); ");

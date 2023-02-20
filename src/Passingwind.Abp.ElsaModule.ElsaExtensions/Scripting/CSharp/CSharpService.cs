@@ -3,34 +3,45 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elsa.Services.Models;
 using MediatR;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
 
 namespace Passingwind.Abp.ElsaModule.Scripting.CSharp;
 
 public class CSharpService : ICSharpService
 {
+    private readonly ILogger<CSharpService> _logger;
     private readonly IMediator _mediator;
-    private readonly IOptions<CSharpScriptOptions> _options;
-    private readonly ICSharpEvaluator _cSharpEvaluator;
+    private readonly ICSharpScriptHost _cSharpScriptHost;
 
-    public CSharpService(IMediator mediator, IOptions<CSharpScriptOptions> options, ICSharpEvaluator cSharpEvaluator)
+    public CSharpService(ILogger<CSharpService> logger, IMediator mediator, ICSharpScriptHost cSharpScriptHost)
     {
+        _logger = logger;
         _mediator = mediator;
-        _options = options;
-        _cSharpEvaluator = cSharpEvaluator;
+        _cSharpScriptHost = cSharpScriptHost;
     }
 
-    public async Task<object> EvaluateAsync(string expression, Type returnType, ActivityExecutionContext activityExecutionContext, Action<CSharpEvaluationGlobal> configure, CancellationToken cancellationToken = default)
+    public async Task<object> EvaluateAsync(string expression, Type returnType, ActivityExecutionContext activityExecutionContext, Action<CSharpScriptEvaluationGlobal> configure = null, CancellationToken cancellationToken = default)
     {
-        CSharpEvaluationGlobal scriptGlobal = new CSharpEvaluationGlobal();
-        CSharpEvaluationContext evaluationContext = new CSharpEvaluationContext(_options.Value, scriptGlobal);
+        CSharpScriptEvaluationGlobal scriptEvaluationGlobal = new CSharpScriptEvaluationGlobal();
 
-        await _mediator.Publish(new CSharpExpressionEvaluationNotification(expression, evaluationContext, activityExecutionContext));
+        configure?.Invoke(scriptEvaluationGlobal);
 
-        configure?.Invoke(scriptGlobal);
+        // 
+        await _mediator.Publish(new CSharpScriptEvaluationNotification(expression, activityExecutionContext, scriptEvaluationGlobal));
 
-        var resultValue = await _cSharpEvaluator.EvaluateAsync(expression, returnType, evaluationContext, (options) => { }, cancellationToken);
+        // 
+        var scriptConfigure = new CSharpScriptConfigureNotification(expression);
+        await _mediator.Publish(scriptConfigure);
+
+        var scriptId = $"{activityExecutionContext.WorkflowExecutionContext.WorkflowBlueprint.VersionId}:{activityExecutionContext.ActivityId}";
+
+        _logger.LogDebug($"Evaluate csharp code with id '{scriptId}' ");
+
+        CSharpScriptContext context = new CSharpScriptContext(expression, scriptEvaluationGlobal, scriptConfigure.Reference.Assemblies, scriptConfigure.Reference.Imports);
+
+        var resultValue = await _cSharpScriptHost.RunWithIdAsync(scriptId, context, (_) => { }, cancellationToken);
 
         if (resultValue == null)
             return null;

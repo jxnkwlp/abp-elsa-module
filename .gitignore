@@ -258,4 +258,6 @@ paket-files/
 /app/**/Logs/*
 /app/**/wwwroot/dist/*
 !/app/**/wwwroot/dist/README.md
-/app/src/Demo.HttpApi.Host/storage/*
+/app/src/Passingwind.WorkflowApp.Web/storage/*
+/app/src/Passingwind.WorkflowApp.HttpApi.Host/storage/*
+.nuget

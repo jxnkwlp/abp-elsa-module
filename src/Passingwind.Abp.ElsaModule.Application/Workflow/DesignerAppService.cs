@@ -6,12 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Elsa.Design;
 using Elsa.Metadata;
-using Elsa.Options;
 using Elsa.Scripting.JavaScript.Services;
 using Elsa.Services;
 using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Common;
-using Passingwind.Abp.ElsaModule.Monacos.Providers;
+using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.Stores;
 using Volo.Abp.Auditing;
@@ -28,37 +27,22 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
     private readonly IStoreMapper _storeMapper;
     private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
     private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
-    private readonly ElsaOptions _elsaOptions;
+    private readonly IWorkflowCSharpEditorService _workflowCSharpEditorService;
 
-    private readonly IMonacoCodeAnalysisProvider _monacoCodeAnalysisProvider;
-    private readonly IMonacoCompletionProvider _monacoCompletionProvider;
-    private readonly IMonacoHoverInfoProvider _monacoHoverInfoProvider;
-    private readonly IMonacoSignatureProvider _monacoSignatureProvider;
-    private readonly IMonacoCodeFormatterProvider _monacoCodeFormatterProvider;
-
-    public DesignerAppService(IActivityTypeService activityTypeService,
-                              ITypeScriptDefinitionService typeScriptDefinitionService,
-                              IStoreMapper storeMapper,
-                              IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository,
-                              IWorkflowDefinitionRepository workflowDefinitionRepository,
-                              ElsaOptions elsaOptions,
-                              IMonacoCodeAnalysisProvider monacoCodeAnalysisProvider,
-                              IMonacoCompletionProvider monacoCompletionProvider,
-                              IMonacoHoverInfoProvider monacoHoverInfoProvider,
-                              IMonacoSignatureProvider monacoSignatureProvider,
-                              IMonacoCodeFormatterProvider monacoCodeFormatterProvider)
+    public DesignerAppService(
+        IActivityTypeService activityTypeService,
+        ITypeScriptDefinitionService typeScriptDefinitionService,
+        IStoreMapper storeMapper,
+        IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository,
+        IWorkflowDefinitionRepository workflowDefinitionRepository,
+        IWorkflowCSharpEditorService workflowCSharpEditorService)
     {
         _activityTypeService = activityTypeService;
         _typeScriptDefinitionService = typeScriptDefinitionService;
         _storeMapper = storeMapper;
         _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
         _workflowDefinitionRepository = workflowDefinitionRepository;
-        _elsaOptions = elsaOptions;
-        _monacoCodeAnalysisProvider = monacoCodeAnalysisProvider;
-        _monacoCompletionProvider = monacoCompletionProvider;
-        _monacoHoverInfoProvider = monacoHoverInfoProvider;
-        _monacoSignatureProvider = monacoSignatureProvider;
-        _monacoCodeFormatterProvider = monacoCodeFormatterProvider;
+        _workflowCSharpEditorService = workflowCSharpEditorService;
     }
 
     public async Task<ActivityTypeDescriptorListResultDto> GetActivityTypesAsync()
@@ -127,11 +111,11 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 
         var workflowDefinition = _storeMapper.MapToModel(version, definition);
 
-        var result = await _monacoCompletionProvider.HandleAsync(new MonacoCompletionRequest(workflowDefinition, input.SessionId ?? workflowDefinition.Id, input.Code, input.Position));
+        var result = await _workflowCSharpEditorService.GetCompletionAsync(workflowDefinition, input.Id, input.Text, input.Position);
 
         return new WorkflowDesignerCSharpLanguageCompletionProviderResultDto
         {
-            Items = result.Items,
+            Items = result?.Items ?? new List<WorkflowCSharpEditorCompletionItem>(),
         };
     }
 
@@ -142,7 +126,7 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 
         var workflowDefinition = _storeMapper.MapToModel(version, definition);
 
-        var result = await _monacoHoverInfoProvider.HandleAsync(new MonacoHoverInfoRequest(workflowDefinition, input.SessionId ?? workflowDefinition.Id, input.Code, input.Position));
+        var result = await _workflowCSharpEditorService.GetHoverInfoAsync(workflowDefinition, input.Id, input.Text, input.Position);
 
         if (result == null)
             return null;
@@ -162,7 +146,7 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 
         var workflowDefinition = _storeMapper.MapToModel(version, definition);
 
-        var result = await _monacoSignatureProvider.HandleAsync(new MonacoSignatureRequest(workflowDefinition, input.SessionId ?? workflowDefinition.Id, input.Code, input.Position));
+        var result = await _workflowCSharpEditorService.GetSignaturesAsync(workflowDefinition, input.Id, input.Text, input.Position);
 
         if (result == null)
             return null;
@@ -182,21 +166,22 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 
         var workflowDefinition = _storeMapper.MapToModel(version, definition);
 
-        var result = await _monacoCodeAnalysisProvider.HandleAsync(new MonacoCodeAnalysisRequest(workflowDefinition, input.SessionId ?? workflowDefinition.Id, input.Code));
+        var result = await _workflowCSharpEditorService.GetCodeAnalysisAsync(workflowDefinition, input.Id, input.Text);
 
         return new WorkflowDesignerCSharpLanguageAnalysisResultDto
         {
-            Items = result.Items,
+            Items = result?.Items ?? new List<WorkflowCSharpEditorCodeAnalysis>(),
         };
     }
 
     public async Task<WorkflowDesignerCSharpLanguageFormatterResult> CSharpLanguageCodeFormatterAsync(WorkflowDesignerCSharpLanguageFormatterRequestDto input)
     {
-        var result = await _monacoCodeFormatterProvider.HandleAsync(new MonacoCodeFormatterRequest { Code = input.Code });
+        var result = await _workflowCSharpEditorService.CodeFormatterAsync(input.Id, input.Text);
 
         return new WorkflowDesignerCSharpLanguageFormatterResult()
         {
-            Code = result.Code,
+            Success = result != null,
+            Code = result?.Text,
         };
     }
 }

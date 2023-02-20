@@ -5,7 +5,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>Passingwind.Abp.ElsaModule</RootNamespace>
     </PropertyGroup>
- 
+
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.*" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
@@ -15,12 +15,21 @@
         <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.4.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.4.0" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-        <PackageReference Include="Volo.Abp.EventBus" Version="6.0.1" />
-        <PackageReference Include="Volo.Abp.Emailing" Version="6.0.1" />
-        <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="6.0.1" />
+        <PackageReference Include="Basic.Reference.Assemblies" Version="1.4.1" />
         <PackageReference Include="IdentityModel" Version="6.0.0" />
         <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.6.0" />
+        <PackageReference Include="NuGet.Protocol" Version="6.4.0" />
     </ItemGroup>
+
+    <!--<Target Name="GetLibReferences" AfterTargets="ResolveFrameworkReferences">
+        <MSBuild Projects="@(ProjectReference)" Targets="GetLibReferences">
+            <Output ItemName="LibReference" TaskParameter="TargetOutputs" />
+        </MSBuild>
+        <ItemGroup>
+            <Reference Include="@(LibReference)" />
+            <Content Include="@(LibReference)" PackagePath="lib/$(TargetFramework)" Pack="true" />
+        </ItemGroup>
+    </Target>-->
 
     <ItemGroup>
         <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp" />
@@ -35,6 +44,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Volo.Abp.EventBus" Version="6.0.1" />
+        <PackageReference Include="Volo.Abp.Emailing" Version="6.0.1" />
+        <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="6.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Elsa.Activities.Email" Version="2.9.2" />
         <PackageReference Include="Elsa.Activities.Http" Version="2.9.2" />
         <PackageReference Include="Elsa.Activities.Temporal.Common" Version="2.9.2" />
@@ -43,9 +58,5 @@
     <ItemGroup>
         <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Domain\Passingwind.Abp.ElsaModule.Domain.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Activities\Temporal\" />
-    </ItemGroup>
-
+ 
 </Project>

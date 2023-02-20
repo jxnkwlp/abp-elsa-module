@@ -2,8 +2,9 @@
 
 namespace Passingwind.Abp.ElsaModule.Workflow;
 public class WorkflowDesignerCSharpLanguageCompletionProviderRequestDto
-{ 
-    public string SessionId { get; set; }
-    public string Code { get; set; }
+{
+    [Required]
+    public string Id { get; set; }
+    public string Text { get; set; }
     public int Position { get; set; }
 }

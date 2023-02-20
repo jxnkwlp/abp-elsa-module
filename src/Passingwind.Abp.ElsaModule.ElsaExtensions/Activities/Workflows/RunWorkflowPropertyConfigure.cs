@@ -42,6 +42,6 @@ public class RunWorkflowWorkflowDefinitionIdRuntimeSelectListProvider : IRuntime
     {
         var list = await _workflowDefinitionRepository.GetListAsync(includeDetails: false);
 
-        return new SelectList(list.Select(x => new SelectListItem($"{x.DisplayName}({x.Name})", x.Id.ToString())).ToArray());
+        return new SelectList(list.OrderBy(x => x.Name).Select(x => new SelectListItem($"{x.DisplayName}({x.Name})", x.Id.ToString())).ToArray());
     }
 }

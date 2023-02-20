@@ -10,7 +10,7 @@ using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
 
 namespace Passingwind.Abp.ElsaModule.Activities.Http.Scripting.CSharp;
 
-public class ConfigureCSharpEngine : INotificationHandler<CSharpExpressionEvaluationNotification>
+public class ConfigureCSharpEngine : INotificationHandler<CSharpScriptEvaluationNotification>
 {
     private readonly IAbsoluteUrlProvider _absoluteUrlProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -21,20 +21,19 @@ public class ConfigureCSharpEngine : INotificationHandler<CSharpExpressionEvalua
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public Task Handle(CSharpExpressionEvaluationNotification notification, CancellationToken cancellationToken)
+    public Task Handle(CSharpScriptEvaluationNotification notification, CancellationToken cancellationToken)
     {
         var activityExecutionContext = notification.ActivityExecutionContext;
-
-        var evaluationContext = notification.Context;
+        var global = notification.EvaluationGlobal;
 
         if (_httpContextAccessor.HttpContext == null)
             throw new System.Exception("The HttpContext is null");
 
-        evaluationContext.EvaluationGlobal.Context.QueryString = (Func<string, string>)(key => _httpContextAccessor.HttpContext!.Request.Query[key].ToString());
-        evaluationContext.EvaluationGlobal.Context.AbsoluteUrl = (Func<string, string>)(url => _absoluteUrlProvider.ToAbsoluteUrl(url).ToString());
-        evaluationContext.EvaluationGlobal.Context.SignalUrl = (Func<string, string>)(signal => activityExecutionContext.GenerateSignalUrl(signal));
-        evaluationContext.EvaluationGlobal.Context.GetRemoteIPAddress = (Func<string>)(() => _httpContextAccessor.HttpContext!.Connection.RemoteIpAddress.ToString());
-        evaluationContext.EvaluationGlobal.Context.GetRouteValue = (Func<string, object>)(key => _httpContextAccessor.HttpContext!.GetRouteValue(key));
+        global.Context.QueryString = (Func<string, string>)(key => _httpContextAccessor.HttpContext!.Request.Query[key].ToString());
+        global.Context.AbsoluteUrl = (Func<string, string>)(url => _absoluteUrlProvider.ToAbsoluteUrl(url).ToString());
+        global.Context.SignalUrl = (Func<string, string>)(signal => activityExecutionContext.GenerateSignalUrl(signal));
+        global.Context.GetRemoteIPAddress = (Func<string>)(() => _httpContextAccessor.HttpContext!.Connection.RemoteIpAddress.ToString());
+        global.Context.GetRouteValue = (Func<string, object>)(key => _httpContextAccessor.HttpContext!.GetRouteValue(key));
 
         return Task.CompletedTask;
     }
