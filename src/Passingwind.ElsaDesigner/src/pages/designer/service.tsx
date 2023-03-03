@@ -175,19 +175,6 @@ export const getPropertySyntaxes = (property: NodeTypeProperty): NodePropertySyn
     } as NodePropertySyntax;
 };
 
-// export const configNode = (node: Node.Metadata) => {
-//     const nodeId = node.id || uuid();
-//     node.id = nodeId.toString();
-//     return node;
-// };
-
-//
-// 1. 1个出口，允许多线 结构
-// 2. 多个出口，1口1线 结构
-//
-
-export const getNodeOutcomes = () => {};
-
 // 更新节点输出端口
 export const setNodeOutPorts = (node: Node<Node.Properties>) => {
     // remove out ports
@@ -237,6 +224,12 @@ export const updateNodePorts = (node: Node<Node.Properties>) => {
 
 // export const updateNodeOutcomes = (nodeConfig: Node.Metadata, node: Node) => {};
 
+export const getNodeOutcomes = (node: Node<Node.Properties>) => {
+    return (node.getProp('outcomes') ?? []).map((x: { toString: () => any }) =>
+        x.toString(),
+    ) as string[];
+};
+
 /**
  *  是否可以新增边
  */
@@ -254,12 +247,12 @@ export const checkCanCreateEdge = (node: Node, outEdges: Edge<Edge.Properties>[]
  *  获取下一条变的名称
  */
 export const getNextEdgeName = (node: Node, outEdges: Edge<Edge.Properties>[]) => {
-    const currentEdgeNames: string[] = (outEdges ?? [])
-        .map((x) => x.getProp('name') ?? '')
-        .filter((x) => x);
     const outcomes: string[] = (node.getProp('outcomes') ?? []).map((x: { toString: () => any }) =>
         x.toString(),
     );
+    const currentEdgeNames: string[] = (outEdges ?? [])
+        .map((x) => x.getProp('name') ?? '')
+        .filter((x) => x);
     //
     if (process.env.NODE_ENV === 'development') {
         console.debug('all: ', outcomes);
@@ -295,6 +288,7 @@ export const createNodeConfig = (config: Node.Metadata): Node.Metadata => {
         label: nodeLabel,
         name: name ?? randString(type),
         icon: getNodeIconByType(type),
+        type: type,
     };
     return {
         // ...nodeDefaultConfig,
@@ -310,19 +304,22 @@ export const createNodeConfig = (config: Node.Metadata): Node.Metadata => {
 
 /**
  *  统一创建边配置信息
+ *  属性只设置 id/name/outcome
  */
 export const createEdgeConfig = (config: Edge.Metadata): Edge.Metadata => {
     const { id, label, name } = config;
     const edgeId = id ?? uuid();
-    const edgeName = label ?? name ?? 'Done';
+    const edgeName = name ?? label ?? 'Done';
 
     return {
         ...edgeDefaultConfig,
         shape: edgeShapeName,
         ...config,
         id: edgeId,
-        label: edgeName,
+        label: label,
+        name: edgeName,
         outcome: edgeName,
+        data: config,
     };
 };
 
@@ -354,6 +351,12 @@ export const conventToServerData = (data: IGraphData) => {
         //     outcomes = ['Done'];
         // }
         const data = item.data;
+        delete data.icon;
+        //
+        data.attributes = {
+            ...item.position,
+            outcomes: outcomes,
+        };
 
         return {
             ...data,
@@ -563,7 +566,7 @@ export const graphCreateEdge = (graph: Graph, args: any) => {
     if (sourceCell.isNode()) {
         const nextName = getNextEdgeName(sourceCell, graph.getOutgoingEdges(sourceCell) ?? []);
         if (nextName) {
-            return new Shape.Edge(createEdgeConfig({ id: '', label: nextName }));
+            return new Shape.Edge(createEdgeConfig({ id: null, label: nextName }));
         } else {
             message.error(formatMessage({ id: 'page.designer.noMoreOutcomes' }));
             return null;

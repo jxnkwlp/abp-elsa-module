@@ -12,7 +12,7 @@ import Icon, {
 import type { NodeData } from './type';
 import { Tooltip } from 'antd';
 
-// 节点内容
+// Custome node
 export class ElsaNode extends React.Component<{ node?: Node }> {
     shouldComponentUpdate() {
         const { node } = this.props;
@@ -45,7 +45,7 @@ export class ElsaNode extends React.Component<{ node?: Node }> {
     }
 }
 
-// 节点端口属性
+// Node port attributes
 export const nodePortAttr = {
     circle: {
         r: 4,
@@ -60,7 +60,7 @@ export const nodePortAttr = {
     },
 };
 
-// 节点默认配置
+// Default config for node
 export const nodeDefaultConfig: Cell.Config = {
     inherit: 'react-shape',
     width: 180,
@@ -118,7 +118,7 @@ export const nodeDefaultConfig: Cell.Config = {
     },
 };
 
-// 线默认配置
+// Default config for edge
 export const edgeDefaultConfig: Cell.Config = {
     zIndex: 0,
     attrs: {
@@ -138,10 +138,10 @@ export const nodeShapeName = 'elsa-node';
 export const edgeShapeName = 'elsa-edge';
 
 export const registerNodeTypes = () => {
-    // 默认设置
+    // default
     Node.config(nodeDefaultConfig);
     Edge.config(edgeDefaultConfig);
-    // 注册
+    // register node & edge
     Graph.registerNode(
         nodeShapeName,
         {

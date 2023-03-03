@@ -22,7 +22,8 @@ const defaultInputSpan = 20;
 const defaultSyntaxSpan = 4;
 
 const NodePropFormItem = (
-    inputName: NamePath,
+    name: string,
+    inputPath: NamePath,
     value: any,
     uiEditor: string,
     propItem: NodeTypeProperty,
@@ -35,7 +36,7 @@ const NodePropFormItem = (
                 return (
                     <ProFormCheckbox.Group
                         {...inputProps}
-                        name={inputName}
+                        name={inputPath}
                         options={optionList}
                         rules={[{ required: propItem.isRequired }]}
                     />
@@ -44,7 +45,7 @@ const NodePropFormItem = (
                 return (
                     <ProFormSwitch
                         {...inputProps}
-                        name={inputName}
+                        name={inputPath}
                         rules={[{ required: propItem.isRequired }]}
                     />
                 );
@@ -52,7 +53,7 @@ const NodePropFormItem = (
                 return (
                     <ProFormSelect
                         {...inputProps}
-                        name={inputName}
+                        name={inputPath}
                         options={optionList}
                         rules={[{ required: propItem.isRequired }]}
                         fieldProps={{ showSearch: true }}
@@ -62,7 +63,7 @@ const NodePropFormItem = (
                 return (
                     <ProFormSelect
                         {...inputProps}
-                        name={inputName}
+                        name={inputPath}
                         options={optionList}
                         fieldProps={{ mode: 'tags' }}
                         rules={[{ required: propItem.isRequired }]}
@@ -72,7 +73,7 @@ const NodePropFormItem = (
                 return (
                     <ProFormTextArea
                         {...inputProps}
-                        name={inputName}
+                        name={inputPath}
                         fieldProps={{
                             rows: 2,
                             autoSize: { minRows: 2, maxRows: 10 },
@@ -86,11 +87,12 @@ const NodePropFormItem = (
                     <Col span={defaultInputSpan}>
                         <ProForm.Item
                             label={inputProps.label}
-                            name={inputName}
+                            name={inputPath}
                             required={propItem.isRequired}
                             rules={[{ required: propItem.isRequired }]}
                         >
                             <MonacorEditorInput
+                                id={name}
                                 height={150}
                                 language={getEditorLanguage(uiEditor)}
                             />
@@ -102,7 +104,7 @@ const NodePropFormItem = (
                     <Col span={defaultInputSpan}>
                         <ProForm.Item
                             label={inputProps.label}
-                            name={inputName}
+                            name={inputPath}
                             required={propItem.isRequired}
                             rules={[{ required: propItem.isRequired }]}
                         >
@@ -114,7 +116,7 @@ const NodePropFormItem = (
                 return (
                     <ProFormText
                         {...inputProps}
-                        name={inputName}
+                        name={inputPath}
                         rules={[{ required: propItem.isRequired }]}
                     />
                 );
@@ -124,7 +126,7 @@ const NodePropFormItem = (
             <Col span={defaultInputSpan}>
                 <ProForm.Item
                     label={inputProps.label}
-                    name={inputName}
+                    name={inputPath}
                     extra={inputProps.extra}
                     required={propItem.isRequired}
                     rules={[{ required: propItem.isRequired }]}
@@ -138,12 +140,12 @@ const NodePropFormItem = (
         <Col span={defaultInputSpan}>
             <ProForm.Item
                 label={inputProps.label}
-                name={inputName}
+                name={inputPath}
                 extra={inputProps.extra}
                 required={propItem.isRequired}
                 rules={[{ required: propItem.isRequired }]}
             >
-                <MonacorEditorInput height={150} language={getEditorLanguage(uiEditor)} />
+                <MonacorEditorInput id={name} height={150} language={getEditorLanguage(uiEditor)} />
             </ProForm.Item>
         </Col>
     );
@@ -250,6 +252,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                 <ProFormGroup key={propItem.name}>
                     {propSyntax.editor ? (
                         NodePropFormItem(
+                            `${propItem.name}_${propSyntax.default ?? 'Literal'}`,
                             [
                                 'props',
                                 propItem.name,
@@ -268,6 +271,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                 {({ props }) => {
                                     const syntax = props?.[propItem.name]?.syntax;
                                     return NodePropFormItem(
+                                        `${propItem.name}_${syntax}`,
                                         ['props', propItem.name, 'expressions', syntax],
                                         propItem.defaultValue,
                                         syntax,

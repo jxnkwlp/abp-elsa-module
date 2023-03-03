@@ -52,6 +52,7 @@ const Index: React.FC = () => {
             request: async (p) => {
                 const list = await getWorkflowDefinitionList({
                     filter: p.keyWords ?? '',
+                    sorting: 'name',
                     maxResultCount: 100,
                 });
                 return (list.items ?? []).map((x) => {

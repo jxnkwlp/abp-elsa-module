@@ -14,18 +14,18 @@ import {
 } from '@/services/WorkflowDefinition';
 import { GlobalOutlined, SaveOutlined, SettingOutlined } from '@ant-design/icons';
 import { ProFormSwitch, ProFormUploadDragger } from '@ant-design/pro-components';
-import ProForm, { ModalForm } from '@ant-design/pro-form';
+import ProForm, { ModalForm, ProFormSelect } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { DagreLayout } from '@antv/layout';
-import type { Node } from '@antv/x6';
+import type { Edge, Graph, Node } from '@antv/x6';
 import { DiffEditor } from '@monaco-editor/react';
 import { Button, Card, Dropdown, Menu, message, Modal, Popconfirm, Space, Spin, Tag } from 'antd';
 import type { RcFile } from 'antd/lib/upload';
 import { isArray } from 'lodash';
 import * as monaco from 'monaco-editor';
-import React, { useEffect, useRef } from 'react';
-import { useAccess, useHistory, useIntl, useLocation } from 'umi';
+import React, { useEffect, useRef, useState } from 'react';
+import { formatMessage, useAccess, useHistory, useIntl, useLocation } from 'umi';
 import EditFormItems from '../definition/edit-form-items';
 import definitionJsonSchema from './definition-json-schema';
 import type { FlowActionType } from './flow';
@@ -37,10 +37,17 @@ import {
     conventToServerData,
     getCSharpEditorLanguageProvider,
     getJavascriptEditorDefinitonsContent,
+    getNodeOutcomes,
     getNodeTypeRawData,
     getPropertySyntaxes,
 } from './service';
-import type { IGraphData, NodeEditFormData, NodeTypeProperty, NodeUpdateData } from './type';
+import type {
+    EdgeEditFormData,
+    IGraphData,
+    NodeEditFormData,
+    NodeTypeProperty,
+    NodeUpdateData,
+} from './type';
 
 let codeAnalysisTimer = 0;
 
@@ -99,6 +106,9 @@ const Index: React.FC = () => {
     const [jsonEditorValue, setJsonEditorValue] = React.useState<string>('');
 
     const [importModalVisible, setImportModalVisible] = React.useState<boolean>(false);
+
+    const [edgeOutcomeChangeModalVisible, setEdgeOutcomeChangeModalVisible] = useState(false);
+    const [edgeOutcomFormData, setEdgeOutcomFormData] = useState<EdgeEditFormData>();
 
     const [autoSaveEnabled, setAutoSaveEnabled] = React.useState<boolean>(false);
 
@@ -676,13 +686,14 @@ const Index: React.FC = () => {
             console.debug('register CSharp language provider ');
 
             const completionProvider = monaco.languages.registerCompletionItemProvider('csharp', {
-                triggerCharacters: [' ', '.'],
+                triggerCharacters: ['.'],
                 provideCompletionItems: async (model, position) => {
                     const result = await getCSharpEditorLanguageProvider(
                         definitionId!,
                         'completion',
                         {
-                            code: model.getValue(),
+                            id: model.uri.path.substring(1),
+                            text: model.getValue() ?? '',
                             position: model.getOffsetAt(position),
                         },
                     );
@@ -735,7 +746,8 @@ const Index: React.FC = () => {
                         definitionId!,
                         'hoverinfo',
                         {
-                            code: model.getValue(),
+                            id: model.uri.path.substring(1),
+                            text: model.getValue() ?? '',
                             position: model.getOffsetAt(position),
                         },
                     )) as API.WorkflowDesignerCSharpLanguageHoverProviderResult;
@@ -770,7 +782,8 @@ const Index: React.FC = () => {
                         definitionId!,
                         'signature',
                         {
-                            code: model.getValue(),
+                            id: model.uri.path.substring(1),
+                            text: model.getValue() ?? '',
                             position: model.getOffsetAt(position),
                         },
                     )) as API.WorkflowDesignerCSharpLanguageSignatureProviderResult;
@@ -804,7 +817,8 @@ const Index: React.FC = () => {
                             definitionId!,
                             'format',
                             {
-                                code: model.getValue(),
+                                id: model.uri.path.substring(1),
+                                text: model.getValue() ?? '',
                             },
                         )) as API.WorkflowDesignerCSharpLanguageFormatterResult;
 
@@ -844,7 +858,8 @@ const Index: React.FC = () => {
                 if (model.isDisposed()) return;
 
                 const data = (await getCSharpEditorLanguageProvider(definitionId!, 'analysis', {
-                    code: model.getValue(),
+                    id: model.uri.path.substring(1),
+                    text: model.getValue() ?? '',
                 })) as API.MonacoCodeAnalysisItem[];
 
                 // check again
@@ -904,8 +919,52 @@ const Index: React.FC = () => {
         return registerCSharpLanguageProvider();
     };
 
-    const handleNodeDBClick = (nodeConfig: Node.Properties, node: Node) => {
+    const handleNodeDbClick = (nodeConfig: Node.Properties, node: Node) => {
         handleShowNodeEditForm(nodeConfig, node);
+    };
+
+    const handleEdgeDbClick = (graph: Graph, edge: Edge<Edge.Properties>) => {
+        const loading = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
+        //
+        const sourceNode = edge.getSourceNode();
+        if (!sourceNode) {
+            loading();
+            return;
+        }
+        const allOutcomes = getNodeOutcomes(sourceNode);
+        if (allOutcomes?.length == 0) {
+            loading();
+            return;
+        }
+
+        const outEdges = graph.getOutgoingEdges(sourceNode) ?? [];
+        const outEdgeNames = outEdges.map((x) => x.getProp('name') as string);
+
+        const availableOutcomes = allOutcomes.filter(
+            (x) => outEdgeNames.indexOf(x) == -1,
+        ) as string[];
+
+        if (availableOutcomes.length == 0) {
+            loading();
+            message.error(formatMessage({ id: 'page.designer.noMoreOutcomes' }));
+            return;
+        }
+
+        setEdgeOutcomFormData({
+            edgeId: edge.id,
+            outcomes: availableOutcomes,
+        });
+
+        loading();
+        setEdgeOutcomeChangeModalVisible(true);
+    };
+
+    const handleUpdateEdgeOutcomeChanged = async (values: any) => {
+        flowAction.current?.setEdgeName(
+            edgeOutcomFormData?.edgeId as string,
+            values.outcome as string,
+        );
+        return true;
     };
 
     const loadStorageProviders = async () => {
@@ -1157,7 +1216,8 @@ const Index: React.FC = () => {
                             <Flow
                                 actionRef={flowAction}
                                 graphData={graphData}
-                                onNodeDoubleClick={handleNodeDBClick}
+                                onNodeDoubleClick={handleNodeDbClick}
+                                onEdgeDoubleClick={handleEdgeDbClick}
                             />
                         ),
                         [graphData],
@@ -1489,6 +1549,24 @@ const Index: React.FC = () => {
                     }}
                     rules={[{ required: true }]}
                     requiredMark={false}
+                />
+            </ModalForm>
+            {/* edge label(outcome) */}
+            <ModalForm
+                title={intl.formatMessage({ id: 'page.designer.selectNewOutcome' })}
+                visible={edgeOutcomeChangeModalVisible}
+                onVisibleChange={setEdgeOutcomeChangeModalVisible}
+                modalProps={{ destroyOnClose: true }}
+                width="380px"
+                onFinish={handleUpdateEdgeOutcomeChanged}
+            >
+                <ProFormSelect
+                    label={intl.formatMessage({ id: 'page.designer.selectNewOutcome' })}
+                    name="outcome"
+                    options={(edgeOutcomFormData?.outcomes ?? []).map((x) => {
+                        return { label: x, value: x };
+                    })}
+                    rules={[{ required: true }]}
                 />
             </ModalForm>
         </PageContainer>

@@ -118,7 +118,7 @@ const Index: React.FC = () => {
                             {
                                 title: intl.formatMessage({ id: 'page.instance.outcomes' }),
                                 dataIndex: 'outcomes',
-                                renderText: (_) => {
+                                render: (_) => {
                                     return (_ ?? []).length == 0
                                         ? '-'
                                         : (_ ?? []).map((x) => {
@@ -144,7 +144,13 @@ const Index: React.FC = () => {
                 label: intl.formatMessage({ id: 'page.instance.journalData' }),
                 children: (
                     <div className="activity-data-render-container ">
-                        {dataRender(JSON.stringify(selectActivityData?.journalData ?? {}, null, 2))}
+                        {Object.keys(selectActivityData?.journalData).length > 0 ? (
+                            dataRender(
+                                JSON.stringify(selectActivityData?.journalData ?? {}, null, 2),
+                            )
+                        ) : (
+                            <Empty />
+                        )}
                     </div>
                 ),
             },

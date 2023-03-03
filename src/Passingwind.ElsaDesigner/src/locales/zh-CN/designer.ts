@@ -30,4 +30,5 @@ export default {
     'page.designer.toolbar.copy': '复制选择的',
     'page.designer.toolbar.delete': '删除选中的',
     'page.designer.noMoreOutcomes': '没有可用的输出端口',
+    'page.designer.selectNewOutcome': '选择新的输出端口',
 }

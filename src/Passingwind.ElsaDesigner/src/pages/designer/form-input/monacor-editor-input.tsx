@@ -2,7 +2,7 @@ import MonacoEditor from '@/components/MonacoEditor';
 import { ExpandOutlined } from '@ant-design/icons';
 import type * as monaco from 'monaco-editor';
 import { Modal, Tag } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './monacor-editor-input.less';
 
 type MonacorEditorInputProps = {
@@ -16,11 +16,13 @@ type MonacorEditorInputProps = {
 };
 
 const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
-    const { options } = props;
+    const { id, options } = props;
 
     const [language] = React.useState(props.language || 'plaintext');
     const [value, setValue] = React.useState(props.value || '');
     const [isFullscreen, setIsFullscreen] = React.useState(false);
+
+    const [name] = useState(props.id);
 
     const [currentSize] = React.useState<{ w?: number; h: number }>({ h: 150 });
 
@@ -60,6 +62,7 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
         >
             <MonacoEditor
                 value={value}
+                path={name}
                 language={language}
                 minimap={false}
                 options={options}
@@ -106,6 +109,7 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                 >
                     <MonacoEditor
                         value={value}
+                        path={name}
                         language={language}
                         minimap={true}
                         options={options}

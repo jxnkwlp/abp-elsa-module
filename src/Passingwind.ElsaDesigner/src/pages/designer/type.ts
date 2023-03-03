@@ -96,6 +96,11 @@ export type NodeEditFormPropItemData = {
 
 export type NodeEditFormPropData = Record<string, NodeEditFormPropItemData>;
 
+export type EdgeEditFormData = {
+    edgeId: string;
+    outcomes: string[]
+}
+
 export type ToolBarGroupData = {
     group: string;
     items: ToolBarItemData[];

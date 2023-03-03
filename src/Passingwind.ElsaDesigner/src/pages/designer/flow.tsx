@@ -15,7 +15,7 @@ import { Toolbar } from '@antv/x6-react-components';
 import '@antv/x6-react-components/es/menu/style/index.css';
 import '@antv/x6-react-components/es/toolbar/style/index.css';
 import type { Dnd } from '@antv/x6/lib/addon';
-import { message } from 'antd';
+import { message, Modal } from 'antd';
 import React, { useEffect, useImperativeHandle } from 'react';
 import { useIntl } from 'umi';
 import './flow.less';
@@ -45,6 +45,8 @@ export type FlowActionType = {
     setEdgeStyle: (id: string, status: NodeStatus) => void;
     setAllEdgesStyle: (status: NodeStatus) => void;
     //
+    setEdgeName: (id: string, name: string) => void;
+    //
     // setNodeIncomingEdgesStyle: (id: string, status: NodeStatus) => void;
     // setNodeOutgoingEdgesStyle: (id: string, status: NodeStatus) => void;
     setNodeOutgoingEdgeStyle: (id: string, edgeId: string, status: NodeStatus) => void;
@@ -62,8 +64,8 @@ type IFlowProps = {
     //node
     onNodeClick?: (nodeConfig: Node.Properties, node: Node) => void;
     onNodeDoubleClick?: (nodeConfig: Node.Properties, node: Node) => void;
-    onEdgeClick?: (edge: Edge.Properties) => void;
-    onEdgeDoubleClick?: (edge: Edge.Properties) => void;
+    onEdgeClick?: (graph: Graph, edge: Edge<Edge.Properties>) => void;
+    onEdgeDoubleClick?: (graph: Graph, edge: Edge<Edge.Properties>) => void;
     //
     onGraphInitial?: (graph: Graph) => void;
     onDataUpdate?: (graph: Graph) => void;
@@ -156,6 +158,16 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             if (edge) {
                 edge?.updateData({ status: status });
                 updateEdgeStatus(edge!, status);
+            }
+        },
+        setEdgeName: (id, name) => {
+            const edge = graphRef.current?.getEdges().find((x) => x.id == id);
+            if (edge) {
+                // edge.updateAttrs({ label: name, name: name });
+                edge.setProp('name', name);
+                edge.setLabels(name);
+                edge.setProp('outcome', name);
+                edge?.updateData({ label: name, name: name, outcome: name });
             }
         },
         //
@@ -287,10 +299,14 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
     };
 
     const loadGraphData = (graph: Graph, data: IGraphData) => {
-        props?.onDataUpdate?.(graph);
-        graph.fromJSON(data);
-        // @ts-ignore
-        graph.centerContent({ padding: 50 });
+        try {
+            props?.onDataUpdate?.(graph);
+            graph.fromJSON(data);
+            // @ts-ignore
+            graph.centerContent({ padding: 50 });
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleOnDrag = async (type: string, e: any) => {
@@ -373,6 +389,7 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             graph.on('node:click', ({ node }) => {
                 console.debug('node', node);
                 console.debug('node data', node.getData());
+                console.debug('node prop', node.prop());
                 node.toFront();
                 props?.onNodeClick?.(node.getProp() as Node.Properties, node);
             });
@@ -382,13 +399,15 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
             });
 
             graph.on('edge:click', ({ edge }) => {
-                console.debug(edge);
+                console.debug('edge', edge);
+                console.debug('edge data', edge.getData());
+                console.debug('edge prop', edge.prop());
                 edge.toFront();
-                props.onEdgeClick?.({ ...edge });
+                props.onEdgeClick?.(graph, edge);
             });
 
             graph.on('edge:dblclick', ({ edge }) => {
-                props.onEdgeDoubleClick?.({ ...edge });
+                props.onEdgeDoubleClick?.(graph, edge);
             });
 
             graph.on('node:mouseenter', ({ node }) => {
@@ -416,6 +435,16 @@ const Flow: React.FC<IFlowProps> = (props: IFlowProps) => {
                         {
                             name: 'button-remove',
                             args: { distance: -40 },
+                        },
+                        {
+                            name: 'target-arrowhead',
+                            args: {
+                                attrs: {
+                                    d: 'M -14 -8 2 0 -14 8 Z',
+                                    'stroke-width': 0,
+                                    fill: '#1890ff',
+                                },
+                            },
                         },
                     ]);
                 }

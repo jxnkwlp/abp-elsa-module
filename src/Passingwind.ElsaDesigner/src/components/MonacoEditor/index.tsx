@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 type Monaco = typeof monaco;
 
 type MonacoEditorProps = {
+    path?: string;
     value?: string;
     onChange?: (value: string) => void;
     language?: string;
@@ -20,6 +21,7 @@ const MonacoEditor: React.FC<MonacoEditorProps> = (props) => {
     const {
         width,
         height,
+        path,
         value,
         language,
         minimap,
@@ -36,6 +38,7 @@ const MonacoEditor: React.FC<MonacoEditorProps> = (props) => {
         <Editor
             width={width}
             height={height}
+            path={path}
             defaultLanguage={language}
             onChange={(v) => {
                 handleValueChanged(v as string);
