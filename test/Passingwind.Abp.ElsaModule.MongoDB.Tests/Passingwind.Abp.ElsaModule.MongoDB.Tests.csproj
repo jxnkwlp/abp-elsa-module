@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>Passingwind.Abp.ElsaModule</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="Mongo2Go" Version="3.1.3" />
+    <ProjectReference Include="..\..\src\Passingwind.Abp.ElsaModule.MongoDB\Passingwind.Abp.ElsaModule.MongoDB.csproj" />
+    <ProjectReference Include="..\Passingwind.Abp.ElsaModule.TestBase\Passingwind.Abp.ElsaModule.TestBase.csproj" />
+  </ItemGroup>
+
+</Project>

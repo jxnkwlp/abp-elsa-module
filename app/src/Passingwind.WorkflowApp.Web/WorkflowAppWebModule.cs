@@ -185,7 +185,7 @@ public class WorkflowAppWebModule : AbpModule
         settings.DefaultValueHandling = DefaultValueHandling.Include;
         settings.TypeNameHandling = TypeNameHandling.None;
         settings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
-        settings.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
+        settings.PreserveReferencesHandling = PreserveReferencesHandling.None;
     }
 
     private void ConfigureBundles()

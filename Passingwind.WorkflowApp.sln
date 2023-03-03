@@ -43,6 +43,22 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.WorkflowApp.Web
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.WorkflowApp.DbMigrator", "app\src\Passingwind.WorkflowApp.DbMigrator\Passingwind.WorkflowApp.DbMigrator.csproj", "{18944C79-D798-40C4-9397-47F41B18D2C9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{93A146E1-E830-4943-A5C3-BC464376C979}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.ElsaExtensionsTests", "test\Passingwind.Abp.ElsaModule.ElsaExtensionsTests\Passingwind.Abp.ElsaModule.ElsaExtensionsTests.csproj", "{781EE124-0BFE-49CA-8953-BD110FB1A88B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.TestBase", "test\Passingwind.Abp.ElsaModule.TestBase\Passingwind.Abp.ElsaModule.TestBase.csproj", "{80E77C75-03D0-40E3-AB8E-6FA52F3B1CE3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.Domain.Tests", "test\Passingwind.Abp.ElsaModule.Domain.Tests\Passingwind.Abp.ElsaModule.Domain.Tests.csproj", "{3A07C486-EE64-4F3A-A4B5-EF2EEDDDCC01}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.Application.Tests", "test\Passingwind.Abp.ElsaModule.Application.Tests\Passingwind.Abp.ElsaModule.Application.Tests.csproj", "{AB1E24A7-AC75-4A85-A330-DA5D7369362A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.MongoDB.Tests", "test\Passingwind.Abp.ElsaModule.MongoDB.Tests\Passingwind.Abp.ElsaModule.MongoDB.Tests.csproj", "{143E15F9-B057-4E38-8305-66C76AD39678}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.HttpApi.Client.ConsoleTestApp", "test\Passingwind.Abp.ElsaModule.HttpApi.Client.ConsoleTestApp\Passingwind.Abp.ElsaModule.HttpApi.Client.ConsoleTestApp.csproj", "{91E8D0B3-0FC1-46DD-9D0E-31CB740CE001}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.EntityFrameworkCore.Tests", "test\Passingwind.Abp.ElsaModule.EntityFrameworkCore.Tests\Passingwind.Abp.ElsaModule.EntityFrameworkCore.Tests.csproj", "{66FA16F1-5D09-450B-986E-E252CB570F72}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +137,34 @@ Global
 		{18944C79-D798-40C4-9397-47F41B18D2C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18944C79-D798-40C4-9397-47F41B18D2C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18944C79-D798-40C4-9397-47F41B18D2C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{781EE124-0BFE-49CA-8953-BD110FB1A88B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{781EE124-0BFE-49CA-8953-BD110FB1A88B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{781EE124-0BFE-49CA-8953-BD110FB1A88B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{781EE124-0BFE-49CA-8953-BD110FB1A88B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80E77C75-03D0-40E3-AB8E-6FA52F3B1CE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80E77C75-03D0-40E3-AB8E-6FA52F3B1CE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80E77C75-03D0-40E3-AB8E-6FA52F3B1CE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80E77C75-03D0-40E3-AB8E-6FA52F3B1CE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A07C486-EE64-4F3A-A4B5-EF2EEDDDCC01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A07C486-EE64-4F3A-A4B5-EF2EEDDDCC01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A07C486-EE64-4F3A-A4B5-EF2EEDDDCC01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A07C486-EE64-4F3A-A4B5-EF2EEDDDCC01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB1E24A7-AC75-4A85-A330-DA5D7369362A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB1E24A7-AC75-4A85-A330-DA5D7369362A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB1E24A7-AC75-4A85-A330-DA5D7369362A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB1E24A7-AC75-4A85-A330-DA5D7369362A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{143E15F9-B057-4E38-8305-66C76AD39678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{143E15F9-B057-4E38-8305-66C76AD39678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{143E15F9-B057-4E38-8305-66C76AD39678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{143E15F9-B057-4E38-8305-66C76AD39678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91E8D0B3-0FC1-46DD-9D0E-31CB740CE001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91E8D0B3-0FC1-46DD-9D0E-31CB740CE001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91E8D0B3-0FC1-46DD-9D0E-31CB740CE001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91E8D0B3-0FC1-46DD-9D0E-31CB740CE001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66FA16F1-5D09-450B-986E-E252CB570F72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66FA16F1-5D09-450B-986E-E252CB570F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66FA16F1-5D09-450B-986E-E252CB570F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66FA16F1-5D09-450B-986E-E252CB570F72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,6 +188,13 @@ Global
 		{0BB7F750-4CF9-47D4-8192-8A53C1EE6C6E} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 		{B00128BF-E5BA-4FF6-953E-9788C10B1277} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 		{18944C79-D798-40C4-9397-47F41B18D2C9} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
+		{781EE124-0BFE-49CA-8953-BD110FB1A88B} = {93A146E1-E830-4943-A5C3-BC464376C979}
+		{80E77C75-03D0-40E3-AB8E-6FA52F3B1CE3} = {93A146E1-E830-4943-A5C3-BC464376C979}
+		{3A07C486-EE64-4F3A-A4B5-EF2EEDDDCC01} = {93A146E1-E830-4943-A5C3-BC464376C979}
+		{AB1E24A7-AC75-4A85-A330-DA5D7369362A} = {93A146E1-E830-4943-A5C3-BC464376C979}
+		{143E15F9-B057-4E38-8305-66C76AD39678} = {93A146E1-E830-4943-A5C3-BC464376C979}
+		{91E8D0B3-0FC1-46DD-9D0E-31CB740CE001} = {93A146E1-E830-4943-A5C3-BC464376C979}
+		{66FA16F1-5D09-450B-986E-E252CB570F72} = {93A146E1-E830-4943-A5C3-BC464376C979}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28315BFD-90E7-4E14-A2EA-F3D23AF4126F}
