@@ -7,39 +7,38 @@ using Elsa.Persistence.Specifications.WorkflowExecutionLogRecords;
 using Passingwind.Abp.ElsaModule.Common;
 using WorkflowExecutionLogRecordModel = Elsa.Models.WorkflowExecutionLogRecord;
 
-namespace Passingwind.Abp.ElsaModule.Stores
+namespace Passingwind.Abp.ElsaModule.Stores;
+
+public class WorkflowExecutionLogStore : Store<WorkflowExecutionLogRecordModel, WorkflowExecutionLog, Guid>, IWorkflowExecutionLogStore
 {
-    public class WorkflowExecutionLogStore : Store<WorkflowExecutionLogRecordModel, WorkflowExecutionLog, Guid>, IWorkflowExecutionLogStore
+    protected override Task<WorkflowExecutionLog> MapToEntityAsync(WorkflowExecutionLogRecordModel model)
     {
-        protected override Task<WorkflowExecutionLog> MapToEntityAsync(WorkflowExecutionLogRecordModel model)
-        {
-            return Task.FromResult(StoreMapper.MapToEntity(model));
-        }
+        return Task.FromResult(StoreMapper.MapToEntity(model));
+    }
 
-        protected override Task<WorkflowExecutionLog> MapToEntityAsync(WorkflowExecutionLogRecordModel model, WorkflowExecutionLog entity)
-        {
-            return Task.FromResult(StoreMapper.MapToEntity(model));
-        }
+    protected override Task<WorkflowExecutionLog> MapToEntityAsync(WorkflowExecutionLogRecordModel model, WorkflowExecutionLog entity)
+    {
+        return Task.FromResult(StoreMapper.MapToEntity(model));
+    }
 
-        protected override Task<WorkflowExecutionLogRecordModel> MapToModelAsync(WorkflowExecutionLog entity)
-        {
-            return Task.FromResult(StoreMapper.MapToModel(entity));
-        }
+    protected override Task<WorkflowExecutionLogRecordModel> MapToModelAsync(WorkflowExecutionLog entity)
+    {
+        return Task.FromResult(StoreMapper.MapToModel(entity));
+    }
 
-        protected override async Task<Expression<Func<WorkflowExecutionLog, bool>>> MapSpecificationAsync(ISpecification<WorkflowExecutionLogRecordModel> specification)
+    protected override async Task<Expression<Func<WorkflowExecutionLog, bool>>> MapSpecificationAsync(ISpecification<WorkflowExecutionLogRecordModel> specification)
+    {
+        return specification switch
         {
-            return specification switch
-            {
-                ActivityIdSpecification activityIdSpecification => x => x.ActivityId == Guid.Parse(activityIdSpecification.ActivityId),
-                ActivityTypeSpecification activityTypeSpecification => x => x.ActivityType == activityTypeSpecification.ActivityType,
-                WorkflowInstanceIdSpecification workflowInstanceIdSpecification => x => x.WorkflowInstanceId == Guid.Parse(workflowInstanceIdSpecification.WorkflowInstanceId),
-                _ => await base.MapSpecificationAsync(specification)
-            };
-        }
+            ActivityIdSpecification activityIdSpecification => x => x.ActivityId == Guid.Parse(activityIdSpecification.ActivityId),
+            ActivityTypeSpecification activityTypeSpecification => x => x.ActivityType == activityTypeSpecification.ActivityType,
+            WorkflowInstanceIdSpecification workflowInstanceIdSpecification => x => x.WorkflowInstanceId == Guid.Parse(workflowInstanceIdSpecification.WorkflowInstanceId),
+            _ => await base.MapSpecificationAsync(specification)
+        };
+    }
 
-        protected override Guid ConvertKey(string value)
-        {
-            return Guid.Parse(value);
-        }
+    protected override Guid ConvertKey(string value)
+    {
+        return Guid.Parse(value);
     }
 }

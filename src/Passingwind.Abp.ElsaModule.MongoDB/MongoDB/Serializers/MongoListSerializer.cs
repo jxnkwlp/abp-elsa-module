@@ -3,49 +3,48 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace Passingwind.Abp.ElsaModule.MongoDB.Serializers
+namespace Passingwind.Abp.ElsaModule.MongoDB.Serializers;
+
+public class MongoListSerializer<T> : SerializerBase<List<T>>
 {
-    public class MongoListSerializer<T> : SerializerBase<List<T>>
+    private static readonly IBsonSerializer<T> _itemSerializer = BsonSerializer.LookupSerializer<T>();
+
+    public override List<T> Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
     {
-        private static readonly IBsonSerializer<T> _itemSerializer = BsonSerializer.LookupSerializer<T>();
+        var result = new List<T>();
 
-        public override List<T> Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        if (context.Reader.CurrentBsonType == BsonType.Null)
         {
-            var result = new List<T>();
-
-            if (context.Reader.CurrentBsonType == BsonType.Null)
-            {
-                context.Reader.ReadNull();
-                return result;
-            }
-
-            context.Reader.ReadStartArray();
-
-            while (context.Reader.ReadBsonType() != BsonType.EndOfDocument)
-            {
-                result.Add(_itemSerializer.Deserialize(context));
-            }
-
-            context.Reader.ReadEndArray();
-
+            context.Reader.ReadNull();
             return result;
         }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, List<T> value)
+        context.Reader.ReadStartArray();
+
+        while (context.Reader.ReadBsonType() != BsonType.EndOfDocument)
         {
-            context.Writer.WriteStartArray();
+            result.Add(_itemSerializer.Deserialize(context));
+        }
 
-            if (value == null)
-                context.Writer.WriteEndArray();
-            else
+        context.Reader.ReadEndArray();
+
+        return result;
+    }
+
+    public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, List<T> value)
+    {
+        context.Writer.WriteStartArray();
+
+        if (value == null)
+            context.Writer.WriteEndArray();
+        else
+        {
+            foreach (var item in value)
             {
-                foreach (var item in value)
-                {
-                    _itemSerializer.Serialize(context, item);
-                }
-
-                context.Writer.WriteEndArray();
+                _itemSerializer.Serialize(context, item);
             }
+
+            context.Writer.WriteEndArray();
         }
     }
 }

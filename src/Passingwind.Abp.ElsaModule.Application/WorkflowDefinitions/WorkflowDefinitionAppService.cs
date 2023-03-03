@@ -361,4 +361,13 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         var result = await _workflowLaunchpad.ExecuteStartableWorkflowAsync(startableWorkflow, new WorkflowInput(input.Input));
     }
 
+    public Task RetractAsync(Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task RevertAsync(Guid id, WorkflowDefinitionRevertRequestDto input)
+    {
+        throw new NotImplementedException();
+    }
 }

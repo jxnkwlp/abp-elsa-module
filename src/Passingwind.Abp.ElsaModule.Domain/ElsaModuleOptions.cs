@@ -1,15 +1,14 @@
 ﻿using Elsa.Options;
 
-namespace Passingwind.Abp.ElsaModule
+namespace Passingwind.Abp.ElsaModule;
+
+public class ElsaModuleOptions
 {
-    public class ElsaModuleOptions
+    public ElsaOptionsBuilder Builder { get; }
+
+    public ElsaModuleOptions(ElsaOptionsBuilder builder)
     {
-        public ElsaOptionsBuilder Builder { get; }
-
-        public ElsaModuleOptions(ElsaOptionsBuilder builder)
-        {
-            Builder = builder;
-        }
-
+        Builder = builder;
     }
+
 }

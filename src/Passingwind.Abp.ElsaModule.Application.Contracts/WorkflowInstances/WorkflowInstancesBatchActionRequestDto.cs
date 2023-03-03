@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Passingwind.Abp.ElsaModule.WorkflowInstances
+namespace Passingwind.Abp.ElsaModule.WorkflowInstances;
+
+public class WorkflowInstancesBatchActionRequestDto
 {
-    public class WorkflowInstancesBatchActionRequestDto
-    {
-        public Guid[] Ids { get; set; }
-    }
+    public Guid[] Ids { get; set; }
 }

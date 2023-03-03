@@ -1,11 +1,10 @@
 ﻿using Volo.Abp.Application.Dtos;
 
-namespace Passingwind.Abp.ElsaModule.GlobalVariables
-{
-    public class GlobalVariableListRequestDto : PagedResultRequestDto
-    {
-        public string Filter { get; set; }
+namespace Passingwind.Abp.ElsaModule.GlobalVariables;
 
-        public bool? IsSecret { get; set; }
-    }
+public class GlobalVariableListRequestDto : PagedResultRequestDto
+{
+    public string Filter { get; set; }
+
+    public bool? IsSecret { get; set; }
 }

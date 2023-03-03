@@ -2,29 +2,28 @@
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 
-namespace Passingwind.Abp.ElsaModule.Workflow
+namespace Passingwind.Abp.ElsaModule.Workflow;
+
+[RemoteService]
+[Route("api/elsa/workflows/signals")]
+public class WorkflowSignalController : ElsaModuleController, IWorkflowSignalAppService
 {
-    [RemoteService]
-    [Route("api/elsa/workflows/signals")]
-    public class WorkflowSignalController : ElsaModuleController, IWorkflowSignalAppService
+    private readonly IWorkflowSignalAppService _service;
+
+    public WorkflowSignalController(IWorkflowSignalAppService service)
     {
-        private readonly IWorkflowSignalAppService _service;
+        _service = service;
+    }
 
-        public WorkflowSignalController(IWorkflowSignalAppService service)
-        {
-            _service = service;
-        }
+    [HttpPost("dispatch/{signalName}")]
+    public Task<WorkflowSignalDispatchResultDto> DispatchAsync(string signalName, WorkflowSignalDispatchRequestDto input)
+    {
+        return _service.DispatchAsync(signalName, input);
+    }
 
-        [HttpPost("dispatch/{signalName}")]
-        public Task<WorkflowSignalDispatchResultDto> DispatchAsync(string signalName, WorkflowSignalDispatchRequestDto input)
-        {
-            return _service.DispatchAsync(signalName, input);
-        }
-
-        [HttpPost("execute/{signalName}")]
-        public Task<WorkflowSignalExecuteResultDto> ExecuteAsync(string signalName, WorkflowSignalExecuteRequestDto input)
-        {
-            return _service.ExecuteAsync(signalName, input);
-        }
+    [HttpPost("execute/{signalName}")]
+    public Task<WorkflowSignalExecuteResultDto> ExecuteAsync(string signalName, WorkflowSignalExecuteRequestDto input)
+    {
+        return _service.ExecuteAsync(signalName, input);
     }
 }

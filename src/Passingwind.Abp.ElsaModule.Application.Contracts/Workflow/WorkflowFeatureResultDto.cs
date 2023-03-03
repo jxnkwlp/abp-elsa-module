@@ -1,7 +1,6 @@
-﻿namespace Passingwind.Abp.ElsaModule.Workflow
-{
-    public class WorkflowFeatureResultDto
-    {
+﻿namespace Passingwind.Abp.ElsaModule.Workflow;
 
-    }
+public class WorkflowFeatureResultDto
+{
+
 }

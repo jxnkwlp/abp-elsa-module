@@ -1,8 +1,7 @@
-﻿namespace Passingwind.Abp.ElsaModule.WorkflowInstances
+﻿namespace Passingwind.Abp.ElsaModule.WorkflowInstances;
+
+public class WorkflowInstanceGetStatusDateCountStatisticsRequestDto
 {
-    public class WorkflowInstanceGetStatusDateCountStatisticsRequestDto
-    {
-        public int? DatePeriod { get; set; } = 30;
-        public double Tz { get; set; }
-    }
+    public int? DatePeriod { get; set; } = 30;
+    public double Tz { get; set; }
 }

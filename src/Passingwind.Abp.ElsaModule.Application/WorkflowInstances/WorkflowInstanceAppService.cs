@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Elsa.Services;
+using Elsa.Services.WorkflowStorage;
 using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Permissions;
@@ -26,6 +27,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     private readonly IWorkflowInstanceCanceller _workflowInstanceCanceller;
     private readonly IWorkflowReviver _workflowReviver;
     private readonly IWorkflowLaunchpad _workflowLaunchpad;
+    private readonly IWorkflowStorageService _workflowStorageService;
     private readonly IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> _workflowInstanceDateCountStatisticsDistributedCache;
     private readonly IDistributedCache<WorkflowInstanceStatusCountStatisticsResultDto> _workflowInstanceStatusCountStatisticsDistributedCache;
 
@@ -38,6 +40,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         IWorkflowInstanceCanceller workflowInstanceCanceller,
         IWorkflowReviver workflowReviver,
         IWorkflowLaunchpad workflowLaunchpad,
+        IWorkflowStorageService workflowStorageService,
         IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> workflowInstanceDateCountStatisticsDistributedCache,
         IDistributedCache<WorkflowInstanceStatusCountStatisticsResultDto> workflowInstanceStatusCountStatisticsDistributedCache)
     {
@@ -49,6 +52,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         _workflowInstanceCanceller = workflowInstanceCanceller;
         _workflowReviver = workflowReviver;
         _workflowLaunchpad = workflowLaunchpad;
+        _workflowStorageService = workflowStorageService;
         _workflowInstanceDateCountStatisticsDistributedCache = workflowInstanceDateCountStatisticsDistributedCache;
         _workflowInstanceStatusCountStatisticsDistributedCache = workflowInstanceStatusCountStatisticsDistributedCache;
     }
@@ -112,7 +116,14 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         var fullDataAccess = await AuthorizationService.IsGrantedAsync(ElsaModulePermissions.Instances.Data);
 
         var entity = await _workflowInstanceRepository.GetAsync(id, fullDataAccess);
-        return ObjectMapper.Map<WorkflowInstance, WorkflowInstanceDto>(entity);
+
+        var instance = _storeMapper.MapToModel(entity);
+
+        var input = await _workflowStorageService.LoadAsync(instance);
+
+        var dto = ObjectMapper.Map<WorkflowInstance, WorkflowInstanceDto>(entity);
+
+        return dto;
     }
 
     public async Task<WorkflowInstanceBasicDto> GetBasicAsync(Guid id)

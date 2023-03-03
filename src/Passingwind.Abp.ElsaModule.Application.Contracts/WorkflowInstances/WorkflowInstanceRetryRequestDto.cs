@@ -1,7 +1,6 @@
-﻿namespace Passingwind.Abp.ElsaModule.WorkflowInstances
+﻿namespace Passingwind.Abp.ElsaModule.WorkflowInstances;
+
+public class WorkflowInstanceRetryRequestDto
 {
-    public class WorkflowInstanceRetryRequestDto
-    {
-        public bool RunImmediately { get; set; }
-    }
+    public bool RunImmediately { get; set; }
 }

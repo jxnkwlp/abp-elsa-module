@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace Passingwind.Abp.ElsaModule.Workflow
+namespace Passingwind.Abp.ElsaModule.Workflow;
+
+public class WorkflowSignalDispatchRequestDto
 {
-    public class WorkflowSignalDispatchRequestDto
-    {
-        public Guid? WorkflowInstanceId { get; set; }
-        public string CorrelationId { get; set; }
-        public object Input { get; set; }
-    }
+    public Guid? WorkflowInstanceId { get; set; }
+    public string CorrelationId { get; set; }
+    public object Input { get; set; }
 }

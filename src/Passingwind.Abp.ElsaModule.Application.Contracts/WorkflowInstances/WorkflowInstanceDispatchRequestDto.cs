@@ -1,11 +1,10 @@
 ﻿using System;
 using Elsa.Models;
 
-namespace Passingwind.Abp.ElsaModule.WorkflowInstances
+namespace Passingwind.Abp.ElsaModule.WorkflowInstances;
+
+public class WorkflowInstanceDispatchRequestDto
 {
-    public class WorkflowInstanceDispatchRequestDto
-    {
-        public Guid? ActivityId { get; set; }
-        public WorkflowInput Input { get; set; }
-    }
+    public Guid? ActivityId { get; set; }
+    public WorkflowInput Input { get; set; }
 }

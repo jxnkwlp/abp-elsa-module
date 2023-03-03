@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Passingwind.Abp.ElsaModule.Workflow
+namespace Passingwind.Abp.ElsaModule.Workflow;
+
+public class WorkflowSignalExecuteResultDto
 {
-    public class WorkflowSignalExecuteResultDto
-    {
-        public List<WorkflowSignalResultDto> StartedWorkflows { get; set; }
-    }
+    public List<WorkflowSignalResultDto> StartedWorkflows { get; set; }
 }

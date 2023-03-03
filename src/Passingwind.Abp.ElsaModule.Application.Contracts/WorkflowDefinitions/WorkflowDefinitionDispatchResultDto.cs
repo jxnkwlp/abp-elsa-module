@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions
+namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions;
+
+public class WorkflowDefinitionDispatchResultDto
 {
-    public class WorkflowDefinitionDispatchResultDto
-    {
-        public Guid WorkflowInstanceId { get; set; }
-    }
+    public Guid WorkflowInstanceId { get; set; }
 }

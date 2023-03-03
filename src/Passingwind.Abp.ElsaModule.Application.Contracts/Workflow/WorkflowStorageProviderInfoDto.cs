@@ -1,8 +1,7 @@
-﻿namespace Passingwind.Abp.ElsaModule.Workflow
+﻿namespace Passingwind.Abp.ElsaModule.Workflow;
+
+public class WorkflowStorageProviderInfoDto
 {
-    public class WorkflowStorageProviderInfoDto
-    {
-        public string Name { get; set; }
-        public string DisplayName { get; set; }
-    }
+    public string Name { get; set; }
+    public string DisplayName { get; set; }
 }

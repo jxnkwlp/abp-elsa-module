@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
-namespace Passingwind.Abp.ElsaModule.Workflow
+namespace Passingwind.Abp.ElsaModule.Workflow;
+
+public interface IFeatureAppService : IApplicationService
 {
-    public interface IFeatureAppService : IApplicationService
-    {
-        Task<WorkflowFeatureResultDto> GetAsync();
-    }
+    Task<WorkflowFeatureResultDto> GetAsync();
 }

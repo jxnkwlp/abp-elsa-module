@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Elsa.Design;
 using Elsa.Metadata;
 using Elsa.Scripting.JavaScript.Services;
 using Elsa.Services;
+using Elsa.Services.Models;
 using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.CSharp;
@@ -49,7 +51,7 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
     {
         var activityTypes = await _activityTypeService.GetActivityTypesAsync();
 
-        var tasks = activityTypes.Select(async x => await _activityTypeService.DescribeActivityType(x)).ToArray();
+        var tasks = activityTypes.Select(async x => await DescribeActivityAsync(x)).ToArray();
 
         var descriptors = await Task.WhenAll(tasks);
 
@@ -60,11 +62,21 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
             Categories = categories,
             Items = ObjectMapper.Map<List<ActivityDescriptor>, List<ActivityTypeDescriptorDto>>(descriptors.ToList())
         };
+
+        async Task<ActivityDescriptor> DescribeActivityAsync(ActivityType activityType, CancellationToken cancellationToken = default)
+        {
+            var activityDescriptor = await _activityTypeService.DescribeActivityType(activityType, cancellationToken);
+
+            // Filter out any non-browsable properties.
+            activityDescriptor.InputProperties = activityDescriptor.InputProperties.Where(x => x.IsBrowsable is true or null).ToArray();
+            activityDescriptor.OutputProperties = activityDescriptor.OutputProperties.Where(x => x.IsBrowsable is true or null).ToArray();
+
+            return activityDescriptor;
+        }
     }
 
     public async Task<RuntimeSelectListResultDto> GetRuntimeSelectListItems(RuntimeSelectListContextDto input)
     {
-        // LazyServiceProvider.LazyGetRequiredService()
         var type = Type.GetType(input.ProviderTypeName)!;
         var provider = LazyServiceProvider.LazyGetRequiredService(type);
         var context = input.Context;

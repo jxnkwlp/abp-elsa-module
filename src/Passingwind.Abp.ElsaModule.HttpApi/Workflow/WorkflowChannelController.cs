@@ -3,23 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 
-namespace Passingwind.Abp.ElsaModule.Workflow
+namespace Passingwind.Abp.ElsaModule.Workflow;
+
+[RemoteService]
+[Route("api/elsa/workflow/channels")]
+public class WorkflowChannelController : ElsaModuleController, IWorkflowChannelAppService
 {
-    [RemoteService]
-    [Route("api/elsa/workflow/channels")]
-    public class WorkflowChannelController : ElsaModuleController, IWorkflowChannelAppService
+    private readonly IWorkflowChannelAppService _service;
+
+    public WorkflowChannelController(IWorkflowChannelAppService service)
     {
-        private readonly IWorkflowChannelAppService _service;
+        _service = service;
+    }
 
-        public WorkflowChannelController(IWorkflowChannelAppService service)
-        {
-            _service = service;
-        }
-
-        [HttpGet]
-        public Task<ListResultDto<string>> GetListAsync()
-        {
-            return _service.GetListAsync();
-        }
+    [HttpGet]
+    public Task<ListResultDto<string>> GetListAsync()
+    {
+        return _service.GetListAsync();
     }
 }
