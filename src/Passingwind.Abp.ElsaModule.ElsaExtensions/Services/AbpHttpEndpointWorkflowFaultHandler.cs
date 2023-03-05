@@ -9,7 +9,6 @@ using Volo.Abp.Json;
 
 namespace Passingwind.Abp.ElsaModule.Services;
 
-[Dependency(ReplaceServices = true)]
 [ExposeServices(typeof(IHttpEndpointWorkflowFaultHandler))]
 public class AbpHttpEndpointWorkflowFaultHandler : IHttpEndpointWorkflowFaultHandler, ITransientDependency
 {
