@@ -36,6 +36,7 @@ using NodaTime;
 using NodaTime.Serialization.JsonNet;
 using Owl.Abp.CultureMap;
 using Passingwind.Abp.ElsaModule;
+using Passingwind.Abp.ElsaModule.Json.Converters;
 using Passingwind.Abp.ElsaModule.Services;
 using Passingwind.WorkflowApp.EntityFrameworkCore;
 using Passingwind.WorkflowApp.MultiTenancy;
@@ -61,6 +62,7 @@ using Volo.Abp.Hangfire;
 using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Identity.Web;
 using Volo.Abp.Json;
+using Volo.Abp.Json.SystemTextJson;
 using Volo.Abp.Localization;
 using Volo.Abp.MailKit;
 using Volo.Abp.Modularity;
@@ -120,10 +122,15 @@ public class WorkflowAppWebModule : AbpModule
             options.KnownProxies.Clear();
             options.KnownNetworks.Clear();
         });
-
-        Configure<MvcNewtonsoftJsonOptions>((options) =>
+         
+        Configure<JsonOptions>(options =>
         {
-            ConfigureNewtonsoftJsonSerializerSettings(options.SerializerSettings);
+            options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
+        });
+
+        Configure<AbpSystemTextJsonSerializerOptions>(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
         });
 
         // Config default 'JsonSerializerSettings'
@@ -146,8 +153,8 @@ public class WorkflowAppWebModule : AbpModule
 
         Configure<AbpJsonOptions>(options =>
         {
-            // options.DefaultDateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssZ";
-            options.UseHybridSerializer = false;
+            // options.DefaultDateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssZ"; 
+            // options.InputDateTimeFormats = new List<string> { "yyyy'-'MM'-'dd'T'HH':'mm':'ssZ", "yyyy'-'MM'-'dd HH':'mm':'ss" };
         });
 
         Configure<CookiePolicyOptions>(options =>

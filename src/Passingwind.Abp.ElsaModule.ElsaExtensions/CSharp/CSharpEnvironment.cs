@@ -2,5 +2,5 @@
 
 public class CSharpEnvironment
 {
-    public const string TargetFramework = "net6.0";
+    public const string TargetFramework = "net7.0";
 }
