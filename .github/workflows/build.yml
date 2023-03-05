@@ -57,8 +57,8 @@ jobs:
         run: dotnet build --no-restore -c Release Passingwind.Abp.ElsaModule.sln
 
       - name: Pack
-        if: steps.changes.outputs.src == 'true'
-        run: dotnet pack --no-build --no-restore -c Release /p:Version="${{env.GITCI_NEXT_VERSION}}" -o ./pack_output  Passingwind.Abp.ElsaModule.sln
+        # if: steps.changes.outputs.src == 'true'
+        run: dotnet pack --no-build --no-restore -c Release /p:Version="${{env.GITCI_NEXT_VERSION}}" --property:PackageOutputPath=./pack_output  Passingwind.Abp.ElsaModule.sln
 
       - uses: actions/setup-node@v3
         with:
@@ -75,17 +75,17 @@ jobs:
           npm run build
 
       - name: copy build out
-        if: steps.changes.outputs.src == 'true'
+        #if: steps.changes.outputs.src == 'true'
         run: |
           cd ${{github.workspace}}/src/Passingwind.ElsaDesigner
           zip ${{github.workspace}}/pack_output/workflow-dashboard.zip -r ./dist/*
 
       - name: Push package
-        if: steps.changes.outputs.src == 'true'
+        #if: steps.changes.outputs.src == 'true'
         run: dotnet nuget push ./pack_output/*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
 
       - name: Create Release
-        if: steps.changes.outputs.src == 'true'
+        #if: steps.changes.outputs.src == 'true'
         uses: ncipollo/release-action@v1
         with:
           tag: v${{env.GITCI_NEXT_VERSION}}
