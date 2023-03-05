@@ -47,17 +47,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elsa" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.Email" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.Http" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.UserTask" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.BlobStorage" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.File" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.Entity" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.RabbitMq" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.Sql" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.Http.OpenApi" Version="2.9.2" />
+        <PackageReference Include="Elsa" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.Email" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.Http" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.UserTask" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.BlobStorage" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.File" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.Entity" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.RabbitMq" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.Sql" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.Http.OpenApi" Version="2.10.2.2" />
     </ItemGroup>
 
     <ItemGroup>

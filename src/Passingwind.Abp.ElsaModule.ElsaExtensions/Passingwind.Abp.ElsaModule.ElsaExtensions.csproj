@@ -50,9 +50,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elsa.Activities.Email" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.Http" Version="2.9.2" />
-        <PackageReference Include="Elsa.Activities.Temporal.Common" Version="2.9.2" />
+        <PackageReference Include="Elsa.Activities.Email" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.Http" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.Temporal.Common" Version="2.10.2.2" />
     </ItemGroup>
 
     <ItemGroup>

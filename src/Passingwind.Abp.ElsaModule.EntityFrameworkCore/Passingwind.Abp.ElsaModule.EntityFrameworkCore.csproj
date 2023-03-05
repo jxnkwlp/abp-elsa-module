@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elsa.Abstractions" Version="2.9.2" />
+        <PackageReference Include="Elsa.Abstractions" Version="2.10.2.2" />
         <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
     </ItemGroup>
 
