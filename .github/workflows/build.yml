@@ -58,7 +58,7 @@ jobs:
 
       - name: Pack
         # if: steps.changes.outputs.src == 'true'
-        run: dotnet pack --no-build --no-restore -c Release /p:Version="${{env.GITCI_NEXT_VERSION}}" --property:PackageOutputPath=./pack_output  Passingwind.Abp.ElsaModule.sln
+        run: dotnet pack --no-build --no-restore -c Release /p:Version="${{env.GITCI_NEXT_VERSION}}" --property:PackageOutputPath=${{github.workspace}}/pack_output  Passingwind.Abp.ElsaModule.sln
 
       - uses: actions/setup-node@v3
         with:
