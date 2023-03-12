@@ -1,5 +1,5 @@
 import MonacoEditor from '@/components/MonacoEditor';
-import { MonacoCompletionItemKind } from '@/services/enums';
+import { WorkflowCSharpEditorCompletionItemKind } from '@/services/enums';
 import type { API } from '@/services/typings';
 import { showDownloadJsonFile } from '@/services/utils';
 import { getWorkflowStorageProviders } from '@/services/Workflow';
@@ -638,7 +638,7 @@ const Index: React.FC = () => {
 
             setJsonEditorVisible(false);
 
-            await loadServerData(data2 as API.WorkflowDefinition, false);
+            await loadServerData(data2 as unknown as API.WorkflowDefinitionVersion, false);
         } catch (error) {
             message.error('Transform json failed');
         }
@@ -708,7 +708,7 @@ const Index: React.FC = () => {
 
                     if (result) {
                         const suggestions: monaco.languages.CompletionItem[] = (
-                            result as API.MonacoCompletionItem[]
+                            result as API.WorkflowCSharpEditorCompletionItem[]
                         ).map((x) => {
                             return {
                                 label: {
@@ -718,17 +718,19 @@ const Index: React.FC = () => {
                                 insertText: x.suggestion ?? '',
                                 range: range,
                                 kind:
-                                    x.itemKind == MonacoCompletionItemKind.Function
+                                    x.itemKind == WorkflowCSharpEditorCompletionItemKind.Function
                                         ? monaco.languages.CompletionItemKind.Method
-                                        : x.itemKind == MonacoCompletionItemKind.Class
+                                        : x.itemKind == WorkflowCSharpEditorCompletionItemKind.Class
                                         ? monaco.languages.CompletionItemKind.Class
-                                        : x.itemKind == MonacoCompletionItemKind.Field
+                                        : x.itemKind == WorkflowCSharpEditorCompletionItemKind.Field
                                         ? monaco.languages.CompletionItemKind.Field
-                                        : x.itemKind == MonacoCompletionItemKind.Variable
+                                        : x.itemKind ==
+                                          WorkflowCSharpEditorCompletionItemKind.Variable
                                         ? monaco.languages.CompletionItemKind.Variable
-                                        : x.itemKind == MonacoCompletionItemKind.Property
+                                        : x.itemKind ==
+                                          WorkflowCSharpEditorCompletionItemKind.Property
                                         ? monaco.languages.CompletionItemKind.Property
-                                        : x.itemKind == MonacoCompletionItemKind.Enum
+                                        : x.itemKind == WorkflowCSharpEditorCompletionItemKind.Enum
                                         ? monaco.languages.CompletionItemKind.Enum
                                         : monaco.languages.CompletionItemKind.Text,
                             };
@@ -860,7 +862,7 @@ const Index: React.FC = () => {
                 const data = (await getCSharpEditorLanguageProvider(definitionId!, 'analysis', {
                     id: model.uri.path.substring(1),
                     text: model.getValue() ?? '',
-                })) as API.MonacoCodeAnalysisItem[];
+                })) as API.WorkflowCSharpEditorCodeAnalysis[];
 
                 // check again
                 if (model.isDisposed()) return;
@@ -1332,7 +1334,7 @@ const Index: React.FC = () => {
             <Modal
                 title={intl.formatMessage({ id: 'page.definition.versions' })}
                 destroyOnClose
-                visible={versionListModalVisible}
+                open={versionListModalVisible}
                 onCancel={() => setVersionListModalVisible(false)}
                 width={680}
                 onOk={() => {
@@ -1486,7 +1488,7 @@ const Index: React.FC = () => {
             {/* version diff */}
             <Modal
                 title={versionDiffModalTitle}
-                visible={versionDiffModalVisible}
+                open={versionDiffModalVisible}
                 onCancel={() => setVersionDiffModalVisible(false)}
                 footer={false}
                 width="90%"

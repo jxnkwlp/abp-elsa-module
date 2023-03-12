@@ -59,7 +59,7 @@ export async function getWorkflowGroupList(
     },
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowGroupPagedResult>(`/api/elsa/workflow/groups`, {
+    return request<API.WorkflowGroupBasicPagedResult>(`/api/elsa/workflow/groups`, {
         method: 'GET',
         params: params,
         ...(options || {}),

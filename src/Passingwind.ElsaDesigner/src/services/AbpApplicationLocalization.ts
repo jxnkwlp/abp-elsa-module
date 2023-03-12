@@ -9,15 +9,16 @@ import type { API } from "./typings";
 import { request } from 'umi';
 
 /**
- * *TODO* GET /api/abp/application-configuration 
+ * *TODO* GET /api/abp/application-localization 
  **/
-export async function getAbpApplicationConfiguration(
+export async function getAbpApplicationLocalization(
     params: {
-        includeLocalizationResources?: boolean | undefined
+        cultureName: string,
+        onlyDynamics?: boolean | undefined
     },
     options?: { [key: string]: any }
 ) {
-    return request<API.ApplicationConfiguration>(`/api/abp/application-configuration`, {
+    return request<API.ApplicationLocalization>(`/api/abp/application-localization`, {
         method: 'GET',
         params: params,
         ...(options || {}),

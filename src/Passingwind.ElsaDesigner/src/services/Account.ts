@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 3
+ * Total count: 4
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -45,6 +45,21 @@ export async function accountSendPasswordResetCode(
     options?: { [key: string]: any }
 ) {
     return request<any>(`/api/account/send-password-reset-code`, {
+        method: 'POST',
+        data: payload,
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* POST /api/account/verify-password-reset-token 
+ **/
+export async function accountVerifyPasswordResetToken(
+    payload: API.VerifyPasswordResetTokenInput,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/account/verify-password-reset-token`, {
         method: 'POST',
         data: payload,
         getResponse: true,

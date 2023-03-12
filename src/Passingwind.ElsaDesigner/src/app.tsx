@@ -76,20 +76,20 @@ export async function getInitialState(): Promise<{
         };
     }
 
-    const allPolicies: Record<string, boolean> = auth?.policies ?? {};
-    const grantedPolicies: Record<string, boolean> = auth?.grantedPolicies ?? {};
+    // const allPolicies: Record<string, boolean> = auth?.policies ?? {};
+    // const grantedPolicies: Record<string, boolean> = auth?.grantedPolicies ?? {};
 
-    let currentPolicies = Object.fromEntries(
-        Object.keys(allPolicies).map((x) => {
-            return [[x], false];
-        }),
-    );
-    currentPolicies = Object.assign({}, currentPolicies, grantedPolicies);
+    // let currentPolicies = Object.fromEntries(
+    //     Object.keys(allPolicies).map((x) => {
+    //         return [[x], false];
+    //     }),
+    // );
+    // currentPolicies = Object.assign({}, currentPolicies, grantedPolicies);
 
     return {
         settings: defaultSettings,
         currentUser: currentUser,
-        grantedPolicies: currentPolicies,
+        grantedPolicies: auth?.grantedPolicies ?? {},
         fetchUserInfo: async () => (await loadData())?.currentUser,
     };
 }

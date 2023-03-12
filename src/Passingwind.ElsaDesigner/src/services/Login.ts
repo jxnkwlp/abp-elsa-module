@@ -35,7 +35,7 @@ export async function loginCheckPassword(
 }
 
 /**
- * *TODO* POST /api/account/login/external 
+ * *TODO* GET /api/account/login/external 
  **/
 export async function loginExternalLogin(
     params: {
@@ -44,7 +44,7 @@ export async function loginExternalLogin(
     options?: { [key: string]: any }
 ) {
     return request<any>(`/api/account/login/external`, {
-        method: 'POST',
+        method: 'GET',
         params: params,
         getResponse: true,
         ...(options || {}),

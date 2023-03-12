@@ -541,7 +541,7 @@ const Index: React.FC = () => {
                     editModalData?.name
                 }`}
                 width={600}
-                visible={iampModalVisible}
+                open={iampModalVisible}
                 onCancel={() => setIampModalVisible(false)}
                 maskClosable={false}
                 destroyOnClose
