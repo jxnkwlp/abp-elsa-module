@@ -7,8 +7,10 @@ using Elsa.Services;
 using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
+using Passingwind.Abp.ElsaModule.WorkflowGroups;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Identity;
 
 namespace Passingwind.Abp.ElsaModule.Common;
 
@@ -19,16 +21,29 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
     private readonly WorkflowDefinitionManager _workflowDefinitionManager;
     private readonly IWorkflowLaunchpad _workflowLaunchpad;
+    private readonly IWorkflowPermissionService _workflowPermissionService;
+    private readonly IWorkflowGroupManager _workflowGroupManager;
+    private readonly IdentityUserManager _identityUserManager;
 
-    public WorkflowDefinitionAppService(IWorkflowDefinitionRepository workflowDefinitionRepository, IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository, WorkflowDefinitionManager workflowDefinitionManager, IWorkflowLaunchpad workflowLaunchpad)
+    public WorkflowDefinitionAppService(
+        IWorkflowDefinitionRepository workflowDefinitionRepository,
+        IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository,
+        WorkflowDefinitionManager workflowDefinitionManager,
+        IWorkflowLaunchpad workflowLaunchpad,
+        IWorkflowPermissionService workflowPermissionService,
+        IWorkflowGroupManager workflowGroupManager,
+        IdentityUserManager identityUserManager)
     {
         _workflowDefinitionRepository = workflowDefinitionRepository;
         _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
         _workflowDefinitionManager = workflowDefinitionManager;
         _workflowLaunchpad = workflowLaunchpad;
+        _workflowPermissionService = workflowPermissionService;
+        _workflowGroupManager = workflowGroupManager;
+        _identityUserManager = identityUserManager;
     }
 
-    [Authorize(Policy = ElsaModulePermissions.Definitions.Publish)]
+    [Authorize(Policy = ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish)]
     public virtual async Task<WorkflowDefinitionVersionDto> CreateAsync(WorkflowDefinitionVersionCreateOrUpdateDto input)
     {
         WorkflowDefinition defintion = await _workflowDefinitionManager.CreateDefinitionAsync(
@@ -91,6 +106,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     [Authorize(Policy = ElsaModulePermissions.Definitions.Delete)]
     public virtual async Task DeleteAsync(Guid id)
     {
+        await CheckWorkflowPermissionAsync(id, ElsaModulePermissions.Definitions.Delete);
+
         await _workflowDefinitionVersionRepository.DeleteAsync(x => x.DefinitionId == id);
         await _workflowDefinitionRepository.DeleteAsync(id);
     }
@@ -98,6 +115,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     [Authorize(Policy = ElsaModulePermissions.Definitions.Delete)]
     public virtual async Task DeleteVersionAsync(Guid id, int version)
     {
+        await CheckWorkflowPermissionAsync(id, ElsaModulePermissions.Definitions.Delete);
+
         await _workflowDefinitionVersionRepository.DeleteAsync(x => x.DefinitionId == id && x.Version == version);
     }
 
@@ -106,8 +125,11 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         var entity = await _workflowDefinitionRepository.GetAsync(id);
         var version = await _workflowDefinitionVersionRepository.GetLatestAsync(id);
 
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.Default);
+
         var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(version);
         dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(entity);
+
         return dto;
     }
 
@@ -115,13 +137,26 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     {
         var entity = await _workflowDefinitionRepository.GetAsync(id);
 
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.Default);
+
         return ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(entity);
     }
 
     public virtual async Task<PagedResultDto<WorkflowDefinitionDto>> GetListAsync(WorkflowDefinitionListRequestDto input)
     {
-        var count = await _workflowDefinitionRepository.CountAsync(name: input.Filter, isSingleton: input.IsSingleton);
-        var list = await _workflowDefinitionRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, name: input.Filter, isSingleton: input.IsSingleton, ordering: input.Sorting);
+        var grantedResult = await _workflowPermissionService.GetGrantsAsync();
+
+        var count = await _workflowDefinitionRepository.CountAsync(
+            name: input.Filter,
+            isSingleton: input.IsSingleton,
+            filterIds: grantedResult.AllGranted ? null : grantedResult.WorkflowIds);
+        var list = await _workflowDefinitionRepository.GetPagedListAsync(
+            input.SkipCount,
+            input.MaxResultCount,
+            name: input.Filter,
+            isSingleton: input.IsSingleton,
+            filterIds: grantedResult.AllGranted ? null : grantedResult.WorkflowIds,
+            ordering: input.Sorting);
 
         return new PagedResultDto<WorkflowDefinitionDto>(count, ObjectMapper.Map<List<WorkflowDefinition>, List<WorkflowDefinitionDto>>(list));
     }
@@ -130,6 +165,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     {
         var entity = await _workflowDefinitionRepository.GetAsync(id);
         var versionEntity = await _workflowDefinitionVersionRepository.GetByVersionAsync(id, version);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.Default);
 
         var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(versionEntity);
         dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(entity);
@@ -140,6 +177,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     {
         var entity = await _workflowDefinitionRepository.GetAsync(id);
         var previousVersion = await _workflowDefinitionVersionRepository.GetPreviousVersionNumberAsync(id, version);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.Default);
 
         if (previousVersion.HasValue == false)
             return null;
@@ -153,6 +192,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
 
     public virtual async Task<PagedResultDto<WorkflowDefinitionVersionListItemDto>> GetVersionsAsync(Guid id, WorkflowDefinitionVersionListRequestDto input)
     {
+        await CheckWorkflowPermissionAsync(id, ElsaModulePermissions.Definitions.Default);
+
         var count = await _workflowDefinitionVersionRepository.GetCountAsync(x => x.DefinitionId == id);
         var list = await _workflowDefinitionVersionRepository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, x => x.DefinitionId == id, "version desc", false);
 
@@ -166,6 +207,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
 
         WorkflowDefinitionVersion currentVersion = null;
         WorkflowDefinition defintion = await _workflowDefinitionRepository.GetAsync(id);
+
+        await AuthorizationService.CheckAsync(defintion, ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish);
 
         int latestVersion = defintion.LatestVersion;
 
@@ -270,6 +313,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     {
         var entity = await _workflowDefinitionRepository.GetAsync(id);
 
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish);
+
         entity.Name = input.Name;
         entity.DisplayName = input.DisplayName;
         entity.Description = input.Description;
@@ -288,10 +333,12 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         return ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(entity);
     }
 
-    [Authorize(Policy = ElsaModulePermissions.Definitions.Publish)]
+    [Authorize(Policy = ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish)]
     public virtual async Task UnPublishAsync(Guid id)
     {
         var entity = await _workflowDefinitionRepository.GetAsync(id);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish);
 
         if (entity.PublishedVersion.HasValue)
         {
@@ -307,10 +354,12 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         }
     }
 
-    [Authorize(Policy = ElsaModulePermissions.Definitions.Publish)]
+    [Authorize(Policy = ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish)]
     public virtual async Task PublishAsync(Guid id)
     {
         var entity = await _workflowDefinitionRepository.GetAsync(id);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish);
 
         if (!entity.PublishedVersion.HasValue)
         {
@@ -330,6 +379,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     public async Task<WorkflowDefinitionDispatchResultDto> DispatchAsync(Guid id, WorkflowDefinitionDispatchRequestDto input)
     {
         var entity = await _workflowDefinitionVersionRepository.GetLatestAsync(id);
+
+        await CheckWorkflowPermissionAsync(entity.DefinitionId, ElsaModulePermissions.Definitions.Dispatch);
 
         var tenantId = CurrentTenant.Id?.ToString();
 
@@ -351,6 +402,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     {
         var entity = await _workflowDefinitionVersionRepository.GetLatestAsync(id);
 
+        await CheckWorkflowPermissionAsync(entity.DefinitionId, ElsaModulePermissions.Definitions.Dispatch);
+
         var tenantId = CurrentTenant.Id?.ToString();
 
         var startableWorkflow = await _workflowLaunchpad.FindStartableWorkflowAsync(id.ToString(), input.ActivityId?.ToString(), input.CorrelationId, input.ContextId, tenantId);
@@ -369,5 +422,38 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     public Task RevertAsync(Guid id, WorkflowDefinitionRevertRequestDto input)
     {
         throw new NotImplementedException();
+    }
+
+    [Authorize(Policy = ElsaModulePermissions.Definitions.ManagePermissions)]
+    public async Task<WorkflowDefinitionIamResultDto> GetIamAsync(Guid id)
+    {
+        var entity = await _workflowDefinitionRepository.GetAsync(id);
+        var groups = await _workflowGroupManager.GetListByWorkflowIdAsync(id);
+
+        var owners = await _workflowPermissionService.GetWorkflowOwnersAsync(entity);
+
+        return new WorkflowDefinitionIamResultDto
+        {
+            Groups = ObjectMapper.Map<IEnumerable<WorkflowGroup>, IEnumerable<WorkflowGroupBasicDto>>(groups),
+            Owners = ObjectMapper.Map<IEnumerable<IdentityUser>, IEnumerable<IdentityUserDto>>(owners),
+        };
+    }
+
+    [Authorize(Policy = ElsaModulePermissions.Definitions.ManagePermissions)]
+    public async Task AddOwnerAsync(Guid id, WorkflowDefinitionAddOwnerRequestDto input)
+    {
+        var entity = await _workflowDefinitionRepository.GetAsync(id);
+        var user = await _identityUserManager.GetByIdAsync(input.UserId);
+
+        await _workflowPermissionService.AddWorkflowOwnerAsync(entity, user);
+    }
+
+    [Authorize(Policy = ElsaModulePermissions.Definitions.ManagePermissions)]
+    public async Task DeleteOwnerAsync(Guid id, Guid userId)
+    {
+        var entity = await _workflowDefinitionRepository.GetAsync(id);
+        var user = await _identityUserManager.GetByIdAsync(userId);
+
+        await _workflowPermissionService.RemoveWorkflowOwnerAsync(entity, user);
     }
 }

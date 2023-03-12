@@ -119,4 +119,21 @@ public class WorkflowDefinitionController : ElsaModuleController, IWorkflowDefin
         return _service.RevertAsync(id, input);
     }
 
+    [HttpGet("{id}/iam")]
+    public Task<WorkflowDefinitionIamResultDto> GetIamAsync(Guid id)
+    {
+        return _service.GetIamAsync(id);
+    }
+
+    [HttpPost("{id}/iam/owners")]
+    public Task AddOwnerAsync(Guid id, WorkflowDefinitionAddOwnerRequestDto input)
+    {
+        return _service.AddOwnerAsync(id, input);
+    }
+
+    [HttpDelete("{id}/iam/owners/{userId}")]
+    public Task DeleteOwnerAsync(Guid id, Guid userId)
+    {
+        return _service.DeleteOwnerAsync(id, userId);
+    }
 }

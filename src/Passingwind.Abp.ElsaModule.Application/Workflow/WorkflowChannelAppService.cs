@@ -8,7 +8,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Workflow;
 
-[Authorize(Policy = ElsaModulePermissions.Definitions.Publish)]
+[Authorize(Policy = ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish)]
 public class WorkflowChannelAppService : ElsaModuleAppService, IWorkflowChannelAppService
 {
     private readonly ElsaOptions _elsaOptions;

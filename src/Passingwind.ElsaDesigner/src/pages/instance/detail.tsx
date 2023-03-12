@@ -144,7 +144,7 @@ const Index: React.FC = () => {
                 label: intl.formatMessage({ id: 'page.instance.journalData' }),
                 children: (
                     <div className="activity-data-render-container ">
-                        {Object.keys(selectActivityData?.journalData).length > 0 ? (
+                        {Object.keys(selectActivityData?.journalData ?? {}).length > 0 ? (
                             dataRender(
                                 JSON.stringify(selectActivityData?.journalData ?? {}, null, 2),
                             )
@@ -473,7 +473,7 @@ const Index: React.FC = () => {
                                 )}
                                 {selectActivityId && selectActivityData && (
                                     <Access
-                                        accessible={access['ElsaModule.Instances.Data']}
+                                        accessible={access['ElsaWorkflow.Instances.Data']}
                                         fallback={
                                             <Alert
                                                 type="error"
@@ -556,7 +556,7 @@ const Index: React.FC = () => {
 
                         {tabKey === 'input' && (
                             <Access
-                                accessible={access['ElsaModule.Instances.Data']}
+                                accessible={access['ElsaWorkflow.Instances.Data']}
                                 fallback={
                                     <Alert
                                         type="error"
@@ -577,7 +577,7 @@ const Index: React.FC = () => {
                         )}
                         {tabKey === 'fault' && (
                             <Access
-                                accessible={access['ElsaModule.Instances.Data']}
+                                accessible={access['ElsaWorkflow.Instances.Data']}
                                 fallback={
                                     <Alert
                                         type="error"
@@ -598,7 +598,7 @@ const Index: React.FC = () => {
                         )}
                         {tabKey === 'variables' && (
                             <Access
-                                accessible={access['ElsaModule.Instances.Data']}
+                                accessible={access['ElsaWorkflow.Instances.Data']}
                                 fallback={
                                     <Alert
                                         type="error"

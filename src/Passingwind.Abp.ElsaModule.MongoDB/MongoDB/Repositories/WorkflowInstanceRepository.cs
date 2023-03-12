@@ -20,8 +20,8 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
 
     public async Task<long> LongCountAsync(
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         WorkflowInstanceStatus? status = null,
         string correlationId = null,
@@ -34,8 +34,8 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
         return await query
-            .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
-            .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
+            .WhereIf(definitionIds?.Any() == true, x => definitionIds.Contains(x.WorkflowDefinitionId))
+            .WhereIf(definitionVersionIds?.Any() == true, x => definitionVersionIds.Contains(x.WorkflowDefinitionVersionId))
             .WhereIf(version.HasValue, x => x.Version == version)
             .WhereIf(status.HasValue, x => x.WorkflowStatus == status)
             .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)
@@ -51,8 +51,8 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
 
     public async Task<List<WorkflowInstance>> GetListAsync(
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         WorkflowInstanceStatus? status = null,
         string correlationId = null,
@@ -66,8 +66,8 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
         return await query
-            .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
-            .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
+            .WhereIf(definitionIds?.Any() == true, x => definitionIds.Contains(x.WorkflowDefinitionId))
+            .WhereIf(definitionVersionIds?.Any() == true, x => definitionVersionIds.Contains(x.WorkflowDefinitionVersionId))
             .WhereIf(version.HasValue, x => x.Version == version)
             .WhereIf(status.HasValue, x => x.WorkflowStatus == status)
             .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)
@@ -86,8 +86,8 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
         int maxResultCount,
         string sorting,
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         WorkflowInstanceStatus? status = null,
         string correlationId = null,
@@ -101,8 +101,8 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
         return await query
-            .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
-            .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
+            .WhereIf(definitionIds?.Any() == true, x => definitionIds.Contains(x.WorkflowDefinitionId))
+            .WhereIf(definitionVersionIds?.Any() == true, x => definitionVersionIds.Contains(x.WorkflowDefinitionVersionId))
             .WhereIf(version.HasValue, x => x.Version == version)
             .WhereIf(status.HasValue, x => x.WorkflowStatus == status)
             .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)
@@ -136,13 +136,20 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
                 .ToDictionary(x => x.Key.Date, x => x.Count());
     }
 
-    public async Task<Dictionary<WorkflowInstanceStatus, int>> GetWorkflowStatusStatisticsAsync(string name = null, Guid? definitionId = null, Guid? definitionVersionId = null, int? version = null, string correlationId = null, DateTime[] creationTimes = null, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<WorkflowInstanceStatus, int>> GetWorkflowStatusStatisticsAsync(
+        string name = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
+        int? version = null,
+        string correlationId = null,
+        DateTime[] creationTimes = null,
+        CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
         return query
-            .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
-            .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
+            .WhereIf(definitionIds?.Any() == true, x => definitionIds.Contains(x.WorkflowDefinitionId))
+            .WhereIf(definitionVersionIds?.Any() == true, x => definitionVersionIds.Contains(x.WorkflowDefinitionVersionId))
             .WhereIf(version.HasValue, x => x.Version == version)
             .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)
             .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name))

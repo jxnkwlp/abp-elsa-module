@@ -41,7 +41,9 @@ export async function getInitialState(): Promise<{
     fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
     const loadData = async () => {
-        const result = await getAbpApplicationConfiguration();
+        const result = await getAbpApplicationConfiguration({
+            includeLocalizationResources: false,
+        });
         return result;
     };
 

@@ -2,16 +2,19 @@
     {
         path: '/auth',
         layout: false,
+        access: 'public',
         routes: [
             {
                 name: 'login',
                 path: '/auth/login',
                 component: './auth/login',
+                access: 'public',
             },
             {
                 name: 'login',
                 path: '/auth/login/external/callback',
                 component: './auth/login/callback',
+                access: 'public',
             },
             {
                 component: './404',
@@ -21,6 +24,7 @@
     {
         path: '/',
         redirect: '/dashboard',
+        access: 'public',
     },
     //
     {
@@ -28,63 +32,68 @@
         icon: 'DashboardOutlined',
         path: '/dashboard',
         component: './dashboard',
+        access: 'public',
     },
     {
         name: 'Instances',
         icon: 'ClusterOutlined',
         path: '/instances',
         component: './instance',
-        access: 'ElsaModule.Instances'
+        access: 'ElsaWorkflow.Instances',
     },
     {
         name: 'InstanceDetail',
         path: '/instances/:id',
         component: './instance/detail',
         hideInMenu: true,
-        access: 'ElsaModule.Instances'
+        access: 'ElsaWorkflow.Instances',
     },
     {
         name: 'Definitions',
         icon: 'BranchesOutlined',
         path: '/definitions',
         component: './definition',
-        access: 'ElsaModule.Definitions'
+        access: 'ElsaWorkflow.Definitions',
     },
     {
         name: 'DefinitionDetail',
         path: '/definitions/:id',
         component: './definition/detail',
         hideInMenu: true,
+        access: 'ElsaWorkflow.Definitions',
     },
     {
         name: 'Designer',
         icon: 'DeploymentUnitOutlined',
         path: '/designer',
         component: './designer',
-        access: 'ElsaModule.Definitions.Publish'
+        access: 'ElsaWorkflow.Definitions.CreateOrUpdateOrPublish',
     },
     {
         name: 'Variables',
         icon: 'KeyOutlined',
         path: '/variables',
         component: './variables',
-        access: 'ElsaModule.GlobalVariables'
+        access: 'ElsaWorkflow.GlobalVariables',
     },
     //
     {
         path: '/account',
         name: 'account',
         hideInMenu: true,
+        access: 'public',
         routes: [
             {
                 path: '/account/change-password',
                 name: 'change-password',
                 component: './profile/changepassword',
+                access: 'public',
             },
             {
                 path: '/account/apikeys',
                 name: 'apikeys',
                 component: './security/apikey',
+                access: 'public',
             },
             {
                 component: './404',
@@ -97,23 +106,31 @@
         name: 'system',
         icon: 'SettingOutlined',
         hideInBreadcrumb: true,
+        access: 'public',
         routes: [
             {
                 path: 'users',
                 name: 'users',
                 component: './user',
-                access: 'AbpIdentity.Users'
+                access: 'AbpIdentity.Users',
             },
             {
                 path: 'roles',
                 name: 'roles',
                 component: './role',
-                access: 'AbpIdentity.Roles'
+                access: 'AbpIdentity.Roles',
+            },
+            {
+                path: 'groups',
+                name: 'groups',
+                component: './group',
+                access: 'ElsaWorkflow.WorkflowGroups',
             },
             {
                 path: 'settings',
                 name: 'settings',
                 component: './setting',
+                access: 'public',
             },
             // {
             //     path: 'audit/logs',
@@ -130,7 +147,6 @@
             },
         ],
     },
-
 
     // {
     //     path: '/test',

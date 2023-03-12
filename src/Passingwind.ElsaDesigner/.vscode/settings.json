@@ -16,5 +16,8 @@
     },
     "[yaml]": {
         "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
 }

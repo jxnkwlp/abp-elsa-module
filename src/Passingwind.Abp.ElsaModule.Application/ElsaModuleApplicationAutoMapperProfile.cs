@@ -1,9 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Elsa.Metadata;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.GlobalVariables;
 using Passingwind.Abp.ElsaModule.Workflow;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
+using Passingwind.Abp.ElsaModule.WorkflowGroups;
 using Passingwind.Abp.ElsaModule.WorkflowInstances;
 using Volo.Abp.AutoMapper;
 
@@ -77,5 +79,9 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
 
         CreateMap<GlobalVariable, GlobalVariableDto>();
 
+        CreateMap<WorkflowGroup, WorkflowGroupBasicDto>();
+        CreateMap<WorkflowGroup, WorkflowGroupDto>()
+            .ForMember(x => x.UserIds, x => x.MapFrom(f => f.Users.Select(u => u.UserId)))
+            .Ignore(x => x.WorkflowIds);
     }
 }

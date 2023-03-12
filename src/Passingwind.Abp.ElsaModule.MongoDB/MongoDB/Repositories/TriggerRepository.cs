@@ -1,5 +1,6 @@
 ﻿using System;
 using Passingwind.Abp.ElsaModule.Common;
+using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Repositories.MongoDB;
 using Volo.Abp.MongoDB;
 

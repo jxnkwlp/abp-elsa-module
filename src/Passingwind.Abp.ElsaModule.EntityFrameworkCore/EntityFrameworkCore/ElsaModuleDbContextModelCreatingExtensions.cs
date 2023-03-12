@@ -2,8 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.WorkflowGroups;
 using Volo.Abp;
 using Volo.Abp.EntityFrameworkCore.Modeling;
+using Volo.Abp.Identity;
 
 namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 
@@ -12,27 +14,6 @@ public static class ElsaModuleDbContextModelCreatingExtensions
     public static void ConfigureElsaModule(this ModelBuilder builder)
     {
         Check.NotNull(builder, nameof(builder));
-
-        /* Configure all entities here. Example:
-
-        builder.Entity<Question>(b =>
-        {
-            //Configure table & schema name
-            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "Questions", ElsaModuleDbProperties.DbSchema);
-
-            b.ConfigureByConvention();
-
-            //Properties
-            b.Property(q => q.Title).IsRequired().HasMaxLength(QuestionConsts.MaxTitleLength);
-
-            //Relations
-            b.HasMany(question => question.Tags).WithOne().HasForeignKey(qt => qt.QuestionId);
-
-            //Indexes
-            b.HasIndex(q => q.CreationTime);
-        });
-        */
-
 
         builder.Entity<WorkflowDefinition>(b =>
         {
@@ -50,6 +31,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.CustomAttributes).HasConversion(new JsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
 
             // b.HasMany(x => x.Versions).WithOne(x => x.Definition).HasForeignKey(x => x.DefinitionId);
+            b.HasIndex(x => x.Name);
         });
 
         builder.Entity<WorkflowDefinitionVersion>(b =>
@@ -145,6 +127,11 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             // b.HasOne(x => x.Definition).WithOne().OnDelete(DeleteBehavior.SetNull);
             // b.HasOne(x => x.DefinitionVersion).WithOne();
+
+            b.HasIndex(x => x.Name);
+            b.HasIndex(x => x.WorkflowStatus);
+            b.HasIndex(x => x.WorkflowDefinitionId);
+            b.HasIndex(x => new { x.WorkflowDefinitionId, x.WorkflowDefinitionVersionId });
         });
 
         builder.Entity<WorkflowInstanceActivityData>(b =>
@@ -209,6 +196,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Key).HasMaxLength(256).IsRequired();
 
             b.Property(x => x.Value).HasConversion(new JsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
+
+            b.HasIndex(x => x.Key);
         });
 
         builder.Entity<WorkflowInstanceFault>(b =>
@@ -232,6 +221,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Source).HasMaxLength(128);
             b.Property(x => x.Data).HasConversion(new JsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
 
+            b.HasIndex(x => x.WorkflowInstanceId);
         });
 
         builder.Entity<GlobalVariable>(b =>
@@ -241,8 +231,32 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.Property(x => x.Key).HasMaxLength(256).IsRequired();
             b.HasIndex(x => x.Key);
+
+            b.HasIndex(x => x.Key);
+        });
+
+        builder.Entity<WorkflowGroup>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowGroups", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.Property(x => x.Name).HasMaxLength(128).IsRequired();
+
+            b.Property(x => x.RoleName).HasMaxLength(IdentityRoleConsts.MaxNameLength).IsRequired();
+
+            b.HasMany(x => x.Users).WithOne().HasForeignKey(x => x.WorkflowGroupId);
+
+            b.HasIndex(x => x.Name);
+            b.HasIndex(x => x.RoleName);
+        });
+
+        builder.Entity<WorkflowGroupUser>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowGroupUsers", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.HasKey(x => new { x.WorkflowGroupId, x.UserId });
         });
 
     }
-
 }

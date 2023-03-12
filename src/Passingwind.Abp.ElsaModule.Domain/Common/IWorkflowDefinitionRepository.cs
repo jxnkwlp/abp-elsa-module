@@ -13,8 +13,7 @@ public interface IWorkflowDefinitionRepository : IRepository<WorkflowDefinition,
     Task<Guid[]> GetIdsByTagsAsync(IEnumerable<string> tags, CancellationToken cancellationToken = default);
     Task<Guid> GetIdByTagAsync(string tags, CancellationToken cancellationToken = default);
 
-    Task<long> CountAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, CancellationToken cancellationToken = default);
-    Task<List<WorkflowDefinition>> GetListAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, CancellationToken cancellationToken = default);
-    Task<List<WorkflowDefinition>> GetPagedListAsync(int skipCount, int maxResultCount, string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, string ordering = null, CancellationToken cancellationToken = default);
-
+    Task<long> CountAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, IEnumerable<Guid> filterIds = null, CancellationToken cancellationToken = default);
+    Task<List<WorkflowDefinition>> GetListAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, IEnumerable<Guid> filterIds = null, CancellationToken cancellationToken = default);
+    Task<List<WorkflowDefinition>> GetPagedListAsync(int skipCount, int maxResultCount, string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, IEnumerable<Guid> filterIds = null, string ordering = null, CancellationToken cancellationToken = default);
 }

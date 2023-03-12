@@ -29,7 +29,7 @@ const Index: React.FC = () => {
             setAllStatusStatisticsCount(result);
         };
 
-        if (access['ElsaModule.Instances.Statistics']) {
+        if (access['ElsaWorkflow.Instances.Statistics']) {
             load();
         }
     }, []);
@@ -60,7 +60,7 @@ const Index: React.FC = () => {
             setLoading(false);
         };
 
-        if (access['ElsaModule.Instances.Statistics']) {
+        if (access['ElsaWorkflow.Instances.Statistics']) {
             load();
         }
     }, []);
@@ -68,13 +68,13 @@ const Index: React.FC = () => {
     return (
         <PageContainer>
             <Access
-                accessible={access['ElsaModule.Instances.Statistics']}
+                accessible={access['ElsaWorkflow.Instances.Statistics']}
                 fallback={
                     <Alert
                         type="error"
                         message={intl.formatMessage(
                             { id: 'common.noaccess' },
-                            { permission: 'ElsaModule.Instances.Statistics' },
+                            { permission: 'ElsaWorkflow.Instances.Statistics' },
                         )}
                     />
                 }

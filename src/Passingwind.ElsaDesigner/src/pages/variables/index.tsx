@@ -92,7 +92,7 @@ const Index: React.FC = () => {
             align: 'center',
             fixed: 'right',
             render: (text, record, _, action) => [
-                access['ElsaModule.GlobalVariables.Update'] && (
+                access['ElsaWorkflow.GlobalVariables.Update'] && (
                     <a
                         key="edit"
                         onClick={() => {
@@ -107,7 +107,7 @@ const Index: React.FC = () => {
                         {intl.formatMessage({ id: 'common.dict.edit' })}
                     </a>
                 ),
-                access['ElsaModule.GlobalVariables.Delete'] && (
+                access['ElsaWorkflow.GlobalVariables.Delete'] && (
                     <Popconfirm
                         key="delete"
                         title={intl.formatMessage({ id: 'common.dict.delete.confirm' })}
@@ -133,7 +133,7 @@ const Index: React.FC = () => {
                 scroll={{ x: 800 }}
                 rowKey="id"
                 toolBarRender={() => [
-                    access['ElsaModule.GlobalVariables.Create'] && (
+                    access['ElsaWorkflow.GlobalVariables.Create'] && (
                         <Button
                             key="add"
                             type="primary"

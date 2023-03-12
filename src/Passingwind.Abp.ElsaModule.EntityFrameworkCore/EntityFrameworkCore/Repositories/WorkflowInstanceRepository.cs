@@ -19,8 +19,8 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
 
     public async Task<long> LongCountAsync(
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         WorkflowInstanceStatus? status = null,
         string correlationId = null,
@@ -33,8 +33,8 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
     {
         var dbset = await GetDbSetAsync();
         return await dbset
-            .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
-            .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
+            .WhereIf(definitionIds?.Any()==true, x => definitionIds.Contains( x.WorkflowDefinitionId))
+            .WhereIf(definitionVersionIds?.Any() == true, x => definitionVersionIds.Contains(x.WorkflowDefinitionVersionId))
             .WhereIf(version.HasValue, x => x.Version == version)
             .WhereIf(status.HasValue, x => x.WorkflowStatus == status)
             .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)
@@ -49,8 +49,8 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
 
     public async Task<List<WorkflowInstance>> GetListAsync(
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         WorkflowInstanceStatus? status = null,
         string correlationId = null,
@@ -64,8 +64,8 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
     {
         var dbset = await GetDbSetAsync();
         return await dbset
-            .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
-            .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
+            .WhereIf(definitionIds?.Any() == true, x => definitionIds.Contains(x.WorkflowDefinitionId))
+            .WhereIf(definitionVersionIds?.Any() == true, x => definitionVersionIds.Contains(x.WorkflowDefinitionVersionId))
             .WhereIf(version.HasValue, x => x.Version == version)
             .WhereIf(status.HasValue, x => x.WorkflowStatus == status)
             .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)
@@ -83,8 +83,8 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
         int maxResultCount,
         string sorting,
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         WorkflowInstanceStatus? status = null,
         string correlationId = null,
@@ -98,8 +98,8 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
     {
         var dbset = await GetDbSetAsync();
         return await dbset
-            .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
-            .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
+            .WhereIf(definitionIds?.Any() == true, x => definitionIds.Contains(x.WorkflowDefinitionId))
+            .WhereIf(definitionVersionIds?.Any() == true, x => definitionVersionIds.Contains(x.WorkflowDefinitionVersionId))
             .WhereIf(version.HasValue, x => x.Version == version)
             .WhereIf(status.HasValue, x => x.WorkflowStatus == status)
             .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)
@@ -131,8 +131,8 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
 
     public async Task<Dictionary<WorkflowInstanceStatus, int>> GetWorkflowStatusStatisticsAsync(
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         string correlationId = null,
         DateTime[] creationTimes = null,
@@ -141,8 +141,8 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
         var dbset = await GetDbSetAsync();
 
         var list = await dbset
-            .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
-            .WhereIf(definitionVersionId.HasValue, x => x.WorkflowDefinitionVersionId == definitionVersionId)
+            .WhereIf(definitionIds?.Any() == true, x => definitionIds.Contains(x.WorkflowDefinitionId))
+            .WhereIf(definitionVersionIds?.Any() == true, x => definitionVersionIds.Contains(x.WorkflowDefinitionVersionId))
             .WhereIf(version.HasValue, x => x.Version == version)
             .WhereIf(!string.IsNullOrEmpty(correlationId), x => x.CorrelationId == correlationId)
             .WhereIf(!string.IsNullOrEmpty(name), x => EF.Functions.Like(x.Name, $"%{name}%"))

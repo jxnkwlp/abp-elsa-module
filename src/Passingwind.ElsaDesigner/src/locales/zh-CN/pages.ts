@@ -65,7 +65,8 @@ export default {
     'page.dashboard.statistics.status.running': '运行中',
     'page.dashboard.statistics.status.suspended': '挂起',
     //
-    'page.definitions.view': '查看',
+    'page.definition.view': '查看',
+    'page.definition.iam': '权限控制',
     'page.definition.edit.basic': '基本信息',
     'page.definition.edit.variables': '变量',
     'page.definition.edit.workflowContext': '上下文',
@@ -102,15 +103,20 @@ export default {
     'page.definition.switchVersion': '切换版本',
     'page.definition.notFound': '工作流定义不存在',
     'page.definition.versionNotFound': '工作流定义不存在',
+    'page.definition.iam.owners': '拥有者',
+    'page.definition.iam.groups': '分组',
     //
     'page.definition.field.name': '名称',
+    'page.definition.field.name.tips': '工作流的唯一技术性名称',
     'page.definition.field.displayName': '显示名称',
+    'page.definition.field.displayName.tips': '工作流的用户友好显示名称',
     'page.definition.field.description': '描述',
     'page.definition.field.variables': '变量',
     'page.definition.field.contextOptions.type': 'Type',
-    'page.definition.field.contextOptions.type.placeholder': "完全限定的工作流上下文类型名称",
+    'page.definition.field.contextOptions.type.placeholder': '完全限定的工作流上下文类型名称',
     'page.definition.field.contextOptions.contextFidelity': 'Fidelity',
-    'page.definition.field.contextOptions.contextFidelity.placeholder': "工作流上下文刷新保真度控制何时加载和持久化工作流上下文的行为",
+    'page.definition.field.contextOptions.contextFidelity.placeholder':
+        '工作流上下文刷新保真度控制何时加载和持久化工作流上下文的行为',
     'page.definition.field.tag': 'Tag',
     'page.definition.field.channel': 'Channel',
     'page.definition.field.persistenceBehavior': '持久化行为',
@@ -168,11 +174,22 @@ export default {
     'page.instance.reload': '刷新',
     'page.instance.toDefinition': '转到定义',
     //
+    'page.workflowgroup.field.name': '名称',
+    'page.workflowgroup.field.description': '描述',
+    'page.workflowgroup.field.users': '用户',
+    'page.workflowgroup.field.role': '角色',
+    'page.workflowgroup.field.roleName': '角色',
+    'page.workflowgroup.field.workflow': '流程',
+    'page.workflowgroup.manageUser': '管理用户',
+    'page.workflowgroup.manageWorkflows': '管理流程',
+    //
     'page.variable.field.key': '名称',
     'page.variable.field.value': '值',
     'page.variable.field.isSecret': '机密',
-    'page.variable.field.isSecret.tooltip': '设置为机密，值在列表和编辑将不可见，仅可以修改或删除操作',
+    'page.variable.field.isSecret.tooltip':
+        '设置为机密，值在列表和编辑将不可见，仅可以修改或删除操作',
     //
+    'page.settings.email': '邮件',
     'page.settings.email.smtpHost': '主机',
     'page.settings.email.smtpPort': '端口',
     'page.settings.email.smtpUserName': '用户名',
@@ -189,6 +206,14 @@ export default {
     'page.settings.email.test.form.targetEmailAddress': '收件人地址',
     'page.settings.email.test.form.subject': '主题',
     'page.settings.email.test.form.body': '内容',
+    'page.settings.oauth2': 'OAuth2',
+    'page.settings.oauth2.enabled': '启用',
+    'page.settings.oauth2.displayName': '显示名称',
+    'page.settings.oauth2.authority': '权限',
+    'page.settings.oauth2.metadataAddress': '元数据地址',
+    'page.settings.oauth2.clientId': '客户端 ID',
+    'page.settings.oauth2.clientSecret': '客户端密码',
+    'page.settings.oauth2.scope': '范围',
     //
     'page.apikey.field.name': '名称',
     'page.apikey.field.expirationTime': '到期时间',
@@ -203,6 +228,6 @@ export default {
     'page.apikey.field.expirationRange.r7': '6个月',
     'page.apikey.field.expirationRange.r8': '1年',
     'page.apikey.tips.p1': '您的新 API 密钥是:',
-    'page.apikey.tips.p2': 'API 密钥一旦创建就无法检索。 确保将此密钥保存在安全的地方，例如密码管理工具。',
-
+    'page.apikey.tips.p2':
+        'API 密钥一旦创建就无法检索。 确保将此密钥保存在安全的地方，例如密码管理工具。',
 };

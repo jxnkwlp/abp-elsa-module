@@ -62,6 +62,7 @@ export default {
     'menu.system': 'System',
     'menu.system.users': 'Users',
     'menu.system.roles': 'Roles',
+    'menu.system.groups': 'Groups',
     'menu.system.settings': 'Settings',
     'menu.system.auditLogs': 'Audit Logs',
     'menu.system.securityLogs': 'Security Logs',

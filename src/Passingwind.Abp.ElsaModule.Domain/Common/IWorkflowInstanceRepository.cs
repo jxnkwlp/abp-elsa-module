@@ -10,8 +10,8 @@ public interface IWorkflowInstanceRepository : IRepository<WorkflowInstance, Gui
 {
     Task<long> LongCountAsync(
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         WorkflowInstanceStatus? status = null,
         string correlationId = null,
@@ -24,8 +24,8 @@ public interface IWorkflowInstanceRepository : IRepository<WorkflowInstance, Gui
 
     Task<List<WorkflowInstance>> GetListAsync(
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         WorkflowInstanceStatus? status = null,
         string correlationId = null,
@@ -42,8 +42,8 @@ public interface IWorkflowInstanceRepository : IRepository<WorkflowInstance, Gui
         int maxResultCount,
         string sorting,
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         WorkflowInstanceStatus? status = null,
         string correlationId = null,
@@ -57,13 +57,18 @@ public interface IWorkflowInstanceRepository : IRepository<WorkflowInstance, Gui
 
     Task<Dictionary<WorkflowInstanceStatus, int>> GetWorkflowStatusStatisticsAsync(
         string name = null,
-        Guid? definitionId = null,
-        Guid? definitionVersionId = null,
+        IEnumerable<Guid> definitionIds = null,
+        IEnumerable<Guid> definitionVersionIds = null,
         int? version = null,
         string correlationId = null,
         DateTime[] creationTimes = null,
         CancellationToken cancellationToken = default);
 
-    Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus workflowStatus, DateTime startDate, DateTime endDate, double timeZone = 0, CancellationToken cancellationToken = default);
+    Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(
+        WorkflowInstanceStatus workflowStatus,
+        DateTime startDate,
+        DateTime endDate,
+        double timeZone = 0,
+        CancellationToken cancellationToken = default);
 
 }

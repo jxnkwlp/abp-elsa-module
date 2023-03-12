@@ -110,7 +110,7 @@ const Index: React.FC = () => {
             title={title}
             extra={
                 <Space>
-                    {access['ElsaModule.Definitions.Publish'] ? (
+                    {access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'] ? (
                         <Button
                             type="primary"
                             disabled={!data}

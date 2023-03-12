@@ -14,13 +14,16 @@
     <ItemGroup>
         <PackageReference Include="Volo.Abp.Ddd.Domain" Version="7.0.2" />
         <PackageReference Include="Volo.Abp.Caching" Version="7.0.2" />
-        <PackageReference Include="Volo.Abp.DistributedLocking" Version="7.0.2" />        
+        <PackageReference Include="Volo.Abp.PermissionManagement.Domain" Version="7.0.2" /> 
+        <PackageReference Include="Volo.Abp.Identity.Domain" Version="7.0.2" /> 
+        <PackageReference Include="Volo.Abp.DistributedLocking" Version="7.0.2" /> 
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Elsa" Version="2.10.2.2" />
         <!--overwrite-->
         <PackageReference Include="Rebus.ServiceProvider" Version="8.4.0" />
+        <PackageReference Include="Rebus.Microsoft.Extensions.Logging" Version="4.0.0" />
     </ItemGroup>
 
 </Project>

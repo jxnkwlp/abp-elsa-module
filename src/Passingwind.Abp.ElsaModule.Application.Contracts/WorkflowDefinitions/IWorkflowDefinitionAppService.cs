@@ -24,4 +24,9 @@ public interface IWorkflowDefinitionAppService : ICrudAppService<WorkflowDefinit
 
     Task RetractAsync(Guid id);
     Task RevertAsync(Guid id, WorkflowDefinitionRevertRequestDto input);
+
+    Task<WorkflowDefinitionIamResultDto> GetIamAsync(Guid id);
+
+    Task AddOwnerAsync(Guid id, WorkflowDefinitionAddOwnerRequestDto input);
+    Task DeleteOwnerAsync(Guid id, Guid userId);
 }

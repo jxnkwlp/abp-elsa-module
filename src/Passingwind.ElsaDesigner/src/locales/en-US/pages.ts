@@ -29,7 +29,8 @@ export default {
     'pages.welcome.advancedLayout': 'Advanced Layout',
     'pages.welcome.alertMessage': 'Faster and stronger heavy-duty components have been released.',
     'pages.admin.subPage.title': 'This page can only be viewed by Admin',
-    'pages.admin.subPage.alertMessage': 'Umi ui is now released, welcome to use npm run ui to start the experience.',
+    'pages.admin.subPage.alertMessage':
+        'Umi ui is now released, welcome to use npm run ui to start the experience.',
     //
     'page.change-password.title': 'Change Password',
     'page.change-password.field.currentPassword': 'Current Password',
@@ -57,7 +58,8 @@ export default {
     'page.role.field.isPublic': 'Public',
     'page.role.field.isStatic': 'Static',
     //
-    'page.dashboard.statistics.datecount.title': 'Process instance count statistics within {d} days',
+    'page.dashboard.statistics.datecount.title':
+        'Process instance count statistics within {d} days',
     'page.dashboard.statistics.status.title': 'Status Statistics',
     'page.dashboard.statistics.status.all': 'All',
     'page.dashboard.statistics.status.finished': 'Finished',
@@ -65,7 +67,8 @@ export default {
     'page.dashboard.statistics.status.running': 'Running',
     'page.dashboard.statistics.status.suspended': 'Suspended',
     //
-    'page.definitions.view': 'View',
+    'page.definition.view': 'View',
+    'page.definition.iam': 'IAM',
     'page.definition.edit.basic': 'Basic',
     'page.definition.edit.variables': 'Variables',
     'page.definition.edit.workflowContext': 'Workflow Context',
@@ -102,15 +105,21 @@ export default {
     'page.definition.switchVersion': 'Switch version',
     'page.definition.notFound': 'The workflow definition does not exist',
     'page.definition.versionNotFound': 'The workflow definition does not exist',
+    'page.definition.iam.owners': 'Owners',
+    'page.definition.iam.groups': 'Groups',
     //
     'page.definition.field.name': 'Name',
+    'page.definition.field.name.tips': 'A unique technical name for the workflow',
     'page.definition.field.displayName': 'Display Name',
+    'page.definition.field.displayName.tips': 'A user-friendly display name of the workflow.',
     'page.definition.field.description': 'Description',
     'page.definition.field.variables': 'Variables',
     'page.definition.field.contextOptions.type': 'Type',
-    'page.definition.field.contextOptions.type.placeholder': 'The fully qualified workflow context type name.',
+    'page.definition.field.contextOptions.type.placeholder':
+        'The fully qualified workflow context type name.',
     'page.definition.field.contextOptions.contextFidelity': 'Fidelity',
-    'page.definition.field.contextOptions.contextFidelity.placeholder': 'The workflow context refresh fidelity controls the behavior of when to load and persist the workflow context',
+    'page.definition.field.contextOptions.contextFidelity.placeholder':
+        'The workflow context refresh fidelity controls the behavior of when to load and persist the workflow context',
     'page.definition.field.tag': 'Tag',
     'page.definition.field.channel': 'Channel',
     'page.definition.field.persistenceBehavior': 'Persistence Behavior',
@@ -123,6 +132,7 @@ export default {
     'page.definition.field.isLatest': 'Latest',
     'page.definition.field.isPublished': 'Published',
     'page.definition.field.comparison': 'Comparison',
+
     //
     'page.instance.field.definition': 'Definition',
     'page.instance.field.name': 'Name',
@@ -136,7 +146,8 @@ export default {
     'page.instance.view': 'View',
     'page.instance.cancel': 'Cancel',
     'page.instance.cancel.confirm.title': 'Are you sure to cancel this instance?',
-    'page.instance.cancel.confirm.content': 'This operation will cancel the instance and all the tasks in it.',
+    'page.instance.cancel.confirm.content':
+        'This operation will cancel the instance and all the tasks in it.',
     'page.instance.cancel.confirm.success': 'Canceled successfully',
     'page.instance.retry': 'Retry',
     'page.instance.retry.confirm.title': 'Are you sure to retry this instance?',
@@ -168,10 +179,20 @@ export default {
     'page.instance.reload': 'Reload',
     'page.instance.toDefinition': 'Go to definition',
     //
+    'page.workflowgroup.field.name': 'Name',
+    'page.workflowgroup.field.description': 'Description',
+    'page.workflowgroup.field.users': 'Users',
+    'page.workflowgroup.field.role': 'Role',
+    'page.workflowgroup.field.roleName': 'Role',
+    'page.workflowgroup.field.workflow': 'Workflow',
+    'page.workflowgroup.manageUser': 'Manage Users',
+    'page.workflowgroup.manageWorkflows': 'Manage Workflows',
+    //
     'page.variable.field.key': 'Key',
     'page.variable.field.value': 'Value',
     'page.variable.field.isSecret': 'Secret',
-    'page.variable.field.isSecret.tooltip': 'Set as secret, the value will not be visible in the list and editing, only modify or delete operations',
+    'page.variable.field.isSecret.tooltip':
+        'Set as secret, the value will not be visible in the list and editing, only modify or delete operations',
     //
     'page.settings.email': 'Emailing',
     'page.settings.email.smtpHost': 'Host',
@@ -212,5 +233,6 @@ export default {
     'page.apikey.field.expirationRange.r7': '6 months',
     'page.apikey.field.expirationRange.r8': '1 year',
     'page.apikey.tips.p1': 'Your new API key is:',
-    'page.apikey.tips.p2': 'An API key cannot be retrieved once created. Make sure to keep this key in a safe place, such as a password management tool. ',
+    'page.apikey.tips.p2':
+        'An API key cannot be retrieved once created. Make sure to keep this key in a safe place, such as a password management tool. ',
 };

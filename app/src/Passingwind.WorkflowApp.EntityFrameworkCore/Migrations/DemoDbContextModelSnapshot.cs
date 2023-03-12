@@ -392,6 +392,8 @@ namespace Demo.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name");
+
                     b.ToTable("ElsaWorkflowDefinitions", (string)null);
                 });
 
@@ -521,6 +523,8 @@ namespace Demo.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("WorkflowInstanceId");
+
                     b.ToTable("ElsaWorkflowExecutionLogs", (string)null);
                 });
 
@@ -631,6 +635,14 @@ namespace Demo.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("WorkflowDefinitionId");
+
+                    b.HasIndex("WorkflowStatus");
+
+                    b.HasIndex("WorkflowDefinitionId", "WorkflowDefinitionVersionId");
 
                     b.ToTable("ElsaWorkflowInstances", (string)null);
                 });
@@ -773,7 +785,97 @@ namespace Demo.Migrations
 
                     b.HasKey("WorkflowInstanceId", "Key");
 
+                    b.HasIndex("Key");
+
                     b.ToTable("ElsaWorkflowInstanceVariables", (string)null);
+                });
+
+            modelBuilder.Entity("Passingwind.Abp.ElsaModule.WorkflowGroups.WorkflowGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExtraProperties")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("TenantId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("RoleName");
+
+                    b.ToTable("ElsaWorkflowGroups", (string)null);
+                });
+
+            modelBuilder.Entity("Passingwind.Abp.ElsaModule.WorkflowGroups.WorkflowGroupUser", b =>
+                {
+                    b.Property<Guid>("WorkflowGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("WorkflowGroupId", "UserId");
+
+                    b.ToTable("ElsaWorkflowGroupUsers", (string)null);
                 });
 
             modelBuilder.Entity("Passingwind.WorkflowApp.ApiKeys.ApiKey", b =>
@@ -2194,6 +2296,15 @@ namespace Demo.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Passingwind.Abp.ElsaModule.WorkflowGroups.WorkflowGroupUser", b =>
+                {
+                    b.HasOne("Passingwind.Abp.ElsaModule.WorkflowGroups.WorkflowGroup", null)
+                        .WithMany("Users")
+                        .HasForeignKey("WorkflowGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>
                 {
                     b.HasOne("Volo.Abp.AuditLogging.AuditLog", null)
@@ -2340,6 +2451,11 @@ namespace Demo.Migrations
                     b.Navigation("ScheduledActivities");
 
                     b.Navigation("Variables");
+                });
+
+            modelBuilder.Entity("Passingwind.Abp.ElsaModule.WorkflowGroups.WorkflowGroup", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>

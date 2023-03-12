@@ -17,16 +17,23 @@ public class ElsaModulePermissionDefinitionProvider : PermissionDefinitionProvid
         instancePermission.AddChild(ElsaModulePermissions.Instances.Delete, L("Permission:Delete"));
 
         var definitionPermission = myGroup.AddPermission(ElsaModulePermissions.Definitions.Default, L("Permission:Definition"));
-        definitionPermission.AddChild(ElsaModulePermissions.Definitions.Publish, L("Permission:Definition.Publish"));
+        definitionPermission.AddChild(ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish, L("Permission:Definition.Publish"));
         definitionPermission.AddChild(ElsaModulePermissions.Definitions.Dispatch, L("Permission:Definition.Dispatch"));
         definitionPermission.AddChild(ElsaModulePermissions.Definitions.Export, L("Permission:Definition.Export"));
         definitionPermission.AddChild(ElsaModulePermissions.Definitions.Import, L("Permission:Definition.Import"));
         definitionPermission.AddChild(ElsaModulePermissions.Definitions.Delete, L("Permission:Delete"));
+        definitionPermission.AddChild(ElsaModulePermissions.Definitions.ManagePermissions, L("Permission:Definition.ManagePermissions"));
 
         var globalVariablesPermission = myGroup.AddPermission(ElsaModulePermissions.GlobalVariables.Default, L("Permission:GlobalVariables"));
         globalVariablesPermission.AddChild(ElsaModulePermissions.GlobalVariables.Create, L("Permission:Create"));
         globalVariablesPermission.AddChild(ElsaModulePermissions.GlobalVariables.Update, L("Permission:Update"));
         globalVariablesPermission.AddChild(ElsaModulePermissions.GlobalVariables.Delete, L("Permission:Delete"));
+
+        var workflowGroupPermission = myGroup.AddPermission(ElsaModulePermissions.WorkflowGroup.Default, L("Permission:WorkflowGroups"));
+        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroup.Create, L("Permission:Create"));
+        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroup.Update, L("Permission:Update"));
+        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroup.Delete, L("Permission:Delete"));
+        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroup.ManagePermissions, L("Permission:WorkflowGroups.ManagePermissions"));
     }
 
     private static LocalizableString L(string name)
