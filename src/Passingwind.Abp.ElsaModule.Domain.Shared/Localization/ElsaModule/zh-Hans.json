@@ -19,7 +19,11 @@
     "Permission:Definition.Dispatch": "触发或发起",
     "Permission:Definition.Export": "导出",
     "Permission:Definition.Import": "导入",
+    "Permission:Definition.ManagePermissions": "权限管理",
 
-    "Permission:GlobalVariables": "全局变量管理"
+    "Permission:GlobalVariables": "全局变量管理",
+
+    "Permission:WorkflowGroups": "分组管理",
+    "Permission:WorkflowGroups.ManagePermissions": "权限管理"
   }
 }

@@ -10,6 +10,7 @@ using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.Stores;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Authorization;
 using Volo.Abp.Caching;
 using Volo.Abp.Json;
 using WorkflowExecutionLog = Passingwind.Abp.ElsaModule.Common.WorkflowExecutionLog;
@@ -30,6 +31,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     private readonly IWorkflowStorageService _workflowStorageService;
     private readonly IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> _workflowInstanceDateCountStatisticsDistributedCache;
     private readonly IDistributedCache<WorkflowInstanceStatusCountStatisticsResultDto> _workflowInstanceStatusCountStatisticsDistributedCache;
+    private readonly IWorkflowPermissionService _workflowPermissionService;
 
     public WorkflowInstanceAppService(
         IJsonSerializer jsonSerializer,
@@ -42,7 +44,8 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         IWorkflowLaunchpad workflowLaunchpad,
         IWorkflowStorageService workflowStorageService,
         IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> workflowInstanceDateCountStatisticsDistributedCache,
-        IDistributedCache<WorkflowInstanceStatusCountStatisticsResultDto> workflowInstanceStatusCountStatisticsDistributedCache)
+        IDistributedCache<WorkflowInstanceStatusCountStatisticsResultDto> workflowInstanceStatusCountStatisticsDistributedCache,
+        IWorkflowPermissionService workflowPermissionService)
     {
         _jsonSerializer = jsonSerializer;
         _workflowInstanceRepository = workflowInstanceRepository;
@@ -55,12 +58,15 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         _workflowStorageService = workflowStorageService;
         _workflowInstanceDateCountStatisticsDistributedCache = workflowInstanceDateCountStatisticsDistributedCache;
         _workflowInstanceStatusCountStatisticsDistributedCache = workflowInstanceStatusCountStatisticsDistributedCache;
+        _workflowPermissionService = workflowPermissionService;
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
     public async Task CancelAsync(Guid id)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Instances.Action);
 
         if (entity.WorkflowStatus == WorkflowInstanceStatus.Idle || entity.WorkflowStatus == WorkflowInstanceStatus.Running || entity.WorkflowStatus == WorkflowInstanceStatus.Suspended)
         {
@@ -77,6 +83,8 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     public virtual async Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Instances.Action);
 
         var instance = _storeMapper.MapToModel(entity);
 
@@ -97,7 +105,8 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     public virtual async Task DispatchAsync(Guid id, WorkflowInstanceDispatchRequestDto input)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id);
-        // var instance = _storeMapper.MapToModel(entity);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Instances.Action);
 
         await _workflowLaunchpad.DispatchPendingWorkflowAsync(id.ToString(), input.ActivityId?.ToString(), input.Input);
     }
@@ -106,6 +115,8 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     public async Task ExecuteAsync(Guid id, WorkflowInstanceExecuteRequestDto input)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Instances.Action);
 
         await _workflowLaunchpad.ExecutePendingWorkflowAsync(id.ToString(), input.ActivityId?.ToString(), input.Input);
     }
@@ -117,9 +128,11 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
         var entity = await _workflowInstanceRepository.GetAsync(id, fullDataAccess);
 
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Instances.Default);
+
         var instance = _storeMapper.MapToModel(entity);
 
-        var input = await _workflowStorageService.LoadAsync(instance);
+        // var input = await _workflowStorageService.LoadAsync(instance);
 
         var dto = ObjectMapper.Map<WorkflowInstance, WorkflowInstanceDto>(entity);
 
@@ -129,12 +142,19 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     public async Task<WorkflowInstanceBasicDto> GetBasicAsync(Guid id)
     {
         var entity = await _workflowInstanceRepository.GetAsync(id, false);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Instances.Default);
+
         return ObjectMapper.Map<WorkflowInstance, WorkflowInstanceBasicDto>(entity);
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Data)]
     public async Task<ListResultDto<WorkflowExecutionLogDto>> GetExecutionLogsAsync(Guid id)
     {
+        var entity = await _workflowInstanceRepository.GetAsync(id, false);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Instances.Data);
+
         var list = await _workflowExecutionLogRepository.GetListAsync(workflowInstanceId: id);
 
         return new ListResultDto<WorkflowExecutionLogDto>(ObjectMapper.Map<List<WorkflowExecutionLog>, List<WorkflowExecutionLogDto>>(list));
@@ -142,9 +162,28 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
     public async Task<PagedResultDto<WorkflowInstanceBasicDto>> GetListAsync(WorkflowInstanceListRequestDto input)
     {
+        var grantedResult = await _workflowPermissionService.GetGrantsAsync();
+
+        // overwrite 
+        List<Guid> definitionIds = new List<Guid>(grantedResult.WorkflowIds);
+
+        if (input.WorkflowDefinitionId.HasValue)
+        {
+            if (!grantedResult.WorkflowIds.Contains(input.WorkflowDefinitionId.Value))
+            {
+                throw new AbpAuthorizationException();
+            }
+            else
+            {
+                definitionIds = new List<Guid>() { input.WorkflowDefinitionId.Value };
+            }
+        }
+
+        definitionIds = definitionIds.Distinct().ToList();
+
         var count = await _workflowInstanceRepository.LongCountAsync(
             name: input.Name,
-            definitionId: input.WorkflowDefinitionId,
+            definitionIds: definitionIds,
             version: input.Version,
             status: input.WorkflowStatus,
             correlationId: input.CorrelationId,
@@ -158,7 +197,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
             input.MaxResultCount,
             input.Sorting,
             name: input.Name,
-            definitionId: input.WorkflowDefinitionId,
+            definitionIds: definitionIds,
             version: input.Version,
             status: input.WorkflowStatus,
             correlationId: input.CorrelationId,
@@ -173,6 +212,9 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     [Authorize(Policy = ElsaModulePermissions.Instances.Delete)]
     public async Task DeleteAsync(Guid id)
     {
+        var entity = await _workflowInstanceRepository.GetAsync(id, false);
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Instances.Delete);
+
         await _workflowInstanceRepository.DeleteAsync(id);
     }
 
@@ -193,6 +235,8 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         var fullDataAccess = await AuthorizationService.IsGrantedAsync(ElsaModulePermissions.Instances.Data);
 
         var entity = await _workflowInstanceRepository.GetAsync(id);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Instances.Default);
 
         var allLogs = await _workflowExecutionLogRepository.GetListAsync(workflowInstanceId: id);
 
@@ -304,6 +348,8 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
     public async Task BatchCancelAsync(WorkflowInstancesBatchActionRequestDto input)
     {
+        // TODO check permissions
+
         if (input?.Ids?.Any() == true)
         {
             foreach (var id in input.Ids)
@@ -316,6 +362,8 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
     public async Task BatchRetryAsync(WorkflowInstancesBatchActionRequestDto input)
     {
+        // TODO check permissions
+
         if (input?.Ids?.Any() == true)
         {
             foreach (var id in input.Ids)

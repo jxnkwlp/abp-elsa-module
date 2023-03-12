@@ -432,7 +432,7 @@ export const conventToGraphData = async (
 };
 
 export const getJavascriptEditorDefinitonsContent = async (id: string) => {
-    const result = await getDesignerJavaScriptTypeDefinition(id);
+    const result = await getDesignerJavaScriptTypeDefinition(id, { passError: true });
     return await result?.response?.text();
 };
 

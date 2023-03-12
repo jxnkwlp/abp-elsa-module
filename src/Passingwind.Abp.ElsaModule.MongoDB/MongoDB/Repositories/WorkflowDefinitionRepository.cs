@@ -18,7 +18,7 @@ public class WorkflowDefinitionRepository : MongoDbRepository<IElsaModuleMongoDb
     {
     }
 
-    public async Task<long> CountAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, CancellationToken cancellationToken = default)
+    public async Task<long> CountAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, IEnumerable<Guid> filterIds = null, CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
@@ -26,6 +26,7 @@ public class WorkflowDefinitionRepository : MongoDbRepository<IElsaModuleMongoDb
               .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
               .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel.Contains(name))
               .WhereIf(!string.IsNullOrEmpty(tag), x => x.Channel.Contains(tag))
+              .WhereIf(filterIds?.Any() == true, x => filterIds.Contains(x.Id))
               .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
               .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
               .As<IMongoQueryable<WorkflowDefinition>>()
@@ -71,7 +72,7 @@ public class WorkflowDefinitionRepository : MongoDbRepository<IElsaModuleMongoDb
         return (await query.Where(x => tags.Contains(x.Tag)).Select(x => x.Id).ToListAsync(cancellationToken)).ToArray();
     }
 
-    public async Task<List<WorkflowDefinition>> GetListAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, CancellationToken cancellationToken = default)
+    public async Task<List<WorkflowDefinition>> GetListAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, IEnumerable<Guid> filterIds = null, CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
@@ -79,13 +80,14 @@ public class WorkflowDefinitionRepository : MongoDbRepository<IElsaModuleMongoDb
               .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
               .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel.Contains(name))
               .WhereIf(!string.IsNullOrEmpty(tag), x => x.Channel.Contains(tag))
+              .WhereIf(filterIds?.Any() == true, x => filterIds.Contains(x.Id))
               .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
               .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
               .As<IMongoQueryable<WorkflowDefinition>>()
               .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<WorkflowDefinition>> GetPagedListAsync(int skipCount, int maxResultCount, string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, string ordering = null, CancellationToken cancellationToken = default)
+    public async Task<List<WorkflowDefinition>> GetPagedListAsync(int skipCount, int maxResultCount, string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, IEnumerable<Guid> filterIds = null, string ordering = null, CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
@@ -93,6 +95,7 @@ public class WorkflowDefinitionRepository : MongoDbRepository<IElsaModuleMongoDb
               .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
               .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel.Contains(name))
               .WhereIf(!string.IsNullOrEmpty(tag), x => x.Channel.Contains(tag))
+              .WhereIf(filterIds?.Any() == true, x => filterIds.Contains(x.Id))
               .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
               .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
               .OrderBy<WorkflowDefinition>(ordering ?? $"{nameof(WorkflowDefinition.CreationTime)} desc")

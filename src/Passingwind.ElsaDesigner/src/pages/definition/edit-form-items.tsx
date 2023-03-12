@@ -28,19 +28,25 @@ const EditFormItems: React.FC = () => {
                                     name="name"
                                     rules={[
                                         { required: true },
-                                        { max: 32 },
+                                        { max: 64 },
                                         {
                                             pattern: /^[\u4e00-\u9fa5A-Za-z0-9\-\_]*$/,
                                             message: 'Invalid characters',
                                         },
                                     ]}
+                                    extra={intl.formatMessage({
+                                        id: 'page.definition.field.name.tips',
+                                    })}
                                 />
                                 <ProFormText
                                     label={intl.formatMessage({
                                         id: 'page.definition.field.displayName',
                                     })}
                                     name="displayName"
-                                    rules={[{ required: true }, { max: 64 }]}
+                                    rules={[{ required: true }, { max: 128 }]}
+                                    extra={intl.formatMessage({
+                                        id: 'page.definition.field.displayName.tips',
+                                    })}
                                 />
                                 <ProFormTextArea
                                     label={intl.formatMessage({
@@ -48,7 +54,7 @@ const EditFormItems: React.FC = () => {
                                     })}
                                     name="description"
                                     fieldProps={{ rows: 2, autoSize: { minRows: 2, maxRows: 5 } }}
-                                    rules={[{ max: 128 }]}
+                                    rules={[{ max: 256 }]}
                                 />
                             </>
                         ),

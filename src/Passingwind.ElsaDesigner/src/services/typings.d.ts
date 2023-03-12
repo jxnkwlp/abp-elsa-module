@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 168
+ * Total count: 181
  **/
 import * as Enum from "./enums";
 
@@ -100,6 +100,45 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type MonacoSignatureParameter = {
+        label?: string | undefined;
+        documentation?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type MonacoSignatures = {
+        label?: string | undefined;
+        documentation?: string | undefined;
+        parameters?: MonacoSignatureParameter[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowCSharpEditorCodeAnalysis = {
+        id?: string | undefined;
+        message?: string | undefined;
+        offsetFrom: number;
+        offsetTo: number;
+        severity: Enum.WorkflowCSharpEditorCodeAnalysisSeverity;
+        severityNumeric: number;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowCSharpEditorCompletionItem = {
+        suggestion?: string | undefined;
+        description?: string | undefined;
+        symbolKind?: string | undefined;
+        itemKind: Enum.WorkflowCSharpEditorCompletionItemKind;
+    };
+
+    /**
+     * *TODO*
+     **/
     type SimpleExceptionModel = {
         type?: any | undefined;
         message?: string | undefined;
@@ -146,46 +185,6 @@ declare namespace API {
         key: string;
         value?: string | undefined;
         isSecret?: boolean | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type MonacoCodeAnalysisItem = {
-        id?: string | undefined;
-        keyword?: string | undefined;
-        message?: string | undefined;
-        offsetFrom: number;
-        offsetTo: number;
-        severity: Enum.MonacoCodeAnalysisSeverity;
-        severityNumeric: number;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type MonacoCompletionItem = {
-        suggestion?: string | undefined;
-        description?: string | undefined;
-        symbolKind?: string | undefined;
-        itemKind: Enum.MonacoCompletionItemKind;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type MonacoSignatureParameter = {
-        label?: string | undefined;
-        documentation?: string | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type MonacoSignatures = {
-        label?: string | undefined;
-        documentation?: string | undefined;
-        parameters?: MonacoSignatureParameter[] | undefined;
     };
 
     /**
@@ -284,23 +283,23 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowDesignerCSharpLanguageAnalysisRequest = {
-        sessionId?: string | undefined;
-        code?: string | undefined;
+        id: string;
+        text?: string | undefined;
     };
 
     /**
      * *TODO*
      **/
     type WorkflowDesignerCSharpLanguageAnalysisResult = {
-        items?: MonacoCodeAnalysisItem[] | undefined;
+        items?: WorkflowCSharpEditorCodeAnalysis[] | undefined;
     };
 
     /**
      * *TODO*
      **/
     type WorkflowDesignerCSharpLanguageCompletionProviderRequest = {
-        sessionId?: string | undefined;
-        code?: string | undefined;
+        id: string;
+        text?: string | undefined;
         position: number;
     };
 
@@ -308,20 +307,22 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowDesignerCSharpLanguageCompletionProviderResult = {
-        items?: MonacoCompletionItem[] | undefined;
+        items?: WorkflowCSharpEditorCompletionItem[] | undefined;
     };
 
     /**
      * *TODO*
      **/
     type WorkflowDesignerCSharpLanguageFormatterRequest = {
-        code?: string | undefined;
+        id: string;
+        text?: string | undefined;
     };
 
     /**
      * *TODO*
      **/
     type WorkflowDesignerCSharpLanguageFormatterResult = {
+        success?: boolean | undefined;
         code?: string | undefined;
     };
 
@@ -329,8 +330,8 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowDesignerCSharpLanguageHoverProviderRequest = {
-        sessionId?: string | undefined;
-        code?: string | undefined;
+        id: string;
+        text?: string | undefined;
         position: number;
     };
 
@@ -347,8 +348,8 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowDesignerCSharpLanguageSignatureProviderRequest = {
-        sessionId?: string | undefined;
-        code?: string | undefined;
+        id: string;
+        text?: string | undefined;
         position: number;
     };
 
@@ -445,6 +446,13 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type WorkflowDefinitionAddOwnerRequest = {
+        userId: string;
+    };
+
+    /**
+     * *TODO*
+     **/
     type WorkflowDefinitionCreateOrUpdate = {
         name: string;
         displayName?: string | undefined;
@@ -488,6 +496,21 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type WorkflowDefinitionIamResult = {
+        owners?: IdentityUser[] | undefined;
+        groups?: WorkflowGroupBasic[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDefinitionRevertRequest = {
+        version: number;
+    };
+
+    /**
+     * *TODO*
+     **/
     type WorkflowDefinitionVersion = {
         id: string;
         creationTime: string;
@@ -524,6 +547,63 @@ declare namespace API {
         version: number;
         isLatest?: boolean | undefined;
         isPublished?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowGroup = {
+        id: string;
+        creationTime: string;
+        creatorId?: string | undefined;
+        lastModificationTime?: string | undefined;
+        lastModifierId?: string | undefined;
+        name?: string | undefined;
+        description?: string | undefined;
+        roleId: string;
+        roleName?: string | undefined;
+        userIds?: string[] | undefined;
+        workflowIds?: string[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowGroupBasic = {
+        id: string;
+        creationTime: string;
+        creatorId?: string | undefined;
+        lastModificationTime?: string | undefined;
+        lastModifierId?: string | undefined;
+        name?: string | undefined;
+        description?: string | undefined;
+        roleId: string;
+        roleName?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowGroupCreateOrUpdate = {
+        name: string;
+        description?: string | undefined;
+        roleId: string;
+        userIds?: string[] | undefined;
+        workflowIds?: string[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowGroupSetWorkflowRequest = {
+        workflowIds?: string[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowGroupUpdateUsersRequest = {
+        userIds?: string[] | undefined;
     };
 
     /**
@@ -851,6 +931,14 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type VerifyPasswordResetTokenInput = {
+        userId: string;
+        resetToken: string;
+    };
+
+    /**
+     * *TODO*
+     **/
     type AbpLoginResult = {
         result: Enum.LoginResultType;
         description?: string | undefined;
@@ -952,6 +1040,14 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type WorkflowGroupBasicPagedResult = {
+        items?: WorkflowGroupBasic[] | undefined;
+        totalCount: number;
+    };
+
+    /**
+     * *TODO*
+     **/
     type WorkflowInstanceBasicPagedResult = {
         items?: WorkflowInstanceBasic[] | undefined;
         totalCount: number;
@@ -975,7 +1071,6 @@ declare namespace API {
      * *TODO*
      **/
     type ApplicationAuthConfiguration = {
-        policies?: any | undefined;
         grantedPolicies?: any | undefined;
     };
 
@@ -1014,13 +1109,29 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type ApplicationLocalization = {
+        resources?: Record<any, ApplicationLocalizationResource> | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type ApplicationLocalizationConfiguration = {
         values?: any | undefined;
+        resources?: Record<any, ApplicationLocalizationResource> | undefined;
         languages?: LanguageInfo[] | undefined;
         currentCulture: CurrentCulture;
         defaultResourceName?: string | undefined;
         languagesMap?: any | undefined;
         languageFilesMap?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type ApplicationLocalizationResource = {
+        texts?: any | undefined;
+        baseResources?: string[] | undefined;
     };
 
     /**
@@ -1307,6 +1418,7 @@ declare namespace API {
         controllerName?: string | undefined;
         controllerGroupName?: string | undefined;
         isRemoteService?: boolean | undefined;
+        isIntegrationService?: boolean | undefined;
         apiVersion?: string | undefined;
         type?: string | undefined;
         interfaces?: ControllerInterfaceApiDescriptionModel[] | undefined;
@@ -1318,6 +1430,17 @@ declare namespace API {
      **/
     type ControllerInterfaceApiDescriptionModel = {
         type?: string | undefined;
+        name?: string | undefined;
+        methods?: InterfaceMethodApiDescriptionModel[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type InterfaceMethodApiDescriptionModel = {
+        name?: string | undefined;
+        parametersOnMethod?: MethodParameterApiDescriptionModel[] | undefined;
+        returnValue: ReturnValueApiDescriptionModel;
     };
 
     /**
@@ -1527,6 +1650,7 @@ declare namespace API {
         cultureName?: string | undefined;
         uiCultureName?: string | undefined;
         displayName?: string | undefined;
+        twoLetterISOLanguageName?: string | undefined;
         flagIcon?: string | undefined;
     };
 
@@ -1564,6 +1688,8 @@ declare namespace API {
     type PermissionGroup = {
         name?: string | undefined;
         displayName?: string | undefined;
+        displayNameKey?: string | undefined;
+        displayNameResource?: string | undefined;
         permissions?: PermissionGrantInfo[] | undefined;
     };
 

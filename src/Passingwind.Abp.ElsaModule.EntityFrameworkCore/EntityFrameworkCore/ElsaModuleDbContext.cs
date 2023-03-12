@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.WorkflowGroups;
 using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ public class ElsaModuleDbContext : AbpDbContext<ElsaModuleDbContext>, IElsaModul
     public DbSet<WorkflowExecutionLog> WorkflowExecutionLogs { get; set; }
     public DbSet<WorkflowInstance> WorkflowInstances { get; set; }
     public DbSet<GlobalVariable> GlobalVariables { get; set; }
+    public DbSet<WorkflowGroup> WorkflowGroups { get; set; }
 
     public ElsaModuleDbContext(DbContextOptions<ElsaModuleDbContext> options)
         : base(options)

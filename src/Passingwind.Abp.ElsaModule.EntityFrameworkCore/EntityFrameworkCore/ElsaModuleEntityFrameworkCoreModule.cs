@@ -1,13 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.Permissions;
+using Passingwind.Abp.ElsaModule.WorkflowGroups;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Modularity;
+using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 
 namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 
 [DependsOn(
     typeof(ElsaModuleDomainModule),
+    typeof(AbpPermissionManagementEntityFrameworkCoreModule),
     typeof(AbpEntityFrameworkCoreModule)
 )]
 public class ElsaModuleEntityFrameworkCoreModule : AbpModule
@@ -28,7 +33,25 @@ public class ElsaModuleEntityFrameworkCoreModule : AbpModule
                                                                                 .Include(c => c.Variables)
                                                                                 .Include(c => c.Faults)
                                                                                 );
+
+            options.Entity<WorkflowGroup>(x => x.DefaultWithDetailsFunc = q => q.Include(x => x.Users));
         });
 
+        context.Services.TryAddTransient(typeof(IPermissionGroupDefinitionRepository), typeof(PermissionGroupDefinitionRepository));
+        context.Services.TryAddTransient(typeof(IPermissionDefinitionRepository), typeof(PermissionDefinitionRepository));
+    }
+
+    public class PermissionGroupDefinitionRepository : EfCorePermissionGroupDefinitionRecordRepository, IPermissionGroupDefinitionRepository
+    {
+        public PermissionGroupDefinitionRepository(IDbContextProvider<IPermissionManagementDbContext> dbContextProvider) : base(dbContextProvider)
+        {
+        }
+    }
+
+    public class PermissionDefinitionRepository : EfCorePermissionDefinitionRecordRepository, IPermissionDefinitionRepository
+    {
+        public PermissionDefinitionRepository(IDbContextProvider<IPermissionManagementDbContext> dbContextProvider) : base(dbContextProvider)
+        {
+        }
     }
 }

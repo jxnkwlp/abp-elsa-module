@@ -47,13 +47,11 @@ const Index: React.FC = () => {
             title: intl.formatMessage({ id: 'page.apikey.field.name' }),
             search: false,
             copyable: true,
-            width: 150,
         },
         {
             dataIndex: 'expirationTime',
             title: intl.formatMessage({ id: 'page.apikey.field.expirationTime' }),
             search: false,
-            width: 150,
             // valueType: 'dateTime',
             renderText: (_) => {
                 return _ ? (
@@ -70,7 +68,6 @@ const Index: React.FC = () => {
             dataIndex: 'creationTime',
             title: intl.formatMessage({ id: 'common.dict.creationTime' }),
             search: false,
-            width: 150,
             valueType: 'dateTime',
         },
         {

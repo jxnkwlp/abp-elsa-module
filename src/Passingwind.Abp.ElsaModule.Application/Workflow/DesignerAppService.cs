@@ -21,7 +21,7 @@ using Volo.Abp.Content;
 namespace Passingwind.Abp.ElsaModule.Workflow;
 
 [DisableAuditing]
-[Authorize(Policy = ElsaModulePermissions.Definitions.Publish)]
+[Authorize(Policy = ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish)]
 public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 {
     private readonly IActivityTypeService _activityTypeService;

@@ -2,10 +2,13 @@
 using Elsa.Events;
 using MediatR;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.Stores;
+using Passingwind.Abp.ElsaModule.WorkflowGroups;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Entities.Events;
 using Volo.Abp.EventBus;
+using Volo.Abp.Identity;
 
 namespace Passingwind.Abp.ElsaModule.EventHandlers;
 
@@ -15,6 +18,7 @@ public class WorkflowDefinitionEventHander :
     ILocalEventHandler<EntityDeletedEventData<WorkflowDefinitionVersion>>,
     // 
     ILocalEventHandler<EntityUpdatedEventData<WorkflowDefinition>>,
+    ILocalEventHandler<EntityCreatedEventData<WorkflowDefinition>>,
     // 
     ITransientDependency
 {
@@ -22,13 +26,26 @@ public class WorkflowDefinitionEventHander :
     private readonly IStoreMapper _storeMapper;
     private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
     private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
+    private readonly IWorkflowGroupManager _workflowGroupManager;
+    private readonly IWorkflowPermissionService _workflowPermissionService;
+    private readonly IIdentityUserRepository _identityUserRepository;
 
-    public WorkflowDefinitionEventHander(IMediator mediator, IStoreMapper storeMapper, IWorkflowDefinitionRepository workflowDefinitionRepository, IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository)
+    public WorkflowDefinitionEventHander(
+        IMediator mediator,
+        IStoreMapper storeMapper,
+        IWorkflowDefinitionRepository workflowDefinitionRepository,
+        IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository,
+        IWorkflowGroupManager workflowGroupManager,
+        IWorkflowPermissionService workflowPermissionService,
+        IIdentityUserRepository identityUserRepository)
     {
         _mediator = mediator;
         _storeMapper = storeMapper;
         _workflowDefinitionRepository = workflowDefinitionRepository;
         _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
+        _workflowGroupManager = workflowGroupManager;
+        _workflowPermissionService = workflowPermissionService;
+        _identityUserRepository = identityUserRepository;
     }
 
     public async Task HandleEventAsync(EntityCreatedEventData<WorkflowDefinitionVersion> eventData)
@@ -99,4 +116,19 @@ public class WorkflowDefinitionEventHander :
 
         await _mediator.Publish(new WorkflowDefinitionSaved(latestModel));
     }
+
+    public async Task HandleEventAsync(EntityCreatedEventData<WorkflowDefinition> eventData)
+    {
+        var entity = eventData.Entity;
+        // 
+        await _workflowPermissionService.CreateWorkflowPermissionDefinitionsAsync(entity);
+
+        // add user that can access the workflow
+        if (entity.CreatorId.HasValue)
+        {
+            var user = await _identityUserRepository.GetAsync(entity.CreatorId.Value);
+            await _workflowPermissionService.SetUserWorkflowPermissionGrantAsync(entity, user, true);
+        }
+    }
+
 }

@@ -15,11 +15,15 @@
     "Permission:Instance.Data": "View data",
 
     "Permission:Definition": "Definition management",
-    "Permission:Definition.Publish": "Publish or save",
+    "Permission:Definition.Publish": "Create or publish",
     "Permission:Definition.Dispatch": "Dispatch",
     "Permission:Definition.Export": "Export",
     "Permission:Definition.Import": "Import",
+    "Permission:Definition.ManagePermissions": "Manage permissions",
 
-    "Permission:GlobalVariables": "Global variables management"
+    "Permission:GlobalVariables": "Global variables management",
+
+    "Permission:WorkflowGroups": "Workflow groups management",
+    "Permission:WorkflowGroups.ManagePermissions": "Manage permissions"
   }
 }

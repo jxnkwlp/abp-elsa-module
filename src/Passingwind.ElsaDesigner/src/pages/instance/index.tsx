@@ -47,7 +47,7 @@ const Index: React.FC = () => {
             dataIndex: 'workflowDefinitionId',
             title: intl.formatMessage({ id: 'page.instance.field.definition' }),
             hideInTable: true,
-            hideInSearch: !access['ElsaModule.Definitions'],
+            hideInSearch: !access['ElsaWorkflow.Definitions'],
             valueType: 'select',
             request: async (p) => {
                 const list = await getWorkflowDefinitionList({
@@ -255,14 +255,14 @@ const Index: React.FC = () => {
                                                 WorkflowInstanceStatus.Running &&
                                             record.workflowStatus !=
                                                 WorkflowInstanceStatus.Suspended) ||
-                                        !access['ElsaModule.Instances.Action'],
+                                        !access['ElsaWorkflow.Instances.Action'],
                                 },
                                 {
                                     key: 'retry',
                                     name: intl.formatMessage({ id: 'page.instance.retry' }),
                                     disabled:
                                         record.workflowStatus != WorkflowInstanceStatus.Faulted ||
-                                        !access['ElsaModule.Instances.Action'],
+                                        !access['ElsaWorkflow.Instances.Action'],
                                 },
                                 {
                                     type: 'divider',
@@ -271,7 +271,7 @@ const Index: React.FC = () => {
                                     key: 'delete',
                                     name: intl.formatMessage({ id: 'common.dict.delete' }),
                                     danger: true,
-                                    disabled: !access['ElsaModule.Instances.Delete'],
+                                    disabled: !access['ElsaWorkflow.Instances.Delete'],
                                 },
                             ]}
                         />
@@ -311,7 +311,7 @@ const Index: React.FC = () => {
                                             (x) =>
                                                 x.workflowStatus == WorkflowInstanceStatus.Faulted,
                                         )
-                                    ) || !access['ElsaModule.Instances.Action']
+                                    ) || !access['ElsaWorkflow.Instances.Action']
                                 }
                                 onClick={() => {
                                     Modal.confirm({
@@ -354,7 +354,7 @@ const Index: React.FC = () => {
                                                 x.workflowStatus ==
                                                     WorkflowInstanceStatus.Suspended,
                                         )
-                                    ) || !access['ElsaModule.Instances.Action']
+                                    ) || !access['ElsaWorkflow.Instances.Action']
                                 }
                                 onClick={() => {
                                     Modal.confirm({
@@ -411,7 +411,7 @@ const Index: React.FC = () => {
                                         },
                                     });
                                 }}
-                                disabled={!access['ElsaModule.Instances.Delete']}
+                                disabled={!access['ElsaWorkflow.Instances.Delete']}
                             >
                                 {intl.formatMessage({ id: 'common.dict.delete' })}
                             </Button>

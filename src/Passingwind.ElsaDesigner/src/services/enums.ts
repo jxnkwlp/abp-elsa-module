@@ -39,7 +39,15 @@ export enum LoginResultType {
 /**
  * *TODO*
  **/
-export enum MonacoCodeAnalysisSeverity {
+export enum WorkflowContextFidelity {
+    Burst = 0,
+    Activity = 1,
+}
+
+/**
+ * *TODO*
+ **/
+export enum WorkflowCSharpEditorCodeAnalysisSeverity {
     Unkown = 0,
     Hint = 1,
     Info = 2,
@@ -50,7 +58,7 @@ export enum MonacoCodeAnalysisSeverity {
 /**
  * *TODO*
  **/
-export enum MonacoCompletionItemKind {
+export enum WorkflowCSharpEditorCompletionItemKind {
     Function = 0,
     Class = 1,
     Field = 2,
@@ -58,14 +66,6 @@ export enum MonacoCompletionItemKind {
     Property = 4,
     Enum = 5,
     Others = 6,
-}
-
-/**
- * *TODO*
- **/
-export enum WorkflowContextFidelity {
-    Burst = 0,
-    Activity = 1,
 }
 
 /**

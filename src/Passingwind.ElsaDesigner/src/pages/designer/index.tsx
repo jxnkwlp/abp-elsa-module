@@ -1097,7 +1097,7 @@ const Index: React.FC = () => {
                 }
                 extra={
                     <Space>
-                        {access['ElsaModule.Definitions.Publish'] ? (
+                        {access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'] ? (
                             <>
                                 <Button
                                     type="primary"
@@ -1158,14 +1158,14 @@ const Index: React.FC = () => {
                                     <Menu.Divider />
                                     <Menu.Item
                                         key="export"
-                                        disabled={!access['ElsaModule.Definitions.Export']}
+                                        disabled={!access['ElsaWorkflow.Definitions.Export']}
                                         onClick={handleOnExport}
                                     >
                                         {intl.formatMessage({ id: 'common.dict.export' })}
                                     </Menu.Item>
                                     <Menu.Item
                                         key="import"
-                                        disabled={!access['ElsaModule.Definitions.Import']}
+                                        disabled={!access['ElsaWorkflow.Definitions.Import']}
                                         onClick={() => {
                                             setImportModalVisible(true);
                                         }}
@@ -1175,7 +1175,11 @@ const Index: React.FC = () => {
                                     <Menu.Divider />
                                     <Menu.Item
                                         key="autoSave"
-                                        disabled={!access['ElsaModule.Definitions.Publish']}
+                                        disabled={
+                                            !access[
+                                                'ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'
+                                            ]
+                                        }
                                         onClick={() => {
                                             if (autoSaveEnabled) {
                                                 message.info(
@@ -1412,7 +1416,7 @@ const Index: React.FC = () => {
                             valueType: 'option',
                             width: 80,
                             align: 'center',
-                            hideInTable: !access['ElsaModule.Definitions.Delete'],
+                            hideInTable: !access['ElsaWorkflow.Definitions.Delete'],
                             render: (text, record, _, action) => {
                                 return (
                                     <Popconfirm

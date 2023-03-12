@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 15
+ * Total count: 20
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -30,6 +30,20 @@ export async function deleteWorkflowDefinition(
     options?: { [key: string]: any }
 ) {
     return request<any>(`/api/elsa/workflow/definitions/${id}`, {
+        method: 'DELETE',
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* DELETE /api/elsa/workflow/definitions/{id}/iam/owners/{userId} 
+ **/
+export async function deleteWorkflowDefinitionOwner(
+    id: string,    userId: string,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/elsa/workflow/definitions/${id}/iam/owners/${userId}`, {
         method: 'DELETE',
         getResponse: true,
         ...(options || {}),
@@ -71,6 +85,19 @@ export async function getWorkflowDefinitionDefinition(
     options?: { [key: string]: any }
 ) {
     return request<API.WorkflowDefinition>(`/api/elsa/workflow/definitions/${id}/definition`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/elsa/workflow/definitions/{id}/iam 
+ **/
+export async function getWorkflowDefinitionIam(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowDefinitionIamResult>(`/api/elsa/workflow/definitions/${id}/iam`, {
         method: 'GET',
         ...(options || {}),
     });
@@ -171,6 +198,22 @@ export async function updateWorkflowDefinitionDefinition(
 }
 
 /**
+ * *TODO* POST /api/elsa/workflow/definitions/{id}/iam/owners 
+ **/
+export async function workflowDefinitionAddOwner(
+    id: string,
+    payload: API.WorkflowDefinitionAddOwnerRequest,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/elsa/workflow/definitions/${id}/iam/owners`, {
+        method: 'POST',
+        data: payload,
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
  * *TODO* POST /api/elsa/workflow/definitions/{id}/dispatch 
  **/
 export async function workflowDefinitionDispatch(
@@ -210,6 +253,36 @@ export async function workflowDefinitionPublish(
 ) {
     return request<any>(`/api/elsa/workflow/definitions/${id}/publish`, {
         method: 'PUT',
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* POST /api/elsa/workflow/definitions/{id}/retract 
+ **/
+export async function workflowDefinitionRetract(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/elsa/workflow/definitions/${id}/retract`, {
+        method: 'POST',
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* POST /api/elsa/workflow/definitions/{id}/revert 
+ **/
+export async function workflowDefinitionRevert(
+    id: string,
+    payload: API.WorkflowDefinitionRevertRequest,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/elsa/workflow/definitions/${id}/revert`, {
+        method: 'POST',
+        data: payload,
         getResponse: true,
         ...(options || {}),
     });

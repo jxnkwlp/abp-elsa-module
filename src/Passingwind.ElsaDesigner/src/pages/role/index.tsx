@@ -55,7 +55,7 @@ const Index: React.FC = () => {
     const [permissionEditData, setPermissionEditData] = useState<API.GetPermissionListResult>();
     const [permissionData, setPermissioData] = useState<{ name: string; isGranted: boolean }[]>([]);
 
-    const updateRolePermission = async (grantedNames: string[]) => {
+    const handleUpdateRolePermissions = async (grantedNames: string[]) => {
         const data = [...permissionData];
         data.forEach((item) => {
             item.isGranted = grantedNames.indexOf(item.name) >= 0;
@@ -180,7 +180,7 @@ const Index: React.FC = () => {
                         onClick={async () => {
                             setEditModalData(record);
                             setEditModalDataId(record.id);
-                            await loadRolePermission(record.name);
+                            await loadRolePermission(record!.name);
                             setPermissionModalVisible(true);
                         }}
                     >
@@ -279,7 +279,7 @@ const Index: React.FC = () => {
                 labelCol={{ span: 4 }}
             >
                 <ProFormText
-                    rules={[{ required: true }, { max: 16 }]}
+                    rules={[{ required: true }, { max: 64 }]}
                     name="name"
                     label={intl.formatMessage({ id: 'page.role.field.name' })}
                 />
@@ -311,7 +311,7 @@ const Index: React.FC = () => {
                 }}
                 onFinish={async (value) => {
                     const grantedNames: string[] = value.name ?? [];
-                    return await updateRolePermission(grantedNames);
+                    return await handleUpdateRolePermissions(grantedNames);
                 }}
             >
                 <ProForm.Item name="name">

@@ -4,7 +4,7 @@ namespace Passingwind.Abp.ElsaModule.Permissions;
 
 public class ElsaModulePermissions
 {
-    public const string GroupName = "ElsaModule";
+    public const string GroupName = "ElsaWorkflow";
 
     public static string[] GetAll()
     {
@@ -23,11 +23,12 @@ public class ElsaModulePermissions
     public static class Definitions
     {
         public const string Default = GroupName + ".Definitions";
-        public const string Publish = Default + ".Publish";
+        public const string CreateOrUpdateOrPublish = Default + ".CreateOrUpdateOrPublish";
         public const string Delete = Default + ".Delete";
         public const string Dispatch = Default + ".Dispatch";
         public const string Export = Default + ".Export";
         public const string Import = Default + ".Import";
+        public const string ManagePermissions = Default + ".ManagePermissions";
     }
 
     public static class GlobalVariables
@@ -36,5 +37,19 @@ public class ElsaModulePermissions
         public const string Create = Default + ".Create";
         public const string Update = Default + ".Update";
         public const string Delete = Default + ".Delete";
+    }
+
+    public static class WorkflowGroup
+    {
+        public const string Default = GroupName + ".WorkflowGroups";
+        public const string Create = Default + ".Create";
+        public const string Update = Default + ".Update";
+        public const string Delete = Default + ".Delete";
+        public const string ManagePermissions = Default + ".ManagePermissions";
+    }
+
+    public static class Workflow
+    {
+        public const string Default = GroupName + ".Workflows";
     }
 }

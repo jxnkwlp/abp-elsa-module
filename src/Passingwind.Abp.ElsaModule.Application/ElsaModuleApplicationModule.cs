@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Passingwind.Abp.ElsaModule.Json;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
+using Passingwind.Abp.ElsaModule.Permissions;
 using Volo.Abp.Application;
+using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Json;
-using Volo.Abp.Json.SystemTextJson;
 using Volo.Abp.Modularity;
 
 namespace Passingwind.Abp.ElsaModule;
@@ -38,10 +39,7 @@ public partial class ElsaModuleApplicationModule : AbpModule
         //    options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowInstanceExecutionLogSummaryDto));
         //    options.UnsupportedTypes.AddIfNotContains(typeof(RuntimeSelectListContextDto));
         //});
-
-        //Configure<AbpSystemTextJsonSerializerOptions>(options =>
-        //{
-        //    options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
-        //});
+         
+        context.Services.AddSingleton<IAuthorizationHandler, WorkflowAuthorizationHandler>();
     }
 }

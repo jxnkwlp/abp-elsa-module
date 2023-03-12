@@ -3,9 +3,12 @@ import type { API } from '@/services/typings';
 import { formatTableSorter, getTableQueryConfig, saveTableQueryConfig } from '@/services/utils';
 import {
     deleteWorkflowDefinition,
+    deleteWorkflowDefinitionOwner,
+    getWorkflowDefinitionIam,
     getWorkflowDefinitionList,
     getWorkflowDefinitionVersion,
     updateWorkflowDefinitionDefinition,
+    workflowDefinitionAddOwner,
     workflowDefinitionDispatch,
     workflowDefinitionPublish,
     workflowDefinitionUnPublish,
@@ -15,7 +18,7 @@ import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-des
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
-import { Button, Form, message, Modal, Typography } from 'antd';
+import { Button, Form, message, Modal, Popconfirm, Table, Tabs, Typography } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { formatMessage, Link, useAccess, useHistory, useIntl } from 'umi';
 import EditFormItems from './edit-form-items';
@@ -59,7 +62,50 @@ const Index: React.FC = () => {
     const [dispatchFormVisible, setDispatchFormVisible] = useState<boolean>(false);
     const [dispatchId, setDispatchId] = useState<string>();
 
+    const [iampModalVisible, setIampModalVisible] = useState(false);
+    const [iamData, setIamData] = useState<API.WorkflowDefinitionIamResult>();
+
     const [editForm] = ProForm.useForm();
+
+    const loadIamData = async (id: string) => {
+        const loading = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
+        const result = await getWorkflowDefinitionIam(id);
+        loading();
+        if (result) {
+            setIamData(result);
+            return true;
+        }
+        return false;
+    };
+
+    const handleShowIam = async (record: API.WorkflowDefinition) => {
+        setEditModalData(record);
+        setEditModalDataId(record.id);
+
+        const result = await loadIamData(record.id);
+
+        if (result) {
+            setIampModalVisible(true);
+        }
+    };
+
+    const handleDeleteOwner = async (userId: string) => {
+        const result = await deleteWorkflowDefinitionOwner(editModalDataId!, userId);
+        if (result?.response?.ok) {
+            message.success(intl.formatMessage({ id: 'common.dict.deleted.success' }));
+            return true;
+        }
+        return false;
+    };
+
+    const handleAddOwner = async (userId: string) => {
+        const result = await workflowDefinitionAddOwner(editModalDataId!, { userId: userId });
+        if (result?.response?.ok) {
+            message.success(intl.formatMessage({ id: 'common.dict.save.success' }));
+            return true;
+        }
+        return false;
+    };
 
     const columns: ProColumnType<API.WorkflowDefinition>[] = [
         {
@@ -76,7 +122,7 @@ const Index: React.FC = () => {
             width: 250,
             fixed: 'left',
             render: (_, record) => (
-                <Typography.Text copyable={{ text: record.name }}>
+                <Typography.Text copyable={{ text: record.name }} ellipsis>
                     <Link to={`/definitions/${record.id}`}>{_}</Link>
                 </Typography.Text>
             ),
@@ -148,9 +194,9 @@ const Index: React.FC = () => {
                         pathname: `/definitions/${record.id}`,
                     }}
                 >
-                    {intl.formatMessage({ id: 'page.definitions.view' })}
+                    {intl.formatMessage({ id: 'page.definition.view' })}
                 </Link>,
-                access['ElsaModule.Definitions.Publish'] ? (
+                access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'] ? (
                     <Link to={'/designer?id=' + record.id}>
                         {intl.formatMessage({
                             id: 'page.definition.designer',
@@ -215,20 +261,30 @@ const Index: React.FC = () => {
                             setDispatchId(record.id);
                             setActionRow(record);
                             setDispatchFormVisible(true);
+                        } else if (key == 'iam') {
+                            handleShowIam(record);
                         }
                     }}
                     menus={[
                         {
                             key: 'edit',
                             name: intl.formatMessage({ id: 'page.definition.settings' }),
-                            disabled: !access['ElsaModule.Definitions.Publish'],
+                            disabled: !access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'],
+                        },
+                        {
+                            key: 'iam',
+                            name: intl.formatMessage({ id: 'page.definition.iam' }),
+                            disabled: !access['ElsaWorkflow.Definitions.ManagePermissions'],
+                        },
+                        {
+                            type: 'divider',
                         },
                         {
                             key: 'dispatch',
                             name: intl.formatMessage({ id: 'page.definition.dispatch' }),
                             disabled:
                                 !record.publishedVersion ||
-                                !access['ElsaModule.Definitions.Dispatch'],
+                                !access['ElsaWorkflow.Definitions.Dispatch'],
                         },
                         {
                             type: 'divider',
@@ -238,14 +294,14 @@ const Index: React.FC = () => {
                             name: intl.formatMessage({ id: 'page.definition.publish' }),
                             disabled:
                                 record.publishedVersion != null ||
-                                !access['ElsaModule.Definitions.Publish'],
+                                !access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'],
                         },
                         {
                             key: 'unpublish',
                             name: intl.formatMessage({ id: 'page.definition.unpublish' }),
                             disabled:
                                 record.publishedVersion == null ||
-                                !access['ElsaModule.Definitions.Publish'],
+                                !access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'],
                         },
                         {
                             type: 'divider',
@@ -253,7 +309,7 @@ const Index: React.FC = () => {
                         {
                             key: 'copyable',
                             name: intl.formatMessage({ id: 'page.definition.copyable' }),
-                            disabled: !access['ElsaModule.Definitions.Publish'],
+                            disabled: !access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'],
                         },
                         {
                             type: 'divider' as const,
@@ -262,7 +318,7 @@ const Index: React.FC = () => {
                             key: 'delete',
                             name: intl.formatMessage({ id: 'common.dict.delete' }),
                             danger: true,
-                            disabled: !access['ElsaModule.Definitions.Delete'],
+                            disabled: !access['ElsaWorkflow.Definitions.Delete'],
                         },
                     ]}
                 />,
@@ -292,7 +348,7 @@ const Index: React.FC = () => {
                 scroll={{ x: 1300 }}
                 rowKey="id"
                 toolBarRender={() => [
-                    access['ElsaModule.Definitions.Publish'] ? (
+                    access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'] ? (
                         <Button
                             key="add"
                             type="primary"
@@ -479,6 +535,103 @@ const Index: React.FC = () => {
                     }}
                 />
             </ModalForm>
+            {/* IAM */}
+            <Modal
+                title={`${intl.formatMessage({ id: 'page.definition.iam' })} - ${
+                    editModalData?.name
+                }`}
+                width={600}
+                visible={iampModalVisible}
+                onCancel={() => setIampModalVisible(false)}
+                maskClosable={false}
+                destroyOnClose
+                footer={false}
+            >
+                <Tabs
+                    defaultActiveKey="owners"
+                    items={[
+                        {
+                            key: 'owners',
+                            label: intl.formatMessage({ id: 'page.definition.iam.owners' }),
+                            children: (
+                                <Table
+                                    columns={[
+                                        {
+                                            dataIndex: 'userName',
+                                            title: intl.formatMessage({
+                                                id: 'page.user.field.userName',
+                                            }),
+                                        },
+                                        {
+                                            dataIndex: 'email',
+                                            title: intl.formatMessage({
+                                                id: 'page.user.field.email',
+                                            }),
+                                        },
+                                        {
+                                            dataIndex: '_actions',
+                                            width: 100,
+                                            align: 'center',
+                                            title: intl.formatMessage({
+                                                id: 'common.dict.table-action',
+                                            }),
+                                            render: (value, record) => [
+                                                <Popconfirm
+                                                    key="delete"
+                                                    title={intl.formatMessage({
+                                                        id: 'common.dict.delete.confirm',
+                                                    })}
+                                                    onConfirm={async () => {
+                                                        if (await handleDeleteOwner(record.id!)) {
+                                                            await loadIamData(editModalDataId!);
+                                                        }
+                                                    }}
+                                                >
+                                                    <a>
+                                                        {intl.formatMessage({
+                                                            id: 'common.dict.delete',
+                                                        })}
+                                                    </a>
+                                                </Popconfirm>,
+                                            ],
+                                        },
+                                    ]}
+                                    rowKey="id"
+                                    size="small"
+                                    dataSource={iamData?.owners ?? []}
+                                    pagination={false}
+                                />
+                            ),
+                        },
+                        {
+                            key: 'groups',
+                            label: intl.formatMessage({ id: 'page.definition.iam.groups' }),
+                            children: (
+                                <Table
+                                    columns={[
+                                        {
+                                            dataIndex: 'name',
+                                            title: intl.formatMessage({
+                                                id: 'page.workflowgroup.field.name',
+                                            }),
+                                        },
+                                        {
+                                            dataIndex: 'roleName',
+                                            title: intl.formatMessage({
+                                                id: 'page.workflowgroup.field.roleName',
+                                            }),
+                                        },
+                                    ]}
+                                    rowKey="id"
+                                    size="small"
+                                    dataSource={iamData?.groups ?? []}
+                                    pagination={false}
+                                />
+                            ),
+                        },
+                    ]}
+                />
+            </Modal>
         </PageContainer>
     );
 };
