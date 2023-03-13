@@ -3,8 +3,8 @@ name: build and pack
 on:
   push:
     branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
+  #pull_request:
+  #  branches: [main, develop]
   workflow_dispatch: 
 
 jobs:
@@ -27,7 +27,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
             dotnet-version: |
-                5.0.x
                 6.0.x
                 7.0.x
 
