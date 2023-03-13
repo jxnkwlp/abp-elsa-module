@@ -265,7 +265,7 @@ const Index: React.FC = () => {
                                         !access['ElsaWorkflow.Instances.Action'],
                                 },
                                 {
-                                    type: 'divider',
+                                    type: 'divider' as const,
                                 },
                                 {
                                     key: 'delete',

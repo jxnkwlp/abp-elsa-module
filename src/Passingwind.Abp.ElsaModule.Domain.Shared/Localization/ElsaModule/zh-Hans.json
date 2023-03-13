@@ -1,9 +1,9 @@
 {
   "culture": "zh-Hans",
   "texts": {
-    "WorkflowDefinition.NameExists": "定义名称'{name}'已经存在",
+    "ElsaModule:WorkflowDefinition.NameExists": "流程定义名称'{name}'已经存在",
 
-    "Permission:ElsaModule": "Workflow(Elsa) 模块",
+    "Permission:ElsaModule": "Workflow 模块",
 
     "Permission:Create": "创建",
     "Permission:Update": "编辑",

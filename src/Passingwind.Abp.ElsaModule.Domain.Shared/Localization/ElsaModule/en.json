@@ -1,9 +1,9 @@
 {
   "culture": "en",
   "texts": {
-    "WorkflowDefinition.NameExists": "Workflow definition name '{name}' exists",
+    "ElsaModule:WorkflowDefinition.NameExists": "Workflow definition name '{name}' exists",
 
-    "Permission:ElsaModule": "Workflow(Elsa) management",
+    "Permission:ElsaModule": "Workflow management",
 
     "Permission:Create": "Create",
     "Permission:Update": "Edit",

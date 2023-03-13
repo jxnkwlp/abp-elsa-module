@@ -169,7 +169,7 @@ const Index: React.FC = () => {
                             disabled: !access['ElsaWorkflow.WorkflowGroups.ManagePermissions'],
                         },
                         {
-                            type: 'divider',
+                            type: 'divider' as const,
                         },
                         {
                             key: 'delete',

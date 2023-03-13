@@ -277,7 +277,7 @@ const Index: React.FC = () => {
                             disabled: !access['ElsaWorkflow.Definitions.ManagePermissions'],
                         },
                         {
-                            type: 'divider',
+                            type: 'divider' as const,
                         },
                         {
                             key: 'dispatch',
@@ -287,7 +287,7 @@ const Index: React.FC = () => {
                                 !access['ElsaWorkflow.Definitions.Dispatch'],
                         },
                         {
-                            type: 'divider',
+                            type: 'divider' as const,
                         },
                         {
                             key: 'publish',
@@ -304,7 +304,7 @@ const Index: React.FC = () => {
                                 !access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'],
                         },
                         {
-                            type: 'divider',
+                            type: 'divider' as const,
                         },
                         {
                             key: 'copyable',

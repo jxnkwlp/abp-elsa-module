@@ -66,7 +66,6 @@ export default {
     'page.dashboard.statistics.status.suspended': '挂起',
     //
     'page.definition.view': '查看',
-    'page.definition.iam': '权限控制',
     'page.definition.edit.basic': '基本信息',
     'page.definition.edit.variables': '变量',
     'page.definition.edit.workflowContext': '上下文',
@@ -103,6 +102,7 @@ export default {
     'page.definition.switchVersion': '切换版本',
     'page.definition.notFound': '工作流定义不存在',
     'page.definition.versionNotFound': '工作流定义不存在',
+    'page.definition.iam': '访问控制',
     'page.definition.iam.owners': '拥有者',
     'page.definition.iam.groups': '分组',
     //

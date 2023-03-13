@@ -38,7 +38,7 @@ public class WorkflowDataSender : IWorkflowDataSender
             {
                 (await RoleManager.CreateAsync(new IdentityRole(GuidGenerator.Create(), workflowAdministratorRoleName) { IsStatic = true })).CheckErrors();
 
-                // // permissions
+                // permissions
                 foreach (var name in ElsaModulePermissions.GetAll())
                 {
                     await PermissionManager.SetAsync(name, RolePermissionValueProvider.ProviderName, workflowAdministratorRoleName, true);
@@ -52,7 +52,7 @@ public class WorkflowDataSender : IWorkflowDataSender
                 // permissions
                 foreach (var name in ElsaModulePermissions.GetAll())
                 {
-                    if (name.EndsWith(".Delete") || name.Contains("GlobalVariables"))
+                    if (name.EndsWith(".Delete") || name.Contains("GlobalVariables") || name.Contains("WorkflowGroup"))
                         continue;
 
                     await PermissionManager.SetAsync(name, RolePermissionValueProvider.ProviderName, workflowDeveloperRoleName, true);

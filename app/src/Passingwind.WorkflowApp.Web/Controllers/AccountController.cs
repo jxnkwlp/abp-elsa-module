@@ -129,6 +129,11 @@ public class AccountController : AbpController
             {
                 CheckIdentityErrors(await _userManager.AddLoginAsync(user, loginInfo));
             }
+
+            await UpdateUserInfoAsync(loginInfo, user);
+            await _userManager.UpdateAsync(user);
+
+            Logger.LogDebug("Update user '{email}' info from external login", user.Email);
         }
 
         if (signInResult.RequiresTwoFactor || signInResult.IsNotAllowed || signInResult.IsLockedOut)
@@ -174,7 +179,6 @@ public class AccountController : AbpController
         await _identityOptions.SetAsync();
 
         string emailAddress = info.Principal.FindFirstValue(AbpClaimTypes.Email);
-        string emailVerified = info.Principal.FindFirstValue(AbpClaimTypes.EmailVerified);
 
         IdentityUser user = new IdentityUser(GuidGenerator.Create(), emailAddress, emailAddress, CurrentTenant.Id);
 
@@ -183,20 +187,26 @@ public class AccountController : AbpController
         CheckIdentityErrors(await _userManager.AddLoginAsync(user, info));
         CheckIdentityErrors(await _userManager.AddDefaultRolesAsync(user));
 
-        user.Name = info.Principal.FindFirstValue(AbpClaimTypes.Name);
-        user.Surname = info.Principal.FindFirstValue(AbpClaimTypes.SurName);
-        user.SetEmailConfirmed(emailVerified == "true");
-
-        string phoneNumber = info.Principal.FindFirstValue(AbpClaimTypes.PhoneNumber);
-        if (!phoneNumber.IsNullOrWhiteSpace())
-        {
-            bool phoneNumberConfirmed = string.Equals(info.Principal.FindFirstValue(AbpClaimTypes.PhoneNumberVerified), "true", StringComparison.InvariantCultureIgnoreCase);
-            user.SetPhoneNumber(phoneNumber, phoneNumberConfirmed);
-        }
+        await UpdateUserInfoAsync(info, user);
 
         CheckIdentityErrors(await _userManager.UpdateAsync(user));
 
         return user;
+    }
+
+    protected virtual Task UpdateUserInfoAsync(ExternalLoginInfo info, IdentityUser user)
+    {
+        user.Surname = info.Principal.FindFirstValue(AbpClaimTypes.SurName);
+        user.Name = info.Principal.FindFirstValue(AbpClaimTypes.Name);
+        user.SetEmailConfirmed(info.Principal.FindFirstValue(AbpClaimTypes.EmailVerified) == "true");
+
+        string phoneNumber = info.Principal.FindFirstValue(AbpClaimTypes.PhoneNumber);
+        if (!phoneNumber.IsNullOrWhiteSpace())
+        {
+            user.SetPhoneNumber(phoneNumber, string.Equals(info.Principal.FindFirstValue(AbpClaimTypes.PhoneNumberVerified), "true", StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        return Task.CompletedTask;
     }
 
     protected virtual void CheckIdentityErrors(IdentityResult identityResult)

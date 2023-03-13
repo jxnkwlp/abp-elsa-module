@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.WorkflowGroups;
 using Volo.Abp.Authorization.Permissions;
@@ -31,6 +33,9 @@ public class WorkflowPermissionService : IWorkflowPermissionService
     protected IWorkflowGroupRepository WorkflowGroupRepository { get; }
     protected IDistributedCache<PermissionGrantCacheItem> PermissionCache { get; }
     protected IIdentityUserRepository IdentityUserRepository { get; }
+    protected IDistributedCache DistributedCache { get; }
+    protected AbpDistributedCacheOptions CacheOptions { get; }
+
 
     public WorkflowPermissionService(
         IGuidGenerator guidGenerator,
@@ -43,7 +48,9 @@ public class WorkflowPermissionService : IWorkflowPermissionService
         IWorkflowDefinitionRepository workflowDefinitionRepository,
         IWorkflowGroupManager workflowGroupManager,
         IDistributedCache<PermissionGrantCacheItem> permissionCache,
-        IIdentityUserRepository identityUserRepository)
+        IIdentityUserRepository identityUserRepository,
+        IDistributedCache distributedCache,
+        IOptions<AbpDistributedCacheOptions> cacheOptions)
     {
         GuidGenerator = guidGenerator;
         PrincipalAccessor = principalAccessor;
@@ -56,6 +63,8 @@ public class WorkflowPermissionService : IWorkflowPermissionService
         WorkflowGroupManager = workflowGroupManager;
         PermissionCache = permissionCache;
         IdentityUserRepository = identityUserRepository;
+        DistributedCache = distributedCache;
+        CacheOptions = cacheOptions.Value;
     }
 
     public virtual async Task<WorkflowPermissionGrantResult> GetGrantsAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken = default)
@@ -127,7 +136,8 @@ public class WorkflowPermissionService : IWorkflowPermissionService
                     return true;
 
                 // back to role permission
-                return await PermissionStore.IsGrantedAsync(name, provider.Name, provider.Value);
+                if (await PermissionStore.IsGrantedAsync(name, provider.Name, provider.Value))
+                    return true;
             }
         }
 
@@ -141,26 +151,25 @@ public class WorkflowPermissionService : IWorkflowPermissionService
 
     public virtual async Task SetUserWorkflowPermissionGrantAsync(WorkflowDefinition workflowDefinition, IdentityUser user, bool isGranted, CancellationToken cancellationToken = default)
     {
-        //await PermissionManager.SetAsync(WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition), UserPermissionValueProvider.ProviderName, user.Name, isGranted);
-        //await PermissionManager.SetAsync(WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition), WorkflowUserPermissionValueProvider.ProviderName, user.Id.ToString("d"), isGranted);
+        await PermissionManager.SetAsync(WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition), WorkflowUserOwnerPermissionValueProvider.ProviderName, user.Id.ToString("d"), isGranted);
 
-        var entity = await PermissionGrantRepository.FindAsync(WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition), WorkflowUserOwnerPermissionValueProvider.ProviderName, user.Id.ToString("d"));
-        if (entity == null && isGranted)
-        {
-            entity = await PermissionGrantRepository.InsertAsync(new PermissionGrant(GuidGenerator.Create(), WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition), WorkflowUserOwnerPermissionValueProvider.ProviderName, user.Id.ToString("d")));
-        }
-        if (entity != null && !isGranted)
-        {
-            await PermissionGrantRepository.DeleteAsync(entity);
-        }
+        //var entity = await PermissionGrantRepository.FindAsync(WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition), WorkflowUserOwnerPermissionValueProvider.ProviderName, user.Id.ToString("d"));
+        //if (entity == null && isGranted)
+        //{
+        //    entity = await PermissionGrantRepository.InsertAsync(new PermissionGrant(GuidGenerator.Create(), WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition), WorkflowUserOwnerPermissionValueProvider.ProviderName, user.Id.ToString("d")), true);
+        //}
+        //if (entity != null && !isGranted)
+        //{
+        //    await PermissionGrantRepository.DeleteAsync(entity, true);
+        //}
 
-        await PermissionCache.RemoveAsync(
-            PermissionGrantCacheItem.CalculateCacheKey(
-                entity.Name,
-                entity.ProviderName,
-                entity.ProviderKey
-            )
-        );
+        //await PermissionCache.RemoveAsync(
+        //    PermissionGrantCacheItem.CalculateCacheKey(
+        //        entity.Name,
+        //        entity.ProviderName,
+        //        entity.ProviderKey
+        //    )
+        //);
     }
 
     [UnitOfWork]
@@ -210,8 +219,8 @@ public class WorkflowPermissionService : IWorkflowPermissionService
                 name,
                 ElsaModulePermissions.Workflow.Default,
                 $"Workflows:{workflow.Id.ToString("d")}",
-                multiTenancySide: Volo.Abp.MultiTenancy.MultiTenancySides.Both,
-                providers: WorkflowGroupPermissionValueProvider.ProviderName), true, cancellationToken);
+                multiTenancySide: Volo.Abp.MultiTenancy.MultiTenancySides.Both
+                ), true, cancellationToken);
         }
     }
 
@@ -223,8 +232,9 @@ public class WorkflowPermissionService : IWorkflowPermissionService
                  WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition),
                  ElsaModulePermissions.Workflow.Default,
                  $"Workflows:{workflowDefinition.Id.ToString("d")}",
-                 multiTenancySide: Volo.Abp.MultiTenancy.MultiTenancySides.Both,
-                 providers: WorkflowGroupPermissionValueProvider.ProviderName), true, cancellationToken);
+                 multiTenancySide: Volo.Abp.MultiTenancy.MultiTenancySides.Both), true, cancellationToken);
+
+        await ClearPermissionDefinitionCacheAsync();
     }
 
     public async Task<IEnumerable<IdentityUser>> GetWorkflowOwnersAsync(WorkflowDefinition workflowDefinition, CancellationToken cancellationToken = default)
@@ -254,5 +264,17 @@ public class WorkflowPermissionService : IWorkflowPermissionService
     public async Task RemoveWorkflowOwnerAsync(WorkflowDefinition workflowDefinition, IdentityUser user, CancellationToken cancellationToken = default)
     {
         await SetUserWorkflowPermissionGrantAsync(workflowDefinition, user, false, cancellationToken);
+    }
+
+    protected virtual string GetCommonStampCacheKey()
+    {
+        return $"{CacheOptions.KeyPrefix}_AbpInMemoryPermissionCacheStamp";
+    }
+
+    protected async Task ClearPermissionDefinitionCacheAsync()
+    {
+        // TODO friendly ?
+        var cacheKey = GetCommonStampCacheKey();
+        await DistributedCache.RemoveAsync(cacheKey);
     }
 }

@@ -68,7 +68,6 @@ export default {
     'page.dashboard.statistics.status.suspended': 'Suspended',
     //
     'page.definition.view': 'View',
-    'page.definition.iam': 'IAM',
     'page.definition.edit.basic': 'Basic',
     'page.definition.edit.variables': 'Variables',
     'page.definition.edit.workflowContext': 'Workflow Context',
@@ -105,6 +104,7 @@ export default {
     'page.definition.switchVersion': 'Switch version',
     'page.definition.notFound': 'The workflow definition does not exist',
     'page.definition.versionNotFound': 'The workflow definition does not exist',
+    'page.definition.iam': 'Access control',
     'page.definition.iam.owners': 'Owners',
     'page.definition.iam.groups': 'Groups',
     //
