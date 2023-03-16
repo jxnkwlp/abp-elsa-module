@@ -153,6 +153,7 @@ const NodePropFormItem = (
 
 type NodePropFormProps = {
     workflowDefinitionId?: string;
+    activityId: string;
     properties: NodeTypeProperty[];
     // initialValues: object | undefined;
     // setFieldsValue: (value: any) => void;
@@ -162,7 +163,7 @@ type NodePropFormProps = {
 };
 
 const NodePropForm: React.FC<NodePropFormProps> = (props) => {
-    const { properties, storageProviders } = props;
+    const { activityId, properties, storageProviders } = props;
 
     const intl = useIntl();
 
@@ -175,6 +176,10 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
             setTabKey('common');
         }
     }, [props, properties]);
+
+    // useEffect(() => {
+    //     console.log(props);
+    // }, [0]);
 
     const renderProperties = () => {
         const formItems: React.ReactNode[] = [];
@@ -252,7 +257,9 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                 <ProFormGroup key={propItem.name}>
                     {propSyntax.editor ? (
                         NodePropFormItem(
-                            `${propItem.name}_${propSyntax.default ?? 'Literal'}`,
+                            `${activityId.replaceAll('-', '_')}_${propItem.name}_${
+                                propSyntax.default ?? 'Literal'
+                            }`,
                             [
                                 'props',
                                 propItem.name,
@@ -271,7 +278,9 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                 {({ props }) => {
                                     const syntax = props?.[propItem.name]?.syntax;
                                     return NodePropFormItem(
-                                        `${propItem.name}_${syntax}`,
+                                        `${activityId.replaceAll('-', '_')}_${
+                                            propItem.name
+                                        }_${syntax}`,
                                         ['props', propItem.name, 'expressions', syntax],
                                         propItem.defaultValue,
                                         syntax,
@@ -338,7 +347,7 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                 id: 'page.designer.settings.field.displayName',
                             })}
                             name="displayName"
-                            rules={[{ required: true }, { max: 32 }]}
+                            rules={[{ required: true }, { max: 64 }]}
                             placeholder={intl.formatMessage({
                                 id: 'page.designer.settings.field.displayName.tips',
                             })}

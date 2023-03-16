@@ -9,9 +9,8 @@
     commits:
       - "[feat]"
       - "feat"
-      - "💡"
-      - ":zap:"
-      - ":bulb:"
+      - "⬆️"
+      - ":arrow_up:"
     labels:
       - "Versioning - Minor"
   patch:
@@ -19,6 +18,7 @@
       - "[fix]"
       - "fix"
       - ":bug:"
+      - "🐛"
     labels:
       - "Versioning - Patch"
   default: patch

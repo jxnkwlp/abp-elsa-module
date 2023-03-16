@@ -40,6 +40,7 @@ import {
     getNodeOutcomes,
     getNodeTypeRawData,
     getPropertySyntaxes,
+    propertyExpressionSyntaxeCompatibleKeys,
 } from './service';
 import type {
     EdgeEditFormData,
@@ -239,6 +240,14 @@ const Index: React.FC = () => {
             props: {},
         };
 
+        //
+        delete formData.propertyStorageProviders?.$id;
+        delete formData.propertyStorageProviders?.$type;
+        delete formData.props?.$id;
+        delete formData.props?.$type;
+        delete formData.$id;
+        delete formData.$type;
+
         // initial all form fields
         const propertySyntaxs = {};
         propItems?.forEach((propItem) => {
@@ -290,17 +299,23 @@ const Index: React.FC = () => {
         // load form data and overwrite
         sourceProperties.forEach((item) => {
             const syntax = !item.syntax ? 'Default' : item.syntax;
+            const expressions = item.expressions ?? {};
+            delete expressions.$id;
+            delete expressions.$type;
             let syntaxValue: any = undefined;
-            let expressionValue: string = item.expressions?.[syntax] ?? '';
+            let expressionValue: string = expressions?.[syntax] ?? '';
 
             // load syntax value
-            let valueSyntax = syntax;
+            let currentSyntax = syntax;
+            // if syntax not found, use fist key in expressions
             if (
-                Object.keys(item.expressions ?? {}).indexOf(syntax) == -1 &&
-                Object.keys(item.expressions ?? {}).filter((x) => x != '$id').length > 0
+                Object.keys(expressions).indexOf(syntax) == -1 &&
+                Object.keys(expressions).length > 0
             ) {
-                valueSyntax = Object.keys(item.expressions ?? {}).filter((x) => x != '$id')[0];
-                expressionValue = item.expressions![valueSyntax];
+                const foundSyntax = Object.keys(expressions)[0];
+                expressionValue = expressions![foundSyntax];
+                //
+                currentSyntax = propertyExpressionSyntaxeCompatibleKeys[foundSyntax] ?? foundSyntax;
             }
 
             if (syntax == 'Default') {
@@ -318,26 +333,26 @@ const Index: React.FC = () => {
                 }
             }
 
-            const current = formData.props[item.name] ?? {};
-            const expressions = current?.expressions ?? {};
-            if (current.noSyntax) {
+            const propData = formData.props[item.name] ?? {};
+            const propExpressions = propData?.expressions ?? {};
+            if (propData.noSyntax) {
                 formData.props[item.name] = {
-                    ...current,
+                    ...propData,
                     expressions: {
-                        ...expressions,
+                        ...propExpressions,
                         Default: syntaxValue,
-                        [valueSyntax]: expressionValue,
+                        [currentSyntax]: expressionValue,
                         Literal: expressionValue,
                     },
                 };
             } else {
                 formData.props[item.name] = {
-                    ...current,
+                    ...propData,
                     syntax: syntax,
                     expressions: {
-                        ...expressions,
+                        ...propExpressions,
                         Default: syntaxValue,
-                        [valueSyntax]: expressionValue,
+                        [currentSyntax]: expressionValue,
                     },
                 };
             }
@@ -380,6 +395,10 @@ const Index: React.FC = () => {
                 let syntaxSourceValue: any = undefined;
                 let sytaxStringValue: string = '';
                 const expressions = curObj.expressions ?? {};
+                // remove
+                delete expressions.$id;
+                delete expressions.$type;
+
                 const syntaxes = nodePropertySyntaxs![name];
                 //
                 if (curObj.expressions && Object.keys(expressions).length > 0) {
@@ -983,7 +1002,6 @@ const Index: React.FC = () => {
         setLoading(false);
         if (definitonVersion) {
             setDefinitionVersion(definitonVersion);
-            console.log(definitonVersion);
             //
             setDefinition(definitonVersion.definition);
             setVersion(definitonVersion.version!);
@@ -1326,6 +1344,7 @@ const Index: React.FC = () => {
             >
                 <NodePropForm
                     workflowDefinitionId={definitionId}
+                    activityId={editNodeFormData?.id ?? ''}
                     properties={nodeTypePropList}
                     storageProviders={storageProviders}
                 />

@@ -118,6 +118,15 @@ export const getEditorLanguage = (syntax: string): string => {
     }
 };
 
+export const propertyExpressionSyntaxeCompatibleKeys = {
+    javaScript: 'JavaScript',
+    literal: 'Literal',
+    json: 'Json',
+    liquid: 'Liquid',
+    sQL: 'SQL',
+    'c#': 'C#',
+};
+
 /**
  *  获取属性值语法配置
  */

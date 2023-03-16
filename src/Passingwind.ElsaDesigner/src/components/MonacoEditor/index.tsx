@@ -40,9 +40,6 @@ const MonacoEditor: React.FC<MonacoEditorProps> = (props) => {
             height={height}
             path={path}
             defaultLanguage={language}
-            onChange={(v) => {
-                handleValueChanged(v as string);
-            }}
             value={value}
             options={{
                 minimap: { enabled: minimap ?? true, autohide: true },
@@ -50,12 +47,17 @@ const MonacoEditor: React.FC<MonacoEditorProps> = (props) => {
                 wordWrapColumn: 1024,
                 automaticLayout: true,
                 autoIndent: 'full',
-                tabSize: 2,
                 autoClosingBrackets: 'languageDefined',
                 foldingStrategy: 'auto',
+                formatOnPaste: true,
+                foldingImportsByDefault: true,
                 ...options,
             }}
+            onChange={(v) => {
+                handleValueChanged(v as string);
+            }}
             onMount={(e, m) => {
+                console.debug('editor mount: ', e.getModel()?.id);
                 onMount?.(e, m);
             }}
         />

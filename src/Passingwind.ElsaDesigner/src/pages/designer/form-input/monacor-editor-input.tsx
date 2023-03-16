@@ -1,7 +1,8 @@
 import MonacoEditor from '@/components/MonacoEditor';
+import { randString } from '@/services/utils';
 import { ExpandOutlined } from '@ant-design/icons';
+import { Modal, Spin, Tag } from 'antd';
 import type * as monaco from 'monaco-editor';
-import { Modal, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './monacor-editor-input.less';
 
@@ -13,16 +14,20 @@ type MonacorEditorInputProps = {
     width?: number;
     height?: number;
     options?: monaco.editor.IStandaloneEditorConstructionOptions;
+    showFullScreen?: false;
 };
 
 const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
-    const { id, options } = props;
+    const { options, showFullScreen } = props;
 
-    const [language] = React.useState(props.language || 'plaintext');
-    const [value, setValue] = React.useState(props.value || '');
+    const [language, setLanguage] = React.useState('plaintext');
+    const [value, setValue] = React.useState<string>();
+
     const [isFullscreen, setIsFullscreen] = React.useState(false);
-
+    const [showEditor, setShowEditor] = React.useState(true);
     const [name] = useState(props.id);
+
+    // const [name2] = useState(randString());
 
     const [currentSize] = React.useState<{ w?: number; h: number }>({ h: 150 });
 
@@ -44,6 +49,26 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
         setValue(props?.value || '');
     }, [props.value]);
 
+    useEffect(() => {
+        // update
+        setLanguage(props.language ?? 'plaintext');
+    }, [props.language]);
+
+    useEffect(() => {
+        console.debug('init editor with id:', name, ', language:', language);
+    }, [name, language]);
+
+    useEffect(() => {
+        if (isFullscreen) {
+            setShowEditor(false);
+        } else {
+            // HACK
+            window.setTimeout(() => {
+                setShowEditor(true);
+            }, 500);
+        }
+    }, [isFullscreen]);
+
     return (
         <div
             className="monaco-editor-container"
@@ -60,22 +85,29 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                 }
             }}
         >
-            <MonacoEditor
-                value={value}
-                path={name}
-                language={language}
-                minimap={false}
-                options={options}
-                onChange={(value) => {
-                    handleValueChanged(value);
-                }}
-            />
-            <div className="fullscreen-toggle">
-                <a onClick={() => handleToggleFullScreen()} title="Toggle fullscreen">
-                    <ExpandOutlined />
-                </a>
-            </div>
-
+            {showEditor ? (
+                <MonacoEditor
+                    value={value}
+                    path={name}
+                    language={language}
+                    minimap={false}
+                    options={options}
+                    onChange={(value) => {
+                        handleValueChanged(value);
+                    }}
+                />
+            ) : (
+                <Spin spinning>
+                    <div style={{ height: 140 }} />
+                </Spin>
+            )}
+            {(showFullScreen ?? true) && (
+                <div className="fullscreen-toggle">
+                    <a onClick={() => handleToggleFullScreen()} title="Toggle fullscreen">
+                        <ExpandOutlined />
+                    </a>
+                </div>
+            )}
             <Modal
                 title={
                     <>
@@ -84,9 +116,7 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
                 }
                 open={isFullscreen}
                 onCancel={() => setIsFullscreen(false)}
-                onOk={() => {
-                    setIsFullscreen(false);
-                }}
+                onOk={() => setIsFullscreen(false)}
                 width="96%"
                 style={{ top: 20 }}
                 destroyOnClose

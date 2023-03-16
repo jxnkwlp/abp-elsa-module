@@ -117,8 +117,8 @@ export default {
     'page.definition.field.contextOptions.contextFidelity': 'Fidelity',
     'page.definition.field.contextOptions.contextFidelity.placeholder':
         '工作流上下文刷新保真度控制何时加载和持久化工作流上下文的行为',
-    'page.definition.field.tag': 'Tag',
-    'page.definition.field.channel': 'Channel',
+    'page.definition.field.tag': '标签',
+    'page.definition.field.channel': '频道',
     'page.definition.field.persistenceBehavior': '持久化行为',
     'page.definition.field.isSingleton': '单列模式',
     'page.definition.field.latestVersion': '最新版本',
