@@ -164,19 +164,17 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     {
         var grantedResult = await _workflowPermissionService.GetGrantsAsync();
 
-        // overwrite 
         List<Guid> definitionIds = new List<Guid>(grantedResult.WorkflowIds);
 
         if (input.WorkflowDefinitionId.HasValue)
         {
-            if (!grantedResult.WorkflowIds.Contains(input.WorkflowDefinitionId.Value))
+            // check permissions
+            if (!grantedResult.WorkflowIds.Contains(input.WorkflowDefinitionId.Value) && !grantedResult.AllGranted)
             {
                 throw new AbpAuthorizationException();
             }
-            else
-            {
-                definitionIds = new List<Guid>() { input.WorkflowDefinitionId.Value };
-            }
+
+            definitionIds = new List<Guid>() { input.WorkflowDefinitionId.Value };
         }
 
         definitionIds = definitionIds.Distinct().ToList();
