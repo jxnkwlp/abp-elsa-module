@@ -36,8 +36,9 @@ using NodaTime;
 using NodaTime.Serialization.JsonNet;
 using Owl.Abp.CultureMap;
 using Passingwind.Abp.ElsaModule;
-using Passingwind.Abp.ElsaModule.Json.Converters;
+using Passingwind.Abp.ElsaModule.NewtonsoftJson.Converters;
 using Passingwind.Abp.ElsaModule.Services;
+using Passingwind.Abp.ElsaModule.SystemTextJson.Converters;
 using Passingwind.WorkflowApp.EntityFrameworkCore;
 using Passingwind.WorkflowApp.MultiTenancy;
 using Passingwind.WorkflowApp.Web.ApiKeys;
@@ -71,6 +72,7 @@ using Volo.Abp.Swashbuckle;
 using Volo.Abp.Timing;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using TypeJsonConverter = Passingwind.Abp.ElsaModule.SystemTextJson.Converters.TypeJsonConverter;
 
 namespace Passingwind.WorkflowApp.Web;
 
@@ -122,15 +124,19 @@ public class WorkflowAppWebModule : AbpModule
             options.KnownProxies.Clear();
             options.KnownNetworks.Clear();
         });
-         
+
         Configure<JsonOptions>(options =>
         {
             options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
+            options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
+            options.JsonSerializerOptions.Converters.Add(new JArrayConverter());
         });
 
         Configure<AbpSystemTextJsonSerializerOptions>(options =>
         {
             options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
+            options.JsonSerializerOptions.Converters.Add(new JArrayConverter());
+            options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
         });
 
         // Config default 'JsonSerializerSettings'

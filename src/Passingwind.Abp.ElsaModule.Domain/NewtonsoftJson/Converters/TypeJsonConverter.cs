@@ -2,13 +2,10 @@
 using Newtonsoft.Json;
 using Rebus.Extensions;
 
-namespace Passingwind.Abp.ElsaModule;
+namespace Passingwind.Abp.ElsaModule.NewtonsoftJson.Converters;
 
-public class NewtonsoftJsonTypeJsonConverter : JsonConverter<Type>
-{
-    public override bool CanRead => true;
-    public override bool CanWrite => true;
-
+public class TypeJsonConverter : JsonConverter<Type>
+{ 
     public override void WriteJson(JsonWriter writer, Type value, JsonSerializer serializer)
     {
         var typeName = value.GetSimpleAssemblyQualifiedName();

@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Rebus.Extensions;
 
-namespace Passingwind.Abp.ElsaModule.Json.Converters;
+namespace Passingwind.Abp.ElsaModule.SystemTextJson.Converters;
 
 public class TypeJsonConverter : JsonConverter<Type>
 {

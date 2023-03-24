@@ -412,12 +412,12 @@ public class StoreMapper : IStoreMapper
         entity.Input = model.Input;
         entity.Output = model.Output;
         // TODO
-        entity.Metadata = model.Metadata.Select(x => new WorkflowInstanceMetadata { Key = x.Key, Value = x.Value }).ToList();
-        entity.Variables = model.Variables.Data.Select(x => new WorkflowInstanceVariable { Key = x.Key, Value = x.Value }).ToList();
-        entity.ActivityData = model.ActivityData.ToList().Select(x => new WorkflowInstanceActivityData() { ActivityId = Guid.Parse(x.Key), Data = (Dictionary<string, object>)x.Value }).ToList();
-        entity.BlockingActivities = model.BlockingActivities.Select(x => new WorkflowInstanceBlockingActivity { ActivityId = Guid.Parse(x.ActivityId), ActivityType = x.ActivityType, Tag = x.Tag, }).ToList();
-        entity.ScheduledActivities = model.ScheduledActivities.Select(x => new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(x.ActivityId), Input = x.Input, }).Distinct().ToList();
-        entity.ActivityScopes = model.Scopes.Select(x => new WorkflowInstanceActivityScope { ActivityId = Guid.Parse(x.ActivityId), Variables = (Dictionary<string, object>)x.Variables.Data, }).ToList();
+        entity.Metadata = ToInstanceMetadata(model);
+        entity.Variables = ToInstanceVariables(model);
+        entity.ActivityData = ToInstanceActivityData(model);
+        entity.BlockingActivities = ToInstanceBlockingActivities(model);
+        entity.ScheduledActivities = ToInstanceScheduledActivities(model);
+        entity.ActivityScopes = ToInstanceActivityScopes(model);
 
         return entity;
     }
@@ -446,20 +446,111 @@ public class StoreMapper : IStoreMapper
             ContextId = entity.ContextId,
             ContextType = entity.ContextType,
             CorrelationId = entity.CorrelationId,
-            CurrentActivity = entity.CurrentActivity == null ? default : new Elsa.Models.ScheduledActivity(entity.CurrentActivity.ActivityId.ToString(), entity.CurrentActivity.Input),
+            CurrentActivity = entity.CurrentActivity == null ? default : new Elsa.Models.ScheduledActivity(entity.CurrentActivity.ActivityId.ToString(), ConvertObjectValue(entity.CurrentActivity.Input)),
             LastExecutedActivityId = entity.LastExecutedActivityId?.ToString(),
 
             Faults = new Elsa.Models.SimpleStack<Elsa.Models.WorkflowFault>(entity.Faults.Select(x => new Elsa.Models.WorkflowFault(x.Exception?.ToException(), x.Message, x.FaultedActivityId?.ToString(), x.ActivityInput, x.Resuming))),
             Input = entity.Input,
             Output = entity.Output,
 
-            Metadata = entity.GetMetadata(),
-            Variables = new Elsa.Models.Variables(entity.GetVariables()),
-            ActivityData = entity.ActivityData?.ToDictionary(x => x.ActivityId.ToString(), x => (IDictionary<string, object>)x.Data) ?? new Dictionary<string, IDictionary<string, object>>(),
-            BlockingActivities = entity.BlockingActivities?.Select(x => new BlockingActivity(x.ActivityId.ToString(), x.ActivityType) { Tag = x.Tag })?.ToHashSet() ?? new HashSet<BlockingActivity>(),
-            ScheduledActivities = new Elsa.Models.SimpleStack<Elsa.Models.ScheduledActivity>(entity.ScheduledActivities?.Select(x => new Elsa.Models.ScheduledActivity(x.ActivityId.ToString(), x.Input)) ?? new List<Elsa.Models.ScheduledActivity>()),
-            Scopes = new Elsa.Models.SimpleStack<Elsa.Models.ActivityScope>(entity.ActivityScopes?.Select(x => new Elsa.Models.ActivityScope() { ActivityId = x.ActivityId.ToString(), Variables = new Elsa.Models.Variables(x.Variables) })?.ToList() ?? new List<Elsa.Models.ActivityScope>()),
-
+            Metadata = GetInstanceMetadata(entity),
+            Variables = GetInstanceVariables(entity),
+            ActivityData = GetInstanceActivityData(entity),
+            BlockingActivities = GetBlockingInstanceActivities(entity),
+            ScheduledActivities = GetInstanceScheduledActivities(entity),
+            Scopes = GetInstanceScopes(entity),
         };
     }
+
+    protected static Dictionary<string, object> GetInstanceMetadata(WorkflowInstance instance)
+    {
+        var metadata = instance.GetMetadata();
+        return metadata.ToDictionary(x => x.Key, x => ConvertObjectValue(x.Value));
+    }
+
+    protected static Elsa.Models.Variables GetInstanceVariables(WorkflowInstance instance)
+    {
+        var variables = instance.GetVariables();
+        var puredResult = variables.ToDictionary(x => x.Key, x => ConvertObjectValue(x.Value));
+        return new Elsa.Models.Variables(puredResult);
+    }
+
+    protected static Dictionary<string, IDictionary<string, object>> GetInstanceActivityData(WorkflowInstance instance)
+    {
+        var result = new Dictionary<string, IDictionary<string, object>>();
+
+        if (instance.ActivityData != null)
+            foreach (var item in instance.ActivityData)
+            {
+                result[item.ActivityId.ToString()] = item.Data.ToDictionary(x => x.Key, x => ConvertObjectValue(x.Value));
+            }
+
+        return result;
+    }
+
+    protected static HashSet<BlockingActivity> GetBlockingInstanceActivities(WorkflowInstance instance)
+    {
+        return instance.BlockingActivities?.Select(x => new BlockingActivity(x.ActivityId.ToString(), x.ActivityType) { Tag = x.Tag })?.ToHashSet() ?? new HashSet<BlockingActivity>();
+    }
+
+    protected static Elsa.Models.SimpleStack<Elsa.Models.ScheduledActivity> GetInstanceScheduledActivities(WorkflowInstance instance)
+    {
+        var result = new List<Elsa.Models.ScheduledActivity>();
+
+        if (instance.ScheduledActivities != null)
+            foreach (var item in instance.ScheduledActivities)
+            {
+                result.Add(new Elsa.Models.ScheduledActivity(item.ActivityId.ToString(), ConvertObjectValue(item.Input)));
+            }
+
+        return new Elsa.Models.SimpleStack<Elsa.Models.ScheduledActivity>(result);
+    }
+
+    protected static Elsa.Models.SimpleStack<Elsa.Models.ActivityScope> GetInstanceScopes(WorkflowInstance instance)
+    {
+        var scopes = new List<Elsa.Models.ActivityScope>();
+
+        if (instance.ActivityScopes != null)
+            foreach (var item in instance.ActivityScopes)
+            {
+                scopes.Add(new Elsa.Models.ActivityScope(item.ActivityId.ToString())
+                {
+                    Variables = new Elsa.Models.Variables(item.Variables.ToDictionary(x => x.Key, x => ConvertObjectValue(x.Value))),
+                });
+            }
+
+        return new Elsa.Models.SimpleStack<Elsa.Models.ActivityScope>(scopes);
+    }
+
+    protected static List<WorkflowInstanceMetadata> ToInstanceMetadata(WorkflowInstanceModel model)
+    {
+        return model.Metadata.Select(x => new WorkflowInstanceMetadata { Key = x.Key, Value = x.Value }).ToList();
+    }
+
+    protected static List<WorkflowInstanceVariable> ToInstanceVariables(WorkflowInstanceModel model)
+    {
+        return model.Variables.Data.Select(x => new WorkflowInstanceVariable { Key = x.Key, Value = x.Value }).ToList();
+    }
+
+    protected static List<WorkflowInstanceActivityData> ToInstanceActivityData(WorkflowInstanceModel model)
+    {
+        return model.ActivityData.ToList().Select(x => new WorkflowInstanceActivityData() { ActivityId = Guid.Parse(x.Key), Data = (Dictionary<string, object>)x.Value }).ToList();
+    }
+
+    protected static List<WorkflowInstanceBlockingActivity> ToInstanceBlockingActivities(WorkflowInstanceModel model)
+    {
+        return model.BlockingActivities.Select(x => new WorkflowInstanceBlockingActivity { ActivityId = Guid.Parse(x.ActivityId), ActivityType = x.ActivityType, Tag = x.Tag, }).ToList();
+    }
+
+    protected static List<WorkflowInstanceScheduledActivity> ToInstanceScheduledActivities(WorkflowInstanceModel model)
+    {
+        return model.ScheduledActivities.Select(x => new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(x.ActivityId), Input = x.Input, }).Distinct().ToList();
+    }
+
+    protected static List<WorkflowInstanceActivityScope> ToInstanceActivityScopes(WorkflowInstanceModel model)
+    {
+        return model.Scopes.Select(x => new WorkflowInstanceActivityScope { ActivityId = Guid.Parse(x.ActivityId), Variables = (Dictionary<string, object>)x.Variables.Data, }).ToList();
+    }
+
+    protected static object ConvertObjectValue(object value) => value;
 }

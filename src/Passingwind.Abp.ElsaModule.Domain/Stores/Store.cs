@@ -41,8 +41,6 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
     protected ILogger Logger => LazyServiceProvider.LazyGetService<ILogger>(provider => LoggerFactory?.CreateLogger(GetType()) ?? NullLogger.Instance);
 
-    // protected IAbpDistributedLock DistributedLock => LazyServiceProvider.LazyGetRequiredService<IAbpDistributedLock>();
-
     protected IUnitOfWorkManager UnitOfWork => LazyServiceProvider.LazyGetRequiredService<IUnitOfWorkManager>();
 
     protected IRepository<TEntity, TKey> Repository => LazyServiceProvider.LazyGetRequiredService<IRepository<TEntity, TKey>>();
@@ -57,9 +55,9 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
     public virtual async Task AddAsync(TModel model, CancellationToken cancellationToken = default)
     {
-        using var uow = UnitOfWork.Begin(requiresNew: true);
+        Logger.LogDebug($"Invoke {typeof(TModel).Name} [AddAsync] with id '{model.Id}' ");
 
-        Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [AddAsync] with id '{model.Id}' ");
+        using var uow = UnitOfWork.Begin(requiresNew: true);
 
         var entity = await MapToEntityAsync(model);
         await Repository.InsertAsync(entity, true, cancellationToken);
@@ -69,12 +67,12 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
     public virtual async Task AddManyAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
     {
-        using var uow = UnitOfWork.Begin(requiresNew: true);
-
-        Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [AddManyAsync] ");
+        Logger.LogDebug($"Invoke {typeof(TModel).Name} [AddManyAsync] ");
 
         if (models.Any() == false)
             return;
+
+        using var uow = UnitOfWork.Begin(requiresNew: true);
 
         var entities = new List<TEntity>();
 
@@ -90,17 +88,15 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
     public virtual async Task<int> CountAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
     {
-        Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [CountAsync]");
-
         var expression = await MapSpecificationAsync(specification);
         return await Repository.CountAsync(expression, cancellationToken);
     }
 
     public virtual async Task DeleteAsync(TModel model, CancellationToken cancellationToken = default)
     {
-        using var uow = UnitOfWork.Begin(requiresNew: true);
+        Logger.LogDebug($"Invoke {typeof(TModel).Name} [DeleteAsync] with id '{model.Id}'");
 
-        Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [DeleteAsync] with id '{model.Id}'");
+        using var uow = UnitOfWork.Begin(requiresNew: true);
 
         var id = (TKey)Convert.ChangeType(model.Id, typeof(TKey));
         await Repository.DeleteAsync(x => x.Id.Equals(id), true, cancellationToken);
@@ -110,9 +106,9 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
     public virtual async Task<int> DeleteManyAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
     {
-        using var uow = UnitOfWork.Begin(requiresNew: true);
+        Logger.LogDebug($"Invoke {typeof(TModel).Name} [DeleteManyAsync] ");
 
-        Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [DeleteManyAsync] ");
+        using var uow = UnitOfWork.Begin(requiresNew: true);
 
         var expression = await MapSpecificationAsync(specification);
         var count = await Repository.CountAsync(expression, cancellationToken);
@@ -125,8 +121,6 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
     public virtual async Task<TModel> FindAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
     {
-        Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [FindAsync] ");
-
         var expression = await MapSpecificationAsync(specification);
         var entity = await Repository.FindAsync(expression, true, cancellationToken);
 
@@ -141,8 +135,6 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
     public virtual async Task<IEnumerable<TModel>> FindManyAsync(ISpecification<TModel> specification, IOrderBy<TModel> orderBy = null, IPaging paging = null, CancellationToken cancellationToken = default)
     {
-        Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [FindManyAsync] ");
-
         var filter = await MapSpecificationAsync(specification).ConfigureAwait(false);
 
         var query = await Repository.WithDetailsAsync();
@@ -187,7 +179,7 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [SaveAsync] ");
+            Logger.LogDebug($"Invoke {typeof(TModel).Name} [SaveAsync] ");
 
             try
             {
@@ -227,9 +219,9 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
     public virtual async Task UpdateAsync(TModel model, CancellationToken cancellationToken = default)
     {
-        using var uow = UnitOfWork.Begin(requiresNew: true);
+        Logger.LogDebug($"Invoke {typeof(TModel).Name} [UpdateAsync] with id '{model.Id}'");
 
-        Logger.LogDebug($"[{StoreId}] Call {typeof(TModel).Name} [UpdateAsync] with id '{model.Id}'");
+        using var uow = UnitOfWork.Begin(requiresNew: true);
 
         TKey id = ConvertKey(model.Id);
 

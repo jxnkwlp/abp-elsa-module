@@ -80,9 +80,8 @@ public class CSharpScriptConfigureHandler : INotificationHandler<CSharpScriptEva
         //global.Context.JsonEncode = (Func<object, string>)((object source) => _jsonSerializer.Serialize(source));
         //global.Context.JsonDecode = (Func<string, object>)((string json) => _jsonSerializer.Deserialize<object>(json));
         global.Context.JsonEncode = (Func<object, string>)((object source) => JsonConvert.SerializeObject(source));
-        //global.Context.JsonDecode = (Func<string, object>)((string json) => JsonConvert.DeserializeObject<object>(json));
         global.Context.JsonDecode = (Func<string, dynamic>)((string json) => JsonConvert.DeserializeObject<dynamic>(json));
-        global.Context.JsonDecodeToType = (Func<string, object, dynamic>)((string json, dynamic obj) => JsonConvert.DeserializeAnonymousType<dynamic>(json, obj));
+        // global.Context.JsonDecodeToType = (Func<string, object, dynamic>)((string json, dynamic obj) => JsonConvert.DeserializeAnonymousType<dynamic>(json, obj));
         global.Context.GetWorkflowDefinitionIdByName = (Func<string, string>)(name => GetWorkflowDefinitionIdByName(context, name));
         global.Context.getWorkflowDefinitionIdByTag = (Func<string, string>)(tag => GetWorkflowDefinitionIdByTag(context, tag));
         global.Context.GetActivity = (Func<string, object>)(idOrName => GetActivityModel(context, idOrName));
@@ -126,7 +125,7 @@ public class CSharpScriptConfigureHandler : INotificationHandler<CSharpScriptEva
             activities[activity.Name!] = activityModel;
         }
 
-        global.Context.Activities = activities;
+        global.Context.ActivitityData = activities;
 
     }
 

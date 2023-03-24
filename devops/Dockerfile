@@ -2,13 +2,10 @@ FROM  mcr.microsoft.com/dotnet/aspnet:7.0-alpine
 
 # 
 WORKDIR /app
+ 
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
-#
-# RUN apt-get update -y && apt-get install -y libgdiplus && apt-get clean
-
-#
-#RUN sed -i 's/MinProtocol = TLSv1.2/MinProtocol = TLSv1.0/g' /etc/ssl/openssl.cnf
-#RUN sed -i 's/MinProtocol = TLSv1.2/MinProtocol = TLSv1.0/g' /usr/lib/ssl/openssl.cnf
+RUN apk add --no-cache icu-libs icu-data-full krb5-libs libgcc libintl libssl1.1 libstdc++ zlib tzdata
 
 # 
 COPY app /app

@@ -26,9 +26,9 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Channel).HasMaxLength(64);
 
             b.Property(x => x.Tag).HasMaxLength(64);
-            b.Property(x => x.ContextOptions).HasConversion(new JsonValueConverter<Elsa.Models.WorkflowContextOptions>(), ValueComparer.CreateDefault(typeof(Elsa.Models.WorkflowContextOptions), false));
-            b.Property(x => x.Variables).HasConversion(new JsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
-            b.Property(x => x.CustomAttributes).HasConversion(new JsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            b.Property(x => x.ContextOptions).HasConversion(new EfCoreJsonValueConverter<Elsa.Models.WorkflowContextOptions>(), ValueComparer.CreateDefault(typeof(Elsa.Models.WorkflowContextOptions), false));
+            b.Property(x => x.Variables).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            b.Property(x => x.CustomAttributes).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
 
             // b.HasMany(x => x.Versions).WithOne(x => x.Definition).HasForeignKey(x => x.DefinitionId);
             b.HasIndex(x => x.Name);
@@ -60,9 +60,9 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.DisplayName).HasMaxLength(128);
             b.Property(x => x.Description).HasMaxLength(256);
 
-            b.Property(x => x.Properties).HasConversion(new JsonValueConverter<List<Elsa.Models.ActivityDefinitionProperty>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ActivityDefinitionProperty>), false));
-            b.Property(x => x.Attributes).HasConversion(new JsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
-            b.Property(x => x.PropertyStorageProviders).HasConversion(new JsonValueConverter<Dictionary<string, string>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, string>), false));
+            b.Property(x => x.Properties).HasConversion(new EfCoreJsonValueConverter<List<Elsa.Models.ActivityDefinitionProperty>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ActivityDefinitionProperty>), false));
+            b.Property(x => x.Attributes).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            b.Property(x => x.PropertyStorageProviders).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, string>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, string>), false));
         });
 
         builder.Entity<ActivityConnection>(b =>
@@ -73,7 +73,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.HasKey(x => new { x.WorkflowDefinitionVersionId, x.SourceId, x.TargetId, x.Outcome, });
 
             b.Property(x => x.Outcome).IsRequired().HasMaxLength(64);
-            b.Property(x => x.Attributes).HasConversion(new JsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            b.Property(x => x.Attributes).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
         });
 
         builder.Entity<Bookmark>(b =>
@@ -111,12 +111,12 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.ContextType).HasMaxLength(128);
             b.Property(x => x.ContextId).HasMaxLength(128);
 
-            b.Property(x => x.Input).HasConversion(new JsonValueConverter<Elsa.Services.Models.WorkflowInputReference>(), ValueComparer.CreateDefault(typeof(Elsa.Services.Models.WorkflowInputReference), false));
-            b.Property(x => x.Output).HasConversion(new JsonValueConverter<Elsa.Services.Models.WorkflowOutputReference>(), ValueComparer.CreateDefault(typeof(Elsa.Services.Models.WorkflowOutputReference), false));
+            b.Property(x => x.Input).HasConversion(new EfCoreJsonValueConverter<Elsa.Services.Models.WorkflowInputReference>(), ValueComparer.CreateDefault(typeof(Elsa.Services.Models.WorkflowInputReference), false));
+            b.Property(x => x.Output).HasConversion(new EfCoreJsonValueConverter<Elsa.Services.Models.WorkflowOutputReference>(), ValueComparer.CreateDefault(typeof(Elsa.Services.Models.WorkflowOutputReference), false));
 #pragma warning disable CS0612 // Type or member is obsolete
-            b.Property(x => x.Fault).HasConversion(new JsonValueConverter<Elsa.Models.WorkflowFault>(), ValueComparer.CreateDefault(typeof(Elsa.Models.WorkflowFault), false));
+            b.Property(x => x.Fault).HasConversion(new EfCoreJsonValueConverter<Elsa.Models.WorkflowFault>(), ValueComparer.CreateDefault(typeof(Elsa.Models.WorkflowFault), false));
 #pragma warning restore CS0612 // Type or member is obsolete
-            b.Property(x => x.CurrentActivity).HasConversion(new JsonValueConverter<WorkflowInstanceScheduledActivity>(), ValueComparer.CreateDefault(typeof(WorkflowInstanceScheduledActivity), false));
+            b.Property(x => x.CurrentActivity).HasConversion(new EfCoreJsonValueConverter<WorkflowInstanceScheduledActivity>(), ValueComparer.CreateDefault(typeof(WorkflowInstanceScheduledActivity), false));
 
             //b.Property(x => x.ScheduledActivities).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.ScheduledActivity>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ScheduledActivity>), false));
             //b.Property(x => x.BlockingActivities).HasConversion(new ElsaEFJsonValueConverter<List<Elsa.Models.BlockingActivity>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.BlockingActivity>), false));
@@ -141,7 +141,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
 
-            b.Property(x => x.Data).HasConversion(new JsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            b.Property(x => x.Data).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
         });
 
         builder.Entity<WorkflowInstanceBlockingActivity>(b =>
@@ -161,7 +161,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
 
-            b.Property(x => x.Input).HasConversion(new JsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
+            b.Property(x => x.Input).HasConversion(new EfCoreJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
         });
 
         builder.Entity<WorkflowInstanceMetadata>(b =>
@@ -173,7 +173,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.Property(x => x.Key).HasMaxLength(256).IsRequired();
 
-            b.Property(x => x.Value).HasConversion(new JsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
+            b.Property(x => x.Value).HasConversion(new EfCoreJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
         });
 
         builder.Entity<WorkflowInstanceActivityScope>(b =>
@@ -183,7 +183,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
 
-            b.Property(x => x.Variables).HasConversion(new JsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            b.Property(x => x.Variables).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
         });
 
         builder.Entity<WorkflowInstanceVariable>(b =>
@@ -195,7 +195,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.Property(x => x.Key).HasMaxLength(256).IsRequired();
 
-            b.Property(x => x.Value).HasConversion(new JsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
+            b.Property(x => x.Value).HasConversion(new EfCoreJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
 
             b.HasIndex(x => x.Key);
         });
@@ -207,8 +207,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.HasKey(x => new { x.Id, x.WorkflowInstanceId });
 
-            b.Property(x => x.ActivityInput).HasConversion(new JsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
-            b.Property(x => x.Exception).HasConversion(new JsonValueConverter<SimpleExceptionModel>(), ValueComparer.CreateDefault(typeof(SimpleExceptionModel), false));
+            b.Property(x => x.ActivityInput).HasConversion(new EfCoreJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
+            b.Property(x => x.Exception).HasConversion(new EfCoreJsonValueConverter<SimpleExceptionModel>(), ValueComparer.CreateDefault(typeof(SimpleExceptionModel), false));
         });
 
         builder.Entity<WorkflowExecutionLog>(b =>
@@ -219,7 +219,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.ActivityType).HasMaxLength(256);
             b.Property(x => x.EventName).HasMaxLength(128);
             b.Property(x => x.Source).HasMaxLength(128);
-            b.Property(x => x.Data).HasConversion(new JsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
+            b.Property(x => x.Data).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
 
             b.HasIndex(x => x.WorkflowInstanceId);
         });

@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json.Linq;
 
-namespace Passingwind.Abp.ElsaModule.Json.Converters;
+namespace Passingwind.Abp.ElsaModule.SystemTextJson.Converters;
 
 public class JArrayConverter : JsonConverter<JArray>
 {

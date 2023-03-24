@@ -38,14 +38,13 @@ public static object GetVariable(string name) => throw new System.NotImplemented
 public static void SetVariable(string name, object value) => throw new System.NotImplementedException(); 
 public static void PurgeVariables() => throw new System.NotImplementedException(); 
 public static string JsonEncode(object value) => throw new System.NotImplementedException(); 
-public static dynamic JsonDecode(string value) => throw new System.NotImplementedException(); 
-public static dynamic JsonDecodeToType(string value, dynamic obj) => throw new System.NotImplementedException(); 
+public static dynamic JsonDecode(string value) => throw new System.NotImplementedException();
 public static string GetWorkflowDefinitionIdByName(string name) => throw new System.NotImplementedException(); 
 public static string GetWorkflowDefinitionIdByTag(string tag) => throw new System.NotImplementedException(); 
 
 // activities
 public static IDictionary<string, object> GetActivity(string name) => throw new System.NotImplementedException(); 
-public static IDictionary<string, Dictionary<string, object>> Activities => throw new System.NotImplementedException(); 
+public static IDictionary<string, Dictionary<string, object>> ActivitityData => throw new System.NotImplementedException(); 
 
 ");
 

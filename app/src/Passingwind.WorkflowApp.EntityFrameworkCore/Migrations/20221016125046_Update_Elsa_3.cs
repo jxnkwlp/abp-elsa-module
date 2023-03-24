@@ -25,29 +25,29 @@ public partial class Update_Elsa_3 : Migration
             name: "IX_ElsaWorkflowExecutionLogs_WorkflowInstanceId",
             table: "ElsaWorkflowExecutionLogs");
 
-        //migrationBuilder.DropColumn(
-        //    name: "ActivityData",
-        //    table: "ElsaWorkflowInstances");
+        migrationBuilder.DropColumn(
+            name: "ActivityData",
+            table: "ElsaWorkflowInstances");
 
-        //migrationBuilder.DropColumn(
-        //    name: "BlockingActivities",
-        //    table: "ElsaWorkflowInstances");
+        migrationBuilder.DropColumn(
+            name: "BlockingActivities",
+            table: "ElsaWorkflowInstances");
 
-        //migrationBuilder.DropColumn(
-        //    name: "Metadata",
-        //    table: "ElsaWorkflowInstances");
+        migrationBuilder.DropColumn(
+            name: "Metadata",
+            table: "ElsaWorkflowInstances");
 
-        //migrationBuilder.DropColumn(
-        //    name: "ScheduledActivities",
-        //    table: "ElsaWorkflowInstances");
+        migrationBuilder.DropColumn(
+            name: "ScheduledActivities",
+            table: "ElsaWorkflowInstances");
 
-        //migrationBuilder.DropColumn(
-        //    name: "Scopes",
-        //    table: "ElsaWorkflowInstances");
+        migrationBuilder.DropColumn(
+            name: "Scopes",
+            table: "ElsaWorkflowInstances");
 
-        //migrationBuilder.DropColumn(
-        //    name: "Variables",
-        //    table: "ElsaWorkflowInstances");
+        migrationBuilder.DropColumn(
+            name: "Variables",
+            table: "ElsaWorkflowInstances");
 
         migrationBuilder.DropColumn(
             name: "CreationTime",
