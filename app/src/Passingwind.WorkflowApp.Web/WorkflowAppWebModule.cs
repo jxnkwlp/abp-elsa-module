@@ -40,6 +40,7 @@ using Passingwind.Abp.ElsaModule.NewtonsoftJson.Converters;
 using Passingwind.Abp.ElsaModule.Services;
 using Passingwind.Abp.ElsaModule.SystemTextJson.Converters;
 using Passingwind.WorkflowApp.EntityFrameworkCore;
+using Passingwind.WorkflowApp.MongoDB;
 using Passingwind.WorkflowApp.MultiTenancy;
 using Passingwind.WorkflowApp.Web.ApiKeys;
 using Passingwind.WorkflowApp.Web.Services;
@@ -77,10 +78,11 @@ using TypeJsonConverter = Passingwind.Abp.ElsaModule.SystemTextJson.Converters.T
 namespace Passingwind.WorkflowApp.Web;
 
 [DependsOn(
+    typeof(ElsaModuleExtensionModule),
     typeof(WorkflowAppHttpApiModule),
     typeof(WorkflowAppApplicationModule),
-    typeof(WorkflowAppEntityFrameworkCoreModule),
-    typeof(ElsaModuleExtensionModule),
+     typeof(WorkflowAppEntityFrameworkCoreModule),
+    // typeof(WorkflowAppMongoDbModule), 
     typeof(AbpAspNetCoreAuthenticationOpenIdConnectModule),
     typeof(AbpAspNetCoreMvcUiBasicThemeModule),
     typeof(AbpIdentityAspNetCoreModule),

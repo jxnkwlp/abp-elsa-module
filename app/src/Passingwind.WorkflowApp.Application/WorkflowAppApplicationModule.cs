@@ -10,9 +10,9 @@ namespace Passingwind.WorkflowApp;
 
 [DependsOn(
     typeof(WorkflowAppDomainModule),
+    typeof(WorkflowAppApplicationContractsModule),
     typeof(ElsaModuleApplicationModule),
     typeof(AbpAccountApplicationModule),
-    typeof(WorkflowAppApplicationContractsModule),
     typeof(AbpIdentityApplicationModule),
     typeof(AbpPermissionManagementApplicationModule),
     typeof(AbpSettingManagementApplicationModule)

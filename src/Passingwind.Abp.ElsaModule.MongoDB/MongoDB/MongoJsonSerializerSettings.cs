@@ -3,39 +3,37 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
+using Passingwind.Abp.ElsaModule.NewtonsoftJson.Converters;
+using TypeJsonConverter = Passingwind.Abp.ElsaModule.NewtonsoftJson.Converters.TypeJsonConverter;
 
 namespace Passingwind.Abp.ElsaModule.MongoDB;
 
-public class MongoJsonSerializerSettings
+public static class MongoJsonSerializerSettings
 {
-    private static JsonSerializerSettings _settings;
+    public static JsonSerializerSettings Settings { get; set; }
 
     static MongoJsonSerializerSettings()
     {
-        _settings = new JsonSerializerSettings()
+        Settings = new JsonSerializerSettings()
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver() { NamingStrategy = new CamelCaseNamingStrategy(false, false) },
+            ContractResolver = new CamelCasePropertyNamesContractResolver() { NamingStrategy = new CamelCaseNamingStrategy(false, true) },
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
             NullValueHandling = NullValueHandling.Ignore,
-            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-            TypeNameHandling = TypeNameHandling.Auto,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.None,
             TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+            PreserveReferencesHandling = PreserveReferencesHandling.None,
+            Formatting = Formatting.None,
         };
         // ignore error
-        _settings.Error += JsonErrorHandle;
-        _settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-        _settings.Converters.Add(new TypeJsonConverter());
-        _settings.Converters.Add(new FlagEnumConverter(new DefaultNamingStrategy()));
-        _settings.Converters.Add(new TypeJsonConverter());
-        _settings.Converters.Add(new VersionOptionsJsonConverter());
-        _settings.Converters.Add(new InlineFunctionJsonConverter());
-    }
-
-    public static JsonSerializerSettings Settings { get => _settings; }
-
-    public static void Update(JsonSerializerSettings settings)
-    {
-        _settings = settings;
+        Settings.Error += JsonErrorHandle;
+        Settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        Settings.Converters.Add(new TypeJsonConverter());
+        Settings.Converters.Add(new FlagEnumConverter(new DefaultNamingStrategy()));
+        Settings.Converters.Add(new VersionOptionsJsonConverter());
+        Settings.Converters.Add(new InlineFunctionJsonConverter());
+        Settings.Converters.Add(new SystemTextJsonElementJsonConverter());
     }
 
     private static void JsonErrorHandle(object sender, ErrorEventArgs e)

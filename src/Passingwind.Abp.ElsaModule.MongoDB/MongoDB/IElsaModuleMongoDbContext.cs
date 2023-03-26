@@ -15,5 +15,5 @@ public interface IElsaModuleMongoDbContext : IAbpMongoDbContext
     IMongoCollection<WorkflowDefinitionVersion> WorkflowDefinitionVersions { get; }
     IMongoCollection<WorkflowExecutionLog> WorkflowExecutionLogs { get; }
     IMongoCollection<WorkflowInstance> WorkflowInstances { get; }
-    IMongoCollection<WorkflowGroup> WorkflowGroups { get; } 
+    IMongoCollection<WorkflowGroup> WorkflowGroups { get; }
 }

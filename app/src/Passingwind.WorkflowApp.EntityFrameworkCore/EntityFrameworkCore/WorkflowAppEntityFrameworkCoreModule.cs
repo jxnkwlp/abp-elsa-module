@@ -14,8 +14,8 @@ using Volo.Abp.TenantManagement.EntityFrameworkCore;
 namespace Passingwind.WorkflowApp.EntityFrameworkCore;
 
 [DependsOn(
-    typeof(WorkflowAppDomainModule),
     typeof(ElsaModuleEntityFrameworkCoreModule),
+    typeof(WorkflowAppDomainModule),
     typeof(AbpIdentityEntityFrameworkCoreModule),
     typeof(AbpPermissionManagementEntityFrameworkCoreModule),
     typeof(AbpSettingManagementEntityFrameworkCoreModule),

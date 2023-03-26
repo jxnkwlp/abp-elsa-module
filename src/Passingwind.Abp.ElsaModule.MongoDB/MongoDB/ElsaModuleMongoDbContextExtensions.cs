@@ -2,6 +2,7 @@
 using MongoDB.Bson.Serialization;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.MongoDB.Serializers;
+using Passingwind.Abp.ElsaModule.WorkflowGroups;
 using Volo.Abp;
 using Volo.Abp.MongoDB;
 
@@ -13,9 +14,19 @@ public static class ElsaModuleMongoDbContextExtensions
     {
         Check.NotNull(builder, nameof(builder));
 
-        BsonSerializer.RegisterSerializer<Dictionary<string, object>>(new MongoDictionarySerializer<Dictionary<string, object>>());
-        BsonSerializer.RegisterSerializer<IDictionary<string, object>>(new MongoDictionarySerializer<IDictionary<string, object>>());
+        BsonSerializer.RegisterSerializer<object>(new MongoObjectSerializer());
+
+        BsonSerializer.RegisterSerializer<System.Text.Json.JsonElement>(new MongoJsonElementSerializer());
+
+        BsonSerializer.RegisterSerializer<Newtonsoft.Json.Linq.JObject>(new MongoJObjectSerializer());
+        BsonSerializer.RegisterSerializer<Newtonsoft.Json.Linq.JArray>(new MongoJArraySerializer());
+
         BsonSerializer.RegisterSerializer<Elsa.Models.Variables>(new MongoVariablesSerializer());
+        BsonSerializer.RegisterSerializer<SimpleExceptionModel>(new MongoJsonObjectSerializer<SimpleExceptionModel>());
+
+        BsonSerializer.RegisterSerializer<Dictionary<string, object>>(new MongoJsonObjectSerializer<Dictionary<string, object>>());
+        BsonSerializer.RegisterSerializer<IDictionary<string, object>>(new MongoJsonObjectSerializer<IDictionary<string, object>>());
+
         BsonSerializer.RegisterSerializer<List<Elsa.Models.ScheduledActivity>>(new MongoListSerializer<Elsa.Models.ScheduledActivity>());
         BsonSerializer.RegisterSerializer<List<Elsa.Models.BlockingActivity>>(new MongoListSerializer<Elsa.Models.BlockingActivity>());
         BsonSerializer.RegisterSerializer<List<Elsa.Models.ActivityScope>>(new MongoListSerializer<Elsa.Models.ActivityScope>());
@@ -55,9 +66,55 @@ public static class ElsaModuleMongoDbContextExtensions
             b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstances";
         });
 
+        BsonClassMap.RegisterClassMap<WorkflowInstanceVariable>(b =>
+        {
+            b.AutoMap();
+        });
+
+        BsonClassMap.RegisterClassMap<WorkflowInstanceActivityData>(b =>
+        {
+            b.AutoMap();
+        });
+
+        BsonClassMap.RegisterClassMap<WorkflowInstanceActivityScope>(b =>
+        {
+            b.AutoMap();
+        });
+
+        BsonClassMap.RegisterClassMap<WorkflowInstanceBlockingActivity>(b =>
+        {
+            b.AutoMap();
+        });
+
+        BsonClassMap.RegisterClassMap<WorkflowInstanceFault>(b =>
+        {
+            b.AutoMap();
+        });
+
+        BsonClassMap.RegisterClassMap<WorkflowInstanceMetadata>(b =>
+        {
+            b.AutoMap();
+        });
+
+        BsonClassMap.RegisterClassMap<WorkflowInstanceScheduledActivity>(b =>
+        {
+            b.AutoMap();
+        });
+
         builder.Entity<WorkflowExecutionLog>(b =>
         {
             b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowExecutionLogs";
         });
+
+        builder.Entity<GlobalVariable>(b =>
+        {
+            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "GlobalVariables";
+        });
+
+        builder.Entity<WorkflowGroup>(b =>
+        {
+            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowGroups";
+        });
+
     }
 }

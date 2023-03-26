@@ -21,14 +21,10 @@ public class MongoVariablesSerializer : SerializerBase<Variables>
 
         var document = serializer.Deserialize(context, args);
 
-        if (document == null)
-            return new Variables();
+        var json = document.ToJson();
 
-        var bsonDocument = document.ToBsonDocument();
-
-        var result = bsonDocument.ToJson();
-
-        return new Variables(JsonConvert.DeserializeObject<Dictionary<string, object>>(result));
+        var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json, MongoJsonSerializerSettings.Settings);
+        return new Variables(data);
     }
 
     public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Variables value)
@@ -37,13 +33,11 @@ public class MongoVariablesSerializer : SerializerBase<Variables>
             context.Writer.WriteNull();
         else
         {
-            var jsonDocument = JsonConvert.SerializeObject(value.Data);
-
-            var bsonDocument = BsonSerializer.Deserialize<BsonDocument>(jsonDocument);
+            var json = JsonConvert.SerializeObject(value.Data, MongoJsonSerializerSettings.Settings);
 
             var serializer = BsonSerializer.LookupSerializer(typeof(BsonDocument));
 
-            serializer.Serialize(context, bsonDocument.AsBsonValue);
+            serializer.Serialize(context, BsonDocument.Parse(json));
         }
     }
 }

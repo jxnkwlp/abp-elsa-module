@@ -71,6 +71,7 @@
         <ProjectReference Include="..\Passingwind.WorkflowApp.EntityFrameworkCore\Passingwind.WorkflowApp.EntityFrameworkCore.csproj" />
         <ProjectReference Include="..\Passingwind.WorkflowApp.HttpApi\Passingwind.WorkflowApp.HttpApi.csproj" />
         <ProjectReference Include="..\Passingwind.WorkflowApp.Domain.Shared\Passingwind.WorkflowApp.Domain.Shared.csproj" />
+        <ProjectReference Include="..\Passingwind.WorkflowApp.MongoDB\Passingwind.WorkflowApp.MongoDB.csproj" />
     </ItemGroup>
 
     <ItemGroup>

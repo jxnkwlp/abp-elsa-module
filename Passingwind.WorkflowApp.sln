@@ -61,6 +61,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.Abp.ElsaModule.Installer", "src\Passingwind.Abp.ElsaModule.Installer\Passingwind.Abp.ElsaModule.Installer.csproj", "{0A2A7CD6-D468-4AB8-9A2E-C3EF76BDE2B9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passingwind.WorkflowApp.MongoDB", "app\src\Passingwind.WorkflowApp.MongoDB\Passingwind.WorkflowApp.MongoDB.csproj", "{035E382E-45DD-4B81-959C-DBBE62E27448}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -171,6 +173,10 @@ Global
 		{0A2A7CD6-D468-4AB8-9A2E-C3EF76BDE2B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A2A7CD6-D468-4AB8-9A2E-C3EF76BDE2B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A2A7CD6-D468-4AB8-9A2E-C3EF76BDE2B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{035E382E-45DD-4B81-959C-DBBE62E27448}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{035E382E-45DD-4B81-959C-DBBE62E27448}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{035E382E-45DD-4B81-959C-DBBE62E27448}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{035E382E-45DD-4B81-959C-DBBE62E27448}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -202,6 +208,7 @@ Global
 		{91E8D0B3-0FC1-46DD-9D0E-31CB740CE001} = {93A146E1-E830-4943-A5C3-BC464376C979}
 		{66FA16F1-5D09-450B-986E-E252CB570F72} = {93A146E1-E830-4943-A5C3-BC464376C979}
 		{0A2A7CD6-D468-4AB8-9A2E-C3EF76BDE2B9} = {649A3FFA-182F-4E56-9717-E6A9A2BEC545}
+		{035E382E-45DD-4B81-959C-DBBE62E27448} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28315BFD-90E7-4E14-A2EA-F3D23AF4126F}

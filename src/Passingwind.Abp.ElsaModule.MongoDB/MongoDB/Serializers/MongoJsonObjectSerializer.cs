@@ -1,14 +1,13 @@
-﻿using System;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using Newtonsoft.Json;
 
 namespace Passingwind.Abp.ElsaModule.MongoDB.Serializers;
 
-public class MongoDictionarySerializer<TDictionary> : SerializerBase<TDictionary>
+public class MongoJsonObjectSerializer<TData> : SerializerBase<TData>
 {
-    public override TDictionary Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+    public override TData Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
     {
         if (context.Reader.CurrentBsonType == BsonType.Null)
         {
@@ -20,23 +19,18 @@ public class MongoDictionarySerializer<TDictionary> : SerializerBase<TDictionary
 
         var document = serializer.Deserialize(context, args);
 
-        if (document == null)
-            return Activator.CreateInstance<TDictionary>();
+        var json = document.ToJson();
 
-        var bsonDocument = document.ToBsonDocument();
-
-        var result = bsonDocument.ToJson();
-
-        return JsonConvert.DeserializeObject<TDictionary>(result);
+        return JsonConvert.DeserializeObject<TData>(json, MongoJsonSerializerSettings.Settings);
     }
 
-    public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, TDictionary value)
+    public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, TData value)
     {
         if (value == null)
             context.Writer.WriteNull();
         else
         {
-            var jsonDocument = JsonConvert.SerializeObject(value);
+            var jsonDocument = JsonConvert.SerializeObject(value, MongoJsonSerializerSettings.Settings);
 
             var bsonDocument = BsonSerializer.Deserialize<BsonDocument>(jsonDocument);
 
