@@ -1,0 +1,144 @@
+name: build and pack
+
+on:
+  push:
+    branches: [main, develop]
+  #pull_request:
+  #  branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      # logLevel:
+      #   description: "Log level"
+      #   required: true
+      #   default: "warning"
+      #   type: choice
+      #   options:
+      #     - info
+      #     - warning
+      #     - debug
+      push_nuget:
+        description: "Push nuget packages"
+        required: true
+        type: boolean
+        default: true
+      push_docker:
+        description: "Push docker images"
+        required: true
+        type: boolean
+        default: true
+      push_release:
+        description: "Create release"
+        required: true
+        type: boolean
+        default: true
+
+env:
+  PUSH_DOCKER: ${{ inputs.push_docker || 'false' }}
+  PUSH_NUGET: ${{ inputs.push_nuget || 'false' }}
+  PUSH_RELEASE: ${{ inputs.push_release || 'false' }}
+  # GITCI_NEXT_VERSION: "0.0.1+${{env.GITHUB_SHA_SHORT}}"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{github.workspace}}/src/Passingwind.ElsaDesigner/node_modules
+          key: ${{ runner.os }}-yarn-cache
+          restore-keys: |
+            ${{ runner.os }}-node
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: |
+            6.0.x
+            7.0.x
+
+      - name: Install dotnet tool
+        run: dotnet tool install -g Passingwind.Git-CI-Tools
+
+      - name: Set environment vars
+        uses: rlespinasse/github-slug-action@3.6.0
+
+      - name: Version check and generate
+        run: |
+          gitci release changes --output ./changeslog.md
+          gitci version next --format json --output ./version.json --build-ver "${{env.GITHUB_SHA_SHORT}}" 
+          ls ./
+
+      - id: changes
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            src:
+              - 'src/**'
+
+      - name: DotNet restore dependencies
+        run: dotnet restore Passingwind.WorkflowApp.sln
+
+      - name: DotNet build
+        run: dotnet build --no-restore -c Release Passingwind.WorkflowApp.sln
+
+      - name: DotNet pack
+        # if: steps.changes.outputs.src == 'true'
+        run: dotnet pack --no-build --no-restore -c Release /p:Version="${{env.GITCI_NEXT_VERSION}}" --property:PackageOutputPath=${{github.workspace}}/pack_output Passingwind.Abp.ElsaModule.sln
+
+      - name: DotNet app publish
+        run: dotnet publish ./app/src/Passingwind.WorkflowApp.Web/Passingwind.WorkflowApp.Web.csproj --output ${{github.workspace}}/docker/app -c Release /p:Version="${{env.GITCI_NEXT_VERSION}}"
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      - name: node yarn
+        run: |
+          cd ./src/Passingwind.ElsaDesigner
+          yarn
+
+      - name: npm build
+        run: |
+          cd ./src/Passingwind.ElsaDesigner
+          npm run build
+
+      - name: zip node assets
+        run: |
+          cd ${{github.workspace}}/src/Passingwind.ElsaDesigner
+          zip ${{github.workspace}}/pack_output/workflow-dashboard.zip -r ./dist/*
+
+      - name: Docker build
+        run: |
+          # copy
+          rm -rf ${{github.workspace}}/docker/app/wwwroot/dist/
+          cp -r ${{github.workspace}}/src/Passingwind.ElsaDesigner/dist ${{github.workspace}}/docker/app/wwwroot/
+          # build
+          cd ${{github.workspace}}/docker
+          docker build -t "${{vars.DOCKER_IMAGE_NAME}}:${{env.GITCI_NEXT_VERSION_MAJOR}}.${{env.GITCI_NEXT_VERSION_MINOR}}.${{env.GITCI_NEXT_VERSION_PATCH}}" .
+
+      - name: Docker publish
+        if: ${{ env.PUSH_DOCKER == 'true' }}
+        run: |
+          docker login -u ${{vars.DOCKER_USER_NAME}} -p ${{secrets.DOCKER_USER_AK}}
+          docker push "${{vars.DOCKER_IMAGE_NAME}}:${{env.GITCI_NEXT_VERSION_MAJOR}}.${{env.GITCI_NEXT_VERSION_MINOR}}.${{env.GITCI_NEXT_VERSION_PATCH}}"
+
+      - name: Push dotnet package
+        #if: steps.changes.outputs.src == 'true'
+        if: ${{ env.PUSH_NUGET == 'true' }}
+        run: dotnet nuget push ./pack_output/*.nupkg --skip-duplicate --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
+
+      - name: Create Release
+        #if: steps.changes.outputs.src == 'true'
+        uses: ncipollo/release-action@v1
+        if: ${{ env.PUSH_RELEASE == 'true' }}
+        with:
+          tag: v${{env.GITCI_NEXT_VERSION}}
+          artifacts: ./changeslog*, ./pack_output/*
+          bodyFile: ./changeslog.md
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
