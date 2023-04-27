@@ -1,13 +1,26 @@
 version: '3.8'
 
 services:
-    app:
-        build: .
-        ports:
-            - 10000:80
-        restart: always
-        environment:
-            - TZ=Asia/Shanghai
-        volumes:
-            - ./appsettings.json:/app/appsettings.json
-            #
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    restart: unless-stopped
+    ports:
+      - 1433:1433
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: <YourStrong!Passw0rd>
+      MSSQL_PID: Express
+
+  app:
+    image: passingwind/abp-elsa-app
+    restart: unless-stopped
+    ports:
+      - 10000:80
+    environment:
+      TZ: Asia/Shanghai
+      ConnectionStrings__Default: "Server=db;Database=workflowapp;User Id=sa;Password=<YourStrong!Passw0rd>;TrustServerCertificate=true;"
+      Elsa__Server__BaseUrl: "http://localhost:10000"
+    # volumes:
+    #   - ./appsettings.json:/app/appsettings.json 
+    depends_on:
+      - db

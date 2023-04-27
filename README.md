@@ -1,6 +1,14 @@
 # Abp & Elsa & Designer
 
-Elsa module integration for abp. [![NuGet](https://img.shields.io/nuget/v/Passingwind.Abp.ElsaModule.Domain?style=flat-square)](https://www.nuget.org/packages?q=Passingwind.Abp.ElsaModule)
+[![build and pack](https://github.com/jxnkwlp/abp-elsa-module/actions/workflows/build-pack.yml/badge.svg)](https://github.com/jxnkwlp/abp-elsa-module/actions/workflows/build-pack.yml)
+[![NuGet](https://img.shields.io/nuget/v/Passingwind.Abp.ElsaModule.Domain?style=flat-square)](https://www.nuget.org/packages?q=Passingwind.Abp.ElsaModule) 
+[![Docker Image Version (latest by date)](https://img.shields.io/docker/v/passingwind/abp-elsa-app?label=docker&sort=semver)](https://hub.docker.com/r/passingwind/abp-elsa-app)
+
+Elsa module integration for abp. 
+
+## Quick start
+
+[Docker](./docker/README.md)
 
 ## What's new
 
