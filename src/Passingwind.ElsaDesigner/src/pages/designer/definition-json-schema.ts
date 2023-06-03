@@ -40,7 +40,7 @@ export default {
                     type: 'string',
                 },
                 description: {
-                    type: 'string',
+                    type: ['string', 'null'],
                 },
                 persistWorkflow: {
                     type: 'boolean',
@@ -90,7 +90,7 @@ export default {
                 outcomes: {
                     type: 'array',
                     items: {
-                        type: 'string',
+                        type: ['string', 'null', 'integer'],
                     },
                 },
             },
@@ -108,7 +108,7 @@ export default {
                     $ref: '#/definitions/Expressions',
                 },
                 syntax: {
-                    type: 'string',
+                    type: ['string', 'null'],
                 },
             },
             required: ['expressions'],

@@ -49,6 +49,8 @@ import type {
     NodeTypeProperty,
     NodeUpdateData,
 } from './type';
+import YAML from 'yaml';
+import { Validator } from 'jsonschema';
 
 let codeAnalysisTimer = 0;
 
@@ -583,24 +585,16 @@ const Index: React.FC = () => {
             return;
         }
 
-        const sourceContent = JSON.stringify(
-            {
-                version: targetVersion.version,
-                activities: targetVersion.activities,
-                connections: targetVersion.connections,
-            },
-            null,
-            2,
-        );
-        const targetContent = JSON.stringify(
-            {
-                version: sourceVersionNumber,
-                activities: sourceVersion.activities,
-                connections: sourceVersion.connections,
-            },
-            null,
-            2,
-        );
+        const sourceContent = YAML.stringify({
+            version: targetVersion.version,
+            activities: targetVersion.activities,
+            connections: targetVersion.connections,
+        });
+        const targetContent = YAML.stringify({
+            version: sourceVersionNumber,
+            activities: sourceVersion.activities,
+            connections: sourceVersion.connections,
+        });
 
         if (sourceVersionNumber > targetVersion.version!) {
             setVersionDiffData({ source: sourceContent, target: targetContent });
@@ -629,38 +623,57 @@ const Index: React.FC = () => {
     };
 
     const handleshowJsonEditor = async () => {
-        message.loading(intl.formatMessage({ id: 'common.dict.loading' }), 1);
+        const loading = message.loading(intl.formatMessage({ id: 'common.dict.loading' }), 1);
         const result = await flowAction.current?.getGraphData();
         if (result) {
             const result2 = conventToServerData(result);
-            setJsonEditorValue(JSON.stringify(result2, null, 2));
+            const variables = definition?.variables ?? {};
+            const data2 = { variables, ...result2 };
+            // remove null value key!
+            const yamlString = YAML.stringify(
+                JSON.parse(
+                    JSON.stringify(data2, (key, value) => {
+                        if (value !== null) return value;
+                    }),
+                ),
+            );
+            setJsonEditorValue(yamlString);
             setJsonEditorVisible(true);
+            loading();
         } else {
             message.error('Get graph data failed');
         }
     };
 
     const handleUpdateFromJsonEditor = async () => {
-        message.loading(intl.formatMessage({ id: 'common.dict.loading' }), 1);
+        const loading = message.loading(intl.formatMessage({ id: 'common.dict.loading' }), 1);
         try {
-            const data = JSON.parse(jsonEditorValue);
-            const data2 = { connections: [], activities: data.activities };
-            if (data?.connections) {
-                data2.connections = data.connections?.map((x: any) => {
-                    return {
-                        sourceId: x.sourceId ?? x.sourceActivityId,
-                        targetId: x.targetId ?? x.targetActivityId,
-                        outcome: x.outcome,
-                    };
-                });
+            const data = YAML.parse(jsonEditorValue);
+            const data2 = { connections: data.connections ?? [], activities: data.activities };
+
+            // validation
+            const validateResult = new Validator().validate(data, definitionJsonSchema);
+            // console.debug(validateResult);
+            if (!validateResult.valid) {
+                message.error(validateResult.errors[0].toString(), 3.6);
+            } else {
+                setJsonEditorVisible(false);
+                await loadServerData(data2 as unknown as API.WorkflowDefinitionVersion, false);
+
+                // variables
+                if (data.variables) {
+                    // @ts-ignore
+                    setDefinition({
+                        ...definition,
+                        variables: data.variables,
+                    });
+                }
             }
-
-            setJsonEditorVisible(false);
-
-            await loadServerData(data2 as unknown as API.WorkflowDefinitionVersion, false);
         } catch (error) {
-            message.error('Transform json failed');
+            console.error(error);
+            message.error('Update failed');
         }
+        loading();
     };
 
     const updateMonacorEditorSciptProvider = () => {
@@ -1023,6 +1036,136 @@ const Index: React.FC = () => {
         }
     };
 
+    const renderActionMenus = () => {
+        return [
+            access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'] ? (
+                <>
+                    <Button
+                        key="publish"
+                        type="primary"
+                        disabled={!definition?.name}
+                        loading={submiting}
+                        icon={<GlobalOutlined />}
+                        onClick={async () => {
+                            await handleSaveGraphData(true);
+                        }}
+                    >
+                        {intl.formatMessage({ id: 'page.definition.publish' })}
+                    </Button>
+                    <Button
+                        key="save"
+                        type="default"
+                        disabled={!definition?.name}
+                        loading={submiting}
+                        icon={<SaveOutlined />}
+                        onClick={async () => {
+                            await handleSaveGraphData();
+                        }}
+                    >
+                        {intl.formatMessage({ id: 'common.dict.save' })}
+                    </Button>
+                </>
+            ) : (
+                <></>
+            ),
+
+            <Dropdown.Button
+                key="more"
+                disabled={submiting || !definition?.name}
+                // icon={<SettingOutlined />}
+                onClick={() => {
+                    setEditModalTitle(intl.formatMessage({ id: 'common.dict.edit' }));
+                    setDefinition({
+                        ...definition,
+                        // @ts-ignore
+                        variablesString: JSON.stringify(definition.variables ?? {}),
+                    });
+                    setEditModalVisible(true);
+                }}
+                overlay={
+                    <Menu>
+                        <Menu.Item
+                            key="versions"
+                            onClick={() => {
+                                setVersionListModalVisible(true);
+                            }}
+                            disabled={!definitionId}
+                        >
+                            {intl.formatMessage({ id: 'page.definition.versions' })}
+                        </Menu.Item>
+                        <Menu.Divider />
+                        <Menu.Item key="jsoneditor" onClick={handleshowJsonEditor}>
+                            {intl.formatMessage({
+                                id: 'page.definition.showJsonEditor',
+                            })}
+                        </Menu.Item>
+                        <Menu.Divider />
+                        <Menu.Item
+                            key="export"
+                            disabled={!access['ElsaWorkflow.Definitions.Export']}
+                            onClick={handleOnExport}
+                        >
+                            {intl.formatMessage({ id: 'common.dict.export' })}
+                        </Menu.Item>
+                        <Menu.Item
+                            key="import"
+                            disabled={!access['ElsaWorkflow.Definitions.Import']}
+                            onClick={() => {
+                                setImportModalVisible(true);
+                            }}
+                        >
+                            {intl.formatMessage({ id: 'common.dict.import' })}
+                        </Menu.Item>
+                        <Menu.Divider />
+                        <Menu.Item
+                            key="autoSave"
+                            disabled={!access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish']}
+                            onClick={() => {
+                                if (autoSaveEnabled) {
+                                    message.info(
+                                        intl.formatMessage({
+                                            id: 'page.definition.autoSaveDisabledTips',
+                                        }),
+                                    );
+                                } else {
+                                    message.info(
+                                        intl.formatMessage({
+                                            id: 'page.definition.autoSaveEnabledTips',
+                                        }),
+                                    );
+                                }
+                                setAutoSaveEnabled(!autoSaveEnabled);
+                            }}
+                        >
+                            {autoSaveEnabled
+                                ? intl.formatMessage({
+                                      id: 'page.definition.autoSaveDisabled',
+                                  })
+                                : intl.formatMessage({
+                                      id: 'page.definition.autoSaveEnabled',
+                                  })}
+                        </Menu.Item>
+                    </Menu>
+                }
+            >
+                <SettingOutlined />
+                {intl.formatMessage({ id: 'page.definition.settings' })}
+            </Dropdown.Button>,
+        ];
+    };
+
+    const flowRef = React.useMemo(
+        () => (
+            <Flow
+                actionRef={flowAction}
+                graphData={graphData}
+                onNodeDoubleClick={handleNodeDbClick}
+                onEdgeDoubleClick={handleEdgeDbClick}
+            />
+        ),
+        [graphData],
+    );
+
     useEffect(() => {
         let timer: number | undefined = undefined;
         if (autoSaveEnabled) {
@@ -1117,134 +1260,68 @@ const Index: React.FC = () => {
                 }
                 extra={
                     <Space>
-                        {access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'] ? (
+                        {jsonEditorVisible ? (
                             <>
                                 <Button
+                                    key="save"
                                     type="primary"
                                     disabled={!definition?.name}
                                     loading={submiting}
-                                    icon={<GlobalOutlined />}
                                     onClick={async () => {
-                                        await handleSaveGraphData(true);
-                                    }}
-                                >
-                                    {intl.formatMessage({ id: 'page.definition.publish' })}
-                                </Button>
-                                <Button
-                                    type="default"
-                                    disabled={!definition?.name}
-                                    loading={submiting}
-                                    icon={<SaveOutlined />}
-                                    onClick={async () => {
-                                        await handleSaveGraphData();
+                                        await handleUpdateFromJsonEditor();
                                     }}
                                 >
                                     {intl.formatMessage({ id: 'common.dict.save' })}
                                 </Button>
+                                <Button
+                                    key="cancel"
+                                    type="default"
+                                    disabled={!definition?.name}
+                                    loading={submiting}
+                                    onClick={() => {
+                                        // toggle
+                                        setJsonEditorVisible(false);
+                                    }}
+                                >
+                                    {intl.formatMessage({ id: 'common.dict.cancel' })}
+                                </Button>
                             </>
                         ) : (
-                            <></>
+                            <>{renderActionMenus()}</>
                         )}
-
-                        <Dropdown.Button
-                            disabled={submiting || !definition?.name}
-                            // icon={<SettingOutlined />}
-                            onClick={() => {
-                                setEditModalTitle(intl.formatMessage({ id: 'common.dict.edit' }));
-                                setDefinition({
-                                    ...definition,
-                                    // @ts-ignore
-                                    variablesString: JSON.stringify(definition.variables ?? {}),
-                                });
-                                setEditModalVisible(true);
-                            }}
-                            overlay={
-                                <Menu>
-                                    <Menu.Item
-                                        key="versions"
-                                        onClick={() => {
-                                            setVersionListModalVisible(true);
-                                        }}
-                                        disabled={!definitionId}
-                                    >
-                                        {intl.formatMessage({ id: 'page.definition.versions' })}
-                                    </Menu.Item>
-                                    <Menu.Divider />
-                                    <Menu.Item key="jsoneditor" onClick={handleshowJsonEditor}>
-                                        {intl.formatMessage({
-                                            id: 'page.definition.showJsonEditor',
-                                        })}
-                                    </Menu.Item>
-                                    <Menu.Divider />
-                                    <Menu.Item
-                                        key="export"
-                                        disabled={!access['ElsaWorkflow.Definitions.Export']}
-                                        onClick={handleOnExport}
-                                    >
-                                        {intl.formatMessage({ id: 'common.dict.export' })}
-                                    </Menu.Item>
-                                    <Menu.Item
-                                        key="import"
-                                        disabled={!access['ElsaWorkflow.Definitions.Import']}
-                                        onClick={() => {
-                                            setImportModalVisible(true);
-                                        }}
-                                    >
-                                        {intl.formatMessage({ id: 'common.dict.import' })}
-                                    </Menu.Item>
-                                    <Menu.Divider />
-                                    <Menu.Item
-                                        key="autoSave"
-                                        disabled={
-                                            !access[
-                                                'ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'
-                                            ]
-                                        }
-                                        onClick={() => {
-                                            if (autoSaveEnabled) {
-                                                message.info(
-                                                    intl.formatMessage({
-                                                        id: 'page.definition.autoSaveDisabledTips',
-                                                    }),
-                                                );
-                                            } else {
-                                                message.info(
-                                                    intl.formatMessage({
-                                                        id: 'page.definition.autoSaveEnabledTips',
-                                                    }),
-                                                );
-                                            }
-                                            setAutoSaveEnabled(!autoSaveEnabled);
-                                        }}
-                                    >
-                                        {autoSaveEnabled
-                                            ? intl.formatMessage({
-                                                  id: 'page.definition.autoSaveDisabled',
-                                              })
-                                            : intl.formatMessage({
-                                                  id: 'page.definition.autoSaveEnabled',
-                                              })}
-                                    </Menu.Item>
-                                </Menu>
-                            }
-                        >
-                            <SettingOutlined />
-                            {intl.formatMessage({ id: 'page.definition.settings' })}
-                        </Dropdown.Button>
                     </Space>
                 }
             >
                 <Spin spinning={loading}>
-                    {React.useMemo(
-                        () => (
-                            <Flow
-                                actionRef={flowAction}
-                                graphData={graphData}
-                                onNodeDoubleClick={handleNodeDbClick}
-                                onEdgeDoubleClick={handleEdgeDbClick}
+                    {!jsonEditorVisible ? (
+                        <>{flowRef}</>
+                    ) : (
+                        <div key="jsonEditorWapper" style={{ height: 'calc(100vh - 230px)' }}>
+                            <MonacoEditor
+                                language="yaml"
+                                minimap={true}
+                                value={jsonEditorValue}
+                                onChange={(value) => {
+                                    setJsonEditorValue(value);
+                                }}
+                                options={{
+                                    readOnly: false,
+                                    minimap: { enabled: true, autohide: false },
+                                }}
+                                // onMount={(e, m) => {
+                                //     m.languages.json.jsonDefaults.setDiagnosticsOptions({
+                                //         validate: true,
+                                //         schemas: [
+                                //             {
+                                //                 uri: 'http://myserver/definitionJsonSchema.json',
+                                //                 fileMatch: [e.getModel()!.uri?.toString()],
+                                //                 schema: definitionJsonSchema,
+                                //             },
+                                //         ],
+                                //     });
+                                // }}
                             />
-                        ),
-                        [graphData],
+                        </div>
                     )}
                 </Spin>
             </Card>
@@ -1280,7 +1357,7 @@ const Index: React.FC = () => {
                 <EditFormItems />
             </ModalForm>
             {/* json editor */}
-            <Modal
+            {/* <Modal
                 open={jsonEditorVisible}
                 title={intl.formatMessage({ id: 'page.definition.settings' })}
                 maskClosable={false}
@@ -1317,7 +1394,7 @@ const Index: React.FC = () => {
                         }}
                     />
                 </div>
-            </Modal>
+            </Modal> */}
             {/* node property */}
             <ModalForm
                 form={editNodeFormRef}
@@ -1515,7 +1592,7 @@ const Index: React.FC = () => {
             >
                 <div style={{ height: 'calc(100vh - 150px)' }}>
                     <DiffEditor
-                        language="json"
+                        language="yaml"
                         original={versionDiffData?.source}
                         modified={versionDiffData?.target}
                         options={{
@@ -1524,7 +1601,7 @@ const Index: React.FC = () => {
                             autoClosingBrackets: 'languageDefined',
                             foldingStrategy: 'auto',
                             readOnly: true,
-                            minimap: { enabled: true },
+                            minimap: { enabled: true, autohide: false },
                         }}
                     />
                 </div>

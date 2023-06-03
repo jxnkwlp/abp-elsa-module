@@ -29,6 +29,7 @@ export default {
     'common.dict.delete.success': '删除成功',
     'common.dict.save': '保存',
     'common.dict.save.success': '保存成功',
+    'common.dict.cancel': '取消',
     'common.dict.submit': '提交',
     'common.dict.created.success': '添加成功',
     'common.dict.modified.success': '修改成功',
