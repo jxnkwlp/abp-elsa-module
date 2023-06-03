@@ -29,6 +29,7 @@ export default {
     'common.dict.delete.success': 'Deleted successfully',
     'common.dict.save': 'Save',
     'common.dict.save.success': 'Saved successfully',
+    'common.dict.cancel': 'Cancel',
     'common.dict.submit': 'Submit',
     'common.dict.created.success': 'Added successfully',
     'common.dict.modified.success': 'Successfully modified',
