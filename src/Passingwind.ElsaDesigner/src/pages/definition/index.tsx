@@ -197,7 +197,7 @@ const Index: React.FC = () => {
                     {intl.formatMessage({ id: 'page.definition.view' })}
                 </Link>,
                 access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'] ? (
-                    <Link to={'/designer?id=' + record.id}>
+                    <Link key="designer" to={'/designer?id=' + record.id}>
                         {intl.formatMessage({
                             id: 'page.definition.designer',
                         })}

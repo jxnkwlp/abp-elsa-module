@@ -20,7 +20,19 @@ import ProTable from '@ant-design/pro-table';
 import { DagreLayout } from '@antv/layout';
 import type { Edge, Graph, Node } from '@antv/x6';
 import { DiffEditor } from '@monaco-editor/react';
-import { Button, Card, Dropdown, Menu, message, Modal, Popconfirm, Space, Spin, Tag } from 'antd';
+import {
+    Button,
+    Card,
+    Dropdown,
+    Menu,
+    MenuProps,
+    message,
+    Modal,
+    Popconfirm,
+    Space,
+    Spin,
+    Tag,
+} from 'antd';
 import type { RcFile } from 'antd/lib/upload';
 import { isArray } from 'lodash';
 import * as monaco from 'monaco-editor';
@@ -146,7 +158,7 @@ const Index: React.FC = () => {
 
     const handleOnExport = async () => {
         if (!definition) return;
-
+        const loading2 = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
         const result = await flowAction.current?.getGraphData();
         if (result) {
             const result2 = conventToServerData(result);
@@ -161,12 +173,15 @@ const Index: React.FC = () => {
                     2,
                 ),
             );
+
+            loading2();
         } else {
             message.error('Get graph data failed');
         }
     };
 
     const handleOnImport = async (file: RcFile, autoLayout: boolean = true) => {
+        const loading2 = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
         try {
             const content = await file.text();
             const data = JSON.parse(content);
@@ -1082,45 +1097,55 @@ const Index: React.FC = () => {
                     });
                     setEditModalVisible(true);
                 }}
-                overlay={
-                    <Menu>
-                        <Menu.Item
-                            key="versions"
-                            onClick={() => {
+                menu={{
+                    items: [
+                        {
+                            key: 'versions',
+                            label: intl.formatMessage({ id: 'page.definition.versions' }),
+                            disabled: !definitionId,
+                            onClick: () => {
                                 setVersionListModalVisible(true);
-                            }}
-                            disabled={!definitionId}
-                        >
-                            {intl.formatMessage({ id: 'page.definition.versions' })}
-                        </Menu.Item>
-                        <Menu.Divider />
-                        <Menu.Item key="jsoneditor" onClick={handleshowJsonEditor}>
-                            {intl.formatMessage({
-                                id: 'page.definition.showJsonEditor',
-                            })}
-                        </Menu.Item>
-                        <Menu.Divider />
-                        <Menu.Item
-                            key="export"
-                            disabled={!access['ElsaWorkflow.Definitions.Export']}
-                            onClick={handleOnExport}
-                        >
-                            {intl.formatMessage({ id: 'common.dict.export' })}
-                        </Menu.Item>
-                        <Menu.Item
-                            key="import"
-                            disabled={!access['ElsaWorkflow.Definitions.Import']}
-                            onClick={() => {
+                            },
+                        },
+                        {
+                            type: 'divider',
+                        },
+                        {
+                            key: 'jsoneditor',
+                            label: intl.formatMessage({ id: 'page.definition.showJsonEditor' }),
+                            onClick: handleshowJsonEditor,
+                        },
+                        {
+                            type: 'divider',
+                        },
+                        {
+                            key: 'export',
+                            label: intl.formatMessage({ id: 'common.dict.export' }),
+                            disabled: !access['ElsaWorkflow.Definitions.Export'],
+                            onClick: handleOnExport,
+                        },
+                        {
+                            key: 'import',
+                            label: intl.formatMessage({ id: 'common.dict.import' }),
+                            disabled: !access['ElsaWorkflow.Definitions.Import'],
+                            onClick: () => {
                                 setImportModalVisible(true);
-                            }}
-                        >
-                            {intl.formatMessage({ id: 'common.dict.import' })}
-                        </Menu.Item>
-                        <Menu.Divider />
-                        <Menu.Item
-                            key="autoSave"
-                            disabled={!access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish']}
-                            onClick={() => {
+                            },
+                        },
+                        {
+                            type: 'divider',
+                        },
+                        {
+                            key: 'autoSave',
+                            label: autoSaveEnabled
+                                ? intl.formatMessage({
+                                      id: 'page.definition.autoSaveDisabled',
+                                  })
+                                : intl.formatMessage({
+                                      id: 'page.definition.autoSaveEnabled',
+                                  }),
+                            disabled: !access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'],
+                            onClick: () => {
                                 if (autoSaveEnabled) {
                                     message.info(
                                         intl.formatMessage({
@@ -1135,18 +1160,10 @@ const Index: React.FC = () => {
                                     );
                                 }
                                 setAutoSaveEnabled(!autoSaveEnabled);
-                            }}
-                        >
-                            {autoSaveEnabled
-                                ? intl.formatMessage({
-                                      id: 'page.definition.autoSaveDisabled',
-                                  })
-                                : intl.formatMessage({
-                                      id: 'page.definition.autoSaveEnabled',
-                                  })}
-                        </Menu.Item>
-                    </Menu>
-                }
+                            },
+                        },
+                    ],
+                }}
             >
                 <SettingOutlined />
                 {intl.formatMessage({ id: 'page.definition.settings' })}
