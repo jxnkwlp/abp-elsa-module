@@ -32,6 +32,8 @@ export type NodeTypeProperty = {
     isReadOnly: boolean;
     isRequired: boolean;
     considerValuesAsOutcomes: boolean;
+    defaultWorkflowStorageProvider: string;
+    disableWorkflowProviderSelection: boolean;
 };
 
 export type NodeTypePropertyOption = {
