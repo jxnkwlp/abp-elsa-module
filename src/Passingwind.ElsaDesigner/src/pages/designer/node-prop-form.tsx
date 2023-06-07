@@ -154,7 +154,8 @@ const NodePropFormItem = (
 type NodePropFormProps = {
     workflowDefinitionId?: string;
     activityId: string;
-    properties: NodeTypeProperty[];
+    inProperties: NodeTypeProperty[];
+    outProperties: NodeTypeProperty[];
     // initialValues: object | undefined;
     // setFieldsValue: (value: any) => void;
     // setFieldValue: (key: NamePath, value: any) => void;
@@ -163,7 +164,7 @@ type NodePropFormProps = {
 };
 
 const NodePropForm: React.FC<NodePropFormProps> = (props) => {
-    const { activityId, properties, storageProviders } = props;
+    const { activityId, inProperties: properties, storageProviders } = props;
 
     const intl = useIntl();
 
@@ -367,8 +368,10 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                 ),
             },
             {
-                key: 'storage',
-                label: intl.formatMessage({ id: 'page.designer.settings.storage' }),
+                key: 'activityOutput',
+                label: intl.formatMessage({
+                    id: 'page.designer.settings.storage',
+                }),
                 children: (
                     <Row>
                         <ProFormSwitch
@@ -398,62 +401,77 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                                 id: 'page.designer.settings.field.persistWorkflow.tips',
                             })}
                         />
-                    </Row>
-                ),
-            },
-            {
-                key: 'activityOutput',
-                label: intl.formatMessage({
-                    id: 'page.designer.settings.activityOutputStorageProvider',
-                }),
-                children: (
-                    <Row>
-                        <ProFormSelect
-                            name={['propertyStorageProviders', 'Output']}
-                            label={intl.formatMessage({
-                                id: 'page.designer.settings.field.propertyStorageProviders.output',
-                            })}
-                            extra={intl.formatMessage({
-                                id: 'page.designer.settings.field.propertyStorageProviders.output.tips',
-                            })}
-                            options={[
-                                {
-                                    label: intl.formatMessage({
-                                        id: 'common.dict.default',
-                                    }),
-                                    value: '',
-                                },
-                            ].concat(
-                                storageProviders.map((x: any) => {
-                                    return { label: x.displayName, value: x.name };
-                                }),
-                            )}
-                        />
-                        {(props.properties ?? []).length > 0 ? (
-                            <Divider style={{ marginTop: 0 }} />
+                        {/* Output */}
+                        {(props.outProperties ?? []).length > 0 ? (
+                            <>
+                                <Divider style={{ marginTop: 0 }}>
+                                    {intl.formatMessage({
+                                        id: 'page.designer.settings.field.propertyStorageProviders.output',
+                                    })}
+                                </Divider>
+                                {(props.outProperties ?? []).map((item) => {
+                                    return (
+                                        <ProFormSelect
+                                            key={'propertyStorageProviders_' + item.name}
+                                            name={['propertyStorageProviders', item.name]}
+                                            label={item.label ?? item.name}
+                                            disabled={item.disableWorkflowProviderSelection}
+                                            options={[
+                                                {
+                                                    label: intl.formatMessage({
+                                                        id: 'common.dict.default',
+                                                    }),
+                                                    value: '',
+                                                },
+                                            ].concat(
+                                                storageProviders.map((x: any) => {
+                                                    return {
+                                                        label: x.displayName,
+                                                        value: x.name,
+                                                    };
+                                                }),
+                                            )}
+                                        />
+                                    );
+                                })}
+                            </>
                         ) : null}
-
-                        {(props.properties ?? []).map((item) => {
-                            return (
-                                <ProFormSelect
-                                    key={'propertyStorageProviders_' + item.name}
-                                    name={['propertyStorageProviders', item.name]}
-                                    label={item.label}
-                                    options={[
-                                        {
-                                            label: intl.formatMessage({
-                                                id: 'common.dict.default',
-                                            }),
-                                            value: '',
-                                        },
-                                    ].concat(
-                                        storageProviders.map((x: any) => {
-                                            return { label: x.displayName, value: x.name };
-                                        }),
-                                    )}
-                                />
-                            );
-                        })}
+                        {/* Input */}
+                        {(props.inProperties ?? []).length > 0 ? (
+                            <>
+                                <Divider style={{ marginTop: 0 }}>
+                                    {' '}
+                                    {intl.formatMessage({
+                                        id: 'page.designer.settings.field.propertyStorageProviders.input',
+                                    })}
+                                </Divider>
+                                {(props.inProperties ?? []).map((item) => {
+                                    return (
+                                        <ProFormSelect
+                                            key={'propertyStorageProviders_' + item.name}
+                                            name={['propertyStorageProviders', item.name]}
+                                            label={item.label}
+                                            disabled={item.disableWorkflowProviderSelection}
+                                            options={[
+                                                {
+                                                    label: intl.formatMessage({
+                                                        id: 'common.dict.default',
+                                                    }),
+                                                    value: '',
+                                                },
+                                            ].concat(
+                                                storageProviders.map((x: any) => {
+                                                    return {
+                                                        label: x.displayName,
+                                                        value: x.name,
+                                                    };
+                                                }),
+                                            )}
+                                        />
+                                    );
+                                })}
+                            </>
+                        ) : null}
                     </Row>
                 ),
             },

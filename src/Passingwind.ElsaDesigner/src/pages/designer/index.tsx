@@ -98,7 +98,12 @@ const Index: React.FC = () => {
 
     const [nodeTypePropFormTitle, setNodeTypePropFormTitle] = React.useState<React.ReactNode>('');
     const [nodeTypePropFormVisible, setNodeTypePropFormVisible] = React.useState<boolean>(false);
-    const [nodeTypePropList, setNodeTypePropList] = React.useState<NodeTypeProperty[]>([]);
+    const [nodeTypePropInputList, setNodeTypePropInputList] = React.useState<NodeTypeProperty[]>(
+        [],
+    );
+    const [nodeTypePropOutputList, setNodeTypePropOutputList] = React.useState<NodeTypeProperty[]>(
+        [],
+    );
     const [nodeTypeDescriptor, setNodeTypeDescriptor] =
         React.useState<API.ActivityTypeDescriptor>();
     const [nodePropertySyntaxs, setNodePropertySyntaxs] =
@@ -236,7 +241,7 @@ const Index: React.FC = () => {
 
         setNodeTypeDescriptor(nodeType);
 
-        const propItems = (nodeType.inputProperties ?? [])
+        const inputPropItems = (nodeType.inputProperties ?? [])
             .filter((x) => x.isBrowsable)
             .map((x) => {
                 return {
@@ -245,29 +250,39 @@ const Index: React.FC = () => {
                 } as NodeTypeProperty;
             });
 
+        const outputPropItems = (nodeType.outputProperties ?? [])
+            .filter((x) => x.isBrowsable)
+            .map((x) => {
+                return {
+                    ...x,
+                } as NodeTypeProperty;
+            });
+
         // save to status
-        setNodeTypePropList(propItems ?? []);
+        setNodeTypePropInputList(inputPropItems ?? []);
+        setNodeTypePropOutputList(outputPropItems ?? []);
 
         // build node edit data
+        const originData = node.getData() ?? {};
+        // clear origin
+        delete originData.propertyStorageProviders?.$id;
+        delete originData.propertyStorageProviders?.$type;
+        delete originData.props?.$id;
+        delete originData.props?.$type;
+        delete originData.$id;
+        delete originData.$type;
+        //
         const formData: NodeEditFormData = {
-            ...(node.getData() ?? {}),
+            ...originData,
             id: node.id ?? '',
             displayName: node.data.label, // to displayname
             // new
             props: {},
         };
 
-        //
-        delete formData.propertyStorageProviders?.$id;
-        delete formData.propertyStorageProviders?.$type;
-        delete formData.props?.$id;
-        delete formData.props?.$type;
-        delete formData.$id;
-        delete formData.$type;
-
         // initial all form fields
         const propertySyntaxs = {};
-        propItems?.forEach((propItem) => {
+        inputPropItems?.forEach((propItem) => {
             //
             const propSyntax = getPropertySyntaxes(propItem);
             propertySyntaxs[propItem.name] = propSyntax.supports;
@@ -305,6 +320,26 @@ const Index: React.FC = () => {
                         Literal: syntaxStringValue,
                     },
                 };
+            }
+
+            //
+            if (
+                propItem.defaultWorkflowStorageProvider &&
+                Object.keys(formData.propertyStorageProviders ?? {}).indexOf(propItem.name) == -1
+            ) {
+                formData.propertyStorageProviders[propItem.name] =
+                    propItem.defaultWorkflowStorageProvider;
+            }
+        });
+
+        outputPropItems.forEach((propItem) => {
+            //
+            if (
+                propItem.defaultWorkflowStorageProvider &&
+                Object.keys(formData.propertyStorageProviders ?? {}).indexOf(propItem.name) == -1
+            ) {
+                formData.propertyStorageProviders[propItem.name] =
+                    propItem.defaultWorkflowStorageProvider;
             }
         });
 
@@ -466,7 +501,7 @@ const Index: React.FC = () => {
 
         // combination all output
         const outcomes = nodeTypeDescriptor?.outcomes ?? [];
-        const outcomeValueProp = nodeTypePropList.find((x) => x.considerValuesAsOutcomes);
+        const outcomeValueProp = nodeTypePropInputList.find((x) => x.considerValuesAsOutcomes);
 
         if (outcomeValueProp) {
             const newValue = result.properties.find((x) => x.name == outcomeValueProp.name)?.value;
@@ -1439,7 +1474,8 @@ const Index: React.FC = () => {
                 <NodePropForm
                     workflowDefinitionId={definitionId}
                     activityId={editNodeFormData?.id ?? ''}
-                    properties={nodeTypePropList}
+                    inProperties={nodeTypePropInputList}
+                    outProperties={nodeTypePropOutputList}
                     storageProviders={storageProviders}
                 />
             </ModalForm>
