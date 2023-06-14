@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\..\common.props" />
 
     <PropertyGroup>
@@ -18,7 +18,7 @@
         <PackageReference Include="Basic.Reference.Assemblies" Version="1.4.1" />
         <PackageReference Include="IdentityModel" Version="6.0.0" />
         <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.6.0" />
-        <PackageReference Include="NuGet.Protocol" Version="6.4.0" />
+        <PackageReference Include="NuGet.Protocol" Version="6.4.2" />
     </ItemGroup>
 
     <!--<Target Name="GetLibReferences" AfterTargets="ResolveFrameworkReferences">
