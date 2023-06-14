@@ -1,196 +1,162 @@
 export default {
-    $schema: 'http://json-schema.org/draft-06/schema#',
-    $ref: '#/definitions/Self',
-    definitions: {
-        Self: {
-            type: 'object',
-            additionalProperties: true,
-            properties: {
-                activities: {
-                    type: 'array',
-                    items: {
-                        $ref: '#/definitions/Activity',
+    $schema: 'http://json-schema.org/draft-04/schema#',
+    type: 'object',
+    properties: {
+        activities: {
+            type: 'array',
+            items: [
+                {
+                    type: 'object',
+                    properties: {
+                        activityId: {
+                            type: 'string',
+                        },
+                        type: {
+                            type: 'string',
+                        },
+                        name: {
+                            type: 'string',
+                        },
+                        displayName: {
+                            type: 'string',
+                        },
+                        description: {
+                            type: 'string',
+                        },
+                        persistWorkflow: {
+                            type: 'boolean',
+                        },
+                        loadWorkflowContext: {
+                            type: 'boolean',
+                        },
+                        saveWorkflowContext: {
+                            type: 'boolean',
+                        },
+                        attributes: {
+                            type: 'object',
+                            properties: {
+                                x: {
+                                    type: 'integer',
+                                },
+                                y: {
+                                    type: 'integer',
+                                },
+                                outcomes: {
+                                    type: 'array',
+                                    items: [
+                                        {
+                                            type: ['string', 'integer'],
+                                        },
+                                    ],
+                                },
+                            },
+                            required: ['x', 'y'],
+                        },
+                        properties: {
+                            type: 'array',
+                            items: [
+                                {
+                                    type: 'object',
+                                    properties: {
+                                        name: {
+                                            type: 'string',
+                                        },
+                                        syntax: {
+                                            type: 'string',
+                                        },
+                                        expressions: {
+                                            type: 'object',
+                                            properties: {
+                                                Literal: {
+                                                    type: 'string',
+                                                },
+                                                Json: {
+                                                    type: 'string',
+                                                },
+                                                JavaScript: {
+                                                    type: 'string',
+                                                },
+                                                'C#': {
+                                                    type: 'string',
+                                                },
+                                                SQL: {
+                                                    type: 'string',
+                                                },
+                                            },
+                                            required: [],
+                                        },
+                                    },
+                                    required: ['name', 'expressions'],
+                                },
+                            ],
+                        },
+                        propertyStorageProviders: {
+                            type: 'object',
+                        },
+                        id: {
+                            type: 'string',
+                        },
+                        label: {
+                            type: 'string',
+                        },
                     },
+                    required: ['activityId', 'type', 'name', 'id'],
                 },
-                connections: {
-                    type: 'array',
-                    items: {
-                        $ref: '#/definitions/Connection',
+            ],
+        },
+        connections: {
+            type: 'array',
+            items: [
+                {
+                    type: 'object',
+                    properties: {
+                        sourceId: {
+                            type: 'string',
+                        },
+                        targetId: {
+                            type: 'string',
+                        },
+                        outcome: {
+                            type: 'string',
+                        },
+                        attributes: {
+                            type: 'object',
+                            properties: {
+                                sourcePort: {
+                                    type: 'string',
+                                },
+                                targetPort: {
+                                    type: 'string',
+                                },
+                            },
+                            required: ['sourcePort', 'targetPort'],
+                        },
                     },
+                    required: ['sourceId', 'targetId', 'attributes'],
                 },
-            },
-            required: ['activities', 'connections'],
-            title: 'Self',
+            ],
         },
-        Activity: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-                activityId: {
-                    type: 'string',
-                    format: 'uuid',
-                },
-                type: {
-                    type: 'string',
-                },
-                name: {
-                    type: 'string',
-                },
-                displayName: {
-                    type: 'string',
-                },
-                description: {
-                    type: ['string', 'null'],
-                },
-                persistWorkflow: {
-                    type: 'boolean',
-                },
-                loadWorkflowContext: {
-                    type: 'boolean',
-                },
-                saveWorkflowContext: {
-                    type: 'boolean',
-                },
-                attributes: {
-                    $ref: '#/definitions/ActivityAttributes',
-                },
-                properties: {
-                    type: 'array',
-                    items: {
-                        $ref: '#/definitions/Property',
-                    },
-                },
-                propertyStorageProviders: {
-                    $ref: '#/definitions/PropertyStorageProviders',
-                },
-                id: {
-                    type: 'string',
-                    format: 'uuid',
-                },
-                label: {
-                    type: 'string',
-                },
-                icon: {
-                    type: 'null',
-                },
-            },
-            required: ['activityId', 'attributes', 'id', 'label', 'name', 'properties', 'type'],
-            title: 'Activity',
+        name: {
+            type: 'string',
         },
-        ActivityAttributes: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-                x: {
-                    type: 'integer',
-                },
-                y: {
-                    type: 'integer',
-                },
-                outcomes: {
-                    type: 'array',
-                    items: {
-                        type: ['string', 'null', 'integer'],
-                    },
-                },
-            },
-            required: ['outcomes'],
-            title: 'ActivityAttributes',
+        displayName: {
+            type: 'string',
         },
-        Property: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-                name: {
-                    type: 'string',
-                },
-                expressions: {
-                    $ref: '#/definitions/Expressions',
-                },
-                syntax: {
-                    type: ['string', 'null'],
-                },
-            },
-            required: ['expressions'],
-            title: 'Property',
+        tenantId: {
+            type: 'null',
         },
-        Expressions: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-                Literal: {
-                    type: 'string',
-                },
-                JavaScript: {
-                    type: 'string',
-                },
-                'C#': {
-                    type: 'string',
-                },
-                Json: {
-                    type: 'string',
-                },
-            },
-            required: [],
-            title: 'Expressions',
+        description: {
+            type: 'null',
         },
-        PropertyStorageProviders: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-                Output: {
-                    type: 'string',
-                },
-                Path: {
-                    type: 'string',
-                },
-            },
-            required: [],
-            title: 'PropertyStorageProviders',
+        isSingleton: {
+            type: 'boolean',
         },
-        Connection: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-                sourceId: {
-                    type: 'string',
-                    format: 'uuid',
-                },
-                targetId: {
-                    type: 'string',
-                    format: 'uuid',
-                },
-                sourceActivityId: {
-                    type: 'string',
-                    format: 'uuid',
-                },
-                targetActivityId: {
-                    type: 'string',
-                    format: 'uuid',
-                },
-                outcome: {
-                    type: 'string',
-                },
-                attributes: {
-                    $ref: '#/definitions/ConnectionAttributes',
-                },
-            },
-            required: ['outcome', 'sourceId', 'targetId'],
-            title: 'Connection',
+        deleteCompletedInstances: {
+            type: 'boolean',
         },
-        ConnectionAttributes: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-                sourcePort: {
-                    type: 'string',
-                },
-                targetPort: {
-                    type: 'string',
-                },
-            },
-            required: [],
-            title: 'ConnectionAttributes',
+        id: {
+            type: 'string',
         },
     },
+    // required: ['activities', 'connections', 'name', 'displayName', 'id'],
 };

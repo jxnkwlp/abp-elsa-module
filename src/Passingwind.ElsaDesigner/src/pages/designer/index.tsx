@@ -1,7 +1,4 @@
 import MonacoEditor from '@/components/MonacoEditor';
-import { WorkflowCSharpEditorCompletionItemKind } from '@/services/enums';
-import type { API } from '@/services/typings';
-import { showDownloadJsonFile } from '@/services/utils';
 import { getWorkflowStorageProviders } from '@/services/Workflow';
 import {
     createWorkflowDefinition,
@@ -12,6 +9,9 @@ import {
     getWorkflowDefinitionVersions,
     updateWorkflowDefinition,
 } from '@/services/WorkflowDefinition';
+import { WorkflowCSharpEditorCompletionItemKind } from '@/services/enums';
+import type { API } from '@/services/typings';
+import { showDownloadJsonFile } from '@/services/utils';
 import { GlobalOutlined, SaveOutlined, SettingOutlined } from '@ant-design/icons';
 import { ProFormSwitch, ProFormUploadDragger } from '@ant-design/pro-components';
 import ProForm, { ModalForm, ProFormSelect } from '@ant-design/pro-form';
@@ -20,25 +20,17 @@ import ProTable from '@ant-design/pro-table';
 import { DagreLayout } from '@antv/layout';
 import type { Edge, Graph, Node } from '@antv/x6';
 import { DiffEditor } from '@monaco-editor/react';
-import {
-    Button,
-    Card,
-    Dropdown,
-    Menu,
-    MenuProps,
-    message,
-    Modal,
-    Popconfirm,
-    Space,
-    Spin,
-    Tag,
-} from 'antd';
+import { Button, Card, Dropdown, Modal, Popconfirm, Space, Spin, Tag, message } from 'antd';
 import type { RcFile } from 'antd/lib/upload';
+import { Validator } from 'jsonschema';
 import { isArray } from 'lodash';
 import * as monaco from 'monaco-editor';
+import { setDiagnosticsOptions } from 'monaco-yaml';
 import React, { useEffect, useRef, useState } from 'react';
 import { formatMessage, useAccess, useHistory, useIntl, useLocation } from 'umi';
+import YAML from 'yaml';
 import EditFormItems from '../definition/edit-form-items';
+import VariableForm from '../definition/variableForm';
 import definitionJsonSchema from './definition-json-schema';
 import type { FlowActionType } from './flow';
 import Flow from './flow';
@@ -61,8 +53,6 @@ import type {
     NodeTypeProperty,
     NodeUpdateData,
 } from './type';
-import YAML from 'yaml';
-import { Validator } from 'jsonschema';
 
 let codeAnalysisTimer = 0;
 
@@ -131,6 +121,9 @@ const Index: React.FC = () => {
     const [edgeOutcomFormData, setEdgeOutcomFormData] = useState<EdgeEditFormData>();
 
     const [autoSaveEnabled, setAutoSaveEnabled] = React.useState<boolean>(false);
+
+    const [variableEditModalVisible, setVariableEditModalVisible] = React.useState<boolean>();
+    const [variableData, setVariableData] = React.useState<any>();
 
     const loadServerData = async (
         definiton: API.WorkflowDefinitionVersion,
@@ -610,6 +603,12 @@ const Index: React.FC = () => {
         setEditModalVisible(true);
     };
 
+    const showVariableModel = () => {
+        setEditModalTitle(intl.formatMessage({ id: 'common.dict.edit' }));
+        setVariableData(definition?.variables);
+        setVariableEditModalVisible(true);
+    };
+
     const handleVersionComparison = async (
         sourceVersionNumber: number,
         targetVersionNumber?: number,
@@ -672,17 +671,32 @@ const Index: React.FC = () => {
         loading();
     };
 
-    const handleshowJsonEditor = async () => {
+    const showJsonEditor = async () => {
         const loading = message.loading(intl.formatMessage({ id: 'common.dict.loading' }), 1);
         const result = await flowAction.current?.getGraphData();
         if (result) {
+            setDiagnosticsOptions({
+                validate: true,
+                enableSchemaRequest: true,
+                format: true,
+                hover: true,
+                completion: true,
+                schemas: [
+                    {
+                        uri: 'http://myserver/foo-schema.json',
+                        fileMatch: ['*'],
+                        // @ts-ignore
+                        schema: definitionJsonSchema,
+                    },
+                ],
+            });
             const result2 = conventToServerData(result);
-            const variables = definition?.variables ?? {};
-            const data2 = { variables, ...result2 };
+            // const variables = definition?.variables ?? {};
+            // const data2 = { variables, ...result2 };
             // remove null value key!
             const yamlString = YAML.stringify(
                 JSON.parse(
-                    JSON.stringify(data2, (key, value) => {
+                    JSON.stringify(result2, (key, value) => {
                         if (value !== null) return value;
                     }),
                 ),
@@ -1125,15 +1139,19 @@ const Index: React.FC = () => {
                 // icon={<SettingOutlined />}
                 onClick={() => {
                     setEditModalTitle(intl.formatMessage({ id: 'common.dict.edit' }));
-                    setDefinition({
-                        ...definition,
-                        // @ts-ignore
-                        variablesString: JSON.stringify(definition.variables ?? {}),
-                    });
                     setEditModalVisible(true);
                 }}
                 menu={{
                     items: [
+                        {
+                            key: 'variables',
+                            label: intl.formatMessage({ id: 'page.definition.edit.variables' }),
+                            disabled: !definitionId,
+                            onClick: () => showVariableModel(),
+                        },
+                        {
+                            type: 'divider',
+                        },
                         {
                             key: 'versions',
                             label: intl.formatMessage({ id: 'page.definition.versions' }),
@@ -1148,7 +1166,7 @@ const Index: React.FC = () => {
                         {
                             key: 'jsoneditor',
                             label: intl.formatMessage({ id: 'page.definition.showJsonEditor' }),
-                            onClick: handleshowJsonEditor,
+                            onClick: showJsonEditor,
                         },
                         {
                             type: 'divider',
@@ -1393,8 +1411,6 @@ const Index: React.FC = () => {
                     setDefinition({
                         ...definition,
                         ...formData,
-                        // @ts-ignore
-                        variables: JSON.parse(formData.variablesString ?? '{}'),
                     });
                     return true;
                 }}
@@ -1408,45 +1424,24 @@ const Index: React.FC = () => {
             >
                 <EditFormItems />
             </ModalForm>
-            {/* json editor */}
-            {/* <Modal
-                open={jsonEditorVisible}
-                title={intl.formatMessage({ id: 'page.definition.settings' })}
-                maskClosable={false}
-                width="90%"
-                destroyOnClose
-                bodyStyle={{ padding: 0 }}
-                onCancel={() => setJsonEditorVisible(false)}
-                onOk={async () => {
-                    await handleUpdateFromJsonEditor();
+
+            {/* variable */}
+            <VariableForm
+                data={variableData}
+                visible={variableEditModalVisible}
+                onVisibleChange={setVariableEditModalVisible}
+                onSubmit={async (value: any) => {
+                    console.debug('update variables', value);
+                    // @ts-ignore
+                    setDefinition({
+                        ...definition,
+                        variables: value,
+                    });
+                    // message.success(intl.formatMessage({ id: 'common.dict.save.success' }));
+                    return true;
                 }}
-            >
-                <div key="jsonEditorWapper" style={{ height: 'calc(100vh - 230px)' }}>
-                    <MonacoEditor
-                        language="json"
-                        minimap={true}
-                        value={jsonEditorValue}
-                        onChange={(value) => {
-                            setJsonEditorValue(value);
-                        }}
-                        options={{
-                            readOnly: false,
-                        }}
-                        onMount={(e, m) => {
-                            m.languages.json.jsonDefaults.setDiagnosticsOptions({
-                                validate: true,
-                                schemas: [
-                                    {
-                                        uri: 'http://myserver/definitionJsonSchema.json',
-                                        fileMatch: [e.getModel()!.uri?.toString()],
-                                        schema: definitionJsonSchema,
-                                    },
-                                ],
-                            });
-                        }}
-                    />
-                </div>
-            </Modal> */}
+            />
+
             {/* node property */}
             <ModalForm
                 form={editNodeFormRef}

@@ -456,4 +456,32 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
 
         await _workflowPermissionService.RemoveWorkflowOwnerAsync(entity, user);
     }
+
+    public async Task<WorkflowVariablesDto> GetVariablesAsync(Guid id)
+    {
+        var entity = await _workflowDefinitionRepository.GetAsync(id);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.Default);
+
+        return new WorkflowVariablesDto
+        {
+            Variables = entity.Variables,
+        };
+    }
+
+    public async Task<WorkflowVariablesDto> UpdateVariablesAsync(Guid id, WorkflowVariableUpdateDto input)
+    {
+        var entity = await _workflowDefinitionRepository.GetAsync(id);
+
+        await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish);
+
+        entity.Variables = input.Variables;
+
+        await _workflowDefinitionRepository.UpdateAsync(entity);
+
+        return new WorkflowVariablesDto
+        {
+            Variables = entity.Variables,
+        };
+    }
 }

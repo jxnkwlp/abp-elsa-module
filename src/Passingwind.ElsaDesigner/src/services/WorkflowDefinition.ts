@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 20
+ * Total count: 22
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -137,6 +137,19 @@ export async function getWorkflowDefinitionPreviousVersion(
 }
 
 /**
+ * *TODO* GET /api/elsa/workflow/definitions/{id}/variables 
+ **/
+export async function getWorkflowDefinitionVariables(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowVariables>(`/api/elsa/workflow/definitions/${id}/variables`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
  * *TODO* GET /api/elsa/workflow/definitions/{id}/versions/{version} 
  **/
 export async function getWorkflowDefinitionVersion(
@@ -191,6 +204,21 @@ export async function updateWorkflowDefinitionDefinition(
     options?: { [key: string]: any }
 ) {
     return request<API.WorkflowDefinition>(`/api/elsa/workflow/definitions/${id}/definition`, {
+        method: 'PUT',
+        data: payload,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* PUT /api/elsa/workflow/definitions/{id}/variables 
+ **/
+export async function updateWorkflowDefinitionVariables(
+    id: string,
+    payload: API.WorkflowVariableUpdate,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowVariables>(`/api/elsa/workflow/definitions/${id}/variables`, {
         method: 'PUT',
         data: payload,
         ...(options || {}),

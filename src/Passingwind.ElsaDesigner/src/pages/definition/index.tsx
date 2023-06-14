@@ -184,7 +184,7 @@ const Index: React.FC = () => {
         {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
-            width: 120,
+            width: 150,
             align: 'center',
             fixed: 'right',
             render: (text, record, _, action) => [

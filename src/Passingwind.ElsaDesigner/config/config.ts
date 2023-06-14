@@ -82,14 +82,25 @@ export default defineConfig({
         memo.plugin('monaco-editor-webpack-plugin').use(MonacoWebpackPlugin, [
             {
                 languages: [
-                    'javascript',
                     'json',
+                    'yaml',
+                    'javascript',
                     'typescript',
                     'liquid',
                     'handlebars',
                     'csharp',
                     'sql',
                 ],
+                // customLanguages: [
+                //     {
+                //         label: 'yaml',
+                //         entry: 'monaco-yaml',
+                //         worker: {
+                //             id: 'monaco-yaml/yamlWorker',
+                //             entry: 'monaco-yaml/yaml.worker',
+                //         },
+                //     },
+                // ],
             },
         ]);
         return memo;

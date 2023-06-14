@@ -1,13 +1,7 @@
 import { WorkflowContextFidelity, WorkflowPersistenceBehavior } from '@/services/enums';
-import ProForm, {
-    ProFormSelect,
-    ProFormSwitch,
-    ProFormText,
-    ProFormTextArea,
-} from '@ant-design/pro-form';
+import { ProFormSelect, ProFormSwitch, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { Tabs } from 'antd';
 import { useIntl } from 'umi';
-import MonacorEditorInput from '../designer/form-input/monacor-editor-input';
 
 const EditFormItems: React.FC = () => {
     const intl = useIntl();
@@ -57,15 +51,6 @@ const EditFormItems: React.FC = () => {
                                     rules={[{ max: 256 }]}
                                 />
                             </>
-                        ),
-                    },
-                    {
-                        key: 'variables',
-                        label: intl.formatMessage({ id: 'page.definition.edit.variables' }),
-                        children: (
-                            <ProForm.Item name="variablesString">
-                                <MonacorEditorInput language="json" height={300} />
-                            </ProForm.Item>
                         ),
                     },
                     {

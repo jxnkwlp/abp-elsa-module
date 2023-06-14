@@ -153,6 +153,7 @@
     //     name: 'test',
     //     icon: 'smile',
     //     component: './test',
+    //     access: 'public',
     // },
 
     //
