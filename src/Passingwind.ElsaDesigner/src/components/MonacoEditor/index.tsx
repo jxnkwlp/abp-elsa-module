@@ -43,7 +43,7 @@ const MonacoEditor: React.FC<MonacoEditorProps> = (props) => {
     };
 
     return (
-        <div className={border ? 'monaco-editor-container' : ''}>
+        <div className={border ? 'monaco-editor-container' : ''} style={{ height: '100%' }}>
             <Editor
                 width={width}
                 height={height}
