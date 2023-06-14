@@ -14,6 +14,9 @@ public interface IWorkflowDefinitionAppService : ICrudAppService<WorkflowDefinit
     Task<WorkflowDefinitionDto> GetDefinitionAsync(Guid id);
     Task<WorkflowDefinitionDto> UpdateDefinitionAsync(Guid id, WorkflowDefinitionCreateOrUpdateDto input);
 
+    Task<WorkflowVariablesDto> GetVariablesAsync(Guid id);
+    Task<WorkflowVariablesDto> UpdateVariablesAsync(Guid id, WorkflowVariableUpdateDto input);
+
     Task UnPublishAsync(Guid id);
     Task PublishAsync(Guid id);
 

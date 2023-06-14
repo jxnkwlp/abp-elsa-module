@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 181
+ * Total count: 183
  **/
 import * as Enum from "./enums";
 
@@ -547,6 +547,20 @@ declare namespace API {
         version: number;
         isLatest?: boolean | undefined;
         isPublished?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowVariableUpdate = {
+        variables?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowVariables = {
+        variables?: any | undefined;
     };
 
     /**

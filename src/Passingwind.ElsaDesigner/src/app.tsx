@@ -10,7 +10,7 @@ import Cookies from 'js-cookie';
 import moment from 'moment';
 import * as monaco from 'monaco-editor';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
-import { formatMessage, history, Link } from 'umi';
+import { Link, formatMessage, history } from 'umi';
 import defaultSettings from '../config/defaultSettings';
 import { getAbpApplicationConfiguration } from './services/AbpApplicationConfiguration';
 import type { API } from './services/typings';

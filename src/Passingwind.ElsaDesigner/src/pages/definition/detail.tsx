@@ -2,12 +2,14 @@ import type { API } from '@/services/typings';
 import {
     getWorkflowDefinition,
     getWorkflowDefinitionDefinition,
+    getWorkflowDefinitionVariables,
     getWorkflowDefinitionVersion,
     getWorkflowDefinitionVersions,
+    updateWorkflowDefinitionVariables,
 } from '@/services/WorkflowDefinition';
 import { DownOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Button, Card, Dropdown, Modal, Space, Tag } from 'antd';
+import { Button, Card, Dropdown, Modal, Space, Tag, message } from 'antd';
 import React, { useEffect, useRef } from 'react';
 import { useAccess, useHistory, useIntl, useParams } from 'umi';
 import type { FlowActionType } from '../designer/flow';
@@ -15,6 +17,7 @@ import Flow from '../designer/flow';
 import { conventToGraphData } from '../designer/service';
 import type { IGraphData } from '../designer/type';
 import './detail.less';
+import VariableForm from './variableForm';
 
 const Index: React.FC = () => {
     const history = useHistory();
@@ -34,6 +37,9 @@ const Index: React.FC = () => {
     const [versionList, setVersionList] = React.useState<API.WorkflowDefinitionVersionListItem[]>(
         [],
     );
+
+    const [variableEditModalVisible, setVariableEditModalVisible] = React.useState<boolean>();
+    const [variableData, setVariableData] = React.useState<any>();
 
     const loadVersion = async (id: string, version?: number) => {
         let _data: API.WorkflowDefinitionVersion;
@@ -94,6 +100,22 @@ const Index: React.FC = () => {
         setLoading(false);
     };
 
+    const loadVariable = async () => {
+        const loading = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
+        const result = await getWorkflowDefinitionVariables(id!);
+        loading();
+        setVariableData(result.variables);
+        setVariableEditModalVisible(true);
+    };
+
+    const handleUpdateVariable = async (values: any) => {
+        const loading = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
+        const result = await updateWorkflowDefinitionVariables(id!, { variables: values });
+        loading();
+        message.success(intl.formatMessage({ id: 'common.dict.save.success' }));
+        return result != null;
+    };
+
     useEffect(() => {
         const sid = params.id ?? '';
         if (!sid) {
@@ -111,13 +133,26 @@ const Index: React.FC = () => {
             extra={
                 <Space>
                     {access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'] ? (
-                        <Button
-                            type="primary"
-                            disabled={!data}
-                            onClick={() => history.push(`/designer?id=${data!.id}`)}
-                        >
-                            {intl.formatMessage({ id: 'page.definition.designer' })}
-                        </Button>
+                        <>
+                            <Button
+                                key="designer"
+                                type="primary"
+                                disabled={!data}
+                                onClick={() => history.push(`/designer?id=${data!.id}`)}
+                            >
+                                {intl.formatMessage({ id: 'page.definition.designer' })}
+                            </Button>
+                            <Button
+                                key="variables"
+                                type="default"
+                                disabled={!data}
+                                onClick={() => {
+                                    loadVariable();
+                                }}
+                            >
+                                {intl.formatMessage({ id: 'page.definition.edit.variables' })}
+                            </Button>
+                        </>
                     ) : (
                         <></>
                     )}
@@ -156,6 +191,17 @@ const Index: React.FC = () => {
                     graphData={graphData}
                 />
             </Card>
+
+            {/* variable */}
+            <VariableForm
+                data={variableData}
+                visible={variableEditModalVisible}
+                onVisibleChange={setVariableEditModalVisible}
+                onSubmit={async (value: any) => {
+                    console.debug('update variables', value);
+                    return await handleUpdateVariable(value);
+                }}
+            />
         </PageContainer>
     );
 };

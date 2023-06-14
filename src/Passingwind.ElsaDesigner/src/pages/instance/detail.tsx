@@ -1,12 +1,8 @@
 import MonacoEditor from '@/components/MonacoEditor';
+import { getWorkflowDefinitionVersion } from '@/services/WorkflowDefinition';
+import { getWorkflowInstance, getWorkflowInstanceLogSummary } from '@/services/WorkflowInstance';
 import { WorkflowInstanceStatus } from '@/services/enums';
 import type { API } from '@/services/typings';
-import { getWorkflowDefinitionVersion } from '@/services/WorkflowDefinition';
-import {
-    getWorkflowInstance,
-    getWorkflowInstanceExecutionLogs,
-    getWorkflowInstanceLogSummary,
-} from '@/services/WorkflowInstance';
 import {
     ClockCircleOutlined,
     FieldTimeOutlined,

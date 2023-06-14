@@ -136,4 +136,16 @@ public class WorkflowDefinitionController : ElsaModuleController, IWorkflowDefin
     {
         return _service.DeleteOwnerAsync(id, userId);
     }
+
+    [HttpGet("{id}/variables")]
+    public Task<WorkflowVariablesDto> GetVariablesAsync(Guid id)
+    {
+        return _service.GetVariablesAsync(id);
+    }
+
+    [HttpPut("{id}/variables")]
+    public Task<WorkflowVariablesDto> UpdateVariablesAsync(Guid id, WorkflowVariableUpdateDto input)
+    {
+        return _service.UpdateVariablesAsync(id, input);
+    }
 }
