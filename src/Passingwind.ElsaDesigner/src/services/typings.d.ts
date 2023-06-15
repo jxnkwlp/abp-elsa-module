@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 183
+ * Total count: 186
  **/
 import * as Enum from "./enums";
 
@@ -641,11 +641,12 @@ declare namespace API {
         finishedTime?: string | undefined;
         cancelledTime?: string | undefined;
         faultedTime?: string | undefined;
+        finishedDuration: TimeSpan;
         lastExecutedActivityId?: string | undefined;
         input: WorkflowInputReference;
         output: WorkflowOutputReference;
         currentActivity: WorkflowInstanceScheduledActivity;
-        faults?: WorkflowInstanceFault[] | undefined;
+        faults?: WorkflowInstanceFaultBasic[] | undefined;
         variables?: any | undefined;
         metadata?: any | undefined;
         scheduledActivities?: WorkflowInstanceScheduledActivity[] | undefined;
@@ -691,6 +692,14 @@ declare namespace API {
         finishedTime?: string | undefined;
         cancelledTime?: string | undefined;
         faultedTime?: string | undefined;
+        finishedDuration: TimeSpan;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowInstanceBatchActionRequest = {
+        ids?: string[] | undefined;
     };
 
     /**
@@ -764,6 +773,21 @@ declare namespace API {
      * *TODO*
      **/
     type WorkflowInstanceFault = {
+        id: string;
+        creationTime: string;
+        creatorId?: string | undefined;
+        workflowInstanceId: string;
+        faultedActivityId?: string | undefined;
+        resuming?: boolean | undefined;
+        activityInput?: any | undefined;
+        message?: string | undefined;
+        exception: SimpleExceptionModel;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowInstanceFaultBasic = {
         faultedActivityId?: string | undefined;
         resuming?: boolean | undefined;
         activityInput?: any | undefined;
@@ -795,13 +819,6 @@ declare namespace API {
         finished: number;
         faulted: number;
         suspended: number;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type WorkflowInstancesBatchActionRequest = {
-        ids?: string[] | undefined;
     };
 
     /**
@@ -1064,6 +1081,21 @@ declare namespace API {
      **/
     type WorkflowInstanceBasicPagedResult = {
         items?: WorkflowInstanceBasic[] | undefined;
+        totalCount: number;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowInstanceFaultListResult = {
+        items?: WorkflowInstanceFault[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowInstanceFaultPagedResult = {
+        items?: WorkflowInstanceFault[] | undefined;
         totalCount: number;
     };
 

@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace Passingwind.Abp.ElsaModule.WorkflowInstances;
 
-public class WorkflowInstancesBatchActionRequestDto
+public class WorkflowInstanceBatchActionRequestDto
 {
     public Guid[] Ids { get; set; }
 }

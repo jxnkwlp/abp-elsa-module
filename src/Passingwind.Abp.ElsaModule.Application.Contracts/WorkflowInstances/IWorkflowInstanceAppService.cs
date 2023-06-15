@@ -12,13 +12,13 @@ public interface IWorkflowInstanceAppService : IApplicationService
     Task<WorkflowInstanceDto> GetAsync(Guid id);
 
     Task DeleteAsync(Guid id);
-    Task BatchDeleteAsync(WorkflowInstancesBatchActionRequestDto input);
+    Task BatchDeleteAsync(WorkflowInstanceBatchActionRequestDto input);
 
     Task CancelAsync(Guid id);
-    Task BatchCancelAsync(WorkflowInstancesBatchActionRequestDto input);
+    Task BatchCancelAsync(WorkflowInstanceBatchActionRequestDto input);
 
     Task RetryAsync(Guid id, WorkflowInstanceRetryRequestDto input);
-    Task BatchRetryAsync(WorkflowInstancesBatchActionRequestDto input);
+    Task BatchRetryAsync(WorkflowInstanceBatchActionRequestDto input);
 
     Task DispatchAsync(Guid id, WorkflowInstanceDispatchRequestDto input);
     Task ExecuteAsync(Guid id, WorkflowInstanceExecuteRequestDto input);
@@ -29,8 +29,11 @@ public interface IWorkflowInstanceAppService : IApplicationService
 
     Task<WorkflowInstanceExecutionLogSummaryDto> GetLogSummaryAsync(Guid id);
 
-    Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(WorkflowInstanceGetStatusDateCountStatisticsRequestDto input);
+    Task<ListResultDto<WorkflowInstanceFaultDto>> GetFaultsAsync(Guid id);
+    Task<PagedResultDto<WorkflowInstanceFaultDto>> GetFaultsByWorkflowDefinitionAsync(Guid id, WorkflowInstanceFaultRequestDto input);
 
-    Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync();
+    Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(WorkflowInstanceDateCountStatisticsRequestDto input);
+
+    Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync(WorkflowInstanceStatusCountStatisticsRequestDto input);
 
 }

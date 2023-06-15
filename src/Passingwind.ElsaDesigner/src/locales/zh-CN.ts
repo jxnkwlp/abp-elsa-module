@@ -46,6 +46,8 @@ export default {
     'common.dict.info.tips': '信息提示',
     'common.dict.error.tips': '错误提示',
     'common.dict.success.tips': '成功提示',
+    'common.dict.general': '基本',
+    'common.dict.common': '通用',
     'common.http.response.error.requestFailed': '请求失败',
     'common.http.response.error.networkError1': '网络异常',
     'common.http.response.error.networkError2': '您的网络发生异常，无法连接服务器',

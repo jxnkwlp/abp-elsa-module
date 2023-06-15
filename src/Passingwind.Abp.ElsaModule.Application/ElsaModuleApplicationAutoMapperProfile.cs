@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using AutoMapper;
 using Elsa.Metadata;
 using Passingwind.Abp.ElsaModule.Common;
@@ -73,6 +73,7 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
         CreateMap<WorkflowInstanceBlockingActivity, WorkflowInstanceBlockingActivityDto>();
         CreateMap<WorkflowInstanceActivityScope, WorkflowInstanceActivityScopeDto>();
         CreateMap<WorkflowInstanceActivityData, WorkflowInstanceActivityDataDto>();
+        CreateMap<WorkflowInstanceFault, WorkflowInstanceFaultBasicDto>();
         CreateMap<WorkflowInstanceFault, WorkflowInstanceFaultDto>();
 
         CreateMap<WorkflowExecutionLog, WorkflowExecutionLogDto>();

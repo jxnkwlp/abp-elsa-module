@@ -46,6 +46,8 @@ export default {
     'common.dict.info.tips': 'Notice',
     'common.dict.error.tips': 'Error',
     'common.dict.success.tips': 'Notice',
+    'common.dict.general': 'General',
+    'common.dict.common': 'Common',
     'common.http.response.error.requestFailed': 'Request failed',
     'common.http.response.error.networkError1': 'Network Error',
     'common.http.response.error.networkError2':

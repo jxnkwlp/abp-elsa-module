@@ -33,7 +33,7 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
     {
         var dbset = await GetDbSetAsync();
         return await dbset
-            .WhereIf(definitionIds?.Any()==true, x => definitionIds.Contains( x.WorkflowDefinitionId))
+            .WhereIf(definitionIds?.Any() == true, x => definitionIds.Contains(x.WorkflowDefinitionId))
             .WhereIf(definitionVersionIds?.Any() == true, x => definitionVersionIds.Contains(x.WorkflowDefinitionVersionId))
             .WhereIf(version.HasValue, x => x.Version == version)
             .WhereIf(status.HasValue, x => x.WorkflowStatus == status)
@@ -114,12 +114,19 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus workflowStatus, DateTime startDate, DateTime endDate, double timeZone = 0, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(
+        WorkflowInstanceStatus workflowStatus,
+        DateTime startDate,
+        DateTime endDate,
+        double timeZone = 0,
+        Guid? definitionId = null,
+        CancellationToken cancellationToken = default)
     {
         var dbset = await GetDbSetAsync();
 
         var list = await dbset
               .Where(x => x.WorkflowStatus == workflowStatus && x.CreationTime >= startDate && x.CreationTime <= endDate)
+              .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
               .Select(x => new { x.Id, x.CreationTime })
               .ToListAsync(cancellationToken);
 
@@ -153,5 +160,31 @@ public class WorkflowInstanceRepository : EfCoreRepository<ElsaModuleDbContext, 
         return list
                 .GroupBy(x => x.WorkflowStatus)
                 .ToDictionary(x => x.Key, x => x.Count());
+    }
+
+    public async Task<List<WorkflowInstanceFault>> GetFaultsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var dbset = await GetDbSetAsync();
+        return await dbset.Where(x => x.Id == id).SelectMany(x => x.Faults).ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<WorkflowInstanceFault>> GetFaultsByWorkflowDefinitionAsync(Guid id, int skipCount, int maxResultCount, CancellationToken cancellationToken = default)
+    {
+        var dbset = await GetDbSetAsync();
+        return await dbset
+            .Where(x => x.WorkflowDefinitionId == id)
+            .SelectMany(x => x.Faults)
+            .OrderByDescending(x => x.CreationTime)
+            .PageBy(skipCount, maxResultCount)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<long> GetFaultsCountByWorkflowDefinitionAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var dbset = await GetDbSetAsync();
+        return await dbset
+            .Where(x => x.WorkflowDefinitionId == id)
+            .SelectMany(x => x.Faults)
+            .LongCountAsync(cancellationToken);
     }
 }

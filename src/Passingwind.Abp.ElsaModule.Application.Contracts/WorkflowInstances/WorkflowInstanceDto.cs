@@ -26,11 +26,13 @@ public class WorkflowInstanceDto : AuditedEntityDto<Guid>
     public DateTime? CancelledTime { get; set; }
     public DateTime? FaultedTime { get; set; }
 
+    public TimeSpan? FinishedDuration { get; set; } // => FinishedTime - CreationTime;
+
     public Guid? LastExecutedActivityId { get; set; }
     public WorkflowInputReference Input { get; set; }
     public WorkflowOutputReference Output { get; set; }
     public WorkflowInstanceScheduledActivityDto CurrentActivity { get; set; }
-    public List<WorkflowInstanceFaultDto> Faults { get; set; }
+    public List<WorkflowInstanceFaultBasicDto> Faults { get; set; }
 
     public Dictionary<string, object> Variables { get; set; }
     public Dictionary<string, object> Metadata { get; set; }

@@ -118,7 +118,13 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus workflowStatus, DateTime startDate, DateTime endDate, double timeZone = 0, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<DateTime, int>> GetStatusDateCountStatisticsAsync(
+        WorkflowInstanceStatus workflowStatus,
+        DateTime startDate,
+        DateTime endDate,
+        double timeZone = 0,
+        Guid? definitionId = null,
+        CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
@@ -127,6 +133,8 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
 
         var list = await query
                    .Where(x => x.WorkflowStatus == workflowStatus && x.CreationTime >= startDate2 && x.CreationTime <= endDate2)
+                   .WhereIf(definitionId.HasValue, x => x.WorkflowDefinitionId == definitionId)
+                   .As<IMongoQueryable<WorkflowInstance>>()
                    .Select(x => new { x.Id, x.CreationTime })
                    .ToListAsync(cancellationToken);
 
@@ -156,5 +164,32 @@ public class WorkflowInstanceRepository : MongoDbRepository<IElsaModuleMongoDbCo
             .WhereIf(creationTimes?.Length == 2, x => x.CreationTime >= creationTimes[0] && x.CreationTime <= creationTimes[1])
             .GroupBy(x => x.WorkflowStatus)
             .ToDictionary(x => x.Key, x => x.Count());
+    }
+
+    public async Task<List<WorkflowInstanceFault>> GetFaultsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var dbset = await GetMongoQueryableAsync(cancellationToken);
+        return await dbset.Where(x => x.Id == id).SelectMany(x => x.Faults).ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<WorkflowInstanceFault>> GetFaultsByWorkflowDefinitionAsync(Guid id, int skipCount, int maxResultCount, CancellationToken cancellationToken = default)
+    {
+        var dbset = await GetMongoQueryableAsync(cancellationToken);
+        return await dbset
+            .Where(x => x.WorkflowDefinitionId == id)
+            .SelectMany(x => x.Faults)
+            .OrderByDescending(x => x.CreationTime)
+            .PageBy(skipCount, maxResultCount)
+            .As<IMongoQueryable<WorkflowInstanceFault>>()
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<long> GetFaultsCountByWorkflowDefinitionAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var dbset = await GetMongoQueryableAsync(cancellationToken);
+        return await dbset
+            .Where(x => x.WorkflowDefinitionId == id)
+            .SelectMany(x => x.Faults)
+            .LongCountAsync(cancellationToken);
     }
 }

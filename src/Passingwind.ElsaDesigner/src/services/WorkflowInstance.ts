@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 15
+ * Total count: 17
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -12,7 +12,7 @@ import { request } from 'umi';
  * *TODO* DELETE /api/elsa/workflow/instances 
  **/
 export async function batchDeleteWorkflowInstance(
-    payload: API.WorkflowInstancesBatchActionRequest,
+    payload: API.WorkflowInstanceBatchActionRequest,
     options?: { [key: string]: any }
 ) {
     return request<any>(`/api/elsa/workflow/instances`, {
@@ -77,6 +77,37 @@ export async function getWorkflowInstanceExecutionLogs(
 }
 
 /**
+ * *TODO* GET /api/elsa/workflow/instances/{id}/faults 
+ **/
+export async function getWorkflowInstanceFaults(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowInstanceFaultListResult>(`/api/elsa/workflow/instances/${id}/faults`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/elsa/workflow/instances/faults/by-definition/{id} 
+ **/
+export async function getWorkflowInstanceFaultsByWorkflowDefinition(
+    id: string,
+    params: {
+        skipCount?: number | undefined,
+        maxResultCount?: number | undefined
+    },
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowInstanceFaultPagedResult>(`/api/elsa/workflow/instances/faults/by-definition/${id}`, {
+        method: 'GET',
+        params: params,
+        ...(options || {}),
+    });
+}
+
+/**
  * *TODO* GET /api/elsa/workflow/instances 
  **/
 export async function getWorkflowInstanceList(
@@ -120,10 +151,14 @@ export async function getWorkflowInstanceLogSummary(
  * *TODO* GET /api/elsa/workflow/instances/statistics/status 
  **/
 export async function getWorkflowInstanceStatusCountStatistics(
+    params: {
+        workflowDefinitionId?: string | undefined
+    },
     options?: { [key: string]: any }
 ) {
     return request<API.WorkflowInstanceStatusCountStatisticsResult>(`/api/elsa/workflow/instances/statistics/status`, {
         method: 'GET',
+        params: params,
         ...(options || {}),
     });
 }
@@ -134,7 +169,8 @@ export async function getWorkflowInstanceStatusCountStatistics(
 export async function getWorkflowInstanceStatusDateCountStatistics(
     params: {
         datePeriod?: number | undefined,
-        tz?: number | undefined
+        tz?: number | undefined,
+        workflowDefinitionId?: string | undefined
     },
     options?: { [key: string]: any }
 ) {
@@ -149,7 +185,7 @@ export async function getWorkflowInstanceStatusDateCountStatistics(
  * *TODO* POST /api/elsa/workflow/instances/cancel 
  **/
 export async function workflowInstanceBatchCancel(
-    payload: API.WorkflowInstancesBatchActionRequest,
+    payload: API.WorkflowInstanceBatchActionRequest,
     options?: { [key: string]: any }
 ) {
     return request<any>(`/api/elsa/workflow/instances/cancel`, {
@@ -164,7 +200,7 @@ export async function workflowInstanceBatchCancel(
  * *TODO* POST /api/elsa/workflow/instances/retry 
  **/
 export async function workflowInstanceBatchRetry(
-    payload: API.WorkflowInstancesBatchActionRequest,
+    payload: API.WorkflowInstanceBatchActionRequest,
     options?: { [key: string]: any }
 ) {
     return request<any>(`/api/elsa/workflow/instances/retry`, {

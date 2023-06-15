@@ -351,6 +351,7 @@ const Index: React.FC = () => {
                             title: intl.formatMessage({ id: 'page.instance.field.name' }),
                             dataIndex: 'name',
                             copyable: true,
+                            ellipsis: true,
                         },
                         {
                             title: intl.formatMessage({ id: 'page.instance.field.correlationId' }),

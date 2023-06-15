@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Elsa.Models;
 using Elsa.Services.Models;
@@ -40,6 +40,8 @@ public class WorkflowInstance : FullAuditedAggregateRoot<Guid>, IMultiTenant
     public DateTime? CancelledTime { get; set; }
     public DateTime? FaultedTime { get; set; }
     public Guid? LastExecutedActivityId { get; set; }
+
+    public TimeSpan? FinishedDuration { get; set; }
 
     public WorkflowInputReference Input { get; set; }
 

@@ -19,19 +19,19 @@ public class WorkflowInstanceController : ElsaModuleController, IWorkflowInstanc
     }
 
     [HttpPost("cancel")]
-    public Task BatchCancelAsync(WorkflowInstancesBatchActionRequestDto input)
+    public Task BatchCancelAsync(WorkflowInstanceBatchActionRequestDto input)
     {
         return _service.BatchCancelAsync(input);
     }
 
     [HttpDelete]
-    public Task BatchDeleteAsync([FromBody] WorkflowInstancesBatchActionRequestDto input)
+    public Task BatchDeleteAsync([FromBody] WorkflowInstanceBatchActionRequestDto input)
     {
         return _service.BatchDeleteAsync(input);
     }
 
     [HttpPost("retry")]
-    public Task BatchRetryAsync(WorkflowInstancesBatchActionRequestDto input)
+    public Task BatchRetryAsync(WorkflowInstanceBatchActionRequestDto input)
     {
         return _service.BatchRetryAsync(input);
     }
@@ -78,6 +78,18 @@ public class WorkflowInstanceController : ElsaModuleController, IWorkflowInstanc
         return _service.GetExecutionLogsAsync(id);
     }
 
+    [HttpGet("{id}/faults")]
+    public Task<ListResultDto<WorkflowInstanceFaultDto>> GetFaultsAsync(Guid id)
+    {
+        return _service.GetFaultsAsync(id);
+    }
+
+    [HttpGet("faults/by-definition/{id}")]
+    public Task<PagedResultDto<WorkflowInstanceFaultDto>> GetFaultsByWorkflowDefinitionAsync(Guid id, WorkflowInstanceFaultRequestDto input)
+    {
+        return _service.GetFaultsByWorkflowDefinitionAsync(id, input);
+    }
+
     [HttpGet()]
     public virtual Task<PagedResultDto<WorkflowInstanceBasicDto>> GetListAsync(WorkflowInstanceListRequestDto input)
     {
@@ -91,13 +103,13 @@ public class WorkflowInstanceController : ElsaModuleController, IWorkflowInstanc
     }
 
     [HttpGet("statistics/status")]
-    public Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync()
+    public Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync(WorkflowInstanceStatusCountStatisticsRequestDto input)
     {
-        return _service.GetStatusCountStatisticsAsync();
+        return _service.GetStatusCountStatisticsAsync(input);
     }
 
     [HttpGet("statistics/count-date")]
-    public Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(WorkflowInstanceGetStatusDateCountStatisticsRequestDto input)
+    public Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(WorkflowInstanceDateCountStatisticsRequestDto input)
     {
         return _service.GetStatusDateCountStatisticsAsync(input);
     }
@@ -107,5 +119,4 @@ public class WorkflowInstanceController : ElsaModuleController, IWorkflowInstanc
     {
         return _service.RetryAsync(id, input);
     }
-
 }
