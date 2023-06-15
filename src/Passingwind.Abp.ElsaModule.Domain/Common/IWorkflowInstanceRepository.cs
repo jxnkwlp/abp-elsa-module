@@ -69,6 +69,11 @@ public interface IWorkflowInstanceRepository : IRepository<WorkflowInstance, Gui
         DateTime startDate,
         DateTime endDate,
         double timeZone = 0,
+        Guid? definitionId = null,
         CancellationToken cancellationToken = default);
 
+    Task<List<WorkflowInstanceFault>> GetFaultsAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task<List<WorkflowInstanceFault>> GetFaultsByWorkflowDefinitionAsync(Guid id, int skipCount, int maxResultCount, CancellationToken cancellationToken = default);
+    Task<long> GetFaultsCountByWorkflowDefinitionAsync(Guid id, CancellationToken cancellationToken = default);
 }

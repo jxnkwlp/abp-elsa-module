@@ -217,7 +217,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Delete)]
-    public async Task BatchDeleteAsync(WorkflowInstancesBatchActionRequestDto input)
+    public async Task BatchDeleteAsync(WorkflowInstanceBatchActionRequestDto input)
     {
         if (input?.Ids?.Any() == true)
         {
@@ -280,7 +280,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Statistic)]
-    public async Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(WorkflowInstanceGetStatusDateCountStatisticsRequestDto input)
+    public async Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(WorkflowInstanceDateCountStatisticsRequestDto input)
     {
         var datePeriod = input.DatePeriod ?? 30;
         if (datePeriod <= 0)
@@ -291,10 +291,24 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         var endDate = Clock.Now;
         var startDate = Clock.Now.Date.AddDays(-datePeriod);
 
-        var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync($"workflow:instance:status:datecount:statistics:{datePeriod}:tz:{tz}", async () =>
+        string cacheKey = $"workflow:instance:all:statistics:datecount:dateperiod:{datePeriod}:tz:{tz}";
+        if (input.WorkflowDefinitionId.HasValue)
+            cacheKey = $"workflow:instance:{input.WorkflowDefinitionId}:statistics:datecount:dateperiod:{datePeriod}:tz:{tz}";
+
+        var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync(cacheKey, async () =>
         {
-            var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Finished, startDate, endDate, timeZone: tz);
-            var faulted = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(WorkflowInstanceStatus.Faulted, startDate, endDate, timeZone: tz);
+            var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(
+                WorkflowInstanceStatus.Finished,
+                startDate,
+                endDate,
+                timeZone: tz,
+                definitionId: input.WorkflowDefinitionId);
+            var faulted = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(
+                WorkflowInstanceStatus.Faulted,
+                startDate,
+                endDate,
+                timeZone: tz,
+                definitionId: input.WorkflowDefinitionId);
 
             var dto = new WorkflowInstanceDateCountStatisticsResultDto();
 
@@ -312,39 +326,51 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
             return dto;
         }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
         {
-            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(10),
+            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(5),
         });
 
         return dto;
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Statistic)]
-    public async Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync()
+    public async Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync(WorkflowInstanceStatusCountStatisticsRequestDto input)
     {
-        return await _workflowInstanceStatusCountStatisticsDistributedCache.GetOrAddAsync("workflow:instance:status:count:statistic", async () =>
-               {
-                   var allCount = await _workflowInstanceRepository.LongCountAsync();
-                   var runningCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Running);
-                   var faultedCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Faulted);
-                   var suspendedCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Suspended);
-                   var finishedCount = await _workflowInstanceRepository.LongCountAsync(status: WorkflowInstanceStatus.Finished);
+        string cacheKey = "workflow:instance:all:statistic:statuscount";
+        if (input.WorkflowDefinitionId.HasValue)
+            cacheKey = $"workflow:instance:{input.WorkflowDefinitionId}:statistic:statuscount";
 
-                   return new WorkflowInstanceStatusCountStatisticsResultDto
-                   {
-                       All = allCount,
-                       Faulted = faultedCount,
-                       Finished = finishedCount,
-                       Suspended = suspendedCount,
-                       Running = runningCount,
-                   };
-               }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
-               {
-                   AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(2),
-               });
+        return await _workflowInstanceStatusCountStatisticsDistributedCache.GetOrAddAsync(cacheKey, async () =>
+        {
+            var allCount = await _workflowInstanceRepository.LongCountAsync(definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null);
+            var runningCount = await _workflowInstanceRepository.LongCountAsync(
+                status: WorkflowInstanceStatus.Running,
+                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null);
+            var faultedCount = await _workflowInstanceRepository.LongCountAsync(
+                status: WorkflowInstanceStatus.Faulted,
+                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null);
+            var suspendedCount = await _workflowInstanceRepository.LongCountAsync(
+                status: WorkflowInstanceStatus.Suspended,
+                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null);
+            var finishedCount = await _workflowInstanceRepository.LongCountAsync(
+                status: WorkflowInstanceStatus.Finished,
+                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null);
+
+            return new WorkflowInstanceStatusCountStatisticsResultDto
+            {
+                All = allCount,
+                Faulted = faultedCount,
+                Finished = finishedCount,
+                Suspended = suspendedCount,
+                Running = runningCount,
+            };
+        }, () => new Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions
+        {
+            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(2),
+        });
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
-    public async Task BatchCancelAsync(WorkflowInstancesBatchActionRequestDto input)
+    public async Task BatchCancelAsync(WorkflowInstanceBatchActionRequestDto input)
     {
         // TODO check permissions
 
@@ -358,7 +384,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
-    public async Task BatchRetryAsync(WorkflowInstancesBatchActionRequestDto input)
+    public async Task BatchRetryAsync(WorkflowInstanceBatchActionRequestDto input)
     {
         // TODO check permissions
 
@@ -371,4 +397,18 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         }
     }
 
+    public async Task<ListResultDto<WorkflowInstanceFaultDto>> GetFaultsAsync(Guid id)
+    {
+        var list = await _workflowInstanceRepository.GetFaultsAsync(id);
+
+        return new ListResultDto<WorkflowInstanceFaultDto>(ObjectMapper.Map<List<WorkflowInstanceFault>, List<WorkflowInstanceFaultDto>>(list));
+    }
+
+    public async Task<PagedResultDto<WorkflowInstanceFaultDto>> GetFaultsByWorkflowDefinitionAsync(Guid id, WorkflowInstanceFaultRequestDto input)
+    {
+        var count = await _workflowInstanceRepository.GetFaultsCountByWorkflowDefinitionAsync(id);
+        var list = await _workflowInstanceRepository.GetFaultsByWorkflowDefinitionAsync(id, input.SkipCount, input.MaxResultCount);
+
+        return new PagedResultDto<WorkflowInstanceFaultDto>(count, ObjectMapper.Map<List<WorkflowInstanceFault>, List<WorkflowInstanceFaultDto>>(list));
+    }
 }

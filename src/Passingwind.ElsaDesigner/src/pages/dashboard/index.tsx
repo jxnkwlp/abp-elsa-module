@@ -25,7 +25,7 @@ const Index: React.FC = () => {
 
     useEffect(() => {
         const load = async () => {
-            const result = await getWorkflowInstanceStatusCountStatistics();
+            const result = await getWorkflowInstanceStatusCountStatistics({});
             setAllStatusStatisticsCount(result);
         };
 

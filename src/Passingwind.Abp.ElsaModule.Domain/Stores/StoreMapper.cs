@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
@@ -25,6 +25,21 @@ public class StoreMapper : IStoreMapper
     {
         _clock = clock;
         _guidGenerator = guidGenerator;
+    }
+
+    protected virtual DateTime? ToDateTime(Instant? instant)
+    {
+        if (instant == null)
+            return null;
+
+        if (_clock.Kind == DateTimeKind.Utc)
+        {
+            return instant.Value.ToDateTimeUtc();
+        }
+        else
+        {
+            return instant.Value.ToDateTimeUtc().ToLocalTime();
+        }
     }
 
     protected virtual DateTime ToDateTime(Instant instant)
@@ -336,17 +351,17 @@ public class StoreMapper : IStoreMapper
 
     public virtual WorkflowInstance MapToEntity(WorkflowInstanceModel model)
     {
-        return new WorkflowInstance(model.Id.ToGuid().Value)
+        var entity = new WorkflowInstance(model.Id.ToGuid().Value)
         {
             Name = model.Name,
 
             Version = model.Version,
             WorkflowStatus = (WorkflowInstanceStatus)(int)model.WorkflowStatus,
 
-            CancelledTime = model.CancelledAt.HasValue ? ToDateTime(model.CancelledAt.Value) : null,
-            FaultedTime = model.FaultedAt.HasValue ? ToDateTime(model.FaultedAt.Value) : null,
-            FinishedTime = model.FinishedAt.HasValue ? ToDateTime(model.FinishedAt.Value) : null,
-            LastExecutedTime = model.LastExecutedAt.HasValue ? ToDateTime(model.LastExecutedAt.Value) : null,
+            CancelledTime = ToDateTime(model.CancelledAt),
+            FaultedTime = ToDateTime(model.FaultedAt),
+            FinishedTime = ToDateTime(model.FinishedAt),
+            LastExecutedTime = ToDateTime(model.LastExecutedAt),
 
             ContextId = model.ContextId,
             ContextType = model.ContextType,
@@ -376,6 +391,13 @@ public class StoreMapper : IStoreMapper
             ActivityScopes = model.Scopes.Select(x => new WorkflowInstanceActivityScope { ActivityId = Guid.Parse(x.ActivityId), Variables = (Dictionary<string, object>)x.Variables.Data, }).ToList(),
 
         };
+
+        // update
+        if (entity.FinishedTime.HasValue)
+            entity.FinishedDuration = entity.FinishedTime - entity.CreationTime;
+        else if (entity.FaultedTime.HasValue)
+            entity.FinishedDuration = entity.FaultedTime - entity.CreationTime;
+        return entity;
     }
 
     public virtual WorkflowInstance MapToEntity(WorkflowInstanceModel model, WorkflowInstance entity)
@@ -390,6 +412,11 @@ public class StoreMapper : IStoreMapper
         entity.FaultedTime = model.FaultedAt.HasValue ? ToDateTime(model.FaultedAt.Value) : null;
         entity.FinishedTime = model.FinishedAt.HasValue ? ToDateTime(model.FinishedAt.Value) : null;
         entity.LastExecutedTime = model.LastExecutedAt.HasValue ? ToDateTime(model.LastExecutedAt.Value) : null;
+
+        if (entity.FinishedTime.HasValue)
+            entity.FinishedDuration = entity.FinishedTime - entity.CreationTime;
+        else if (entity.FaultedTime.HasValue)
+            entity.FinishedDuration = entity.FaultedTime - entity.CreationTime;
 
         entity.ContextId = model.ContextId;
         entity.ContextType = model.ContextType;

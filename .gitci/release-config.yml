@@ -8,7 +8,7 @@
   minor:
     commits:
       - "[feat]"
-      - "feat"
+      - "feat:"
       - "⬆️"
       - ":arrow_up:"
       - "🚀"
@@ -18,7 +18,7 @@
   patch:
     commits:
       - "[fix]"
-      - "fix"
+      - "fix:"
       - ":bug:"
       - "🐛"
     labels:

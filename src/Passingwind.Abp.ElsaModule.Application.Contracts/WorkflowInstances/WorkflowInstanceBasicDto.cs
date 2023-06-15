@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Passingwind.Abp.ElsaModule.Common;
 using Volo.Abp.Application.Dtos;
 
@@ -22,4 +22,5 @@ public class WorkflowInstanceBasicDto : AuditedEntityDto<Guid>
     public DateTime? FinishedTime { get; set; }
     public DateTime? CancelledTime { get; set; }
     public DateTime? FaultedTime { get; set; }
+    public TimeSpan? FinishedDuration { get; set; }
 }
