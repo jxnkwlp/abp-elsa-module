@@ -19,44 +19,11 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
 
-        //CreateMap<WorkflowDefinitionCreateOrUpdateDto, WorkflowDefinition>()
-        //    .Ignore(x => x.TenantId)
-        //    .Ignore(x => x.LatestVersion)
-        //    .Ignore(x => x.PublishedVersion)
-        //    .Ignore(x => x.Id)
-        //    .Ignore(x => x.ContextOptions)
-        //    .Ignore(x => x.CustomAttributes)
-        //    .Ignore(x => x.Variables)
-        //    .Ignore(x => x.ConcurrencyStamp)
-        //    .Ignore(x => x.ExtraProperties)
-        //    .IgnoreFullAuditedObjectProperties();
-
-        //CreateMap<WorkflowDefinitionVersionCreateOrUpdateDto, WorkflowDefinitionVersion>()
-        //    .Ignore(x => x.TenantId)
-        //    //.Ignore(x => x.Definition)
-        //    .Ignore(x => x.DefinitionId)
-        //    .Ignore(x => x.Id)
-        //    .Ignore(x => x.IsLatest)
-        //    //.Ignore(x => x.IsPublished)
-        //    .Ignore(x => x.Version)
-        //    .IgnoreFullAuditedObjectProperties();
-
-        CreateMap<WorkflowDefinitionVersion, WorkflowDefinitionVersionListItemDto>();
         CreateMap<WorkflowDefinition, WorkflowDefinitionDto>();
+        CreateMap<WorkflowDefinition, WorkflowDefinitionBasicDto>();
+        CreateMap<WorkflowDefinitionVersion, WorkflowDefinitionVersionListItemDto>();
         CreateMap<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>()
             .Ignore(x => x.Definition);
-
-        //CreateMap<ActivityCreateOrUpdateDto, Activity>()
-        //    .Ignore(x => x.WorkflowDefinitionVersionId)
-        //    .IgnoreAuditedObjectProperties();
-
-        //CreateMap<ActivityConnectionDto, ActivityConnection>()
-        //    .Ignore(x => x.WorkflowDefinitionVersionId)
-        //    .IgnoreCreationAuditedObjectProperties();
-
-        //CreateMap<ActivityConnectionCreateDto, ActivityConnection>()
-        //    .Ignore(x => x.WorkflowDefinitionVersionId)
-        //    .IgnoreCreationAuditedObjectProperties();
 
         CreateMap<Activity, ActivityDto>();
         CreateMap<ActivityConnection, ActivityConnectionDto>();

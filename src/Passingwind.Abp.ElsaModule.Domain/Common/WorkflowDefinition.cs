@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Elsa.Models;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
@@ -14,9 +15,9 @@ public class WorkflowDefinition : FullAuditedAggregateRoot<Guid>, IMultiTenant
         CustomAttributes = new Dictionary<string, object>();
     }
 
+    [JsonConstructor]
     public WorkflowDefinition(Guid id) : base(id)
     {
-
     }
 
     public WorkflowDefinition(Guid id, string name, string displayName, Guid? tenantId, string description, bool isSingleton, bool deleteCompletedInstances, string channel, string tag, WorkflowPersistenceBehavior persistenceBehavior, WorkflowContextOptions contextOptions, Dictionary<string, object> variables, Dictionary<string, object> customAttributes) : base(id)
@@ -35,11 +36,19 @@ public class WorkflowDefinition : FullAuditedAggregateRoot<Guid>, IMultiTenant
         CustomAttributes = customAttributes ?? new Dictionary<string, object>();
     }
 
-    public string Name { get; set; }
+    public WorkflowDefinition(Guid id, string name, Guid? tenantId) : base(id)
+    {
+        Name = name;
+        TenantId = tenantId;
+        Variables = new Dictionary<string, object>();
+        CustomAttributes = new Dictionary<string, object>();
+    }
+
+    public string Name { get; protected set; }
 
     public string DisplayName { get; set; }
 
-    public Guid? TenantId { get; protected set; }
+    public Guid? TenantId { get; set; }
 
     public string Description { get; set; }
 
@@ -79,4 +88,8 @@ public class WorkflowDefinition : FullAuditedAggregateRoot<Guid>, IMultiTenant
         PublishedVersion = version;
     }
 
+    public void ChangeName(string name)
+    {
+        Name = name;
+    }
 }

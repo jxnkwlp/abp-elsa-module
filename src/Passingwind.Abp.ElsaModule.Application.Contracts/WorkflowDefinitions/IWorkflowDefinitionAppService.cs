@@ -2,10 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Content;
 
 namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 
-public interface IWorkflowDefinitionAppService : ICrudAppService<WorkflowDefinitionVersionDto, WorkflowDefinitionDto, Guid, WorkflowDefinitionListRequestDto, WorkflowDefinitionVersionCreateOrUpdateDto, WorkflowDefinitionVersionCreateOrUpdateDto>
+public interface IWorkflowDefinitionAppService : ICrudAppService<WorkflowDefinitionVersionDto, WorkflowDefinitionBasicDto, Guid, WorkflowDefinitionListRequestDto, WorkflowDefinitionVersionCreateOrUpdateDto, WorkflowDefinitionVersionCreateOrUpdateDto>
 {
     Task<PagedResultDto<WorkflowDefinitionVersionListItemDto>> GetVersionsAsync(Guid id, WorkflowDefinitionVersionListRequestDto input);
     Task DeleteVersionAsync(Guid id, int version);
@@ -32,4 +33,8 @@ public interface IWorkflowDefinitionAppService : ICrudAppService<WorkflowDefinit
 
     Task AddOwnerAsync(Guid id, WorkflowDefinitionAddOwnerRequestDto input);
     Task DeleteOwnerAsync(Guid id, Guid userId);
+
+    Task<IRemoteStreamContent> ExportAsync(WorkflowDefinitionExportRequestDto input);
+    Task<WorkflowDefinitionImportResultDto> ImportAsync(WorkflowDefinitionImportRequestDto input);
+
 }

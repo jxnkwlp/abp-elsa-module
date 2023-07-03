@@ -1,6 +1,3 @@
-import type { GlobalAPI } from '@/services/global';
-import type { API } from '@/services/typings';
-import { formatTableSorter, getTableQueryConfig, saveTableQueryConfig } from '@/services/utils';
 import {
     deleteWorkflowDefinition,
     deleteWorkflowDefinitionOwner,
@@ -10,17 +7,45 @@ import {
     updateWorkflowDefinitionDefinition,
     workflowDefinitionAddOwner,
     workflowDefinitionDispatch,
+    workflowDefinitionExport2 as workflowDefinitionExport,
+    workflowDefinitionImport,
     workflowDefinitionPublish,
     workflowDefinitionUnPublish,
 } from '@/services/WorkflowDefinition';
-import { ProForm, ProFormInstance } from '@ant-design/pro-components';
+import type { GlobalAPI } from '@/services/global';
+import type { API } from '@/services/typings';
+import {
+    formatTableSorter,
+    getTableQueryConfig,
+    saveTableQueryConfig,
+    showDownloadFile,
+} from '@/services/utils';
+import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
+import type { ProFormInstance } from '@ant-design/pro-components';
+import { ProForm } from '@ant-design/pro-components';
 import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
-import { Button, Form, message, Modal, Popconfirm, Table, Tabs, Typography } from 'antd';
+import {
+    Alert,
+    Button,
+    Checkbox,
+    Drawer,
+    Form,
+    Modal,
+    Popconfirm,
+    Table,
+    Tabs,
+    Tag,
+    Tooltip,
+    Typography,
+    Upload,
+    message,
+} from 'antd';
+import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { formatMessage, Link, useAccess, useHistory, useIntl } from 'umi';
+import { Link, formatMessage, useAccess, useHistory, useIntl } from 'umi';
 import EditFormItems from './edit-form-items';
 
 const handleEdit = async (id: string, data: any) => {
@@ -49,6 +74,8 @@ const Index: React.FC = () => {
     const tableActionRef = useRef<ActionType>();
     const [tableFilterCollapsed, setTableFilterCollapsed] = useState<boolean>(true);
     const [tableQueryConfig, setTableQueryConfig] = useState<GlobalAPI.TableQueryConfig>();
+    const [tableSelectedRowKeys, setTableSelectedRowKeys] = useState<React.Key[]>();
+    const [tableSelectedRows, setTableSelectedRows] = useState<API.WorkflowDefinition[]>([]);
 
     const history = useHistory();
 
@@ -64,6 +91,14 @@ const Index: React.FC = () => {
 
     const [iampModalVisible, setIampModalVisible] = useState(false);
     const [iamData, setIamData] = useState<API.WorkflowDefinitionIamResult>();
+
+    const [exporting, setExporting] = useState<boolean>();
+
+    const [importing, setImporting] = useState(false);
+    const [importModalVisible, setImportModalVisible] = useState<boolean>(false);
+    const [importOverwrite, setImportOverwrite] = useState(false);
+    const [importResult, setImportResult] = useState<API.WorkflowDefinitionImportResult>();
+    const [importResultTableVisible, setImportResultTableVisible] = useState(false);
 
     const [editForm] = ProForm.useForm();
 
@@ -105,6 +140,80 @@ const Index: React.FC = () => {
             return true;
         }
         return false;
+    };
+
+    const handleExport = async () => {
+        const loading = message.loading(
+            intl.formatMessage({ id: 'page.definition.export.loading' }),
+        );
+        setExporting(true);
+        const res = await workflowDefinitionExport(
+            {
+                ids: tableSelectedRowKeys as string[],
+            },
+            { responseType: 'arrayBuffer' },
+        );
+        if (res.response.ok) {
+            const fileName =
+                intl.formatMessage({ id: 'page.definition' }) +
+                '-' +
+                moment().format('YYYYMMDDHHmm') +
+                '.zip';
+            showDownloadFile(fileName, res.data, 'application/stream');
+        }
+        loading();
+        setExporting(false);
+    };
+
+    const handleImport = async (
+        file: any,
+        filename: string | undefined,
+        onSuccess: any,
+        onError: any,
+    ) => {
+        setImporting(true);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('overwrite', importOverwrite as unknown as string);
+        const result = await workflowDefinitionImport(
+            formData as unknown as API.WorkflowDefinitionImportRequest,
+        );
+
+        setImporting(false);
+        setImportResult(result);
+
+        // @ts-nocheck
+        const firstError = (result?.results ?? []).find((x) => x.hasError);
+        if (firstError) {
+            onError?.({
+                name: firstError.fileName!,
+                message: firstError.errorMessage!,
+            });
+        } else {
+            onSuccess?.({});
+        }
+
+        // check result
+        // (result?.results ?? []).forEach((item) => {
+        //     if (item.hasError) {
+        //         message.error(
+        //             intl.formatMessage(
+        //                 {
+        //                     id: 'page.definition.import.result.failed',
+        //                 },
+        //                 item.workflow,
+        //             ) + item.errorMessage,
+        //             5,
+        //         );
+        //     } else {
+        //         message.success(
+        //             intl.formatMessage(
+        //                 { id: 'page.definition.import.result.success' },
+        //                 { ...item.workflow },
+        //             ),
+        //         );
+        //     }
+        // });
     };
 
     const columns: ProColumnType<API.WorkflowDefinition>[] = [
@@ -344,11 +453,42 @@ const Index: React.FC = () => {
                 }}
                 actionRef={tableActionRef}
                 formRef={searchFormRef}
+                rowSelection={{
+                    selectedRowKeys: tableSelectedRowKeys,
+                    onChange: (selectedRowKeys, selectedRows) => {
+                        setTableSelectedRows(selectedRows);
+                        setTableSelectedRowKeys(selectedRowKeys);
+                    },
+                }}
                 search={{ labelWidth: 140 }}
                 scroll={{ x: 1300 }}
                 rowKey="id"
                 toolBarRender={() => [
-                    access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'] ? (
+                    access['ElsaWorkflow.Definitions.Export'] && (
+                        <Button
+                            key="export"
+                            type="default"
+                            loading={exporting}
+                            onClick={() => {
+                                handleExport();
+                            }}
+                            icon={<DownloadOutlined />}
+                        >
+                            {intl.formatMessage({ id: 'common.dict.export' })}
+                        </Button>
+                    ),
+                    access['ElsaWorkflow.Definitions.Import'] && (
+                        <Button
+                            key="import"
+                            type="default"
+                            onClick={() => {
+                                setImportModalVisible(true);
+                            }}
+                        >
+                            {intl.formatMessage({ id: 'common.dict.import' })}
+                        </Button>
+                    ),
+                    access['ElsaWorkflow.Definitions.CreateOrUpdateOrPublish'] && (
                         <Button
                             key="add"
                             type="primary"
@@ -358,8 +498,6 @@ const Index: React.FC = () => {
                         >
                             {intl.formatMessage({ id: 'common.dict.create' })}
                         </Button>
-                    ) : (
-                        <></>
                     ),
                 ]}
                 onReset={() => {
@@ -369,6 +507,8 @@ const Index: React.FC = () => {
                         filter: null,
                         pagination: undefined,
                     });
+                    // clear selected
+                    setTableSelectedRowKeys([]);
                 }}
                 pagination={tableQueryConfig?.pagination}
                 onChange={(pagination, _, sorter) => {
@@ -630,6 +770,147 @@ const Index: React.FC = () => {
                             ),
                         },
                     ]}
+                />
+            </Modal>
+
+            <Drawer
+                open={importModalVisible}
+                onClose={() => setImportModalVisible(false)}
+                maskClosable={false}
+                width={500}
+                title={intl.formatMessage({
+                    id: 'page.definition.import',
+                })}
+                footer={false}
+            >
+                {importResult && !importing && (
+                    <Alert
+                        style={{ marginBottom: '10px' }}
+                        showIcon
+                        type={importResult?.failedCount > 0 ? 'warning' : 'success'}
+                        message={intl.formatMessage(
+                            { id: 'page.definition.import.result.summary' },
+                            {
+                                success: importResult?.successCount,
+                                failed: importResult?.failedCount,
+                            },
+                        )}
+                        action={
+                            <Button
+                                size="small"
+                                onClick={() => {
+                                    setImportResultTableVisible(true);
+                                }}
+                            >
+                                {intl.formatMessage({
+                                    id: 'page.definition.import.result.summary.table',
+                                })}
+                            </Button>
+                        }
+                    />
+                )}
+                <Form disabled={importing}>
+                    <Form.Item
+                        name="overwrite"
+                        label=""
+                        extra={intl.formatMessage({
+                            id: 'page.definition.import.overwrite.tips',
+                        })}
+                    >
+                        <Checkbox
+                            onChange={(e) => {
+                                setImportOverwrite(e.target.checked);
+                            }}
+                        >
+                            {intl.formatMessage({
+                                id: 'page.definition.import.overwrite',
+                            })}
+                        </Checkbox>
+                    </Form.Item>
+                    <Form.Item>
+                        <Upload
+                            name="file"
+                            accept=".zip,.json"
+                            listType="picture"
+                            maxCount={1}
+                            multiple={false}
+                            withCredentials={true}
+                            customRequest={async ({ file, filename, onSuccess, onError }) => {
+                                await handleImport(file, filename, onSuccess, onError);
+                            }}
+                        >
+                            <Button icon={<UploadOutlined />}>
+                                {intl.formatMessage({
+                                    id: 'common.dict.uploadButton',
+                                })}
+                            </Button>
+                        </Upload>
+                    </Form.Item>
+                </Form>
+            </Drawer>
+
+            {/* import results */}
+            <Modal
+                open={importResultTableVisible}
+                onCancel={() => setImportResultTableVisible(false)}
+                width={680}
+                maskClosable={false}
+                footer={false}
+                title={intl.formatMessage({ id: 'page.definition.import.result.table.tableTitle' })}
+            >
+                <Table
+                    rowKey="fileName"
+                    columns={[
+                        {
+                            dataIndex: 'fileName',
+                            title: intl.formatMessage({
+                                id: 'page.definition.import.result.table.fileName',
+                            }),
+                            ellipsis: true,
+                        },
+                        {
+                            dataIndex: 'hasError',
+                            title: intl.formatMessage({
+                                id: 'page.definition.import.result.table.retult',
+                            }),
+                            render: (txt, record) => {
+                                return txt ? (
+                                    <Tooltip title={record.errorMessage}>
+                                        <Tag color="error">
+                                            {intl.formatMessage({
+                                                id: 'page.definition.import.result.table.retult.error',
+                                            })}
+                                        </Tag>
+                                    </Tooltip>
+                                ) : (
+                                    <Tag color="success">
+                                        {intl.formatMessage({
+                                            id: 'page.definition.import.result.table.retult.success',
+                                        })}
+                                    </Tag>
+                                );
+                            },
+                        },
+                        {
+                            dataIndex: ['workflow', 'name'],
+                            title: intl.formatMessage({ id: 'page.definition.field.name' }),
+                            ellipsis: true,
+                        },
+                        {
+                            dataIndex: ['workflow', 'displayName'],
+                            title: intl.formatMessage({ id: 'page.definition.field.displayName' }),
+                            ellipsis: true,
+                        },
+                        {
+                            dataIndex: ['workflow', 'publishedVersion'],
+                            title: intl.formatMessage({
+                                id: 'page.definition.field.publishedVersion',
+                            }),
+                            width: 120,
+                        },
+                    ]}
+                    dataSource={importResult?.results ?? []}
+                    pagination={false}
                 />
             </Modal>
         </PageContainer>

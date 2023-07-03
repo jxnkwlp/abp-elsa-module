@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Content;
 
 namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 
@@ -24,7 +25,7 @@ public class WorkflowDefinitionController : ElsaModuleController, IWorkflowDefin
     }
 
     [HttpGet()]
-    public virtual Task<PagedResultDto<WorkflowDefinitionDto>> GetListAsync(WorkflowDefinitionListRequestDto input)
+    public virtual Task<PagedResultDto<WorkflowDefinitionBasicDto>> GetListAsync(WorkflowDefinitionListRequestDto input)
     {
         return _service.GetListAsync(input);
     }
@@ -147,5 +148,25 @@ public class WorkflowDefinitionController : ElsaModuleController, IWorkflowDefin
     public Task<WorkflowVariablesDto> UpdateVariablesAsync(Guid id, WorkflowVariableUpdateDto input)
     {
         return _service.UpdateVariablesAsync(id, input);
+    }
+
+    [NonAction]
+    public Task<IRemoteStreamContent> ExportAsync(WorkflowDefinitionExportRequestDto input)
+    {
+        return _service.ExportAsync(input);
+    }
+
+    [HttpPost("export")]
+    public async Task<IActionResult> Export2Async(WorkflowDefinitionExportRequestDto input)
+    {
+        var result = await _service.ExportAsync(input);
+
+        return File(result.GetStream(), result.ContentType, result.FileName, false);
+    }
+
+    [HttpPost("import")]
+    public Task<WorkflowDefinitionImportResultDto> ImportAsync([FromForm] WorkflowDefinitionImportRequestDto input)
+    {
+        return _service.ImportAsync(input);
     }
 }

@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
 using Elsa.Models;
 using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 
-public class WorkflowDefinitionDto : AuditedEntityDto<Guid>
+public class WorkflowDefinitionBasicDto : AuditedEntityDto<Guid>
 {
     public string Name { get; set; }
 
@@ -26,10 +25,4 @@ public class WorkflowDefinitionDto : AuditedEntityDto<Guid>
     public string Tag { get; set; }
 
     public WorkflowPersistenceBehavior PersistenceBehavior { get; set; }
-
-    public WorkflowContextOptions ContextOptions { get; set; }
-
-    public Dictionary<string, object> Variables { get; set; }
-
-    public Dictionary<string, object> CustomAttributes { get; set; }
 }

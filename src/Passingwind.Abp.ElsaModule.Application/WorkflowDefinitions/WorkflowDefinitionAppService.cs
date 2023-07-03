@@ -1,16 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Elsa.Models;
 using Elsa.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Passingwind.Abp.ElsaModule.WorkflowGroups;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Content;
 using Volo.Abp.Identity;
+using Volo.Abp.Json;
 
 namespace Passingwind.Abp.ElsaModule.Common;
 
@@ -24,6 +30,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     private readonly IWorkflowPermissionService _workflowPermissionService;
     private readonly IWorkflowGroupManager _workflowGroupManager;
     private readonly IdentityUserManager _identityUserManager;
+    private readonly IJsonSerializer _jsonSerializer;
+    private readonly IWorkflowImporter _workflowImporter;
 
     public WorkflowDefinitionAppService(
         IWorkflowDefinitionRepository workflowDefinitionRepository,
@@ -32,7 +40,9 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         IWorkflowLaunchpad workflowLaunchpad,
         IWorkflowPermissionService workflowPermissionService,
         IWorkflowGroupManager workflowGroupManager,
-        IdentityUserManager identityUserManager)
+        IdentityUserManager identityUserManager,
+        IJsonSerializer jsonSerializer,
+        IWorkflowImporter workflowImporter)
     {
         _workflowDefinitionRepository = workflowDefinitionRepository;
         _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
@@ -41,6 +51,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         _workflowPermissionService = workflowPermissionService;
         _workflowGroupManager = workflowGroupManager;
         _identityUserManager = identityUserManager;
+        _jsonSerializer = jsonSerializer;
+        _workflowImporter = workflowImporter;
     }
 
     [Authorize(Policy = ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish)]
@@ -142,7 +154,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         return ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(entity);
     }
 
-    public virtual async Task<PagedResultDto<WorkflowDefinitionDto>> GetListAsync(WorkflowDefinitionListRequestDto input)
+    public virtual async Task<PagedResultDto<WorkflowDefinitionBasicDto>> GetListAsync(WorkflowDefinitionListRequestDto input)
     {
         var grantedResult = await _workflowPermissionService.GetGrantsAsync();
 
@@ -158,7 +170,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
             filterIds: grantedResult.AllGranted ? null : grantedResult.WorkflowIds,
             ordering: input.Sorting);
 
-        return new PagedResultDto<WorkflowDefinitionDto>(count, ObjectMapper.Map<List<WorkflowDefinition>, List<WorkflowDefinitionDto>>(list));
+        return new PagedResultDto<WorkflowDefinitionBasicDto>(count, ObjectMapper.Map<List<WorkflowDefinition>, List<WorkflowDefinitionBasicDto>>(list));
     }
 
     public virtual async Task<WorkflowDefinitionVersionDto> GetVersionAsync(Guid id, int version)
@@ -215,6 +227,25 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         if (input.IsPublished)
             await _workflowDefinitionManager.UnsetPublishedVersionAsync(id);
 
+        var activities = input.Activities?.Select(x => new Activity(
+                   x.ActivityId,
+                   x.Type,
+                   x.Name,
+                   x.DisplayName,
+                   x.Description,
+                   x.PersistWorkflow,
+                   x.LoadWorkflowContext,
+                   x.SaveWorkflowContext,
+                   x.Attributes,
+                   x.Properties,
+                   x.PropertyStorageProviders))?.ToList();
+
+        var connections = input.Connections.Select(x => new ActivityConnection(
+                x.SourceId,
+                x.TargetId,
+                x.Outcome,
+                x.Attributes))?.ToList();
+
         // check version
         if (defintion.PublishedVersion == defintion.LatestVersion)
         {
@@ -223,23 +254,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
             currentVersion = await _workflowDefinitionManager.CreateDefinitionVersionAsync(
                 id,
                 CurrentTenant.Id,
-                input.Activities?.Select(x => new Activity(
-                    x.ActivityId,
-                    x.Type,
-                    x.Name,
-                    x.DisplayName,
-                    x.Description,
-                    x.PersistWorkflow,
-                    x.LoadWorkflowContext,
-                    x.SaveWorkflowContext,
-                    x.Attributes,
-                    x.Properties,
-                    x.PropertyStorageProviders))?.ToList(),
-                input.Connections.Select(x => new ActivityConnection(
-                    x.SourceId,
-                    x.TargetId,
-                    x.Outcome,
-                    x.Attributes))?.ToList());
+                activities,
+                connections);
 
             currentVersion.SetVersion(defintion.LatestVersion + 1);
             currentVersion.SetIsLatest(true);
@@ -258,23 +274,10 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
             if (currentVersion == null)
                 throw new UserFriendlyException($"The latest versiont '{defintion.LatestVersion}' not found.");
 
-            await _workflowDefinitionManager.UpdateDefinitionVersionAsync(currentVersion, input.Activities?.Select(x => new Activity(
-                     x.ActivityId,
-                     x.Type,
-                     x.Name,
-                     x.DisplayName,
-                     x.Description,
-                     x.PersistWorkflow,
-                     x.LoadWorkflowContext,
-                     x.SaveWorkflowContext,
-                     x.Attributes,
-                     x.Properties,
-                     x.PropertyStorageProviders))?.ToList(),
-                 input.Connections.Select(x => new ActivityConnection(
-                     x.SourceId,
-                     x.TargetId,
-                     x.Outcome,
-                     x.Attributes))?.ToList());
+            await _workflowDefinitionManager.UpdateDefinitionVersionAsync(
+                currentVersion,
+                activities,
+                connections);
 
             if (input.IsPublished)
                 currentVersion.SetIsPublished(true);
@@ -289,20 +292,26 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         else
             defintion.SetLatestVersion(currentVersion.Version);
 
-        // update 
-        defintion.Name = input.Definition.Name;
-        defintion.DisplayName = input.Definition.DisplayName;
-        defintion.Description = input.Definition.Description;
-        defintion.IsSingleton = input.Definition.IsSingleton;
-        defintion.Channel = input.Definition.Channel;
-        defintion.Tag = input.Definition.Tag;
-        defintion.PersistenceBehavior = input.Definition.PersistenceBehavior;
-        defintion.ContextOptions = input.Definition.ContextOptions;
-        defintion.Variables = input.Definition.Variables;
-        await _workflowDefinitionRepository.UpdateAsync(defintion);
+        // update  
+        defintion.ChangeName(input.Definition.Name);
+        await _workflowDefinitionManager.UpdateDefinitionAsync(
+            defintion,
+            input.Definition.DisplayName,
+            input.Definition.Description,
+            input.Definition.IsSingleton,
+            input.Definition.DeleteCompletedInstances,
+            input.Definition.Channel,
+            input.Definition.Tag,
+            input.Definition.PersistenceBehavior,
+            input.Definition.ContextOptions,
+            input.Definition.Variables,
+            defintion.CustomAttributes);
 
         // check name
         await _workflowDefinitionManager.CheckNameExistsAsync(defintion);
+
+        // update
+        await _workflowDefinitionRepository.UpdateAsync(defintion);
 
         var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(currentVersion);
         dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(defintion);
@@ -315,19 +324,24 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
 
         await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish);
 
-        entity.Name = input.Name;
-        entity.DisplayName = input.DisplayName;
-        entity.Description = input.Description;
-        entity.IsSingleton = input.IsSingleton;
-        entity.Channel = input.Channel;
-        entity.Tag = input.Tag;
-        entity.PersistenceBehavior = input.PersistenceBehavior;
-        entity.ContextOptions = input.ContextOptions;
-        entity.Variables = input.Variables;
+        entity.ChangeName(input.Name);
+        await _workflowDefinitionManager.UpdateDefinitionAsync(
+               entity,
+               input.DisplayName,
+               input.Description,
+               input.IsSingleton,
+               input.DeleteCompletedInstances,
+               input.Channel,
+               input.Tag,
+               input.PersistenceBehavior,
+               input.ContextOptions,
+               input.Variables,
+               entity.CustomAttributes);
 
         // check name
         await _workflowDefinitionManager.CheckNameExistsAsync(entity);
 
+        // update
         await _workflowDefinitionRepository.UpdateAsync(entity);
 
         return ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(entity);
@@ -483,5 +497,140 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         {
             Variables = entity.Variables,
         };
+    }
+
+    [Authorize(Policy = ElsaModulePermissions.Definitions.Export)]
+    public async Task<IRemoteStreamContent> ExportAsync(WorkflowDefinitionExportRequestDto input)
+    {
+        var filterIds = await FilterWorkflowsAsync(input.Ids);
+
+        var list = await _workflowDefinitionRepository.GetListAsync(filterIds: filterIds);
+
+        var versionList = await _workflowDefinitionVersionRepository.GetListAsync(definitionIds: filterIds, isPublished: true, includeDetails: true);
+
+        var randomName = Path.GetFileNameWithoutExtension(Path.GetTempFileName());
+        var zipFilePath = Path.Combine(Path.GetTempPath(), "workflow", "export", $"{randomName}.zip");
+        // create directory
+        var exportTempDir = Path.Combine(Path.GetTempPath(), "workflow", "export", randomName);
+        if (!Directory.Exists(exportTempDir))
+            Directory.CreateDirectory(exportTempDir);
+
+        var jsonNodeOptions = new JsonNodeOptions() { PropertyNameCaseInsensitive = true };
+
+        try
+        {
+            // write file 
+            foreach (var item in list)
+            {
+                var version = versionList.FirstOrDefault(x => x.DefinitionId == item.Id);
+
+                var content = _jsonSerializer.Serialize(item);
+
+                if (version != null)
+                {
+                    var jsonObject = JsonObject.Parse(content, jsonNodeOptions);
+                    jsonObject["activities"] = JsonNode.Parse(_jsonSerializer.Serialize(version.Activities), jsonNodeOptions);
+                    jsonObject["connections"] = JsonNode.Parse(_jsonSerializer.Serialize(version.Connections), jsonNodeOptions);
+
+                    content = jsonObject.ToJsonString();
+                }
+
+                var itemFile = Path.Combine(exportTempDir, item.Name + ".json");
+                File.WriteAllText(itemFile, content);
+            }
+
+            ZipFile.CreateFromDirectory(exportTempDir, zipFilePath);
+
+            Logger.LogInformation("Workflow definition export zip file created: {0}", zipFilePath);
+
+            return new RemoteStreamContent(File.OpenRead(zipFilePath), $"{DateTime.UtcNow:yyyyMMddHHmmss}.zip", "application/stream");
+        }
+        catch (Exception ex)
+        {
+            throw new UserFriendlyException("Export workflow definition failed.", innerException: ex);
+        }
+    }
+
+    [Authorize(Policy = ElsaModulePermissions.Definitions.Import)]
+    public async Task<WorkflowDefinitionImportResultDto> ImportAsync(WorkflowDefinitionImportRequestDto input)
+    {
+        if (input.File?.ContentLength == 0)
+            throw new ArgumentNullException();
+
+        var randomName = Path.GetFileNameWithoutExtension(Path.GetTempFileName());
+        var zipFilePath = Path.Combine(Path.GetTempPath(), "workflow", "import", $"{randomName}.zip");
+        var tempFileDir = Path.Combine(Path.GetTempPath(), "workflow", "import", randomName);
+        if (!Directory.Exists(Path.GetDirectoryName(zipFilePath)))
+            Directory.CreateDirectory(Path.GetDirectoryName(zipFilePath));
+
+        bool isZip = false;
+
+        if (Path.GetExtension(input.File.FileName) == ".zip" || input.File.ContentType == "application/zip")
+            isZip = true;
+
+        var importList = new Dictionary<string, string>();
+
+        if (isZip)
+        {
+            // extract zip file
+            try
+            {
+                using MemoryStream ms = new MemoryStream();
+
+                await input.File.GetStream().CopyToAsync(ms);
+
+                await File.WriteAllBytesAsync(zipFilePath, ms.ToArray());
+
+                ZipFile.ExtractToDirectory(zipFilePath, tempFileDir, true);
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException("Unzip file failed.", innerException: ex);
+            }
+
+            // read files
+            foreach (var item in Directory.EnumerateFiles(tempFileDir))
+            {
+                importList[Path.GetFileName(item)] = File.ReadAllText(item);
+            }
+        }
+        else
+        {
+            try
+            {
+                using StreamReader sr = new StreamReader(input.File.GetStream());
+                var fileContent = await sr.ReadToEndAsync();
+
+                importList[input.File.FileName] = fileContent;
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException("Read upload file content failed.", innerException: ex);
+            }
+        }
+
+        var result = new WorkflowDefinitionImportResultDto()
+        {
+            TotalCount = importList.Count,
+        };
+
+        foreach (var item in importList)
+        {
+            try
+            {
+                var workflow = await _workflowImporter.ImportAsync(item.Value, input.Overwrite);
+
+                result.Add(item.Key, ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionBasicDto>(workflow));
+
+                result.SuccessCount++;
+            }
+            catch (Exception ex)
+            {
+                result.FailedCount++;
+                result.Add(item.Key, ex.Message);
+            }
+        }
+
+        return result;
     }
 }
