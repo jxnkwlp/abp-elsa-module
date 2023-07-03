@@ -1,13 +1,19 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Localization;
+using Passingwind.Abp.ElsaModule.Permissions;
 using Volo.Abp.Application.Services;
 
 namespace Passingwind.Abp.ElsaModule;
 
 public abstract class ElsaModuleAppService : ApplicationService
 {
+    protected IWorkflowPermissionService WorkflowPermissionService => LazyServiceProvider.GetRequiredService<IWorkflowPermissionService>();
+
     protected ElsaModuleAppService()
     {
         LocalizationResource = typeof(ElsaModuleResource);
@@ -35,5 +41,26 @@ public abstract class ElsaModuleAppService : ApplicationService
     protected virtual async Task CheckWorkflowPermissionAsync(WorkflowDefinition definition, string name)
     {
         await AuthorizationService.CheckAsync(definition, name);
+    }
+
+    protected async Task<IEnumerable<Guid>> FilterWorkflowsAsync(IEnumerable<Guid> sources = null)
+    {
+        var grantedResult = await WorkflowPermissionService.GetGrantsAsync();
+
+        var filterIds = sources?.ToList();
+
+        if (!grantedResult.AllGranted)
+        {
+            if (sources?.Any() == true)
+            {
+                filterIds = grantedResult.WorkflowIds.Intersect(sources).ToList();
+            }
+            else
+            {
+                filterIds = grantedResult.WorkflowIds.ToList();
+            }
+        }
+
+        return filterIds;
     }
 }

@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 22
+ * Total count: 24
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -116,7 +116,7 @@ export async function getWorkflowDefinitionList(
     },
     options?: { [key: string]: any }
 ) {
-    return request<API.WorkflowDefinitionPagedResult>(`/api/elsa/workflow/definitions`, {
+    return request<API.WorkflowDefinitionBasicPagedResult>(`/api/elsa/workflow/definitions`, {
         method: 'GET',
         params: params,
         ...(options || {}),
@@ -268,6 +268,36 @@ export async function workflowDefinitionExecute(
         method: 'POST',
         data: payload,
         getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* POST /api/elsa/workflow/definitions/export 
+ **/
+export async function workflowDefinitionExport2(
+    payload: API.WorkflowDefinitionExportRequest,
+    options?: { [key: string]: any }
+) {
+    return request<any>(`/api/elsa/workflow/definitions/export`, {
+        method: 'POST',
+        data: payload,
+        getResponse: true,
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* POST /api/elsa/workflow/definitions/import 
+ **/
+export async function workflowDefinitionImport(
+    payload: API.WorkflowDefinitionImportRequest,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowDefinitionImportResult>(`/api/elsa/workflow/definitions/import`, {
+        method: 'POST',
+        requestType: 'form',
+        data: payload,
         ...(options || {}),
     });
 }

@@ -68,9 +68,22 @@ public class WorkflowDefinitionVersionRepository : MongoDbRepository<IElsaModule
         return entity;
     }
 
+    public async Task<List<WorkflowDefinitionVersion>> GetListAsync(IEnumerable<Guid> definitionIds = null, bool? isLatest = null, bool? isPublished = null, bool includeDetails = false, CancellationToken cancellationToken = default)
+    {
+        var query = await GetMongoQueryableAsync(cancellationToken);
+
+        return await query
+            .WhereIf(definitionIds != null, x => definitionIds.Contains(x.DefinitionId))
+            .WhereIf(isLatest.HasValue, x => x.IsLatest == isLatest)
+            .WhereIf(isPublished.HasValue, x => x.IsPublished == isPublished)
+            .As<IMongoQueryable<WorkflowDefinitionVersion>>()
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<List<WorkflowDefinitionVersion>> GetPagedListAsync(int skipCount, int maxResultCount, Expression<Func<WorkflowDefinitionVersion, bool>> expression, string sorting, bool includeDetails = false, CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
+
         return await query
             .WhereIf(expression != null, expression)
             .OrderBy(sorting ?? nameof(WorkflowDefinitionVersion.CreationTime) + " desc")
@@ -82,6 +95,7 @@ public class WorkflowDefinitionVersionRepository : MongoDbRepository<IElsaModule
     public async Task<int?> GetPreviousVersionNumberAsync(Guid definitionId, int version, CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
+
         return await query
             .Where(x => x.DefinitionId == definitionId)
             .OrderByDescending(x => x.Version)

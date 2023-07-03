@@ -48,6 +48,7 @@ export default {
     'common.dict.success.tips': 'Notice',
     'common.dict.general': 'General',
     'common.dict.common': 'Common',
+    'common.dict.uploadButton': 'Click To Upload',
     'common.http.response.error.requestFailed': 'Request failed',
     'common.http.response.error.networkError1': 'Network Error',
     'common.http.response.error.networkError2':

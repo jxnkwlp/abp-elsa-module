@@ -13,6 +13,8 @@ public interface IWorkflowDefinitionVersionRepository : IRepository<WorkflowDefi
 
     Task<List<WorkflowDefinitionVersion>> GetPagedListAsync(int skipCount, int maxResultCount, Expression<Func<WorkflowDefinitionVersion, bool>> expression, string sorting, bool includeDetails = false, CancellationToken cancellationToken = default);
 
+    Task<List<WorkflowDefinitionVersion>> GetListAsync(IEnumerable<Guid> definitionIds = null, bool? isLatest = null, bool? isPublished = null, bool includeDetails = false, CancellationToken cancellationToken = default);
+
     Task<WorkflowDefinitionVersion> GetLatestAsync(Guid definitionId, bool includeDetails = true, CancellationToken cancellationToken = default);
 
     Task<WorkflowDefinitionVersion> GetByVersionAsync(Guid definitionId, int version, bool includeDetails = true, CancellationToken cancellationToken = default);
@@ -21,4 +23,3 @@ public interface IWorkflowDefinitionVersionRepository : IRepository<WorkflowDefi
 
     Task<int?> GetPreviousVersionNumberAsync(Guid definitionId, int version, CancellationToken cancellationToken = default);
 }
-

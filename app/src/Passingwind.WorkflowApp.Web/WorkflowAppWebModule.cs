@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Elsa;
 using Elsa.Activities.Http.OpenApi;
@@ -129,6 +130,7 @@ public class WorkflowAppWebModule : AbpModule
 
         Configure<JsonOptions>(options =>
         {
+            options.JsonSerializerOptions.Encoder = JavaScriptEncoder.Default;
             options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
             options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
             options.JsonSerializerOptions.Converters.Add(new JArrayConverter());
@@ -136,11 +138,12 @@ public class WorkflowAppWebModule : AbpModule
 
         Configure<AbpSystemTextJsonSerializerOptions>(options =>
         {
+            options.JsonSerializerOptions.Encoder = JavaScriptEncoder.Default;
             options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
             options.JsonSerializerOptions.Converters.Add(new JArrayConverter());
             options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
         });
-
+         
         // Config default 'JsonSerializerSettings'
         JsonConvert.DefaultSettings = () =>
         {
@@ -395,7 +398,7 @@ public class WorkflowAppWebModule : AbpModule
                         return $"{part1}.{part2}";
                     }
 
-                    return type.FullName.RemovePostFix("Dto");
+                    return type.FullName.RemovePostFix("Dto").Replace("Dto+", null);
                 });
 
                 options.CustomOperationIds(e =>

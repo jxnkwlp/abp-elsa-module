@@ -76,8 +76,7 @@ const Index: React.FC = () => {
     const [definitionId, setDefinitionId] = React.useState<string>();
     const [version, setVersion] = React.useState<number>(1);
     const [definition, setDefinition] = React.useState<API.WorkflowDefinition>();
-    const [definitionVersion, setDefinitionVersion] =
-        React.useState<API.WorkflowDefinitionVersion>();
+    const [_, setDefinitionVersion] = React.useState<API.WorkflowDefinitionVersion>();
 
     const [oldVersion, setOldVersion] = React.useState<number>();
 
@@ -125,11 +124,12 @@ const Index: React.FC = () => {
     const [variableEditModalVisible, setVariableEditModalVisible] = React.useState<boolean>();
     const [variableData, setVariableData] = React.useState<any>();
 
-    const loadServerData = async (
-        definiton: API.WorkflowDefinitionVersion,
+    const loadGraphData = async (
+        activities: API.Activity[],
+        connections: API.ActivityConnection[],
         autoLayout: boolean = false,
     ) => {
-        const gData = await conventToGraphData(definiton.activities!, definiton.connections!);
+        const gData = await conventToGraphData(activities, connections);
 
         // if (item.sourceActivityId) sourceId = item.sourceActivityId;
         // if (item.targetActivityId) targetId = item.targetActivityId;
@@ -171,7 +171,6 @@ const Index: React.FC = () => {
                     2,
                 ),
             );
-
             loading2();
         } else {
             message.error('Get graph data failed');
@@ -182,11 +181,24 @@ const Index: React.FC = () => {
         const loading2 = message.loading(intl.formatMessage({ id: 'common.dict.loading' }));
         try {
             const content = await file.text();
-            const data = JSON.parse(content);
-            const data2 = { connections: [], activities: data.activities };
-            // compatible with offlice export json file
-            if (data?.connections) {
-                data2.connections = data.connections?.map((x: any) => {
+            const importData = JSON.parse(content);
+            //
+            delete importData.name;
+            delete importData.id;
+            delete importData.publishedVersion;
+            delete importData.latestVersion;
+
+            const activities = importData?.activities;
+
+            if (!activities) {
+                message.error('No activities found.');
+                return;
+            }
+
+            // compatible with elsa export json file
+            let connections = importData?.connections ?? [];
+            if (importData?.connections) {
+                connections = importData.connections?.map((x: any) => {
                     return {
                         sourceId: x.sourceId ?? x.sourceActivityId,
                         targetId: x.targetId ?? x.targetActivityId,
@@ -195,12 +207,20 @@ const Index: React.FC = () => {
                 });
             }
 
-            await loadServerData(data2 as API.WorkflowDefinition, autoLayout);
-            message.info('import successful.');
+            // reload graph
+            await loadGraphData(activities, connections, autoLayout);
+            // update definition
+            setDefinition({
+                ...definition,
+                ...importData,
+            });
 
+            message.info('import successful.');
+            loading2();
             //
             return true;
         } catch (error) {
+            loading2();
             console.error(error);
             message.error('Import file failed');
             //
@@ -722,7 +742,7 @@ const Index: React.FC = () => {
                 message.error(validateResult.errors[0].toString(), 3.6);
             } else {
                 setJsonEditorVisible(false);
-                await loadServerData(data2 as unknown as API.WorkflowDefinitionVersion, false);
+                await loadGraphData(data2.activities, data2.connections, false);
 
                 // variables
                 if (data.variables) {
@@ -1072,26 +1092,26 @@ const Index: React.FC = () => {
 
     const loadData = async (did: string, version?: number) => {
         setLoading(true);
-        let definitonVersion: API.WorkflowDefinitionVersion;
-        if (version) definitonVersion = await getWorkflowDefinitionVersion(did, version);
-        else definitonVersion = await getWorkflowDefinition(did);
+        let serverVersion: API.WorkflowDefinitionVersion;
+        if (version) serverVersion = await getWorkflowDefinitionVersion(did, version);
+        else serverVersion = await getWorkflowDefinition(did);
         //
         setLoading(false);
-        if (definitonVersion) {
-            setDefinitionVersion(definitonVersion);
+        if (serverVersion) {
+            setDefinitionVersion(serverVersion);
             //
-            setDefinition(definitonVersion.definition);
-            setVersion(definitonVersion.version!);
+            setDefinition(serverVersion.definition);
+            setVersion(serverVersion.version!);
             //
-            await loadServerData(definitonVersion);
+            await loadGraphData(serverVersion.activities!, serverVersion?.connections ?? [], false);
 
             //
             if (fromDefinition) {
                 // update
                 setDefinition({
-                    ...definitonVersion.definition,
-                    name: definitonVersion.definition?.name + '_copy',
-                    displayName: definitonVersion.definition?.displayName + '_copy',
+                    ...serverVersion.definition,
+                    name: serverVersion.definition?.name + '_copy',
+                    displayName: serverVersion.definition?.displayName + '_copy',
                 });
                 showCreateModal();
             }
