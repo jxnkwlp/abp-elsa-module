@@ -1,5 +1,4 @@
-﻿using Elsa.Scripting.JavaScript.Services;
-using MediatR;
+using Elsa.Scripting.JavaScript.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Permissions;
@@ -26,7 +25,10 @@ public class ElsaModuleDomainModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddMediatR(typeof(ElsaModuleDomainModule));
+        context.Services.AddMediatR(config =>
+        {
+            config.RegisterServicesFromAssembly(typeof(ElsaModuleDomainModule).Assembly);
+        });
 
         context.Services.AddTransient<IWorkflowCSharpEditorService, NullMonacoEditorService>();
 

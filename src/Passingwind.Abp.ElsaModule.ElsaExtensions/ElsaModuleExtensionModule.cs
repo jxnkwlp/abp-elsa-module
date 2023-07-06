@@ -1,6 +1,5 @@
-﻿using Elsa.Activities.Email.Services;
+using Elsa.Activities.Email.Services;
 using Elsa.Expressions;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Passingwind.Abp.ElsaModule.Bookmarks;
 using Passingwind.Abp.ElsaModule.CSharp;
@@ -55,7 +54,10 @@ public class ElsaModuleExtensionModule : AbpModule
         //context.Services.AddWorkflowContextProvider(typeof(ElsaModuleActivitiesModule).Assembly);
 
         // 
-        context.Services.AddMediatR(typeof(ElsaModuleExtensionModule).Assembly);
+        context.Services.AddMediatR(config =>
+        {
+            config.RegisterServicesFromAssembly(typeof(ElsaModuleExtensionModule).Assembly);
+        });
 
         // 
         context.Services.AddTransient<IWorkflowCSharpEditorService, WorkflowCSharpEditorService>();

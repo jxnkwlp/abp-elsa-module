@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 using Passingwind.WorkflowApp.ApiKeys;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -47,6 +47,7 @@ public class WorkflowAppDbContext :
     public DbSet<OrganizationUnit> OrganizationUnits { get; set; }
     public DbSet<IdentitySecurityLog> SecurityLogs { get; set; }
     public DbSet<IdentityLinkUser> LinkUsers { get; set; }
+    public DbSet<IdentityUserDelegation> UserDelegations { get; set; }
 
     // Tenant Management
     public DbSet<Tenant> Tenants { get; set; }
@@ -55,7 +56,7 @@ public class WorkflowAppDbContext :
     #endregion
 
     public DbSet<ApiKey> ApiKeys { get; set; }
-
+   
     public WorkflowAppDbContext(DbContextOptions<WorkflowAppDbContext> options)
         : base(options)
     {

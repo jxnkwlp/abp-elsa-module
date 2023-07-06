@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.*" />
     <ProjectReference Include="..\..\src\Passingwind.Abp.ElsaModule.EntityFrameworkCore\Passingwind.Abp.ElsaModule.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Passingwind.Abp.ElsaModule.TestBase\Passingwind.Abp.ElsaModule.TestBase.csproj" />
-    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" Version="7.0.2" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" Version="7.2.3" />
   </ItemGroup>
 
 </Project>

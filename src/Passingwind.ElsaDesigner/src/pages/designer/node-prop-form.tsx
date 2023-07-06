@@ -219,11 +219,11 @@ const NodePropForm: React.FC<NodePropFormProps> = (props) => {
                     if (!isDynamicOptionItems) return fieldOptionItems;
                     //
                     const result = await getDesignerRuntimeSelectListItems({
-                        providerTypeName: propItem.options?.runtimeSelectListProviderType,
+                        providerTypeName: propItem.options?.runtimeSelectListProviderType ?? '',
                         context: propItem.options?.context,
                     });
 
-                    return (result?.selectList?.items ?? []).map((x) => {
+                    return (result?.items ?? []).map((x) => {
                         return {
                             label: x.text,
                             value: x.value,

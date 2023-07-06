@@ -17,7 +17,6 @@ using Hangfire.MemoryStorage;
 using Medallion.Threading;
 using Medallion.Threading.FileSystem;
 using Medallion.Threading.Redis;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -37,11 +36,9 @@ using NodaTime;
 using NodaTime.Serialization.JsonNet;
 using Owl.Abp.CultureMap;
 using Passingwind.Abp.ElsaModule;
-using Passingwind.Abp.ElsaModule.NewtonsoftJson.Converters;
 using Passingwind.Abp.ElsaModule.Services;
 using Passingwind.Abp.ElsaModule.SystemTextJson.Converters;
 using Passingwind.WorkflowApp.EntityFrameworkCore;
-using Passingwind.WorkflowApp.MongoDB;
 using Passingwind.WorkflowApp.MultiTenancy;
 using Passingwind.WorkflowApp.Web.ApiKeys;
 using Passingwind.WorkflowApp.Web.Services;
@@ -74,6 +71,7 @@ using Volo.Abp.Swashbuckle;
 using Volo.Abp.Timing;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using ObjectConverter = Passingwind.Abp.ElsaModule.SystemTextJson.Converters.ObjectConverter;
 using TypeJsonConverter = Passingwind.Abp.ElsaModule.SystemTextJson.Converters.TypeJsonConverter;
 
 namespace Passingwind.WorkflowApp.Web;
@@ -134,6 +132,8 @@ public class WorkflowAppWebModule : AbpModule
             options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
             options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
             options.JsonSerializerOptions.Converters.Add(new JArrayConverter());
+            options.JsonSerializerOptions.Converters.Add(new ObjectConverter());
+            options.JsonSerializerOptions.Converters.RemoveAll(x=>x.GetType()== typeof(Volo.Abp.Json.SystemTextJson.JsonConverters.ObjectToInferredTypesConverter));
         });
 
         Configure<AbpSystemTextJsonSerializerOptions>(options =>
@@ -142,8 +142,10 @@ public class WorkflowAppWebModule : AbpModule
             options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
             options.JsonSerializerOptions.Converters.Add(new JArrayConverter());
             options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
+            options.JsonSerializerOptions.Converters.Add(new ObjectConverter());
+            options.JsonSerializerOptions.Converters.RemoveAll(x => x.GetType() == typeof(Volo.Abp.Json.SystemTextJson.JsonConverters.ObjectToInferredTypesConverter));
         });
-         
+
         // Config default 'JsonSerializerSettings'
         JsonConvert.DefaultSettings = () =>
         {
@@ -182,7 +184,10 @@ public class WorkflowAppWebModule : AbpModule
         });
 
         // Mediator.
-        context.Services.AddMediatR(typeof(Program).Assembly);
+        context.Services.AddMediatR(config =>
+        {
+            config.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        });
 
         context.Services.AddHealthChecks();
     }
@@ -201,7 +206,7 @@ public class WorkflowAppWebModule : AbpModule
         settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
         settings.NullValueHandling = NullValueHandling.Ignore;
         settings.DefaultValueHandling = DefaultValueHandling.Include;
-        settings.TypeNameHandling = TypeNameHandling.None;
+        settings.TypeNameHandling = TypeNameHandling.Auto;
         settings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
         settings.PreserveReferencesHandling = PreserveReferencesHandling.None;
     }
