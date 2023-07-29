@@ -40,8 +40,8 @@ export enum LoginResultType {
  * *TODO*
  **/
 export enum WorkflowContextFidelity {
-    Burst = 0,
-    Activity = 1,
+    Burst = 'Burst',
+    Activity = 'Activity',
 }
 
 /**
@@ -84,8 +84,8 @@ export enum WorkflowInstanceStatus {
  * *TODO*
  **/
 export enum WorkflowPersistenceBehavior {
-    Suspended = 0,
-    WorkflowBurst = 1,
-    ActivityExecuted = 2,
+    Suspended = 'Suspended',
+    WorkflowBurst = 'WorkflowBurst',
+    ActivityExecuted = 'ActivityExecuted',
 }
 

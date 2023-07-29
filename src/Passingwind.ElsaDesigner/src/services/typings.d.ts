@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 191
+ * Total count: 182
  **/
 import * as Enum from "./enums";
 
@@ -639,6 +639,7 @@ declare namespace API {
         lockoutEnabled?: boolean | undefined;
         lockoutEnd?: string | undefined;
         concurrencyStamp?: string | undefined;
+        entityVersion: number;
     };
 
     /**
@@ -948,7 +949,7 @@ declare namespace API {
      * *TODO*
      **/
     type RuntimeSelectListContext = {
-        providerTypeName?: string | undefined;
+        providerTypeName: string;
         context?: any | undefined;
     };
 
@@ -956,13 +957,6 @@ declare namespace API {
      * *TODO*
      **/
     type RuntimeSelectListResult = {
-        selectList: SelectList;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type SelectList = {
         isFlagsEnum?: boolean | undefined;
         items?: SelectListItem[] | undefined;
     };

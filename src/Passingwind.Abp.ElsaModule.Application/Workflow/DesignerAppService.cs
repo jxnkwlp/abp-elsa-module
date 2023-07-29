@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -77,27 +77,31 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 
     public async Task<RuntimeSelectListResultDto> GetRuntimeSelectListItems(RuntimeSelectListContextDto input)
     {
-        var type = Type.GetType(input.ProviderTypeName)!;
-        var provider = LazyServiceProvider.LazyGetRequiredService(type);
+        var type = Type.GetType(input.ProviderTypeName);
+
+        if (type == null)
+            return new RuntimeSelectListResultDto();
+
+        var provider = LazyServiceProvider.LazyGetService(type);
+
+        if (provider == null)
+            if (type == null)
+                return new RuntimeSelectListResultDto();
+
         var context = input.Context;
 
         if (provider is IRuntimeSelectListProvider newProvider)
         {
             var selectList = await newProvider.GetSelectListAsync(context, default);
 
-            return new RuntimeSelectListResultDto
-            {
-                SelectList = selectList,
-            };
+            return new RuntimeSelectListResultDto(selectList.Items, selectList.IsFlagsEnum);
         }
+
 #pragma warning disable CS0618
         var items = await ((IRuntimeSelectListItemsProvider)provider).GetItemsAsync(context, default);
 #pragma warning restore CS0618
 
-        return new RuntimeSelectListResultDto
-        {
-            SelectList = new SelectList(items.ToArray())
-        };
+        return new RuntimeSelectListResultDto(items.ToArray());
     }
 
     public async Task<IRemoteStreamContent> GetJavaScriptTypeDefinitionAsync(Guid id)

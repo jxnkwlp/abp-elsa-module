@@ -1,8 +1,15 @@
-﻿using Elsa.Design;
+using System.Collections.Generic;
+using Elsa.Design;
 
 namespace Passingwind.Abp.ElsaModule.Workflow;
 
-public class RuntimeSelectListResultDto
+public class RuntimeSelectListResultDto : SelectList
 {
-    public SelectList SelectList { get; set; }
+    public RuntimeSelectListResultDto()
+    {
+    }
+
+    public RuntimeSelectListResultDto(ICollection<SelectListItem> items, bool isFlagsEnum = false) : base(items, isFlagsEnum)
+    {
+    }
 }

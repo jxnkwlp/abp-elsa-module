@@ -291,6 +291,7 @@ const Index: React.FC = () => {
             displayName: node.data.label, // to displayname
             // new
             props: {},
+            propertyStorageProviders: originData.propertyStorageProviders ?? {},
         };
 
         // initial all form fields
@@ -338,7 +339,7 @@ const Index: React.FC = () => {
             //
             if (
                 propItem.defaultWorkflowStorageProvider &&
-                Object.keys(formData.propertyStorageProviders ?? {}).indexOf(propItem.name) == -1
+                Object.keys(formData.propertyStorageProviders).indexOf(propItem.name) == -1
             ) {
                 formData.propertyStorageProviders[propItem.name] =
                     propItem.defaultWorkflowStorageProvider;
@@ -349,7 +350,7 @@ const Index: React.FC = () => {
             //
             if (
                 propItem.defaultWorkflowStorageProvider &&
-                Object.keys(formData.propertyStorageProviders ?? {}).indexOf(propItem.name) == -1
+                Object.keys(formData.propertyStorageProviders).indexOf(propItem.name) == -1
             ) {
                 formData.propertyStorageProviders[propItem.name] =
                     propItem.defaultWorkflowStorageProvider;

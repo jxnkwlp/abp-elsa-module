@@ -7,18 +7,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.3" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.4.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.4.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.4.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.4.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.8" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.6.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.6.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.6.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.6.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.6.0" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-        <PackageReference Include="Basic.Reference.Assemblies" Version="1.4.1" />
-        <PackageReference Include="IdentityModel" Version="6.0.0" />
+        <PackageReference Include="Basic.Reference.Assemblies" Version="1.4.2" />
+        <PackageReference Include="IdentityModel" Version="6.1.0" />
         <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.6.0" />
-        <PackageReference Include="NuGet.Protocol" Version="6.4.0" />
+        <PackageReference Include="NuGet.Protocol" Version="6.6.1" />
     </ItemGroup>
 
     <!--<Target Name="GetLibReferences" AfterTargets="ResolveFrameworkReferences">
@@ -44,15 +44,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.EventBus" Version="7.0.2" />
-        <PackageReference Include="Volo.Abp.Emailing" Version="7.0.2" />
-        <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="7.0.2" />
+        <PackageReference Include="Volo.Abp.EventBus" Version="7.2.3" />
+        <PackageReference Include="Volo.Abp.Emailing" Version="7.2.3" />
+        <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="7.2.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elsa.Activities.Email" Version="2.10.2.2" />
-        <PackageReference Include="Elsa.Activities.Http" Version="2.10.2.2" />
-        <PackageReference Include="Elsa.Activities.Temporal.Common" Version="2.10.2.2" />
+        <PackageReference Include="Elsa.Activities.Email" Version="2.12.0" />
+        <PackageReference Include="Elsa.Activities.Http" Version="2.12.0" />
+        <PackageReference Include="Elsa.Activities.Temporal.Common" Version="2.12.0" />
     </ItemGroup>
 
     <ItemGroup>
