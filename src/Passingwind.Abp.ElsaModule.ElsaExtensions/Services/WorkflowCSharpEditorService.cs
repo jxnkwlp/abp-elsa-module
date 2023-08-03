@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -106,15 +105,15 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
 
         var sourceText = await document.GetTextAsync(cancellationToken);
 
-        CompletionTrigger completionTrigger = CompletionTrigger.Invoke;
-        var triggerText = sourceText.GetSubText(position <= 0 ? 0 : position - 1)?.ToString();
-        if (triggerText.Length > 0)
-        {
-            if (triggerText[0] != '.')
-                completionTrigger = CompletionTrigger.CreateInsertionTrigger(triggerText[0]);
-        }
+        //CompletionTrigger completionTrigger = CompletionTrigger.Invoke;
+        //var triggerText = sourceText.GetSubText(position <= 0 ? 0 : position - 1)?.ToString();
+        //if (triggerText.Length > 0)
+        //{
+        //    if (triggerText[0] != '.')
+        //        completionTrigger = CompletionTrigger.CreateInsertionTrigger(triggerText[0]);
+        //}
 
-        var completionResult = await completionService.GetCompletionsAsync(document, position, completionTrigger, cancellationToken: cancellationToken);
+        var completionResult = await completionService.GetCompletionsAsync(document, position, cancellationToken: cancellationToken);
 
         var results = new List<WorkflowCSharpEditorCompletionItem>();
 
@@ -122,15 +121,16 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
         {
             var textSpanToTextCache = new Dictionary<TextSpan, string>();
 
-            var completions = completionResult.ItemsList.Where(x =>
-            {
-                if (!textSpanToTextCache.TryGetValue(x.Span, out var spanTxt))
-                {
-                    spanTxt = textSpanToTextCache[x.Span] = sourceText.GetSubText(x.Span).ToString();
-                }
+            var completions = completionResult.ItemsList;
+            //.Where(x =>
+            //{
+            //    if (!textSpanToTextCache.TryGetValue(x.Span, out var spanTxt))
+            //    {
+            //        spanTxt = textSpanToTextCache[x.Span] = sourceText.GetSubText(x.Span).ToString();
+            //    }
 
-                return helper.MatchesPattern(x, spanTxt, CultureInfo.InvariantCulture);
-            });
+            //    return helper.MatchesPattern(x, spanTxt, CultureInfo.InvariantCulture);
+            //});
 
             foreach (var item in completions)
             {
