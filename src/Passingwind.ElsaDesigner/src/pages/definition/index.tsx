@@ -16,6 +16,7 @@ import type { GlobalAPI } from '@/services/global';
 import type { API } from '@/services/typings';
 import {
     formatTableSorter,
+    formatUserName,
     getTableQueryConfig,
     saveTableQueryConfig,
     showDownloadFile,
@@ -709,6 +710,13 @@ const Index: React.FC = () => {
                                             }),
                                         },
                                         {
+                                            dataIndex: 'name',
+                                            title: intl.formatMessage({
+                                                id: 'page.user.field.name',
+                                            }),
+                                            render: (value, record) => formatUserName(record),
+                                        },
+                                        {
                                             dataIndex: '_actions',
                                             width: 100,
                                             align: 'center',
@@ -744,27 +752,27 @@ const Index: React.FC = () => {
                             ),
                         },
                         {
-                            key: 'groups',
-                            label: intl.formatMessage({ id: 'page.definition.iam.groups' }),
+                            key: 'teams',
+                            label: intl.formatMessage({ id: 'page.definition.iam.teams' }),
                             children: (
                                 <Table
                                     columns={[
                                         {
                                             dataIndex: 'name',
                                             title: intl.formatMessage({
-                                                id: 'page.workflowgroup.field.name',
+                                                id: 'page.workflowTeam.field.name',
                                             }),
                                         },
                                         {
-                                            dataIndex: 'roleName',
+                                            dataIndex: 'description',
                                             title: intl.formatMessage({
-                                                id: 'page.workflowgroup.field.roleName',
+                                                id: 'page.workflowTeam.field.description',
                                             }),
                                         },
                                     ]}
                                     rowKey="id"
                                     size="small"
-                                    dataSource={iamData?.groups ?? []}
+                                    dataSource={iamData?.teams ?? []}
                                     pagination={false}
                                 />
                             ),

@@ -1,4 +1,4 @@
-using Elsa.Scripting.JavaScript.Services;
+﻿using Elsa.Scripting.JavaScript.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Permissions;
@@ -35,13 +35,13 @@ public class ElsaModuleDomainModule : AbpModule
         Configure<PermissionManagementOptions>(options =>
         {
             options.IsDynamicPermissionStoreEnabled = true;
-            options.ManagementProviders.Add<WorkflowGroupPermissionManagementProvider>();
+            options.ManagementProviders.Add<WorkflowTeamPermissionManagementProvider>();
             options.ManagementProviders.Add<WorkflowUserOwnerPermissionManagementProvider>();
         });
 
         Configure<AbpPermissionOptions>(options =>
         {
-            options.ValueProviders.Add<WorkflowGroupPermissionValueProvider>();
+            options.ValueProviders.Add<WorkflowTeamPermissionValueProvider>();
             options.ValueProviders.Add<WorkflowUserOwnerPermissionValueProvider>();
         });
     }
@@ -53,12 +53,5 @@ public class ElsaModuleDomainModule : AbpModule
         context.Services.Replace<Elsa.Services.IWorkflowFactory, NewWorkflowFactory>(ServiceLifetime.Transient);
         context.Services.Replace<IConvertsJintEvaluationResult, SystemTextJsonJintConverter>(ServiceLifetime.Singleton);
         // context.Services.Replace<IContentSerializer, AbpContentSerializer>(ServiceLifetime.Singleton);
-
-        //PostConfigure<AbpSystemTextJsonSerializerOptions>(options =>
-        //{
-        //    options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
-        //    options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
-        //    options.JsonSerializerOptions.Converters.Add(new JArrayConverter());
-        //});
     }
 }

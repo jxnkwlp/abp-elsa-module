@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Permissions;
-using Passingwind.Abp.ElsaModule.WorkflowGroups;
+using Passingwind.Abp.ElsaModule.Teams;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
@@ -34,12 +34,16 @@ public class ElsaModuleEntityFrameworkCoreModule : AbpModule
                                                                                 .Include(c => c.Faults)
                                                                                 );
 
-            options.Entity<WorkflowGroup>(x => x.DefaultWithDetailsFunc = q => q.Include(x => x.Users));
+            options.Entity<WorkflowTeam>(x => x.DefaultWithDetailsFunc = q => q
+                                                                            .Include(x => x.Users)
+                                                                            .Include(x => x.RoleScopes));
         });
 
         context.Services.TryAddTransient(typeof(IPermissionGroupDefinitionRepository), typeof(PermissionGroupDefinitionRepository));
         context.Services.TryAddTransient(typeof(IPermissionDefinitionRepository), typeof(PermissionDefinitionRepository));
     }
+
+    #region Replace permission repository
 
     public class PermissionGroupDefinitionRepository : EfCorePermissionGroupDefinitionRecordRepository, IPermissionGroupDefinitionRepository
     {
@@ -54,4 +58,7 @@ public class ElsaModuleEntityFrameworkCoreModule : AbpModule
         {
         }
     }
+
+    #endregion
+
 }

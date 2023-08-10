@@ -1,24 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Passingwind.Abp.ElsaModule.Permissions;
 
 public class WorkflowPermissionGrantResult
 {
-    public bool AllGranted { get; private set; }
-    public IEnumerable<Guid> WorkflowIds => WorkflowRoleMaps.Keys;
-    public Dictionary<Guid, IEnumerable<WorkflowPermissionGrantProvider>> WorkflowRoleMaps { get; set; }
+    public bool AllGranted => WorkflowGrantProviders.Keys.Count == 0;
+    public IEnumerable<Guid> WorkflowIds => WorkflowGrantProviders.Keys;
+    public Dictionary<Guid, IReadOnlyList<WorkflowPermissionGrantProvider>> WorkflowGrantProviders { get; protected set; }
 
     protected WorkflowPermissionGrantResult()
     {
-        WorkflowRoleMaps = new Dictionary<Guid, IEnumerable<WorkflowPermissionGrantProvider>>();
+        WorkflowGrantProviders = new Dictionary<Guid, IReadOnlyList<WorkflowPermissionGrantProvider>>();
     }
 
-    public WorkflowPermissionGrantResult(Dictionary<Guid, IEnumerable<WorkflowPermissionGrantProvider>> maps)
-    {
-        WorkflowRoleMaps = maps;
-    }
-
-    public static WorkflowPermissionGrantResult All => new WorkflowPermissionGrantResult() { AllGranted = true };
     public static WorkflowPermissionGrantResult Empty => new WorkflowPermissionGrantResult();
+
+    public static WorkflowPermissionGrantResult Create() => new WorkflowPermissionGrantResult();
+
+    public WorkflowPermissionGrantResult AddWorkflow(Guid workflowId, params WorkflowPermissionGrantProvider[] provider)
+    {
+        WorkflowGrantProviders[workflowId] = provider;
+
+        return this;
+    }
+
+    public WorkflowPermissionGrantResult AddProvider(Guid workflowId, string name, string value)
+    {
+        lock (WorkflowGrantProviders)
+        {
+            if (WorkflowGrantProviders.ContainsKey(workflowId))
+            {
+                var providers = WorkflowGrantProviders[workflowId].ToList();
+
+                providers.Add(new WorkflowPermissionGrantProvider(name, value));
+                WorkflowGrantProviders[workflowId] = providers;
+            }
+            else
+            {
+                WorkflowGrantProviders[workflowId] = new List<WorkflowPermissionGrantProvider> { new WorkflowPermissionGrantProvider(name, value) };
+            }
+        }
+
+        return this;
+    }
 }

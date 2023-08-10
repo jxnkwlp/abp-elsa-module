@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 

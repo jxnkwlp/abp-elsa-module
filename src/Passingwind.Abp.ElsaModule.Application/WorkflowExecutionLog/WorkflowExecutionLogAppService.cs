@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Permissions;
+using Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
 using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Common;

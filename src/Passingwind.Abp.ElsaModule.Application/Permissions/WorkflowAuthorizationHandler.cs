@@ -11,13 +11,13 @@ namespace Passingwind.Abp.ElsaModule.Permissions;
 
 public class WorkflowAuthorizationHandler : AuthorizationHandler<WorkflowAuthorizationRequirement, WorkflowDefinition>, ITransientDependency
 {
-    private readonly WorkflowPermissionService _workflowPermissionService;
+    private readonly WorkflowPermissionProvider _workflowPermissionProvider;
     private readonly IOptions<PermissionManagementOptions> _permissionManagementOptions;
     private readonly IPermissionStore _permissionStore;
 
-    public WorkflowAuthorizationHandler(WorkflowPermissionService workflowPermissionService, IOptions<PermissionManagementOptions> permissionManagementOptions, IPermissionStore permissionStore)
+    public WorkflowAuthorizationHandler(WorkflowPermissionProvider workflowPermissionProvider, IOptions<PermissionManagementOptions> permissionManagementOptions, IPermissionStore permissionStore)
     {
-        _workflowPermissionService = workflowPermissionService;
+        _workflowPermissionProvider = workflowPermissionProvider;
         _permissionManagementOptions = permissionManagementOptions;
         _permissionStore = permissionStore;
     }
@@ -26,13 +26,7 @@ public class WorkflowAuthorizationHandler : AuthorizationHandler<WorkflowAuthori
     {
         var userId = context.User.FindUserId();
 
-        // creator 
-        //if (resource.CreatorId != null && resource.CreatorId == context.User.FindUserId())
-        //{
-        //    context.Succeed(requirement);
-        //}
-
-        var granted = await _workflowPermissionService.IsGrantedAsync(context.User, requirement.Id, requirement.Name);
+        var granted = await _workflowPermissionProvider.IsGrantedAsync(context.User, requirement.Id, requirement.Name);
 
         if (granted)
         {

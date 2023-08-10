@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Passingwind.Abp.ElsaModule.WorkflowGroups;
+using Passingwind.Abp.ElsaModule.Teams;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.Identity;
@@ -8,24 +8,18 @@ namespace Passingwind.Abp.ElsaModule.EventHandlers;
 
 public class RoleNameChangedEventHandler : IDistributedEventHandler<IdentityRoleNameChangedEto>, ITransientDependency
 {
-    protected IWorkflowGroupRepository WorkflowGroupRepository { get; }
+    protected IWorkflowTeamRepository WorkflowTeamRepository { get; }
 
-    public RoleNameChangedEventHandler(IWorkflowGroupRepository workflowGroupRepository)
+    public RoleNameChangedEventHandler(IWorkflowTeamRepository workflowTeamRepository)
     {
-        WorkflowGroupRepository = workflowGroupRepository;
+        WorkflowTeamRepository = workflowTeamRepository;
     }
 
     public async Task HandleEventAsync(IdentityRoleNameChangedEto eventData)
     {
-        var roleId = eventData.Id;
+        var oldName = eventData.OldName;
         var newName = eventData.Name;
 
-        var list = await WorkflowGroupRepository.GetListAsync(x => x.RoleId == roleId);
-
-        foreach (var group in list)
-        {
-            group.RoleName = newName;
-            await WorkflowGroupRepository.UpdateAsync(group);
-        }
+        await WorkflowTeamRepository.UpdateRoleNameAsync(oldName, newName);
     }
 }

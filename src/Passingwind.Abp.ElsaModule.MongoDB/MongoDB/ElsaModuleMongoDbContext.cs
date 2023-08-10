@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver;
 using Passingwind.Abp.ElsaModule.Common;
-using Passingwind.Abp.ElsaModule.WorkflowGroups;
+using Passingwind.Abp.ElsaModule.Teams;
 using Volo.Abp.Data;
 using Volo.Abp.MongoDB;
 
@@ -16,7 +16,7 @@ public class ElsaModuleMongoDbContext : AbpMongoDbContext, IElsaModuleMongoDbCon
     public IMongoCollection<WorkflowExecutionLog> WorkflowExecutionLogs => Collection<WorkflowExecutionLog>();
     public IMongoCollection<WorkflowInstance> WorkflowInstances => Collection<WorkflowInstance>();
     public IMongoCollection<GlobalVariable> GlobalVariables => Collection<GlobalVariable>();
-    public IMongoCollection<WorkflowGroup> WorkflowGroups => Collection<WorkflowGroup>();
+    public IMongoCollection<WorkflowTeam> WorkflowTeams => Collection<WorkflowTeam>();
 
     protected override void CreateModel(IMongoModelBuilder modelBuilder)
     {

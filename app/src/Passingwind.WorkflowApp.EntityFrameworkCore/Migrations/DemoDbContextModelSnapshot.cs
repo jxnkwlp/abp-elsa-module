@@ -19,7 +19,7 @@ namespace Demo.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("_Abp_DatabaseProvider", EfCoreDatabaseProvider.SqlServer)
-                .HasAnnotation("ProductVersion", "7.0.8")
+                .HasAnnotation("ProductVersion", "7.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -793,7 +793,7 @@ namespace Demo.Migrations
                     b.ToTable("ElsaWorkflowInstanceVariables", (string)null);
                 });
 
-            modelBuilder.Entity("Passingwind.Abp.ElsaModule.WorkflowGroups.WorkflowGroup", b =>
+            modelBuilder.Entity("Passingwind.Abp.ElsaModule.Teams.WorkflowTeam", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -847,14 +847,6 @@ namespace Demo.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
                     b.Property<Guid?>("TenantId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("TenantId");
@@ -863,22 +855,37 @@ namespace Demo.Migrations
 
                     b.HasIndex("Name");
 
-                    b.HasIndex("RoleName");
-
-                    b.ToTable("ElsaWorkflowGroups", (string)null);
+                    b.ToTable("ElsaWorkflowTeams", (string)null);
                 });
 
-            modelBuilder.Entity("Passingwind.Abp.ElsaModule.WorkflowGroups.WorkflowGroupUser", b =>
+            modelBuilder.Entity("Passingwind.Abp.ElsaModule.Teams.WorkflowTeamRoleScope", b =>
                 {
-                    b.Property<Guid>("WorkflowGroupId")
+                    b.Property<Guid>("WorkflowTeamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RoleName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Values")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("WorkflowTeamId", "RoleName");
+
+                    b.ToTable("ElsaWorkflowTeamRoleScopes", (string)null);
+                });
+
+            modelBuilder.Entity("Passingwind.Abp.ElsaModule.Teams.WorkflowTeamUser", b =>
+                {
+                    b.Property<Guid>("WorkflowTeamId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("WorkflowGroupId", "UserId");
+                    b.HasKey("WorkflowTeamId", "UserId");
 
-                    b.ToTable("ElsaWorkflowGroupUsers", (string)null);
+                    b.ToTable("ElsaWorkflowTeamUsers", (string)null);
                 });
 
             modelBuilder.Entity("Passingwind.WorkflowApp.ApiKeys.ApiKey", b =>
@@ -2343,11 +2350,20 @@ namespace Demo.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Passingwind.Abp.ElsaModule.WorkflowGroups.WorkflowGroupUser", b =>
+            modelBuilder.Entity("Passingwind.Abp.ElsaModule.Teams.WorkflowTeamRoleScope", b =>
                 {
-                    b.HasOne("Passingwind.Abp.ElsaModule.WorkflowGroups.WorkflowGroup", null)
+                    b.HasOne("Passingwind.Abp.ElsaModule.Teams.WorkflowTeam", null)
+                        .WithMany("RoleScopes")
+                        .HasForeignKey("WorkflowTeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Passingwind.Abp.ElsaModule.Teams.WorkflowTeamUser", b =>
+                {
+                    b.HasOne("Passingwind.Abp.ElsaModule.Teams.WorkflowTeam", null)
                         .WithMany("Users")
-                        .HasForeignKey("WorkflowGroupId")
+                        .HasForeignKey("WorkflowTeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -2500,8 +2516,10 @@ namespace Demo.Migrations
                     b.Navigation("Variables");
                 });
 
-            modelBuilder.Entity("Passingwind.Abp.ElsaModule.WorkflowGroups.WorkflowGroup", b =>
+            modelBuilder.Entity("Passingwind.Abp.ElsaModule.Teams.WorkflowTeam", b =>
                 {
+                    b.Navigation("RoleScopes");
+
                     b.Navigation("Users");
                 });
 

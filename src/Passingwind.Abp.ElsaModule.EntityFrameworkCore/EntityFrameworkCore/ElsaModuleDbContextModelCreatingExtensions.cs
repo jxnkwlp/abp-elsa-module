@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Passingwind.Abp.ElsaModule.Common;
-using Passingwind.Abp.ElsaModule.WorkflowGroups;
+using Passingwind.Abp.ElsaModule.Teams;
 using Volo.Abp;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.Identity;
@@ -235,28 +235,36 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.HasIndex(x => x.Key);
         });
 
-        builder.Entity<WorkflowGroup>(b =>
+        builder.Entity<WorkflowTeam>(b =>
         {
-            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowGroups", ElsaModuleDbProperties.DbSchema);
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowTeams", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
 
             b.Property(x => x.Name).HasMaxLength(128).IsRequired();
 
-            b.Property(x => x.RoleName).HasMaxLength(IdentityRoleConsts.MaxNameLength).IsRequired();
-
-            b.HasMany(x => x.Users).WithOne().HasForeignKey(x => x.WorkflowGroupId);
+            b.HasMany(x => x.Users).WithOne().HasForeignKey(x => x.WorkflowTeamId);
+            b.HasMany(x => x.RoleScopes).WithOne().HasForeignKey(x => x.WorkflowTeamId);
 
             b.HasIndex(x => x.Name);
-            b.HasIndex(x => x.RoleName);
         });
 
-        builder.Entity<WorkflowGroupUser>(b =>
+        builder.Entity<WorkflowTeamUser>(b =>
         {
-            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowGroupUsers", ElsaModuleDbProperties.DbSchema);
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowTeamUsers", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
 
-            b.HasKey(x => new { x.WorkflowGroupId, x.UserId });
+            b.HasKey(x => new { x.WorkflowTeamId, x.UserId });
         });
 
+        builder.Entity<WorkflowTeamRoleScope>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowTeamRoleScopes", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.Property(x => x.RoleName).IsRequired().HasMaxLength(IdentityRoleConsts.MaxNameLength);
+            b.Property(x => x.Values).HasConversion(new EfCoreJsonValueConverter<List<WorkflowTeamRoleScopeValue>>(), ValueComparer.CreateDefault(typeof(List<WorkflowTeamRoleScopeValue>), false));
+
+            b.HasKey(x => new { x.WorkflowTeamId, x.RoleName });
+        });
     }
 }

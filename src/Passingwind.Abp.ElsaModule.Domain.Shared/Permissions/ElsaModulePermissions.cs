@@ -39,9 +39,9 @@ public class ElsaModulePermissions
         public const string Delete = Default + ".Delete";
     }
 
-    public static class WorkflowGroup
+    public static class WorkflowTeam
     {
-        public const string Default = GroupName + ".WorkflowGroups";
+        public const string Default = GroupName + ".WorkflowTeams";
         public const string Create = Default + ".Create";
         public const string Update = Default + ".Update";
         public const string Delete = Default + ".Delete";

@@ -2,6 +2,7 @@ import { isInteger } from '@antv/util';
 import type { SortOrder } from 'antd/lib/table/interface';
 import moment from 'moment';
 import type { GlobalAPI } from './global';
+import { API } from './typings';
 
 export const randString = (prefix: string = '', length: number = 5) => {
     let result = '';
@@ -89,4 +90,11 @@ export const formatDateTimeToUtc = (value: string) => {
         }
     }
     return value;
+};
+
+export const formatUserName = (value: API.IdentityUser) => {
+    if (value.name && value.surname) return value.name + ' ' + value.surname;
+    else if (value.name) return value.name;
+    else if (value.surname) return value.surname;
+    else return '';
 };

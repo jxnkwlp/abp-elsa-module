@@ -17,16 +17,30 @@ public class WorkflowDataSender : IWorkflowDataSender
     protected IdentityRoleManager RoleManager { get; }
     protected IGuidGenerator GuidGenerator { get; }
     protected IPermissionManager PermissionManager { get; }
+    protected IWorkflowPermissionProvider WorkflowPermissionProvider { get; }
 
-    public WorkflowDataSender(ICurrentTenant currentTenant, IdentityRoleManager roleManager, IGuidGenerator guidGenerator, IPermissionManager permissionManager)
+    public WorkflowDataSender(
+        ICurrentTenant currentTenant,
+        IdentityRoleManager roleManager,
+        IGuidGenerator guidGenerator,
+        IPermissionManager permissionManager,
+        IWorkflowPermissionProvider workflowPermissionProvider)
     {
         CurrentTenant = currentTenant;
         RoleManager = roleManager;
         GuidGenerator = guidGenerator;
         PermissionManager = permissionManager;
+        WorkflowPermissionProvider = workflowPermissionProvider;
     }
 
     public async Task SendAsync(Guid? tenantId = null, CancellationToken cancellationToken = default)
+    {
+        await InitialPredefinedRolesAsync(tenantId, cancellationToken);
+        await InitialWorkflowPermissionDefinitionAsync(cancellationToken);
+        await RestoreWorkflowTeamPermissionGrantsAsync(cancellationToken);
+    }
+
+    protected async Task InitialPredefinedRolesAsync(Guid? tenantId = null, CancellationToken cancellationToken = default)
     {
         const string workflowAdministratorRoleName = "Workflow Administrator";
         const string workflowDeveloperRoleName = "Workflow Developer";
@@ -52,7 +66,7 @@ public class WorkflowDataSender : IWorkflowDataSender
                 // permissions
                 foreach (var name in ElsaModulePermissions.GetAll())
                 {
-                    if (name.EndsWith(".Delete") || name.Contains("GlobalVariables") || name.Contains("WorkflowGroup"))
+                    if (name.EndsWith(".Delete") || name.StartsWith(ElsaModulePermissions.GlobalVariables.Default) || name.StartsWith(ElsaModulePermissions.WorkflowTeam.Default))
                         continue;
 
                     await PermissionManager.SetAsync(name, RolePermissionValueProvider.ProviderName, workflowDeveloperRoleName, true);
@@ -69,5 +83,15 @@ public class WorkflowDataSender : IWorkflowDataSender
                 await PermissionManager.SetAsync(ElsaModulePermissions.Instances.Statistic, RolePermissionValueProvider.ProviderName, workflowViewerRoleName, true);
             }
         }
+    }
+
+    protected async Task InitialWorkflowPermissionDefinitionAsync(CancellationToken cancellationToken = default)
+    {
+        await WorkflowPermissionProvider.InitialWorkflowPermissionDefinitionsAsync(cancellationToken);
+    }
+
+    protected async Task RestoreWorkflowTeamPermissionGrantsAsync(CancellationToken cancellationToken = default)
+    {
+        await WorkflowPermissionProvider.RestoreWorkflowTeamPermissionGrantsAsync(cancellationToken);
     }
 }

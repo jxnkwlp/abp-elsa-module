@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -133,7 +133,7 @@ public class WorkflowAppWebModule : AbpModule
             options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
             options.JsonSerializerOptions.Converters.Add(new JArrayConverter());
             options.JsonSerializerOptions.Converters.Add(new ObjectConverter());
-            options.JsonSerializerOptions.Converters.RemoveAll(x=>x.GetType()== typeof(Volo.Abp.Json.SystemTextJson.JsonConverters.ObjectToInferredTypesConverter));
+            options.JsonSerializerOptions.Converters.RemoveAll(x => x.GetType() == typeof(Volo.Abp.Json.SystemTextJson.JsonConverters.ObjectToInferredTypesConverter));
         });
 
         Configure<AbpSystemTextJsonSerializerOptions>(options =>
@@ -311,6 +311,10 @@ public class WorkflowAppWebModule : AbpModule
                     //context.Response.WriteAsJsonAsync(new RemoteServiceErrorResponse(new RemoteServiceErrorInfo()));
                     context.Response.StatusCode = 401;
                 }
+                else
+                {
+                    context.Response.Redirect(context.RedirectUri);
+                }
                 return Task.CompletedTask;
             };
             optopns.Events.OnRedirectToAccessDenied = (context) =>
@@ -320,6 +324,10 @@ public class WorkflowAppWebModule : AbpModule
                     // TODO
                     //context.Response.WriteAsJsonAsync(new RemoteServiceErrorResponse(new RemoteServiceErrorInfo()));
                     context.Response.StatusCode = 403;
+                }
+                else
+                {
+                    context.Response.Redirect(context.RedirectUri);
                 }
                 return Task.CompletedTask;
             };
@@ -592,7 +600,7 @@ public class WorkflowAppWebModule : AbpModule
 
         app.UseResponseCompression();
 
-        app.UseStatusCodePages();
+        // app.UseStatusCodePages();
 
         app.UseForwardedHeaders();
         app.UseOwlRequestLocalization();

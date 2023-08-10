@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 
-namespace Passingwind.Abp.ElsaModule.Common;
+namespace Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
 
 public interface IWorkflowExecutionLogAppService : IApplicationService
 {

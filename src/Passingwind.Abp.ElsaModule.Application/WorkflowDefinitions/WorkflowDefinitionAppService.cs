@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -10,8 +10,8 @@ using Elsa.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.Permissions;
+using Passingwind.Abp.ElsaModule.Teams;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
-using Passingwind.Abp.ElsaModule.WorkflowGroups;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Content;
@@ -27,8 +27,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
     private readonly WorkflowDefinitionManager _workflowDefinitionManager;
     private readonly IWorkflowLaunchpad _workflowLaunchpad;
-    private readonly IWorkflowPermissionService _workflowPermissionService;
-    private readonly IWorkflowGroupManager _workflowGroupManager;
+    private readonly IWorkflowPermissionProvider _workflowPermissionProvider;
+    private readonly IWorkflowTeamManager _workflowTeamManager;
     private readonly IdentityUserManager _identityUserManager;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IWorkflowImporter _workflowImporter;
@@ -38,8 +38,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository,
         WorkflowDefinitionManager workflowDefinitionManager,
         IWorkflowLaunchpad workflowLaunchpad,
-        IWorkflowPermissionService workflowPermissionService,
-        IWorkflowGroupManager workflowGroupManager,
+        IWorkflowPermissionProvider workflowPermissionProvider,
+        IWorkflowTeamManager workflowTeamManager,
         IdentityUserManager identityUserManager,
         IJsonSerializer jsonSerializer,
         IWorkflowImporter workflowImporter)
@@ -48,8 +48,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
         _workflowDefinitionManager = workflowDefinitionManager;
         _workflowLaunchpad = workflowLaunchpad;
-        _workflowPermissionService = workflowPermissionService;
-        _workflowGroupManager = workflowGroupManager;
+        _workflowPermissionProvider = workflowPermissionProvider;
+        _workflowTeamManager = workflowTeamManager;
         _identityUserManager = identityUserManager;
         _jsonSerializer = jsonSerializer;
         _workflowImporter = workflowImporter;
@@ -156,7 +156,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
 
     public virtual async Task<PagedResultDto<WorkflowDefinitionBasicDto>> GetListAsync(WorkflowDefinitionListRequestDto input)
     {
-        var grantedResult = await _workflowPermissionService.GetGrantsAsync();
+        var grantedResult = await _workflowPermissionProvider.GetGrantsAsync();
 
         var count = await _workflowDefinitionRepository.CountAsync(
             name: input.Filter,
@@ -442,13 +442,13 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     public async Task<WorkflowDefinitionIamResultDto> GetIamAsync(Guid id)
     {
         var entity = await _workflowDefinitionRepository.GetAsync(id);
-        var groups = await _workflowGroupManager.GetListByWorkflowIdAsync(id);
+        var groups = await _workflowTeamManager.GetListByWorkflowIdAsync(id);
 
-        var owners = await _workflowPermissionService.GetWorkflowOwnersAsync(entity);
+        var owners = await _workflowPermissionProvider.GetWorkflowOwnersAsync(entity);
 
         return new WorkflowDefinitionIamResultDto
         {
-            Groups = ObjectMapper.Map<IEnumerable<WorkflowGroup>, IEnumerable<WorkflowGroupBasicDto>>(groups),
+            Teams = ObjectMapper.Map<IEnumerable<WorkflowTeam>, IEnumerable<WorkflowTeamBasicDto>>(groups),
             Owners = ObjectMapper.Map<IEnumerable<IdentityUser>, IEnumerable<IdentityUserDto>>(owners),
         };
     }
@@ -459,7 +459,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         var entity = await _workflowDefinitionRepository.GetAsync(id);
         var user = await _identityUserManager.GetByIdAsync(input.UserId);
 
-        await _workflowPermissionService.AddWorkflowOwnerAsync(entity, user);
+        await _workflowPermissionProvider.AddWorkflowOwnerAsync(entity, user);
     }
 
     [Authorize(Policy = ElsaModulePermissions.Definitions.ManagePermissions)]
@@ -468,7 +468,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         var entity = await _workflowDefinitionRepository.GetAsync(id);
         var user = await _identityUserManager.GetByIdAsync(userId);
 
-        await _workflowPermissionService.RemoveWorkflowOwnerAsync(entity, user);
+        await _workflowPermissionProvider.RemoveWorkflowOwnerAsync(entity, user);
     }
 
     public async Task<WorkflowVariablesDto> GetVariablesAsync(Guid id)

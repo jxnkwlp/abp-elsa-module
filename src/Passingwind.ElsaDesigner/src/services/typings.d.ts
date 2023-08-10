@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 182
+ * Total count: 185
  **/
 import * as Enum from "./enums";
 
@@ -1269,7 +1269,7 @@ declare namespace API {
      **/
     type WorkflowDefinitionIamResult = {
         owners?: IdentityUser[] | undefined;
-        groups?: WorkflowGroupBasic[] | undefined;
+        teams?: WorkflowTeamBasic[] | undefined;
     };
 
     /**
@@ -1469,71 +1469,6 @@ declare namespace API {
     type WorkflowExecutionLogPagedResult = {
         items?: WorkflowExecutionLog[] | undefined;
         totalCount: number;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type WorkflowGroup = {
-        id: string;
-        creationTime: string;
-        creatorId?: string | undefined;
-        lastModificationTime?: string | undefined;
-        lastModifierId?: string | undefined;
-        name?: string | undefined;
-        description?: string | undefined;
-        roleId: string;
-        roleName?: string | undefined;
-        userIds?: string[] | undefined;
-        workflowIds?: string[] | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type WorkflowGroupBasic = {
-        id: string;
-        creationTime: string;
-        creatorId?: string | undefined;
-        lastModificationTime?: string | undefined;
-        lastModifierId?: string | undefined;
-        name?: string | undefined;
-        description?: string | undefined;
-        roleId: string;
-        roleName?: string | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type WorkflowGroupBasicPagedResult = {
-        items?: WorkflowGroupBasic[] | undefined;
-        totalCount: number;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type WorkflowGroupCreateOrUpdate = {
-        name: string;
-        description?: string | undefined;
-        roleId: string;
-        userIds?: string[] | undefined;
-        workflowIds?: string[] | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type WorkflowGroupSetWorkflowRequest = {
-        workflowIds?: string[] | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type WorkflowGroupUpdateUsersRequest = {
-        userIds?: string[] | undefined;
     };
 
     /**
@@ -1851,6 +1786,88 @@ declare namespace API {
      **/
     type WorkflowStorageProviderInfoListResult = {
         items?: WorkflowStorageProviderInfo[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowTeam = {
+        id: string;
+        creationTime: string;
+        creatorId?: string | undefined;
+        lastModificationTime?: string | undefined;
+        lastModifierId?: string | undefined;
+        name?: string | undefined;
+        description?: string | undefined;
+        userIds?: string[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowTeamBasic = {
+        id: string;
+        creationTime: string;
+        creatorId?: string | undefined;
+        lastModificationTime?: string | undefined;
+        lastModifierId?: string | undefined;
+        name?: string | undefined;
+        description?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowTeamBasicPagedResult = {
+        items?: WorkflowTeamBasic[] | undefined;
+        totalCount: number;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowTeamCreateOrUpdate = {
+        name: string;
+        description?: string | undefined;
+        userIds?: string[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowTeamRoleScope = {
+        roleName?: string | undefined;
+        values?: WorkflowTeamRoleScopeValue[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowTeamRoleScopeCreateOrUpdate = {
+        roleName: string;
+        items?: WorkflowTeamRoleScopeValue[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowTeamRoleScopeListResult = {
+        items?: WorkflowTeamRoleScope[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowTeamRoleScopeValue = {
+        providerName: string;
+        providerValue: string;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowTeamUserUpdateRequest = {
+        userIds?: string[] | undefined;
     };
 
     /**

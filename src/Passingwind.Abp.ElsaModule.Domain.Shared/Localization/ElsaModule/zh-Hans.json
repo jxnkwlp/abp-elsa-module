@@ -1,4 +1,4 @@
-{
+﻿{
   "culture": "zh-Hans",
   "texts": {
     "ElsaModule:WorkflowDefinition.NameExists": "流程定义名称'{name}'已经存在",
@@ -23,7 +23,7 @@
 
     "Permission:GlobalVariables": "全局变量管理",
 
-    "Permission:WorkflowGroups": "分组管理",
-    "Permission:WorkflowGroups.ManagePermissions": "权限管理"
+    "Permission:WorkflowTeams": "团队管理",
+    "Permission:WorkflowTeams.ManagePermissions": "权限管理"
   }
 }
