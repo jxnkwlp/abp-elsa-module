@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +12,7 @@ namespace Passingwind.Abp.ElsaModule;
 
 public abstract class ElsaModuleAppService : ApplicationService
 {
-    protected IWorkflowPermissionService WorkflowPermissionService => LazyServiceProvider.GetRequiredService<IWorkflowPermissionService>();
+    protected IWorkflowPermissionProvider WorkflowPermissionProvider => LazyServiceProvider.GetRequiredService<IWorkflowPermissionProvider>();
 
     protected ElsaModuleAppService()
     {
@@ -45,7 +45,7 @@ public abstract class ElsaModuleAppService : ApplicationService
 
     protected async Task<IEnumerable<Guid>> FilterWorkflowsAsync(IEnumerable<Guid> sources = null)
     {
-        var grantedResult = await WorkflowPermissionService.GetGrantsAsync();
+        var grantedResult = await WorkflowPermissionProvider.GetGrantsAsync();
 
         var filterIds = sources?.ToList();
 

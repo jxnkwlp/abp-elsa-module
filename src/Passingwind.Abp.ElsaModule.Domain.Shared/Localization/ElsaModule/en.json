@@ -1,4 +1,4 @@
-{
+﻿{
   "culture": "en",
   "texts": {
     "ElsaModule:WorkflowDefinition.NameExists": "Workflow definition name '{name}' exists",
@@ -23,7 +23,7 @@
 
     "Permission:GlobalVariables": "Global variables management",
 
-    "Permission:WorkflowGroups": "Workflow groups management",
-    "Permission:WorkflowGroups.ManagePermissions": "Manage permissions"
+    "Permission:WorkflowTeams": "Workflow Teams Management",
+    "Permission:WorkflowTeams.ManagePermissions": "Manage permissions"
   }
 }

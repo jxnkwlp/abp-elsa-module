@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.Stores;
+using Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Authorization;
@@ -31,7 +32,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     private readonly IWorkflowStorageService _workflowStorageService;
     private readonly IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> _workflowInstanceDateCountStatisticsDistributedCache;
     private readonly IDistributedCache<WorkflowInstanceStatusCountStatisticsResultDto> _workflowInstanceStatusCountStatisticsDistributedCache;
-    private readonly IWorkflowPermissionService _workflowPermissionService;
+    private readonly IWorkflowPermissionProvider _workflowPermissionProvider;
 
     public WorkflowInstanceAppService(
         IJsonSerializer jsonSerializer,
@@ -45,7 +46,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         IWorkflowStorageService workflowStorageService,
         IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> workflowInstanceDateCountStatisticsDistributedCache,
         IDistributedCache<WorkflowInstanceStatusCountStatisticsResultDto> workflowInstanceStatusCountStatisticsDistributedCache,
-        IWorkflowPermissionService workflowPermissionService)
+        IWorkflowPermissionProvider workflowPermissionProvider)
     {
         _jsonSerializer = jsonSerializer;
         _workflowInstanceRepository = workflowInstanceRepository;
@@ -58,7 +59,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         _workflowStorageService = workflowStorageService;
         _workflowInstanceDateCountStatisticsDistributedCache = workflowInstanceDateCountStatisticsDistributedCache;
         _workflowInstanceStatusCountStatisticsDistributedCache = workflowInstanceStatusCountStatisticsDistributedCache;
-        _workflowPermissionService = workflowPermissionService;
+        _workflowPermissionProvider = workflowPermissionProvider;
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
@@ -157,12 +158,12 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
         var list = await _workflowExecutionLogRepository.GetListAsync(workflowInstanceId: id);
 
-        return new ListResultDto<WorkflowExecutionLogDto>(ObjectMapper.Map<List<WorkflowExecutionLog>, List<WorkflowExecutionLogDto>>(list));
+        return new ListResultDto<WorkflowExecutionLogDto>(ObjectMapper.Map<List<Common.WorkflowExecutionLog>, List<WorkflowExecutionLogDto>>(list));
     }
 
     public async Task<PagedResultDto<WorkflowInstanceBasicDto>> GetListAsync(WorkflowInstanceListRequestDto input)
     {
-        var grantedResult = await _workflowPermissionService.GetGrantsAsync();
+        var grantedResult = await _workflowPermissionProvider.GetGrantsAsync();
 
         List<Guid> definitionIds = new List<Guid>(grantedResult.WorkflowIds);
 

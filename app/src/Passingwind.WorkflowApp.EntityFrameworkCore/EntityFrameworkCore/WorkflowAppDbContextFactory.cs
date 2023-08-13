@@ -25,7 +25,8 @@ public class WorkflowAppDbContextFactory : IDesignTimeDbContextFactory<WorkflowA
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../Passingwind.WorkflowApp.DbMigrator/"))
-            .AddJsonFile("appsettings.json", optional: false);
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile("appsettings.secrets.json", optional: true);
 
         return builder.Build();
     }

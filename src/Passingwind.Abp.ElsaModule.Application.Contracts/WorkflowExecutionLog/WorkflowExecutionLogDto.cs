@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Volo.Abp.Application.Dtos;
 
-namespace Passingwind.Abp.ElsaModule.Common;
+namespace Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
 
 public class WorkflowExecutionLogDto : CreationAuditedEntityDto<Guid>
 {

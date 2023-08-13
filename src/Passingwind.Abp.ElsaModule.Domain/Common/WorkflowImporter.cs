@@ -17,7 +17,7 @@ public class WorkflowImporter : IWorkflowImporter
     private readonly WorkflowDefinitionManager _workflowDefinitionManager;
     private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
     private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
-    private readonly IWorkflowPermissionService _workflowPermissionService;
+    private readonly IWorkflowPermissionProvider _workflowPermissionService;
 
     public WorkflowImporter(
         IGuidGenerator guidGenerator,
@@ -25,7 +25,7 @@ public class WorkflowImporter : IWorkflowImporter
         WorkflowDefinitionManager workflowDefinitionManager,
         IWorkflowDefinitionRepository workflowDefinitionRepository,
         IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository,
-        IWorkflowPermissionService workflowPermissionService)
+        IWorkflowPermissionProvider workflowPermissionService)
     {
         _guidGenerator = guidGenerator;
         _currentTenant = currentTenant;

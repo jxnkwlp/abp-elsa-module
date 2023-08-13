@@ -11,7 +11,7 @@ namespace Passingwind.Abp.ElsaModule.Permissions;
 /// </summary>
 public class WorkflowUserOwnerPermissionValueProvider : PermissionValueProvider
 {
-    public const string ProviderName = "WUO";
+    public const string ProviderName = "WorkflowUserOwner";
 
     public override string Name => ProviderName;
 

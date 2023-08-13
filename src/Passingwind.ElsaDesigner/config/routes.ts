@@ -70,11 +70,27 @@
         access: 'ElsaWorkflow.Definitions.CreateOrUpdateOrPublish',
     },
     {
-        name: 'Variables',
-        icon: 'KeyOutlined',
-        path: '/variables',
-        component: './variables',
-        access: 'ElsaWorkflow.GlobalVariables',
+        path: '/workflows',
+        name: 'Workflows',
+        icon: 'ToolOutlined',
+        access: 'public',
+        routes: [
+            {
+                path: '/workflows/variables',
+                name: 'Variables',
+                component: './workflow/variables',
+                access: 'ElsaWorkflow.GlobalVariables',
+            },
+            {
+                path: '/workflows/teams',
+                name: 'Teams',
+                component: './workflow/teams',
+                access: 'ElsaWorkflow.WorkflowTeams',
+            },
+            {
+                component: './404',
+            },
+        ],
     },
     //
     {
@@ -119,12 +135,6 @@
                 name: 'roles',
                 component: './role',
                 access: 'AbpIdentity.Roles',
-            },
-            {
-                path: 'groups',
-                name: 'groups',
-                component: './group',
-                access: 'ElsaWorkflow.WorkflowGroups',
             },
             {
                 path: 'settings',

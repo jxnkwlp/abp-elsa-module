@@ -2,22 +2,21 @@
   major:
     commits:
       - "Major"
-      - "[break changes]"
     labels:
       - "Versioning - major"
   minor:
     commits:
-      - "[feat]"
       - "feat:"
       - "⬆️"
       - ":arrow_up:"
       - "🚀"
       - ":rocket:"
+      - ":recycle:"
+      - ":zap:"
     labels:
       - "Versioning - Minor"
   patch:
     commits:
-      - "[fix]"
       - "fix:"
       - ":bug:"
       - "🐛"

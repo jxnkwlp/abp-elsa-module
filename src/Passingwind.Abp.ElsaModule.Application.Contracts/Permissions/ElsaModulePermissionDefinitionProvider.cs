@@ -29,11 +29,11 @@ public class ElsaModulePermissionDefinitionProvider : PermissionDefinitionProvid
         globalVariablesPermission.AddChild(ElsaModulePermissions.GlobalVariables.Update, L("Permission:Update"));
         globalVariablesPermission.AddChild(ElsaModulePermissions.GlobalVariables.Delete, L("Permission:Delete"));
 
-        var workflowGroupPermission = myGroup.AddPermission(ElsaModulePermissions.WorkflowGroup.Default, L("Permission:WorkflowGroups"));
-        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroup.Create, L("Permission:Create"));
-        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroup.Update, L("Permission:Update"));
-        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroup.Delete, L("Permission:Delete"));
-        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroup.ManagePermissions, L("Permission:WorkflowGroups.ManagePermissions"));
+        var workflowTeamsPermission = myGroup.AddPermission(ElsaModulePermissions.WorkflowTeam.Default, L("Permission:WorkflowTeams"));
+        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeam.Create, L("Permission:Create"));
+        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeam.Update, L("Permission:Update"));
+        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeam.Delete, L("Permission:Delete"));
+        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeam.ManagePermissions, L("Permission:WorkflowTeams.ManagePermissions"));
     }
 
     private static LocalizableString L(string name)

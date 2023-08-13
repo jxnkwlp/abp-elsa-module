@@ -4,7 +4,7 @@ using MediatR;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.Stores;
-using Passingwind.Abp.ElsaModule.WorkflowGroups;
+using Passingwind.Abp.ElsaModule.Teams;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Entities.Events;
 using Volo.Abp.EventBus;
@@ -26,8 +26,8 @@ public class WorkflowDefinitionEventHander :
     private readonly IStoreMapper _storeMapper;
     private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
     private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
-    private readonly IWorkflowGroupManager _workflowGroupManager;
-    private readonly IWorkflowPermissionService _workflowPermissionService;
+    private readonly IWorkflowTeamManager _workflowTeamManager;
+    private readonly IWorkflowPermissionProvider _workflowPermissionService;
     private readonly IIdentityUserRepository _identityUserRepository;
 
     public WorkflowDefinitionEventHander(
@@ -35,15 +35,15 @@ public class WorkflowDefinitionEventHander :
         IStoreMapper storeMapper,
         IWorkflowDefinitionRepository workflowDefinitionRepository,
         IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository,
-        IWorkflowGroupManager workflowGroupManager,
-        IWorkflowPermissionService workflowPermissionService,
+        IWorkflowTeamManager workflowTeamManager,
+        IWorkflowPermissionProvider workflowPermissionService,
         IIdentityUserRepository identityUserRepository)
     {
         _mediator = mediator;
         _storeMapper = storeMapper;
         _workflowDefinitionRepository = workflowDefinitionRepository;
         _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
-        _workflowGroupManager = workflowGroupManager;
+        _workflowTeamManager = workflowTeamManager;
         _workflowPermissionService = workflowPermissionService;
         _identityUserRepository = identityUserRepository;
     }

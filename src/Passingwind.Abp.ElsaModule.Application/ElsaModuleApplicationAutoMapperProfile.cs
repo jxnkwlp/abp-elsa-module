@@ -1,11 +1,12 @@
-using System.Linq;
+﻿using System.Linq;
 using AutoMapper;
 using Elsa.Metadata;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.GlobalVariables;
+using Passingwind.Abp.ElsaModule.Teams;
 using Passingwind.Abp.ElsaModule.Workflow;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
-using Passingwind.Abp.ElsaModule.WorkflowGroups;
+using Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
 using Passingwind.Abp.ElsaModule.WorkflowInstances;
 using Volo.Abp.AutoMapper;
 
@@ -43,13 +44,15 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
         CreateMap<WorkflowInstanceFault, WorkflowInstanceFaultBasicDto>();
         CreateMap<WorkflowInstanceFault, WorkflowInstanceFaultDto>();
 
-        CreateMap<WorkflowExecutionLog, WorkflowExecutionLogDto>();
+        CreateMap<Common.WorkflowExecutionLog, WorkflowExecutionLogDto>();
 
         CreateMap<GlobalVariable, GlobalVariableDto>();
 
-        CreateMap<WorkflowGroup, WorkflowGroupBasicDto>();
-        CreateMap<WorkflowGroup, WorkflowGroupDto>()
-            .ForMember(x => x.UserIds, x => x.MapFrom(f => f.Users.Select(u => u.UserId)))
-            .Ignore(x => x.WorkflowIds);
+        CreateMap<WorkflowTeam, WorkflowTeamBasicDto>();
+        CreateMap<WorkflowTeam, WorkflowTeamDto>()
+            .ForMember(x => x.UserIds, x => x.MapFrom(f => f.Users.Select(u => u.UserId)));
+
+        CreateMap<WorkflowTeamRoleScope, WorkflowTeamRoleScopeDto>();
+        CreateMap<WorkflowTeamRoleScopeValue, WorkflowTeamRoleScopeValueDto>();
     }
 }
