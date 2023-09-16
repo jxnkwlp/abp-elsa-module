@@ -6,7 +6,7 @@ namespace Passingwind.Abp.ElsaModule;
 
 internal static class WorkflowHelper
 {
-    public const string WorkflowPermissionKeyPrefix = ElsaModulePermissions.Workflow.Default;
+    public const string WorkflowPermissionKeyPrefix = ElsaModulePermissions.Workflows.Default;
 
     public static string GenerateWorkflowPermissionKey(Guid guid)
     {

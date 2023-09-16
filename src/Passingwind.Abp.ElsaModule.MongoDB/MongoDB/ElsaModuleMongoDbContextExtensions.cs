@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson.Serialization;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.Groups;
 using Passingwind.Abp.ElsaModule.MongoDB.Serializers;
 using Passingwind.Abp.ElsaModule.Teams;
 using Volo.Abp;
@@ -116,5 +117,9 @@ public static class ElsaModuleMongoDbContextExtensions
             b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowTeams";
         });
 
+        builder.Entity<WorkflowGroup>(b =>
+        {
+            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowGroups";
+        });
     }
 }

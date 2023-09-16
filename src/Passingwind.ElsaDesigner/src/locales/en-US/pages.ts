@@ -130,6 +130,7 @@ export default {
     'page.definition.field.displayName': 'Display Name',
     'page.definition.field.displayName.tips': 'A user-friendly display name of the workflow.',
     'page.definition.field.description': 'Description',
+    'page.definition.field.groupName': 'Group',
     'page.definition.field.variables': 'Variables',
     'page.definition.field.contextOptions.type': 'Type',
     'page.definition.field.contextOptions.type.placeholder':
@@ -148,6 +149,7 @@ export default {
     'page.definition.field.version': 'Version',
     'page.definition.field.isLatest': 'Latest',
     'page.definition.field.isPublished': 'Published',
+    'page.definition.field.deleteCompletedInstances': 'Delete Instances',
     'page.definition.field.comparison': 'Comparison',
 
     //
@@ -218,6 +220,10 @@ export default {
     'page.workflowTeam.users': 'Users',
     'page.workflowTeam.roleScopes': 'Role Scopes',
     'page.workflowTeam.manage': 'Manage',
+    //
+    'page.workflowGroup': 'Group',
+    'page.workflowGroup.field.name': 'Name',
+    'page.workflowGroup.field.description': 'Description',
     //
     'page.variable.field.key': 'Key',
     'page.variable.field.value': 'Value',

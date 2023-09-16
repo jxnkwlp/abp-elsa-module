@@ -170,19 +170,19 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
         }
 
         // parent
-        var parent = await PermissionDefinitionRepository.FindAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.Name == ElsaModulePermissions.Workflow.Default);
+        var parent = await PermissionDefinitionRepository.FindAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.Name == ElsaModulePermissions.Workflows.Default);
 
         if (parent == null)
         {
             parent = await PermissionDefinitionRepository.InsertAsync(new PermissionDefinitionRecord(
                 GuidGenerator.Create(),
                 ElsaModulePermissions.GroupName,
-                ElsaModulePermissions.Workflow.Default,
+                ElsaModulePermissions.Workflows.Default,
                 null,
                 "Workflows"));
         }
 
-        var exists = await PermissionDefinitionRepository.GetListAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.ParentName == ElsaModulePermissions.Workflow.Default, cancellationToken: cancellationToken);
+        var exists = await PermissionDefinitionRepository.GetListAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.ParentName == ElsaModulePermissions.Workflows.Default, cancellationToken: cancellationToken);
 
         var workflows = await WorkflowDefinitionRepository.GetListAsync();
 
@@ -199,7 +199,7 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
                 GuidGenerator.Create(),
                 ElsaModulePermissions.GroupName,
                 name,
-                ElsaModulePermissions.Workflow.Default,
+                ElsaModulePermissions.Workflows.Default,
                 $"Workflows:{workflow.Id.ToString("d")}",
                 multiTenancySide: Volo.Abp.MultiTenancy.MultiTenancySides.Both
                 ), true, cancellationToken);
@@ -212,7 +212,7 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
                  GuidGenerator.Create(),
                  ElsaModulePermissions.GroupName,
                  WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition),
-                 ElsaModulePermissions.Workflow.Default,
+                 ElsaModulePermissions.Workflows.Default,
                  $"Workflows:{workflowDefinition.Id.ToString("d")}",
                  multiTenancySide: Volo.Abp.MultiTenancy.MultiTenancySides.Both), true, cancellationToken);
 

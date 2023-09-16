@@ -14,9 +14,23 @@ namespace Passingwind.Abp.ElsaModule.Stores;
 
 public class WorkflowInstanceStore : Store<WorkflowInstanceModel, WorkflowInstance, Guid>, IWorkflowInstanceStore
 {
-    protected override Task<WorkflowInstance> MapToEntityAsync(WorkflowInstanceModel model)
+    protected IWorkflowDefinitionRepository WorkflowDefinitionRepository { get; }
+
+    public WorkflowInstanceStore(IWorkflowDefinitionRepository workflowDefinitionRepository)
     {
-        return Task.FromResult(StoreMapper.MapToEntity(model));
+        WorkflowDefinitionRepository = workflowDefinitionRepository;
+    }
+
+    protected override async Task<WorkflowInstance> MapToEntityAsync(WorkflowInstanceModel model)
+    {
+        var entity = StoreMapper.MapToEntity(model);
+
+        var definition = await WorkflowDefinitionRepository.GetAsync(entity.WorkflowDefinitionId, false);
+
+        // copy
+        entity.GroupId = definition.GroupId;
+
+        return entity;
     }
 
     protected override Task<WorkflowInstance> MapToEntityAsync(WorkflowInstanceModel model, WorkflowInstance entity)

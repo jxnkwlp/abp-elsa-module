@@ -1432,6 +1432,7 @@ const Index: React.FC = () => {
                     setDefinition({
                         ...definition,
                         ...formData,
+                        groupId: formData.groupId,
                     });
                     return true;
                 }}

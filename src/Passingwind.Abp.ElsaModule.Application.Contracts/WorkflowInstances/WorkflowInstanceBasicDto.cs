@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Passingwind.Abp.ElsaModule.Common;
 using Volo.Abp.Application.Dtos;
 
@@ -17,6 +17,8 @@ public class WorkflowInstanceBasicDto : AuditedEntityDto<Guid>
     public string CorrelationId { get; set; }
     public string ContextType { get; set; }
     public string ContextId { get; set; }
+
+    public Guid? GroupId { get; set; }
 
     public DateTime? LastExecutedTime { get; set; }
     public DateTime? FinishedTime { get; set; }

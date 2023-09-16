@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Elsa.Models;
@@ -27,14 +27,39 @@ public class WorkflowDefinitionManager : DomainService
             throw new BusinessException(ElsaModuleErrorCodes.WorkflowDefinitionNameExists).WithData("name", entity.Name);
     }
 
-    public virtual Task<WorkflowDefinition> CreateDefinitionAsync(string name, string displayName, Guid? tenantId, string description, bool isSingleton, bool deleteCompletedInstances, string channel, string tag, WorkflowPersistenceBehavior persistenceBehavior, WorkflowContextOptions contextOptions, Dictionary<string, object> variables, Dictionary<string, object> customAttributes)
+    public virtual Task<WorkflowDefinition> CreateDefinitionAsync(
+        string name,
+        string displayName,
+        Guid? tenantId,
+        string description = null,
+        bool isSingleton = false,
+        bool deleteCompletedInstances = false,
+        string channel = null,
+        string tag = null,
+        WorkflowPersistenceBehavior? persistenceBehavior = null,
+        WorkflowContextOptions contextOptions = null,
+        Dictionary<string, object> variables = null,
+        Dictionary<string, object> customAttributes = null)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
         }
 
-        var definition = new WorkflowDefinition(GuidGenerator.Create(), name, displayName ?? name, tenantId, description, isSingleton, deleteCompletedInstances, channel, tag, persistenceBehavior, contextOptions, variables, customAttributes);
+        var definition = new WorkflowDefinition(
+            GuidGenerator.Create(),
+            name,
+            displayName ?? name,
+            tenantId,
+            description,
+            isSingleton,
+            deleteCompletedInstances,
+            channel,
+            tag,
+            persistenceBehavior,
+            contextOptions,
+            variables,
+            customAttributes);
 
         return Task.FromResult(definition);
     }

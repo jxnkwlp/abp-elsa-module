@@ -29,11 +29,16 @@ public class ElsaModulePermissionDefinitionProvider : PermissionDefinitionProvid
         globalVariablesPermission.AddChild(ElsaModulePermissions.GlobalVariables.Update, L("Permission:Update"));
         globalVariablesPermission.AddChild(ElsaModulePermissions.GlobalVariables.Delete, L("Permission:Delete"));
 
-        var workflowTeamsPermission = myGroup.AddPermission(ElsaModulePermissions.WorkflowTeam.Default, L("Permission:WorkflowTeams"));
-        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeam.Create, L("Permission:Create"));
-        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeam.Update, L("Permission:Update"));
-        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeam.Delete, L("Permission:Delete"));
-        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeam.ManagePermissions, L("Permission:WorkflowTeams.ManagePermissions"));
+        var workflowTeamsPermission = myGroup.AddPermission(ElsaModulePermissions.WorkflowTeams.Default, L("Permission:WorkflowTeams"));
+        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeams.Create, L("Permission:Create"));
+        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeams.Update, L("Permission:Update"));
+        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeams.Delete, L("Permission:Delete"));
+        workflowTeamsPermission.AddChild(ElsaModulePermissions.WorkflowTeams.ManagePermissions, L("Permission:WorkflowTeams.ManagePermissions"));
+
+        var workflowGroupPermission = myGroup.AddPermission(ElsaModulePermissions.WorkflowGroups.Default, L("Permission:WorkflowGroups"));
+        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroups.Create, L("Permission:Create"));
+        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroups.Update, L("Permission:Update"));
+        workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroups.Delete, L("Permission:Delete"));
     }
 
     private static LocalizableString L(string name)

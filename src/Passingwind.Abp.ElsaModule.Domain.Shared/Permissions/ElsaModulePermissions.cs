@@ -39,7 +39,7 @@ public class ElsaModulePermissions
         public const string Delete = Default + ".Delete";
     }
 
-    public static class WorkflowTeam
+    public static class WorkflowTeams
     {
         public const string Default = GroupName + ".WorkflowTeams";
         public const string Create = Default + ".Create";
@@ -48,7 +48,15 @@ public class ElsaModulePermissions
         public const string ManagePermissions = Default + ".ManagePermissions";
     }
 
-    public static class Workflow
+    public static class WorkflowGroups
+    {
+        public const string Default = GroupName + ".WorkflowGroups";
+        public const string Create = Default + ".Create";
+        public const string Update = Default + ".Update";
+        public const string Delete = Default + ".Delete";
+    }
+
+    public static class Workflows
     {
         public const string Default = GroupName + ".Workflows";
     }

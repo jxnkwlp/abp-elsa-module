@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 185
+ * Total count: 189
  **/
 import * as Enum from "./enums";
 
@@ -1172,10 +1172,12 @@ declare namespace API {
         deleteCompletedInstances?: boolean | undefined;
         channel?: string | undefined;
         tag?: string | undefined;
+        groupId?: string | undefined;
         persistenceBehavior: Enum.WorkflowPersistenceBehavior;
         contextOptions: WorkflowContextOptions;
         variables?: any | undefined;
         customAttributes?: any | undefined;
+        groupName?: string | undefined;
     };
 
     /**
@@ -1204,6 +1206,8 @@ declare namespace API {
         channel?: string | undefined;
         tag?: string | undefined;
         persistenceBehavior: Enum.WorkflowPersistenceBehavior;
+        groupId?: string | undefined;
+        groupName?: string | undefined;
     };
 
     /**
@@ -1225,6 +1229,7 @@ declare namespace API {
         deleteCompletedInstances?: boolean | undefined;
         channel?: string | undefined;
         tag?: string | undefined;
+        groupId?: string | undefined;
         persistenceBehavior: Enum.WorkflowPersistenceBehavior;
         contextOptions: WorkflowContextOptions;
         variables?: any | undefined;
@@ -1468,6 +1473,45 @@ declare namespace API {
      **/
     type WorkflowExecutionLogPagedResult = {
         items?: WorkflowExecutionLog[] | undefined;
+        totalCount: number;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowGroup = {
+        extraProperties?: any | undefined;
+        id: string;
+        creationTime: string;
+        creatorId?: string | undefined;
+        lastModificationTime?: string | undefined;
+        lastModifierId?: string | undefined;
+        name?: string | undefined;
+        description?: string | undefined;
+        tenantId?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowGroupCreateOrUpdate = {
+        extraProperties?: any | undefined;
+        name: string;
+        description?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowGroupListResult = {
+        items?: WorkflowGroup[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowGroupPagedResult = {
+        items?: WorkflowGroup[] | undefined;
         totalCount: number;
     };
 

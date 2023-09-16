@@ -12,7 +12,7 @@ using Volo.Abp.PermissionManagement;
 
 namespace Passingwind.Abp.ElsaModule.Teams;
 
-[Authorize(Policy = ElsaModulePermissions.WorkflowTeam.Default)]
+[Authorize(Policy = ElsaModulePermissions.WorkflowTeams.Default)]
 public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppService
 {
     private readonly IWorkflowTeamManager _workflowTeamManager;
@@ -53,7 +53,7 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
         return dto;
     }
 
-    [Authorize(Policy = ElsaModulePermissions.WorkflowTeam.Create)]
+    [Authorize(Policy = ElsaModulePermissions.WorkflowTeams.Create)]
     public virtual async Task<WorkflowTeamDto> CreateAsync(WorkflowTeamCreateOrUpdateDto input)
     {
         if (await _workflowTeamRepository.AnyAsync(x => x.Name == input.Name.Trim()))
@@ -75,7 +75,7 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
         return dto;
     }
 
-    [Authorize(Policy = ElsaModulePermissions.WorkflowTeam.Update)]
+    [Authorize(Policy = ElsaModulePermissions.WorkflowTeams.Update)]
     public virtual async Task<WorkflowTeamDto> UpdateAsync(Guid id, WorkflowTeamCreateOrUpdateDto input)
     {
         var entity = await _workflowTeamRepository.GetAsync(id);
@@ -99,7 +99,7 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
         return ObjectMapper.Map<WorkflowTeam, WorkflowTeamDto>(entity);
     }
 
-    [Authorize(Policy = ElsaModulePermissions.WorkflowTeam.Update)]
+    [Authorize(Policy = ElsaModulePermissions.WorkflowTeams.Update)]
     public async Task SetUsersAsync(Guid id, WorkflowTeamUserUpdateRequestDto input)
     {
         var entity = await _workflowTeamRepository.GetAsync(id);
@@ -113,7 +113,7 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
         await CurrentUnitOfWork.SaveChangesAsync();
     }
 
-    [Authorize(Policy = ElsaModulePermissions.WorkflowTeam.Delete)]
+    [Authorize(Policy = ElsaModulePermissions.WorkflowTeams.Delete)]
     public virtual async Task DeleteAsync(Guid id)
     {
         await _workflowTeamRepository.DeleteAsync(id);
@@ -126,7 +126,7 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
         return new ListResultDto<WorkflowTeamRoleScopeDto>(ObjectMapper.Map<List<WorkflowTeamRoleScope>, List<WorkflowTeamRoleScopeDto>>(entity.RoleScopes));
     }
 
-    [Authorize(Policy = ElsaModulePermissions.WorkflowTeam.Update)]
+    [Authorize(Policy = ElsaModulePermissions.WorkflowTeams.Update)]
     public async Task<ListResultDto<WorkflowTeamRoleScopeDto>> SetRoleScopeAsync(Guid id, WorkflowTeamRoleScopeCreateOrUpdateDto input)
     {
         var entity = await _workflowTeamRepository.GetAsync(id);
@@ -150,7 +150,7 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
         return new ListResultDto<WorkflowTeamRoleScopeDto>(ObjectMapper.Map<List<WorkflowTeamRoleScope>, List<WorkflowTeamRoleScopeDto>>(entity.RoleScopes));
     }
 
-    [Authorize(Policy = ElsaModulePermissions.WorkflowTeam.Update)]
+    [Authorize(Policy = ElsaModulePermissions.WorkflowTeams.Update)]
     public async Task DeleteRoleScopeAsync(Guid id, string roleName)
     {
         var entity = await _workflowTeamRepository.GetAsync(id);

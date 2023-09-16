@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 24
+ * Total count: 25
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -72,6 +72,18 @@ export async function getWorkflowDefinition(
     options?: { [key: string]: any }
 ) {
     return request<API.WorkflowDefinitionVersion>(`/api/elsa/workflow/definitions/${id}`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/elsa/workflow/definitions/assignable-groups 
+ **/
+export async function getWorkflowDefinitionAssignableGroups(
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowGroupListResult>(`/api/elsa/workflow/definitions/assignable-groups`, {
         method: 'GET',
         ...(options || {}),
     });

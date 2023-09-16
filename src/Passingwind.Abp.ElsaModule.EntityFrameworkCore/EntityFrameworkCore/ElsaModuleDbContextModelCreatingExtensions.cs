@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.Groups;
 using Passingwind.Abp.ElsaModule.Teams;
 using Volo.Abp;
 using Volo.Abp.EntityFrameworkCore.Modeling;
@@ -24,6 +25,7 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.DisplayName).HasMaxLength(128);
             b.Property(x => x.Description).HasMaxLength(256);
             b.Property(x => x.Channel).HasMaxLength(64);
+            b.Property(x => x.GroupName).HasMaxLength(64);
 
             b.Property(x => x.Tag).HasMaxLength(64);
             b.Property(x => x.ContextOptions).HasConversion(new EfCoreJsonValueConverter<Elsa.Models.WorkflowContextOptions>(), ValueComparer.CreateDefault(typeof(Elsa.Models.WorkflowContextOptions), false));
@@ -265,6 +267,16 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Values).HasConversion(new EfCoreJsonValueConverter<List<WorkflowTeamRoleScopeValue>>(), ValueComparer.CreateDefault(typeof(List<WorkflowTeamRoleScopeValue>), false));
 
             b.HasKey(x => new { x.WorkflowTeamId, x.RoleName });
+        });
+
+        builder.Entity<WorkflowGroup>(b =>
+        {
+            b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowGroups", ElsaModuleDbProperties.DbSchema);
+            b.ConfigureByConvention();
+
+            b.Property(x => x.Name).HasMaxLength(64).IsRequired();
+            b.Property(x => x.Description).HasMaxLength(256);
+
         });
     }
 }
