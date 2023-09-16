@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Content;
 
 namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions;

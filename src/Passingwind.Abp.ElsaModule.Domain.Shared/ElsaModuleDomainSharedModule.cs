@@ -15,10 +15,7 @@ public class ElsaModuleDomainSharedModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        Configure<AbpVirtualFileSystemOptions>(options =>
-        {
-            options.FileSets.AddEmbedded<ElsaModuleDomainSharedModule>();
-        });
+        Configure<AbpVirtualFileSystemOptions>(options => options.FileSets.AddEmbedded<ElsaModuleDomainSharedModule>());
 
         Configure<AbpLocalizationOptions>(options =>
         {
@@ -28,9 +25,6 @@ public class ElsaModuleDomainSharedModule : AbpModule
                 .AddVirtualJson("/Localization/ElsaModule");
         });
 
-        Configure<AbpExceptionLocalizationOptions>(options =>
-        {
-            options.MapCodeNamespace("ElsaModule", typeof(ElsaModuleResource));
-        });
+        Configure<AbpExceptionLocalizationOptions>(options => options.MapCodeNamespace("ElsaModule", typeof(ElsaModuleResource)));
     }
 }

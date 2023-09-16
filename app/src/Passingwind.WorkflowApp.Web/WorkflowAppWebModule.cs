@@ -48,9 +48,7 @@ using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.Authentication.OpenIdConnect;
 using Volo.Abp.AspNetCore.Mvc.AntiForgery;
-using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic.Bundling;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.BackgroundJobs.Hangfire;
@@ -154,15 +152,9 @@ public class WorkflowAppWebModule : AbpModule
             return settings;
         };
 
-        Configure<AbpAntiForgeryOptions>(options =>
-        {
-            options.AutoValidate = true;
-        });
+        Configure<AbpAntiForgeryOptions>(options => options.AutoValidate = true);
 
-        Configure<AbpClockOptions>(options =>
-        {
-            options.Kind = DateTimeKind.Utc;
-        });
+        Configure<AbpClockOptions>(options => options.Kind = DateTimeKind.Utc);
 
         Configure<AbpJsonOptions>(options =>
         {
@@ -178,16 +170,10 @@ public class WorkflowAppWebModule : AbpModule
 
         context.Services.AddResponseCompression();
 
-        context.Services.AddSpaStaticFiles(options =>
-        {
-            options.RootPath = "wwwroot/dist";
-        });
+        context.Services.AddSpaStaticFiles(options => options.RootPath = "wwwroot/dist");
 
         // Mediator.
-        context.Services.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(typeof(Program).Assembly);
-        });
+        context.Services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
         context.Services.AddHealthChecks();
     }
@@ -211,26 +197,9 @@ public class WorkflowAppWebModule : AbpModule
         settings.PreserveReferencesHandling = PreserveReferencesHandling.None;
     }
 
-    private void ConfigureBundles()
-    {
-        Configure<AbpBundlingOptions>(options =>
-        {
-            options.StyleBundles.Configure(
-                BasicThemeBundles.Styles.Global,
-                bundle =>
-                {
-                    bundle.AddFiles("/global-styles.css");
-                }
-            );
-        });
-    }
-
     private void ConfigureCache(ServiceConfigurationContext context, IConfiguration configuration)
     {
-        Configure<AbpDistributedCacheOptions>(options =>
-        {
-            options.KeyPrefix = GetAppName(configuration) + ":";
-        });
+        Configure<AbpDistributedCacheOptions>(options => options.KeyPrefix = GetAppName(configuration) + ":");
     }
 
     private void ConfigureDistributedLocking(ServiceConfigurationContext context, IConfiguration configuration)
@@ -243,27 +212,19 @@ public class WorkflowAppWebModule : AbpModule
                 ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
                 return new RedisDistributedSynchronizationProvider(connection.GetDatabase(database));
             }
-            else
-            {
-                return new FileDistributedSynchronizationProvider(new DirectoryInfo(Path.Combine(Path.GetTempPath(), GetAppName(configuration), "distributedlock")));
-            }
+
+            return new FileDistributedSynchronizationProvider(new DirectoryInfo(Path.Combine(Path.GetTempPath(), GetAppName(configuration), "distributedlock")));
         });
     }
 
     private void ConfigureUrls(IConfiguration configuration)
     {
-        Configure<AppUrlOptions>(options =>
-        {
-            options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
-        });
+        Configure<AppUrlOptions>(options => options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"]);
     }
 
     private void ConfigureMultiTenancy()
     {
-        Configure<AbpMultiTenancyOptions>(options =>
-        {
-            options.IsEnabled = MultiTenancyConsts.IsEnabled;
-        });
+        Configure<AbpMultiTenancyOptions>(options => options.IsEnabled = MultiTenancyConsts.IsEnabled);
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)
@@ -293,10 +254,7 @@ public class WorkflowAppWebModule : AbpModule
                         //    options.Scope.Add("phone");
                         //    //options.Scope.Add("WorkflowApp");
                         //})
-                        .AddApiKey(options =>
-                        {
-                            options.KeyName = ApiKeyDefaults.ApiKeyName;
-                        })
+                        .AddApiKey(options => options.KeyName = ApiKeyDefaults.ApiKeyName)
             ;
 
         context.Services.ConfigureApplicationCookie(optopns =>
@@ -354,10 +312,7 @@ public class WorkflowAppWebModule : AbpModule
 
     private void ConfigureAutoMapper()
     {
-        Configure<AbpAutoMapperOptions>(options =>
-        {
-            options.AddMaps<WorkflowAppWebModule>();
-        });
+        Configure<AbpAutoMapperOptions>(options => options.AddMaps<WorkflowAppWebModule>());
     }
 
     private void ConfigureVirtualFileSystem(IWebHostEnvironment hostingEnvironment)
@@ -429,7 +384,7 @@ public class WorkflowAppWebModule : AbpModule
                     if (action.StartsWith("GetAll"))
                         return $"GetAll{controller}{action.RemovePreFix("GetAll")}";
 
-                    if (action == ("Get") || action == ("Create") || action == ("Update") || action == ("Delete"))
+                    if (action == "Get" || action == "Create" || action == "Update" || action == "Delete")
                         return action + controller;
 
                     if (action.StartsWith("Get"))
@@ -449,8 +404,8 @@ public class WorkflowAppWebModule : AbpModule
 
                     if (method == "HttpGet")
                         return action + controller;
-                    else
-                        return controller + action;
+
+                    return controller + action;
                 });
             });
     }
@@ -551,10 +506,7 @@ public class WorkflowAppWebModule : AbpModule
                 {
                     http.HttpEndpointAuthorizationHandlerFactory = ActivatorUtilities.GetServiceOrCreateInstance<AuthenticationBasedHttpEndpointAuthorizationHandler>;
                     http.HttpEndpointWorkflowFaultHandlerFactory = ActivatorUtilities.GetServiceOrCreateInstance<AbpHttpEndpointWorkflowFaultHandler>;
-                }, builder =>
-                {
-                    builder.ConfigureHttpClient(client => { client.Timeout = TimeSpan.FromMinutes(10); });
-                })
+                }, builder => builder.ConfigureHttpClient(client => client.Timeout = TimeSpan.FromMinutes(10)))
                 .AddEmailActivities()
                 .AddJavaScriptActivities()
                 .AddUserTaskActivities()
@@ -567,10 +519,7 @@ public class WorkflowAppWebModule : AbpModule
                 ;
         });
 
-        Configure<ScriptOptions>(o =>
-        {
-            o.AllowClr = true;
-        });
+        Configure<ScriptOptions>(o => o.AllowClr = true);
 
         context.Services.AddTransient<IUserLookupService, UserAndRoleLookupService>();
         context.Services.AddTransient<IRoleLookupService, UserAndRoleLookupService>();

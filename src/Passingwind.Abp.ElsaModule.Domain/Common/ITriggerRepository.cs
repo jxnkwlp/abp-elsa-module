@@ -5,5 +5,4 @@ namespace Passingwind.Abp.ElsaModule.Common;
 
 public interface ITriggerRepository : IRepository<Trigger, Guid>
 {
-
 }

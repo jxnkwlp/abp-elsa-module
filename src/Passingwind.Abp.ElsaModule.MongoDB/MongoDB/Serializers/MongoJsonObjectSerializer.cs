@@ -26,8 +26,10 @@ public class MongoJsonObjectSerializer<TData> : SerializerBase<TData>
 
     public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, TData value)
     {
-        if (value == null)
+        if (System.Collections.Generic.EqualityComparer<TData>.Default.Equals(value, default(TData)))
+        {
             context.Writer.WriteNull();
+        }
         else
         {
             var jsonDocument = JsonConvert.SerializeObject(value, MongoJsonSerializerSettings.Settings);

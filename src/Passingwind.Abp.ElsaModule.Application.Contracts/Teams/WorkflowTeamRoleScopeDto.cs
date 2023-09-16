@@ -7,5 +7,5 @@ public class WorkflowTeamRoleScopeDto : EntityDto
 {
     public string RoleName { get; set; }
 
-    public List<WorkflowTeamRoleScopeValueDto> Values { get; private set; }
+    public List<WorkflowTeamRoleScopeValueDto> Values { get; }
 }

@@ -21,7 +21,7 @@ public class AbpSmtpService : ISmtpService
 
     public async Task SendAsync(ActivityExecutionContext context, MimeMessage message, CancellationToken cancellationToken)
     {
-        await SendAsync(message,cancellationToken);
+        await SendAsync(message, cancellationToken);
     }
 
     public async Task SendAsync(MimeMessage message, CancellationToken cancellationToken)
@@ -38,22 +38,28 @@ public class AbpSmtpService : ISmtpService
             mailMessage.From = new MailAddress(((MailboxAddress)message.From[0]).Address);
 
         if (message.To.Any())
+        {
             foreach (var item in message.To)
             {
                 mailMessage.To.Add(((MailboxAddress)item).Address);
             }
+        }
 
         if (message.Cc.Any())
+        {
             foreach (var item in message.Cc)
             {
                 mailMessage.CC.Add(((MailboxAddress)item).Address);
             }
+        }
 
         if (message.Bcc.Any())
+        {
             foreach (var item in message.Bcc)
             {
                 mailMessage.Bcc.Add(((MailboxAddress)item).Address);
             }
+        }
 
         if (message.Attachments.Any())
         {

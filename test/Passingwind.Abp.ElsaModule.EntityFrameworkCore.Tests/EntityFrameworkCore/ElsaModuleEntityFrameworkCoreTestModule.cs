@@ -19,13 +19,7 @@ public class ElsaModuleEntityFrameworkCoreTestModule : AbpModule
     {
         var sqliteConnection = CreateDatabaseAndGetConnection();
 
-        Configure<AbpDbContextOptions>(options =>
-        {
-            options.Configure(abpDbContextConfigurationContext =>
-            {
-                abpDbContextConfigurationContext.DbContextOptions.UseSqlite(sqliteConnection);
-            });
-        });
+        Configure<AbpDbContextOptions>(options => options.Configure(abpDbContextConfigurationContext => abpDbContextConfigurationContext.DbContextOptions.UseSqlite(sqliteConnection)));
     }
 
     private static SqliteConnection CreateDatabaseAndGetConnection()

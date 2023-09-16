@@ -19,5 +19,4 @@ public interface IWorkflowTeamManager : IDomainService
     Task<IReadOnlyList<WorkflowTeam>> GetListByWorkflowIdAsync(Guid workflowId, CancellationToken cancellationToken = default);
 
     Task UpdatePermissionGrantsAsync(WorkflowTeam workflowTeam, CancellationToken cancellationToken = default);
-
 }

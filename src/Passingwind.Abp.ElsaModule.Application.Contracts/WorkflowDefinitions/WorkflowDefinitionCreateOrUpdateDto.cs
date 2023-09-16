@@ -17,7 +17,7 @@ public class WorkflowDefinitionCreateOrUpdateDto
 
     public bool IsSingleton { get; set; }
 
-    public bool DeleteCompletedInstances { get; set; } = false;
+    public bool DeleteCompletedInstances { get; set; }
 
     [MaxLength(64)]
     public string Channel { get; set; }

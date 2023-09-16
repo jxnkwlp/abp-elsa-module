@@ -12,7 +12,6 @@ public class WorkflowTeamRoleScope : Entity
 
     public List<WorkflowTeamRoleScopeValue> Values { get; set; }
 
-
     protected WorkflowTeamRoleScope()
     {
         Values = new List<WorkflowTeamRoleScopeValue>();

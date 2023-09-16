@@ -18,16 +18,16 @@ public class CSharpScriptTypeDefinitionRenderHander : INotificationHandler<CShar
         var reference = notification.Reference;
 
         // methods
-        source.AppendLine(@$"
+        source.Append(@"
 // properties
 public static object Input => throw new System.NotImplementedException();
 public static string DefinitionId => throw new System.NotImplementedException();
 public static int DefinitionVersion => throw new System.NotImplementedException();
 public static string CorrelationId => throw new System.NotImplementedException();
-public static {typeof(CultureInfo).FullName} CurrentCulture => throw new System.NotImplementedException();
-public static {typeof(WorkflowInstance).FullName} WorkflowInstance => throw new System.NotImplementedException();
-public static {typeof(ActivityExecutionContext).FullName} ActivityExecutionContext => throw new System.NotImplementedException();
-public static {typeof(WorkflowExecutionContext).FullName} WorkflowExecutionContext => throw new System.NotImplementedException();
+public static ").Append(typeof(CultureInfo).FullName).Append(@" CurrentCulture => throw new System.NotImplementedException();
+public static ").Append(typeof(WorkflowInstance).FullName).Append(@" WorkflowInstance => throw new System.NotImplementedException();
+public static ").Append(typeof(ActivityExecutionContext).FullName).Append(@" ActivityExecutionContext => throw new System.NotImplementedException();
+public static ").Append(typeof(WorkflowExecutionContext).FullName).AppendLine(@" WorkflowExecutionContext => throw new System.NotImplementedException();
 public static object WorkflowContext => throw new System.NotImplementedException(); 
 
 // methods

@@ -25,10 +25,7 @@ public class ElsaModuleDomainModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        context.Services.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(typeof(ElsaModuleDomainModule).Assembly);
-        });
+        context.Services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(ElsaModuleDomainModule).Assembly));
 
         context.Services.AddTransient<IWorkflowCSharpEditorService, NullMonacoEditorService>();
 

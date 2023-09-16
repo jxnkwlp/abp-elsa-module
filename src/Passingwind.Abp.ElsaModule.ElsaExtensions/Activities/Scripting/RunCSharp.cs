@@ -40,7 +40,6 @@ public class RunCSharp : Activity, IActivityPropertyOptionsProvider, INotificati
     [ActivityOutput]
     public object Output { get; set; }
 
-
     private readonly ICSharpService _cSharpService;
 
     public RunCSharp(ICSharpService cSharpService)
@@ -60,13 +59,11 @@ public class RunCSharp : Activity, IActivityPropertyOptionsProvider, INotificati
         var setOutcome = (string value) => outcomes.Add(value);
         var setOutcomes = (IEnumerable<string> values) => outcomes.AddRange(values.Distinct());
 
-        var output = await _cSharpService.EvaluateAsync(script, typeof(object), context, (globalConfigure) =>
+        Output = await _cSharpService.EvaluateAsync(script, typeof(object), context, (globalConfigure) =>
         {
             globalConfigure.Context.SetOutcome = setOutcome;
             globalConfigure.Context.SetOutcomes = setOutcomes;
         }, context.CancellationToken);
-
-        Output = output;
 
         // distinct
         outcomes = outcomes.Distinct().ToList();
@@ -94,8 +91,8 @@ public class RunCSharp : Activity, IActivityPropertyOptionsProvider, INotificati
     {
         var source = notification.DefinitionSource;
 
-        source.AppendLine("public static void SetOutcome(string value) => throw new System.NotImplementedException(); ");
-        source.AppendLine("public static void SetOutcomes(IEnumerable<string> values) => throw new System.NotImplementedException(); ");
+        source.AppendLine("public static void SetOutcome(string value) => throw new System.NotImplementedException(); ")
+            .AppendLine("public static void SetOutcomes(IEnumerable<string> values) => throw new System.NotImplementedException(); ");
 
         return Task.CompletedTask;
     }

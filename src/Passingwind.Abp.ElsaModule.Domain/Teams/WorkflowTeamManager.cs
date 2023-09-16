@@ -83,7 +83,7 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
                 ElsaModulePermissions.GroupName,
                 name,
                 ElsaModulePermissions.Workflows.Default,
-                $"Workflows:{workflow.Id.ToString("d")}",
+                $"Workflows:{workflow.Id:d}",
                 multiTenancySide: workflow.TenantId == null ? Volo.Abp.MultiTenancy.MultiTenancySides.Host : Volo.Abp.MultiTenancy.MultiTenancySides.Tenant), true, cancellationToken);
         }
     }

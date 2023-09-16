@@ -27,11 +27,11 @@ public class WorkflowCSharpEditorCompletionItem
 
 public enum WorkflowCSharpEditorCompletionItemKind
 {
-    Function,
-    Class,
-    Field,
-    Variable,
-    Property,
-    Enum,
-    Others,
+    Function = 0,
+    Class = 1,
+    Field = 2,
+    Variable = 3,
+    Property = 4,
+    Enum = 5,
+    Others = 6,
 }

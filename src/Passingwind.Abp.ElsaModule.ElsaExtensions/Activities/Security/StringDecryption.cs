@@ -65,5 +65,4 @@ public class StringDecryption : Activity
             return Outcome("Error");
         }
     }
-
 }

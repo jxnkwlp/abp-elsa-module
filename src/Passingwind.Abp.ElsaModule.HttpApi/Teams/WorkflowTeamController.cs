@@ -70,5 +70,4 @@ public class WorkflowTeamController : Controller, IWorkflowTeamAppService
     {
         return _service.UpdateAsync(id, input);
     }
-
 }

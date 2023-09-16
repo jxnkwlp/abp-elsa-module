@@ -17,7 +17,7 @@ public class WorkflowGroupController : ElsaModuleController, IWorkflowGroupAppSe
         _service = service;
     }
 
-    [HttpGet()]
+    [HttpGet]
     public virtual Task<PagedResultDto<WorkflowGroupDto>> GetListAsync(WorkflowGroupListRequestDto input)
     {
         return _service.GetListAsync(input);
@@ -29,7 +29,7 @@ public class WorkflowGroupController : ElsaModuleController, IWorkflowGroupAppSe
         return _service.GetAsync(id);
     }
 
-    [HttpPost()]
+    [HttpPost]
     public virtual Task<WorkflowGroupDto> CreateAsync(WorkflowGroupCreateOrUpdateDto input)
     {
         return _service.CreateAsync(input);
@@ -46,5 +46,4 @@ public class WorkflowGroupController : ElsaModuleController, IWorkflowGroupAppSe
     {
         return _service.DeleteAsync(id);
     }
-
 }

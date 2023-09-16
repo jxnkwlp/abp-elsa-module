@@ -65,5 +65,4 @@ public class StringEncryption : Activity
             return Outcome("Error");
         }
     }
-
 }

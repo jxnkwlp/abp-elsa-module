@@ -18,9 +18,6 @@ public class ElsaModuleMongoDbTestModule : AbpModule
                                    "Db_" +
                                Guid.NewGuid().ToString("N") + "/?" + stringArray[1];
 
-        Configure<AbpDbConnectionOptions>(options =>
-        {
-            options.ConnectionStrings.Default = connectionString;
-        });
+        Configure<AbpDbConnectionOptions>(options => options.ConnectionStrings.Default = connectionString);
     }
 }

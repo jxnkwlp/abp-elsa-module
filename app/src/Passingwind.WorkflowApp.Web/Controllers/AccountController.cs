@@ -55,14 +55,12 @@ public class AccountController : AbpController
     [HttpGet("login")]
     public async Task<AccountResultDto> GetAsync()
     {
-        AccountResultDto dto = new AccountResultDto
+        return new AccountResultDto
         {
             ExternalProviders = await GetExternalProviders(),
 
             EnableLocalLogin = await _settingsProvider.IsTrueAsync(AccountSettingNames.EnableLocalLogin)
         };
-
-        return dto;
     }
 
     [HttpGet("login/external")]
@@ -114,7 +112,7 @@ public class AccountController : AbpController
 
         if (email.IsNullOrWhiteSpace())
         {
-            Logger.LogWarning($"External login user email is null.");
+            Logger.LogWarning("External login user email is null.");
             throw new UserFriendlyException("Cannot proceed because user email is null!");
         }
 
@@ -140,13 +138,10 @@ public class AccountController : AbpController
         {
             return LoginHelper.GetAbpLoginResult(signInResult);
         }
-        else
-        {
-            signInResult = SignInResult.Success;
+        signInResult = SignInResult.Success;
 
-            // success
-            await _signInManager.SignInAsync(user, false);
-        }
+        // success
+        await _signInManager.SignInAsync(user, false);
 
         await _identityOptions.SetAsync();
 

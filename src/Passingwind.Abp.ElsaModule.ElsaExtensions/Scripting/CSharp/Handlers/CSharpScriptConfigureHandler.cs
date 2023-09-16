@@ -95,7 +95,6 @@ public class CSharpScriptConfigureHandler : INotificationHandler<CSharpScriptEva
 
         // activity output
         await AddActivityOutputAsync(global, context, cancellationToken);
-
     }
 
     private async Task AddActivityOutputAsync(CSharpScriptEvaluationGlobal global, ActivityExecutionContext activityExecutionContext, CancellationToken cancellationToken)
@@ -126,7 +125,6 @@ public class CSharpScriptConfigureHandler : INotificationHandler<CSharpScriptEva
         }
 
         global.Context.ActivitityData = activities;
-
     }
 
     private string GetWorkflowDefinitionIdByTag(ActivityExecutionContext activityExecutionContext, string tag)
@@ -156,5 +154,4 @@ public class CSharpScriptConfigureHandler : INotificationHandler<CSharpScriptEva
         var activity = workflowExecutionContext.GetActivityBlueprintByName(idOrName) ?? workflowExecutionContext.GetActivityBlueprintById(idOrName);
         return activity == null ? null : workflowExecutionContext.WorkflowInstance.ActivityData[activity.Id];
     }
-
 }

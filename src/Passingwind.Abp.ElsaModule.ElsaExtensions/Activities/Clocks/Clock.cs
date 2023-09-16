@@ -40,7 +40,6 @@ public class Clock : Activity
 
         return Done();
     }
-
 }
 
 public class ClockOutputModel

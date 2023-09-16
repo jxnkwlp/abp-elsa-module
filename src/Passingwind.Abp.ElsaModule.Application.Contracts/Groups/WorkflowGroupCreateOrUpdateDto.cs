@@ -11,5 +11,4 @@ public class WorkflowGroupCreateOrUpdateDto : ExtensibleEntityDto
 
     [MaxLength(128)]
     public virtual string Description { get; set; }
-
 }

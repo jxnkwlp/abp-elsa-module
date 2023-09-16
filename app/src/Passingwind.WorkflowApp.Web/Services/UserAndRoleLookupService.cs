@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Passingwind.Abp.ElsaModule.Services;
@@ -36,33 +35,33 @@ public class UserAndRoleLookupService : IUserLookupService, IRoleLookupService
     public async Task<List<UserLookupResultItem>> GetListAsync(string filter = null, CancellationToken cancellationToken = default)
     {
         var list = await _identityUserRepository.GetListAsync();
-        return list.Select(x => new UserLookupResultItem
+        return list.ConvertAll(x => new UserLookupResultItem
         {
             UserName = x.UserName,
             DisplayName = x.UserName,
             Email = x.Email,
-        }).ToList();
+        });
     }
 
     public async Task<List<UserLookupResultItem>> GetListByRoleNameAsync(string roleName, CancellationToken cancellationToken = default)
     {
         var users = await _identityUserRepository.GetListByNormalizedRoleNameAsync(roleName);
 
-        return users.Select(x => new UserLookupResultItem
+        return users.ConvertAll(x => new UserLookupResultItem
         {
             UserName = x.UserName,
             DisplayName = x.UserName,
             Email = x.Email,
-        }).ToList();
+        });
     }
 
     async Task<List<RoleLookupResultItem>> IRoleLookupService.GetListAsync(string filter, CancellationToken cancellationToken)
     {
         var list = await _identityRoleRepository.GetListAsync();
-        return list.Select(x => new RoleLookupResultItem
+        return list.ConvertAll(x => new RoleLookupResultItem
         {
             Id = x.Id.ToString(),
             Name = x.Name
-        }).ToList();
+        });
     }
 }

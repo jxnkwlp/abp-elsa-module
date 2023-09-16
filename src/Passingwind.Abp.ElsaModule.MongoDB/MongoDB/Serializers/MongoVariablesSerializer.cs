@@ -30,7 +30,9 @@ public class MongoVariablesSerializer : SerializerBase<Variables>
     public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Variables value)
     {
         if (value == null || value.Data == null)
+        {
             context.Writer.WriteNull();
+        }
         else
         {
             var json = JsonConvert.SerializeObject(value.Data, MongoJsonSerializerSettings.Settings);

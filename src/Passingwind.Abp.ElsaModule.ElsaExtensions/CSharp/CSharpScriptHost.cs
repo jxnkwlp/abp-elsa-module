@@ -17,12 +17,16 @@ using Microsoft.CodeAnalysis.Scripting.Hosting;
 
 namespace Passingwind.Abp.ElsaModule.CSharp;
 
-// 
-// https://github.com/dotnet/roslyn/blob/main/docs/wiki/Scripting-API-Samples.md
-// 
+/// <summary>
+///
+/// https://github.com/dotnet/roslyn/blob/main/docs/wiki/Scripting-API-Samples.md
+///
+/// </summary>
 public class CSharpScriptHost : ICSharpScriptHost
 {
-    // default references
+    /// <summary>
+    /// default references
+    /// </summary>
     public static ImmutableArray<MetadataReference> DefaultReferences = new[] {
             Assembly.Load("System.Runtime"), // System.Runtime.dll
             Assembly.Load("netstandard"), // netstandard.dll
@@ -42,7 +46,9 @@ public class CSharpScriptHost : ICSharpScriptHost
         //.Concat(Basic.Reference.Assemblies.Net60.References.All)
         .ToImmutableArray<MetadataReference>();
 
-    // default imports
+    /// <summary>
+    /// default imports
+    /// </summary>
     public static ImmutableArray<string> DefaultImports => new string[] {
             "System",
             "System.Console",
@@ -111,7 +117,7 @@ public class CSharpScriptHost : ICSharpScriptHost
         {
             var result = await scriptState.Script.RunAsync(context.EvaluationGlobal, cancellationToken: cancellationToken);
 
-            return result?.ReturnValue ?? null;
+            return result?.ReturnValue;
         }
         catch (CompilationErrorException e)
         {
@@ -137,7 +143,7 @@ public class CSharpScriptHost : ICSharpScriptHost
 
             var result = await script.RunAsync(context.EvaluationGlobal, cancellationToken: cancellationToken);
 
-            return result?.ReturnValue ?? null;
+            return result?.ReturnValue;
         }
         catch (CompilationErrorException e)
         {
@@ -180,8 +186,8 @@ public class CSharpScriptHost : ICSharpScriptHost
         var compilation = CSharpCompilation.Create(
             name,
             syntaxTrees: new[] { syntaxTree },
-            options: compilationOptions,
-            references: scriptOptions.MetadataReferences);
+            references: scriptOptions.MetadataReferences,
+            options: compilationOptions);
 
         var file = Path.Combine(rootFolder, name);
 
@@ -193,10 +199,6 @@ public class CSharpScriptHost : ICSharpScriptHost
         if (emitResult?.Success != true && !emitResult.Diagnostics.IsEmpty)
         {
             throw new AggregateException(emitResult.Diagnostics.Select(x => new Exception(x.ToString())));
-        }
-        else
-        {
-            // TODO: logging
         }
     }
 

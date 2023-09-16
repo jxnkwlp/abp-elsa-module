@@ -4,5 +4,4 @@ namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 
 public class WorkflowDefinitionVersionListRequestDto : PagedResultRequestDto
 {
-
 }

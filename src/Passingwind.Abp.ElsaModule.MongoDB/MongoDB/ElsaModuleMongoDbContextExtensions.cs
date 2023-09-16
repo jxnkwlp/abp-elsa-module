@@ -32,94 +32,40 @@ public static class ElsaModuleMongoDbContextExtensions
         BsonSerializer.RegisterSerializer<List<Elsa.Models.BlockingActivity>>(new MongoListSerializer<Elsa.Models.BlockingActivity>());
         BsonSerializer.RegisterSerializer<List<Elsa.Models.ActivityScope>>(new MongoListSerializer<Elsa.Models.ActivityScope>());
 
-        builder.Entity<Bookmark>(b =>
-        {
-            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "Bookmarks";
-        });
+        builder.Entity<Bookmark>(b => b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "Bookmarks");
 
-        builder.Entity<Trigger>(b =>
-        {
-            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "Triggers";
-        });
+        builder.Entity<Trigger>(b => b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "Triggers");
 
-        builder.Entity<WorkflowDefinition>(b =>
-        {
-            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowDefinitions";
-        });
+        builder.Entity<WorkflowDefinition>(b => b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowDefinitions");
 
-        builder.Entity<WorkflowDefinitionVersion>(b =>
-        {
-            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowDefinitionVersions";
-        });
+        builder.Entity<WorkflowDefinitionVersion>(b => b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowDefinitionVersions");
 
-        BsonClassMap.RegisterClassMap<Activity>(b =>
-        {
-            b.AutoMap();
-        });
+        BsonClassMap.RegisterClassMap<Activity>(b => b.AutoMap());
 
-        BsonClassMap.RegisterClassMap<ActivityConnection>(b =>
-        {
-            b.AutoMap();
-        });
+        BsonClassMap.RegisterClassMap<ActivityConnection>(b => b.AutoMap());
 
-        builder.Entity<WorkflowInstance>(b =>
-        {
-            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstances";
-        });
+        builder.Entity<WorkflowInstance>(b => b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstances");
 
-        BsonClassMap.RegisterClassMap<WorkflowInstanceVariable>(b =>
-        {
-            b.AutoMap();
-        });
+        BsonClassMap.RegisterClassMap<WorkflowInstanceVariable>(b => b.AutoMap());
 
-        BsonClassMap.RegisterClassMap<WorkflowInstanceActivityData>(b =>
-        {
-            b.AutoMap();
-        });
+        BsonClassMap.RegisterClassMap<WorkflowInstanceActivityData>(b => b.AutoMap());
 
-        BsonClassMap.RegisterClassMap<WorkflowInstanceActivityScope>(b =>
-        {
-            b.AutoMap();
-        });
+        BsonClassMap.RegisterClassMap<WorkflowInstanceActivityScope>(b => b.AutoMap());
 
-        BsonClassMap.RegisterClassMap<WorkflowInstanceBlockingActivity>(b =>
-        {
-            b.AutoMap();
-        });
+        BsonClassMap.RegisterClassMap<WorkflowInstanceBlockingActivity>(b => b.AutoMap());
 
-        BsonClassMap.RegisterClassMap<WorkflowInstanceFault>(b =>
-        {
-            b.AutoMap();
-        });
+        BsonClassMap.RegisterClassMap<WorkflowInstanceFault>(b => b.AutoMap());
 
-        BsonClassMap.RegisterClassMap<WorkflowInstanceMetadata>(b =>
-        {
-            b.AutoMap();
-        });
+        BsonClassMap.RegisterClassMap<WorkflowInstanceMetadata>(b => b.AutoMap());
 
-        BsonClassMap.RegisterClassMap<WorkflowInstanceScheduledActivity>(b =>
-        {
-            b.AutoMap();
-        });
+        BsonClassMap.RegisterClassMap<WorkflowInstanceScheduledActivity>(b => b.AutoMap());
 
-        builder.Entity<WorkflowExecutionLog>(b =>
-        {
-            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowExecutionLogs";
-        });
+        builder.Entity<WorkflowExecutionLog>(b => b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowExecutionLogs");
 
-        builder.Entity<GlobalVariable>(b =>
-        {
-            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "GlobalVariables";
-        });
+        builder.Entity<GlobalVariable>(b => b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "GlobalVariables");
 
-        builder.Entity<WorkflowTeam>(b =>
-        {
-            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowTeams";
-        });
+        builder.Entity<WorkflowTeam>(b => b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowTeams");
 
-        builder.Entity<WorkflowGroup>(b =>
-        {
-            b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowGroups";
-        });
+        builder.Entity<WorkflowGroup>(b => b.CollectionName = ElsaModuleDbProperties.DbTablePrefix + "WorkflowGroups");
     }
 }

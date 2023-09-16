@@ -42,5 +42,4 @@ public class ApiKeyRepository : EfCoreRepository<WorkflowAppDbContext, ApiKey, G
             .PageBy(skipCount, maxResultCount)
             .ToListAsync(cancellationToken);
     }
-
 }

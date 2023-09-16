@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace Passingwind.Abp.ElsaModule.Workflow;

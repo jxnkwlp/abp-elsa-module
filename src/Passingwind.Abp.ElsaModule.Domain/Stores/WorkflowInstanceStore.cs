@@ -68,9 +68,7 @@ public class WorkflowInstanceStore : Store<WorkflowInstanceModel, WorkflowInstan
 
         var selectQuery = query.Select(mappingExp);
 
-        var list = await AsyncExecuter.ToListAsync(selectQuery, cancellationToken);
-
-        return list;
+        return await AsyncExecuter.ToListAsync(selectQuery, cancellationToken);
     }
 
     protected override async Task<Expression<Func<WorkflowInstance, bool>>> MapSpecificationAsync(ISpecification<WorkflowInstanceModel> specification)
@@ -184,12 +182,10 @@ public class WorkflowInstanceStore : Store<WorkflowInstanceModel, WorkflowInstan
                 }
 
             case AndSpecification<WorkflowInstanceModel> andSpecification:
-                {
-                    var left = andSpecification.Left;
-                    var right = andSpecification.Right;
+                var left = andSpecification.Left;
+                var right = andSpecification.Right;
 
-                    return (await MapSpecificationAsync(left)).And(await MapSpecificationAsync(right));
-                }
+                return (await MapSpecificationAsync(left)).And(await MapSpecificationAsync(right));
 
             default:
                 return await base.MapSpecificationAsync(specification);
@@ -200,5 +196,4 @@ public class WorkflowInstanceStore : Store<WorkflowInstanceModel, WorkflowInstan
     {
         return Guid.Parse(value);
     }
-
 }

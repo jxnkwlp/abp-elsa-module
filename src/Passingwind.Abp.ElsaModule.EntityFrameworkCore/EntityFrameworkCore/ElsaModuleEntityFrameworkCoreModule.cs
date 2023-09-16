@@ -59,6 +59,6 @@ public class ElsaModuleEntityFrameworkCoreModule : AbpModule
         }
     }
 
-    #endregion
+    #endregion Replace permission repository
 
 }

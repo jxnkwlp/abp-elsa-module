@@ -26,7 +26,7 @@ public class OAuth2SettingsAppService : WorkflowAppAppService, IOAuth2SettingsAp
 
     public async Task<OAuth2SettingsDto> GetAsync()
     {
-        OAuth2SettingsDto result = new OAuth2SettingsDto()
+        return new OAuth2SettingsDto()
         {
             Enabled = await _settingProvider.GetAsync<bool>(OAuth2Setting.Enabled),
             DisplayName = await _settingProvider.GetOrNullAsync(OAuth2Setting.DisplayName),
@@ -36,8 +36,6 @@ public class OAuth2SettingsAppService : WorkflowAppAppService, IOAuth2SettingsAp
             ClientSecret = await _settingProvider.GetOrNullAsync(OAuth2Setting.ClientSecret),
             Scope = await _settingProvider.GetOrNullAsync(OAuth2Setting.Scope),
         };
-
-        return result;
     }
 
     public async Task UpdateAsync(OAuth2SettingUpdateDto input)

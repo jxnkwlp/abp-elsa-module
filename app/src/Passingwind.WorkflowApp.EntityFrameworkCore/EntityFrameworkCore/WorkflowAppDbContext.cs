@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 using Passingwind.WorkflowApp.ApiKeys;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -40,7 +40,9 @@ public class WorkflowAppDbContext :
      * uses this DbContext on runtime. Otherwise, it will use its own DbContext class.
      */
 
-    //Identity
+    /// <summary>
+    /// Identity
+    /// </summary>
     public DbSet<IdentityUser> Users { get; set; }
     public DbSet<IdentityRole> Roles { get; set; }
     public DbSet<IdentityClaimType> ClaimTypes { get; set; }
@@ -49,18 +51,19 @@ public class WorkflowAppDbContext :
     public DbSet<IdentityLinkUser> LinkUsers { get; set; }
     public DbSet<IdentityUserDelegation> UserDelegations { get; set; }
 
-    // Tenant Management
+    /// <summary>
+    /// Tenant Management
+    /// </summary>
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
 
-    #endregion
+    #endregion Entities from the modules
 
     public DbSet<ApiKey> ApiKeys { get; set; }
-   
+
     public WorkflowAppDbContext(DbContextOptions<WorkflowAppDbContext> options)
         : base(options)
     {
-
     }
 
     protected override void OnModelCreating(ModelBuilder builder)

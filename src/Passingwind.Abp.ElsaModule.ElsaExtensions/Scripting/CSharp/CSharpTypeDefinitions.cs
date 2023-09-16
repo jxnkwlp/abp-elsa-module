@@ -5,11 +5,8 @@ namespace Passingwind.Abp.ElsaModule.Scripting.CSharp;
 
 public class CSharpTypeDefinitions
 {
-    private readonly Dictionary<string, Type> _properties = new Dictionary<string, Type>();
-    private readonly Dictionary<string, CSharpMethodDefinition> _methods = new Dictionary<string, CSharpMethodDefinition>();
-
-    public Dictionary<string, Type> Properties => _properties;
-    public Dictionary<string, CSharpMethodDefinition> Methods => _methods;
+    public Dictionary<string, Type> Properties { get; } = new Dictionary<string, Type>();
+    public Dictionary<string, CSharpMethodDefinition> Methods { get; } = new Dictionary<string, CSharpMethodDefinition>();
 
     public CSharpTypeDefinitions AddProperty(string name, Type type)
     {

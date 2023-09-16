@@ -11,7 +11,6 @@ public class WorkflowTeamRoleScopeValue : IEquatable<WorkflowTeamRoleScopeValue>
     public string ProviderName { get; set; }
     public string ProviderValue { get; set; }
 
-
     public override string ToString()
     {
         return $"{ProviderName}: {ProviderValue}";

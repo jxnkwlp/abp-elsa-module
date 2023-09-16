@@ -10,7 +10,7 @@ public class WorkflowTeamUser : Entity
     public Guid UserId { get; set; }
 
     protected WorkflowTeamUser()
-    { 
+    {
     }
 
     public WorkflowTeamUser(Guid userId)

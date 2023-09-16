@@ -36,7 +36,9 @@ public class MongoListSerializer<T> : SerializerBase<List<T>>
         context.Writer.WriteStartArray();
 
         if (value == null)
+        {
             context.Writer.WriteEndArray();
+        }
         else
         {
             foreach (var item in value)

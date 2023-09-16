@@ -39,7 +39,6 @@ public class SetCache : Activity
         SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript })]
     public double? Expiration { get; set; }
 
-
     private readonly IDistributedCache<CacheActivityCacheItem> _distributedCache;
 
     public SetCache(IDistributedCache<CacheActivityCacheItem> distributedCache)

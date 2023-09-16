@@ -55,8 +55,6 @@ public class WorkflowAppEntityFrameworkCoreModule : AbpModule
             /* The main point to change your DBMS.
              * See also DemoMigrationsDbContextFactory for EF Core tooling. */
             options.UseSqlServer();
-
         });
-
     }
 }

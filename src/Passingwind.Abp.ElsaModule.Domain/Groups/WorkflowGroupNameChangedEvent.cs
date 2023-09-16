@@ -2,7 +2,8 @@
 
 namespace Passingwind.Abp.ElsaModule.Groups;
 
-public class WorkflowGroupNameChangedEvent {
+public class WorkflowGroupNameChangedEvent
+{
     public WorkflowGroupNameChangedEvent(string oldName, string name, Guid id)
     {
         OldName = oldName;

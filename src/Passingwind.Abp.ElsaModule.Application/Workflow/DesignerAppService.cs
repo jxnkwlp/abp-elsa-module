@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -84,9 +84,10 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 
         var provider = LazyServiceProvider.LazyGetService(type);
 
-        if (provider == null)
-            if (type == null)
-                return new RuntimeSelectListResultDto();
+        if (provider == null && type == null)
+        {
+            return new RuntimeSelectListResultDto();
+        }
 
         var context = input.Context;
 

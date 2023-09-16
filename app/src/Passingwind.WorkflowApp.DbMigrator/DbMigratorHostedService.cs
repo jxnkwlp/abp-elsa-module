@@ -24,9 +24,9 @@ public class DbMigratorHostedService : IHostedService
     {
         using (var application = await AbpApplicationFactory.CreateAsync<WorkflowAppDbMigratorModule>(options =>
         {
-           options.Services.ReplaceConfiguration(_configuration);
-           options.UseAutofac();
-           options.Services.AddLogging(c => c.AddSerilog());
+            options.Services.ReplaceConfiguration(_configuration);
+            options.UseAutofac();
+            options.Services.AddLogging(c => c.AddSerilog());
         }))
         {
             await application.InitializeAsync();

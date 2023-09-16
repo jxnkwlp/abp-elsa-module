@@ -11,8 +11,10 @@ public class WorkflowInstanceExecutionLogSummaryDto
 public class WorkflowInstanceExecutionLogSummaryActivityDto
 {
     public Guid ActivityId { get; set; }
-    //public string Name { get; set; }
-    //public string DisplayName { get; set; }
+    /// <summary>
+    /// public string Name { get; set; }
+    /// public string DisplayName { get; set; }
+    /// </summary>
     public string ActivityType { get; set; }
     public bool IsExecuting { get; set; }
     public bool IsExecuted { get; set; }

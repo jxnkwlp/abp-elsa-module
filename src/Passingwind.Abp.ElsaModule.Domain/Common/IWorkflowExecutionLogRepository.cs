@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,5 +13,4 @@ public interface IWorkflowExecutionLogRepository : IRepository<WorkflowExecution
     Task<List<WorkflowExecutionLog>> GetListAsync(Guid? workflowInstanceId = null, Guid? activityId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
 
     Task<List<WorkflowExecutionLog>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting, Guid? workflowInstanceId = null, Guid? activityId = null, bool includeDetails = false, CancellationToken cancellationToken = default);
-
 }

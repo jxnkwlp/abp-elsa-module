@@ -90,7 +90,6 @@ public class SendEmailV2 : Activity, IActivityPropertyOptionsProvider, IRuntimeS
         )]
     public bool Queued { get; set; }
 
-
     private readonly ILogger<SendEmailV2> _logger;
     private readonly IEmailSender _emailSender;
     private readonly IUserLookupService _userLookupService;
@@ -119,10 +118,12 @@ public class SendEmailV2 : Activity, IActivityPropertyOptionsProvider, IRuntimeS
             message.From = new MailAddress(From);
 
         if (OtherEmails?.Any() == true)
+        {
             foreach (var item in OtherEmails)
             {
                 message.To.Add(item);
             }
+        }
 
         if (ToUsers?.Any() == true)
         {
@@ -185,16 +186,19 @@ public class SendEmailV2 : Activity, IActivityPropertyOptionsProvider, IRuntimeS
     public object GetOptions(PropertyInfo property)
     {
         if (property.Name == nameof(ToUsers))
+        {
             return new RuntimeSelectListProviderSettings(GetType(), new SendEmailV2GetRuntimeSelectListContext()
             {
                 Name = "Users"
             });
-
+        }
         else if (property.Name == nameof(ToRoles))
+        {
             return new RuntimeSelectListProviderSettings(GetType(), new SendEmailV2GetRuntimeSelectListContext()
             {
                 Name = "Roles"
             });
+        }
 
         return default;
     }

@@ -14,10 +14,7 @@ public class ElsaModuleHttpApiModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-        PreConfigure<IMvcBuilder>(mvcBuilder =>
-        {
-            mvcBuilder.AddApplicationPartIfNotExists(typeof(ElsaModuleHttpApiModule).Assembly);
-        });
+        PreConfigure<IMvcBuilder>(mvcBuilder => mvcBuilder.AddApplicationPartIfNotExists(typeof(ElsaModuleHttpApiModule).Assembly));
     }
 
     public override void ConfigureServices(ServiceConfigurationContext context)

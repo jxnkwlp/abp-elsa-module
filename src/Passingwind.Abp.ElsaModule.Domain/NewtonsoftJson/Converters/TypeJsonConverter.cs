@@ -5,7 +5,7 @@ using Rebus.Extensions;
 namespace Passingwind.Abp.ElsaModule.NewtonsoftJson.Converters;
 
 public class TypeJsonConverter : JsonConverter<Type>
-{ 
+{
     public override void WriteJson(JsonWriter writer, Type value, JsonSerializer serializer)
     {
         var typeName = value.GetSimpleAssemblyQualifiedName();

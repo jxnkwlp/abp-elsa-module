@@ -39,7 +39,6 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
     protected AbpDistributedCacheOptions CacheOptions { get; }
     protected IWorkflowTeamRepository WorkflowTeamRepository { get; }
 
-
     public WorkflowPermissionProvider(
         IGuidGenerator guidGenerator,
         ICurrentPrincipalAccessor principalAccessor,
@@ -95,9 +94,7 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
         {
             foreach (var scope in team.RoleScopes)
             {
-                var workflowIds = scope.Values.Select(v => Guid.Parse(v.ProviderValue)).ToArray();
-
-                foreach (var value in workflowIds)
+                foreach (var value in scope.Values.Select(v => Guid.Parse(v.ProviderValue)).ToArray())
                 {
                     result.AddProvider(value, RolePermissionValueProvider.ProviderName, scope.RoleName);
                 }
@@ -200,7 +197,7 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
                 ElsaModulePermissions.GroupName,
                 name,
                 ElsaModulePermissions.Workflows.Default,
-                $"Workflows:{workflow.Id.ToString("d")}",
+                $"Workflows:{workflow.Id:d}",
                 multiTenancySide: Volo.Abp.MultiTenancy.MultiTenancySides.Both
                 ), true, cancellationToken);
         }
@@ -213,7 +210,7 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
                  ElsaModulePermissions.GroupName,
                  WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition),
                  ElsaModulePermissions.Workflows.Default,
-                 $"Workflows:{workflowDefinition.Id.ToString("d")}",
+                 $"Workflows:{workflowDefinition.Id:d}",
                  multiTenancySide: Volo.Abp.MultiTenancy.MultiTenancySides.Both), true, cancellationToken);
 
         await ClearPermissionDefinitionCacheAsync();
@@ -260,13 +257,14 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
                 foreach (var value in scope.Values)
                 {
                     if (value.ProviderName == WorkflowTeamRoleScopeValue.WorkflowProviderName)
+                    {
                         await PermissionManager.SetAsync(WorkflowHelper.GenerateWorkflowPermissionKey(Guid.Parse(value.ProviderValue)), WorkflowTeamPermissionValueProvider.ProviderName, team.Id.ToString("d"), true);
+                    }
                     else
                     {
                         // TODO
                     }
                 }
-
             }
         }
     }

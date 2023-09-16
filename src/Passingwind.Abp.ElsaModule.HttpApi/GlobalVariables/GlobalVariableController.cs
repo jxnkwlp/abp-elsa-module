@@ -23,13 +23,13 @@ public class GlobalVariableController : ElsaModuleController, IGlobalVariableApp
         return _service.GetAsync(id);
     }
 
-    [HttpGet()]
+    [HttpGet]
     public virtual Task<PagedResultDto<GlobalVariableDto>> GetListAsync(GlobalVariableListRequestDto input)
     {
         return _service.GetListAsync(input);
     }
 
-    [HttpPost()]
+    [HttpPost]
     public virtual Task<GlobalVariableDto> CreateAsync(GlobalVariableCreateOrUpdateDto input)
     {
         return _service.CreateAsync(input);
@@ -52,5 +52,4 @@ public class GlobalVariableController : ElsaModuleController, IGlobalVariableApp
     {
         return _service.GetByKeyAsync(key);
     }
-
 }

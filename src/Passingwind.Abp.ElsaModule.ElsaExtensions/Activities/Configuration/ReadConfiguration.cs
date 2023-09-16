@@ -49,5 +49,4 @@ public class ReadConfiguration : Activity
 
         return Done();
     }
-
 }

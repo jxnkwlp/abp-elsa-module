@@ -30,10 +30,7 @@ public class CSharpScriptMetadataResolver : MetadataReferenceResolver
             // https://github.com/dotnet/roslyn/blob/master/src/Compilers/Core/Portable/ReferenceManager/CommonReferenceManager.Resolution.cs#L838
             return ImmutableArray<PortableExecutableReference>.Empty.Add(MetadataReference.CreateFromFile(typeof(CSharpScriptMetadataResolver).GetTypeInfo().Assembly.Location));
         }
-        else
-        {
-            //TODO
-        }
+
         return _resolver.ResolveReference(reference, baseFilePath, properties);
     }
 }

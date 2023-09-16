@@ -10,9 +10,6 @@ public class ElsaModuleInstallerModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        Configure<AbpVirtualFileSystemOptions>(options =>
-        {
-            options.FileSets.AddEmbedded<ElsaModuleInstallerModule>();
-        });
+        Configure<AbpVirtualFileSystemOptions>(options => options.FileSets.AddEmbedded<ElsaModuleInstallerModule>());
     }
 }

@@ -13,5 +13,4 @@ public interface IWorkflowGroupRepository : IRepository<WorkflowGroup, Guid>
     Task<List<WorkflowGroup>> GetListAsync(string filter, bool includeDetails = false, CancellationToken cancellationToken = default);
 
     Task<List<WorkflowGroup>> GetPagedListAsync(int skipCount, int maxResultCount, string filter, string sorting = null, bool includeDetails = false, CancellationToken cancellationToken = default);
-
 }

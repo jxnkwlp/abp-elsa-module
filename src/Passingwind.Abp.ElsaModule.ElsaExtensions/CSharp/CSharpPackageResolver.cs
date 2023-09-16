@@ -18,11 +18,11 @@ public class CSharpPackageResolver : ICSharpPackageResolver
         _nuGetPackageResolver = nuGetPackageResolver;
     }
 
-    public async ValueTask<ImmutableArray<CSharpPackageReference>> ResolveAsync(string value, CancellationToken cancellationToken = default)
+    public async ValueTask<ImmutableArray<CSharpPackageReference>> ResolveAsync(string text, CancellationToken cancellationToken = default)
     {
         var packages = new List<CSharpPackageReference>();
 
-        using StringReader sr = new(value?.Trim());
+        using StringReader sr = new(text?.Trim());
         string line = string.Empty;
         while (!string.IsNullOrWhiteSpace(line = sr.ReadLine()))
         {

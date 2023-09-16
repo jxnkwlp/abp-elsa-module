@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Passingwind.Abp.ElsaModule.Permissions;
 using Volo.Abp.Application;
-using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Json;
 using Volo.Abp.Modularity;
@@ -16,16 +15,13 @@ namespace Passingwind.Abp.ElsaModule;
     typeof(AbpAutoMapperModule),
     typeof(AbpJsonModule)
     )]
-public partial class ElsaModuleApplicationModule : AbpModule
+public class ElsaModuleApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         context.Services.AddAutoMapperObjectMapper<ElsaModuleApplicationModule>();
 
-        Configure<AbpAutoMapperOptions>(options =>
-        {
-            options.AddMaps<ElsaModuleApplicationModule>(validate: true);
-        });
+        Configure<AbpAutoMapperOptions>(options => options.AddMaps<ElsaModuleApplicationModule>(validate: true));
 
         //Configure<AbpSystemTextJsonSerializerOptions>(options =>
         //{
@@ -39,7 +35,7 @@ public partial class ElsaModuleApplicationModule : AbpModule
         //    options.UnsupportedTypes.AddIfNotContains(typeof(WorkflowInstanceExecutionLogSummaryDto));
         //    options.UnsupportedTypes.AddIfNotContains(typeof(RuntimeSelectListContextDto));
         //});
-         
+
         context.Services.AddSingleton<IAuthorizationHandler, WorkflowAuthorizationHandler>();
     }
 }

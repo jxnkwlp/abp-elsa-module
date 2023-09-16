@@ -48,9 +48,7 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
     {
         var entity = await _workflowTeamRepository.GetAsync(id);
 
-        var dto = ObjectMapper.Map<WorkflowTeam, WorkflowTeamDto>(entity);
-
-        return dto;
+        return ObjectMapper.Map<WorkflowTeam, WorkflowTeamDto>(entity);
     }
 
     [Authorize(Policy = ElsaModulePermissions.WorkflowTeams.Create)]
@@ -64,15 +62,13 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
         var entity = new WorkflowTeam(GuidGenerator.Create(), input.Name.Trim(), input.Description);
 
         if (input.UserIds != null)
-            entity.Users.AddRange(input.UserIds.Select(x => new WorkflowTeamUser(x)).ToList());
+            entity.Users.AddRange(input.UserIds.ConvertAll(x => new WorkflowTeamUser(x)));
 
         await _workflowTeamRepository.InsertAsync(entity);
 
         await CurrentUnitOfWork.SaveChangesAsync();
 
-        var dto = ObjectMapper.Map<WorkflowTeam, WorkflowTeamDto>(entity);
-
-        return dto;
+        return ObjectMapper.Map<WorkflowTeam, WorkflowTeamDto>(entity);
     }
 
     [Authorize(Policy = ElsaModulePermissions.WorkflowTeams.Update)]
@@ -90,7 +86,7 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
 
         entity.Users.Clear();
         if (input.UserIds != null)
-            entity.Users.AddRange(input.UserIds.Select(x => new WorkflowTeamUser(x)).ToList());
+            entity.Users.AddRange(input.UserIds.ConvertAll(x => new WorkflowTeamUser(x)));
 
         await _workflowTeamRepository.UpdateAsync(entity);
 

@@ -8,5 +8,4 @@ public interface IWorkflowAppService : IApplicationService
 {
     Task<ListResultDto<WorkflowProviderDescriptorDto>> GetProvidersAsync();
     Task<ListResultDto<WorkflowStorageProviderInfoDto>> GetStorageProvidersAsync();
-
 }

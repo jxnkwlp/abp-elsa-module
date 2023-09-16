@@ -1,4 +1,4 @@
-using Elsa.Activities.Email.Services;
+﻿using Elsa.Activities.Email.Services;
 using Elsa.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using Passingwind.Abp.ElsaModule.Bookmarks;
@@ -28,10 +28,7 @@ public class ElsaModuleExtensionModule : AbpModule
                 ;
         });
 
-        PreConfigure<IMvcBuilder>(mvcBuilder =>
-        {
-            mvcBuilder.AddApplicationPartIfNotExists(typeof(ElsaModuleExtensionModule).Assembly);
-        });
+        PreConfigure<IMvcBuilder>(mvcBuilder => mvcBuilder.AddApplicationPartIfNotExists(typeof(ElsaModuleExtensionModule).Assembly));
     }
 
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -54,10 +51,7 @@ public class ElsaModuleExtensionModule : AbpModule
         //context.Services.AddWorkflowContextProvider(typeof(ElsaModuleActivitiesModule).Assembly);
 
         // 
-        context.Services.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(typeof(ElsaModuleExtensionModule).Assembly);
-        });
+        context.Services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(ElsaModuleExtensionModule).Assembly));
 
         // 
         context.Services.AddTransient<IWorkflowCSharpEditorService, WorkflowCSharpEditorService>();

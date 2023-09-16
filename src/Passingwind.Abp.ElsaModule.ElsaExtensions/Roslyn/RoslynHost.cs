@@ -11,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.Text;
@@ -22,8 +21,6 @@ namespace Passingwind.Abp.ElsaModule.Roslyn;
 
 public class RoslynHost : IDisposable, IRoslynHost
 {
-    private const string _scriptName = "Program";
-
     #region static
 
     public static ImmutableArray<string> PreprocessorSymbols => ImmutableArray.CreateRange(new[] { "TRACE", "DEBUG" });
@@ -67,7 +64,7 @@ public class RoslynHost : IDisposable, IRoslynHost
 
     public static ImmutableArray<MetadataReference> DefaultMetadataReferences => Basic.Reference.Assemblies.Net60.References.All.ToImmutableArray<MetadataReference>();
 
-    #endregion
+    #endregion static
 
     private ParseOptions _parseOptions;
     private CompositionHost _compositionHost;
@@ -79,7 +76,6 @@ public class RoslynHost : IDisposable, IRoslynHost
 
     private readonly ICSharpPackageResolver _cSharpPackageResolver;
     private readonly IServiceProvider _serviceProvider;
-
 
     public RoslynHost(ICSharpPackageResolver cSharpPackageResolver, IServiceProvider serviceProvider)
     {
@@ -221,13 +217,11 @@ public class RoslynHost : IDisposable, IRoslynHost
             {
                 var project = CreateProject(_workspace, projectName, additionalAssemblies, additionalImports);
 
-                var rp = new RoslynProject(
+                return new RoslynProject(
                      key,
                      project.Id,
                      additionalAssemblies == null ? ImmutableArray<Assembly>.Empty : additionalAssemblies.ToImmutableArray(),
                      additionalImports == null ? ImmutableArray<string>.Empty : additionalImports.ToImmutableArray());
-
-                return rp;
             });
         }).Value;
     }
@@ -306,7 +300,7 @@ public class RoslynHost : IDisposable, IRoslynHost
             var packageReferences = await _cSharpPackageResolver.ResolveAsync(documentTxt, cancellationToken);
             foreach (var packageReference in packageReferences)
             {
-                documentMetaReferences.AddRange((await packageReference.GetReferencesAsync(_serviceProvider, cancellationToken)));
+                documentMetaReferences.AddRange(await packageReference.GetReferencesAsync(_serviceProvider, cancellationToken));
             }
             roslynProject.UpdateDocumentMetadataReferences(document.Name, documentMetaReferences);
         }
@@ -316,8 +310,8 @@ public class RoslynHost : IDisposable, IRoslynHost
         return CSharpCompilation.Create(
             project.Id.Id.ToString("N"),
             syntaxTrees: syntaxTrees,
-            options: compilationOptions,
-            references: roslynProject.AllMetadataReferences);
+            references: roslynProject.AllMetadataReferences,
+            options: compilationOptions);
     }
 
     public async Task<ImmutableArray<Diagnostic>> GetDiagnosticsAsync(string projectName, CancellationToken cancellationToken = default)
@@ -400,8 +394,8 @@ public class RoslynHost : IDisposable, IRoslynHost
             LanguageNames.CSharp,
             filePath: $"{file}.dll",
             outputFilePath: file,
-            parseOptions: _parseOptions,
             compilationOptions: compilationOptions,
+            parseOptions: _parseOptions,
             metadataReferences: references
         // analyzerReferences: analyzerReferences
         );
@@ -423,23 +417,15 @@ public class RoslynHost : IDisposable, IRoslynHost
 
         return new CSharpCompilationOptions(
             OutputKind.DynamicallyLinkedLibrary,
-            allowUnsafe: false,
-            checkOverflow: true,
-            concurrentBuild: false,
-            usings: hostImports,
-            generalDiagnosticOption: ReportDiagnostic.Warn,
             reportSuppressedDiagnostics: false,
+            usings: hostImports,
+            checkOverflow: true,
+            allowUnsafe: false,
+            generalDiagnosticOption: ReportDiagnostic.Warn,
             specificDiagnosticOptions: _specificDiagnosticOptions,
+            concurrentBuild: false,
             metadataReferenceResolver: CSharpScriptMetadataResolver.Instance,
             nullableContextOptions: NullableContextOptions.Enable);
-    }
-
-    private static IEnumerable<AnalyzerReference> GetAnalyzerReferences(IAnalyzerAssemblyLoader loader)
-    {
-        yield return new AnalyzerFileReference(typeof(Compilation).Assembly.Location, loader);
-        yield return new AnalyzerFileReference(typeof(CSharpResources).Assembly.Location, loader);
-        yield return new AnalyzerFileReference(typeof(FeaturesResources).Assembly.Location, loader);
-        yield return new AnalyzerFileReference(typeof(CSharpFeaturesResources).Assembly.Location, loader);
     }
 
     private static string GetProjectFolder(ProjectId projectId)

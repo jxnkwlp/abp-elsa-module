@@ -47,7 +47,6 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
     protected IStoreMapper StoreMapper => LazyServiceProvider.LazyGetRequiredService<IStoreMapper>();
 
-
     protected Store()
     {
         StoreId = Guid.NewGuid();
@@ -69,7 +68,7 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
     {
         Logger.LogDebug($"Invoke {typeof(TModel).Name} [AddManyAsync] ");
 
-        if (models.Any() == false)
+        if (!models.Any())
             return;
 
         using var uow = UnitOfWork.Begin(requiresNew: true);
@@ -166,8 +165,6 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
         return result;
     }
-
-    private static readonly object _saveKey = new object();
 
     public virtual async Task SaveAsync(TModel model, CancellationToken cancellationToken = default)
     {
@@ -283,7 +280,9 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
             return (_) => true;
         }
         else
+        {
             throw new NotSupportedException($"{specification.GetType().FullName} of {typeof(TModel).FullName} is not supported.");
+        }
     }
 
     private static readonly Dictionary<Type, ISpecification<TModel>> _notSpecificationCache = new Dictionary<Type, ISpecification<TModel>>();

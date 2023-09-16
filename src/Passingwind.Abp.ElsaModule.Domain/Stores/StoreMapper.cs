@@ -36,10 +36,8 @@ public class StoreMapper : IStoreMapper
         {
             return instant.Value.ToDateTimeUtc();
         }
-        else
-        {
-            return instant.Value.ToDateTimeUtc().ToLocalTime();
-        }
+
+        return instant.Value.ToDateTimeUtc().ToLocalTime();
     }
 
     protected virtual DateTime ToDateTime(Instant instant)
@@ -48,10 +46,8 @@ public class StoreMapper : IStoreMapper
         {
             return instant.ToDateTimeUtc();
         }
-        else
-        {
-            return instant.ToDateTimeUtc().ToLocalTime();
-        }
+
+        return instant.ToDateTimeUtc().ToLocalTime();
     }
 
     protected virtual Instant ToInstant(DateTime dateTime)
@@ -60,15 +56,13 @@ public class StoreMapper : IStoreMapper
         {
             return Instant.FromDateTimeUtc(dateTime);
         }
-        else
-        {
-            return Instant.FromDateTimeUtc(dateTime.ToUniversalTime());
-        }
+
+        return Instant.FromDateTimeUtc(dateTime.ToUniversalTime());
     }
 
     public virtual WorkflowDefinitionModel MapToModel(WorkflowDefinitionVersion entity, WorkflowDefinition definition)
     {
-        var model = new WorkflowDefinitionModel
+        return new WorkflowDefinitionModel
         {
             Id = entity.Id.ToString(), // version id
             DefinitionId = definition.Id.ToString(),
@@ -93,7 +87,6 @@ public class StoreMapper : IStoreMapper
             Variables = new Elsa.Models.Variables(definition.Variables ?? new Dictionary<string, object>()),
             PersistenceBehavior = definition.PersistenceBehavior,
 
-
             IsLatest = entity.IsLatest,
             IsPublished = entity.IsPublished,
 
@@ -102,8 +95,6 @@ public class StoreMapper : IStoreMapper
 
             CreatedAt = ToInstant(entity.CreationTime),
         };
-
-        return model;
     }
 
     public virtual ActivityDefinition MapToModel(Activity entity)
@@ -386,11 +377,10 @@ public class StoreMapper : IStoreMapper
 
             Metadata = model.Metadata.Select(x => new WorkflowInstanceMetadata { Key = x.Key, Value = x.Value }).ToList(),
             Variables = model.Variables.Data.Select(x => new WorkflowInstanceVariable { Key = x.Key, Value = x.Value }).ToList(),
-            ActivityData = model.ActivityData.ToList().Select(x => new WorkflowInstanceActivityData() { ActivityId = Guid.Parse(x.Key), Data = (Dictionary<string, object>)x.Value }).ToList(),
+            ActivityData = model.ActivityData.ToList().ConvertAll(x => new WorkflowInstanceActivityData() { ActivityId = Guid.Parse(x.Key), Data = (Dictionary<string, object>)x.Value }),
             BlockingActivities = model.BlockingActivities.Select(x => new WorkflowInstanceBlockingActivity { ActivityId = Guid.Parse(x.ActivityId), ActivityType = x.ActivityType, Tag = x.Tag, }).ToList(),
             ScheduledActivities = model.ScheduledActivities.Select(x => new WorkflowInstanceScheduledActivity { ActivityId = Guid.Parse(x.ActivityId), Input = x.Input, }).ToList(),
             ActivityScopes = model.Scopes.Select(x => new WorkflowInstanceActivityScope { ActivityId = Guid.Parse(x.ActivityId), Variables = (Dictionary<string, object>)x.Variables.Data, }).ToList(),
-
         };
 
         // update
@@ -508,10 +498,12 @@ public class StoreMapper : IStoreMapper
         var result = new Dictionary<string, IDictionary<string, object>>();
 
         if (instance.ActivityData != null)
+        {
             foreach (var item in instance.ActivityData)
             {
                 result[item.ActivityId.ToString()] = item.Data.ToDictionary(x => x.Key, x => ConvertObjectValue(x.Value));
             }
+        }
 
         return result;
     }
@@ -526,10 +518,12 @@ public class StoreMapper : IStoreMapper
         var result = new List<Elsa.Models.ScheduledActivity>();
 
         if (instance.ScheduledActivities != null)
+        {
             foreach (var item in instance.ScheduledActivities)
             {
                 result.Add(new Elsa.Models.ScheduledActivity(item.ActivityId.ToString(), ConvertObjectValue(item.Input)));
             }
+        }
 
         return new Elsa.Models.SimpleStack<Elsa.Models.ScheduledActivity>(result);
     }
@@ -539,6 +533,7 @@ public class StoreMapper : IStoreMapper
         var scopes = new List<Elsa.Models.ActivityScope>();
 
         if (instance.ActivityScopes != null)
+        {
             foreach (var item in instance.ActivityScopes)
             {
                 scopes.Add(new Elsa.Models.ActivityScope(item.ActivityId.ToString())
@@ -546,6 +541,7 @@ public class StoreMapper : IStoreMapper
                     Variables = new Elsa.Models.Variables(item.Variables.ToDictionary(x => x.Key, x => ConvertObjectValue(x.Value))),
                 });
             }
+        }
 
         return new Elsa.Models.SimpleStack<Elsa.Models.ActivityScope>(scopes);
     }
@@ -562,7 +558,7 @@ public class StoreMapper : IStoreMapper
 
     protected static List<WorkflowInstanceActivityData> ToInstanceActivityData(WorkflowInstanceModel model)
     {
-        return model.ActivityData.ToList().Select(x => new WorkflowInstanceActivityData() { ActivityId = Guid.Parse(x.Key), Data = (Dictionary<string, object>)x.Value }).ToList();
+        return model.ActivityData.ToList().ConvertAll(x => new WorkflowInstanceActivityData() { ActivityId = Guid.Parse(x.Key), Data = (Dictionary<string, object>)x.Value });
     }
 
     protected static List<WorkflowInstanceBlockingActivity> ToInstanceBlockingActivities(WorkflowInstanceModel model)

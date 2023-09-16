@@ -23,5 +23,5 @@ public class WorkflowTeamRepository : EfCoreRepository<ElsaModuleDbContext, Work
         var dbset = dbcontext.Set<WorkflowTeamRoleScope>();
 
         await dbset.Where(x => x.RoleName == oldName).ExecuteUpdateAsync(s => s.SetProperty(x => x.RoleName, roleName));
-    } 
+    }
 }

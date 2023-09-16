@@ -3,27 +3,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Demo.Migrations
+namespace Demo.Migrations;
+
+/// <inheritdoc />
+public partial class Update_Elsa_6 : Migration
 {
     /// <inheritdoc />
-    public partial class Update_Elsa_6 : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<TimeSpan>(
-                name: "FinishedDuration",
-                table: "ElsaWorkflowInstances",
-                type: "time",
-                nullable: true);
-        }
+        migrationBuilder.AddColumn<TimeSpan>(
+            name: "FinishedDuration",
+            table: "ElsaWorkflowInstances",
+            type: "time",
+            nullable: true);
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "FinishedDuration",
-                table: "ElsaWorkflowInstances");
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropColumn(
+            name: "FinishedDuration",
+            table: "ElsaWorkflowInstances");
     }
 }

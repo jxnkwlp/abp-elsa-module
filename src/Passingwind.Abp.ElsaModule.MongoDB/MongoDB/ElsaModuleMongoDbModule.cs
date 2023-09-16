@@ -26,10 +26,7 @@ public class ElsaModuleMongoDbModule : AbpModule
             options.AddDefaultRepositories();
         });
 
-        Configure<AbpUnitOfWorkDefaultOptions>(options =>
-        {
-            options.TransactionBehavior = UnitOfWorkTransactionBehavior.Disabled;
-        });
+        Configure<AbpUnitOfWorkDefaultOptions>(options => options.TransactionBehavior = UnitOfWorkTransactionBehavior.Disabled);
 
         context.Services.TryAddTransient(typeof(IPermissionGroupDefinitionRepository), typeof(PermissionGroupDefinitionRepository));
         context.Services.TryAddTransient(typeof(IPermissionDefinitionRepository), typeof(PermissionDefinitionRepository));

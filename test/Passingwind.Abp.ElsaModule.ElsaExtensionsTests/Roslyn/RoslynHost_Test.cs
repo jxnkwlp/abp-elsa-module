@@ -74,7 +74,7 @@ var tmp2 = new MyClass2();
         string id = Guid.NewGuid().ToString();
 
         var project = _roslynHost.GetOrCreateProject(id);
-        
+
         _roslynHost.CreateOrUpdateDocument(project.Name, "Program", @"
 #r ""nuget: Newtonsoft.Json, 13.0.2""
 using Newtonsoft.Json;

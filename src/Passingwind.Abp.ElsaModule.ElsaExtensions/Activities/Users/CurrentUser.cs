@@ -33,7 +33,7 @@ public class CurrentUser : Activity
 
     private IActivityExecutionResult Execute()
     {
-        var model = new CurrentUserOutputModel()
+        Output = new CurrentUserOutputModel()
         {
             IsAuthenticated = _currentUser.IsAuthenticated,
             Id = _currentUser.Id,
@@ -47,8 +47,6 @@ public class CurrentUser : Activity
             TenantId = _currentUser.TenantId,
             UserName = _currentUser.UserName,
         };
-
-        Output = model;
 
         return Done();
     }

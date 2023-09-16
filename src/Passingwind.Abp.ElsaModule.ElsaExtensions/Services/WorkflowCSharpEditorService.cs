@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -121,7 +121,6 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
         {
             var textSpanToTextCache = new Dictionary<TextSpan, string>();
 
-            var completions = completionResult.ItemsList;
             //.Where(x =>
             //{
             //    if (!textSpanToTextCache.TryGetValue(x.Span, out var spanTxt))
@@ -132,7 +131,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
             //    return helper.MatchesPattern(x, spanTxt, CultureInfo.InvariantCulture);
             //});
 
-            foreach (var item in completions)
+            foreach (var item in (IReadOnlyList<CompletionItem>)completionResult.ItemsList)
             {
                 SymbolKind symbolKind = SymbolKind.Local;
                 if (item.Properties.TryGetValue(nameof(SymbolKind), out var kindValue))
@@ -159,34 +158,22 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
             switch (symbolKind)
             {
                 case SymbolKind.Field:
-                    {
-                        return WorkflowCSharpEditorCompletionItemKind.Field;
-                    }
+                    return WorkflowCSharpEditorCompletionItemKind.Field;
 
                 case SymbolKind.Property:
-                    {
-                        return WorkflowCSharpEditorCompletionItemKind.Property;
-                    }
+                    return WorkflowCSharpEditorCompletionItemKind.Property;
 
                 case SymbolKind.Local:
-                    {
-                        return WorkflowCSharpEditorCompletionItemKind.Variable;
-                    }
+                    return WorkflowCSharpEditorCompletionItemKind.Variable;
 
                 case SymbolKind.Method:
-                    {
-                        return WorkflowCSharpEditorCompletionItemKind.Function;
-                    }
+                    return WorkflowCSharpEditorCompletionItemKind.Function;
 
                 case SymbolKind.NamedType:
-                    {
-                        return WorkflowCSharpEditorCompletionItemKind.Class;
-                    }
+                    return WorkflowCSharpEditorCompletionItemKind.Class;
 
                 default:
-                    {
-                        return WorkflowCSharpEditorCompletionItemKind.Others;
-                    }
+                    return WorkflowCSharpEditorCompletionItemKind.Others;
             }
         }
     }
@@ -219,12 +206,14 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
                 typeInfo = semanticModel.GetTypeInfo(childNode);
                 var location = expressionNode.GetLocation();
                 if (typeInfo.Type != null)
+                {
                     return new WorkflowCSharpEditorHoverInfoResult()
                     {
                         Information = typeInfo.Type.ToString(),
                         OffsetFrom = location.SourceSpan.Start,
                         OffsetTo = location.SourceSpan.End
                     };
+                }
             }
         }
 
@@ -255,12 +244,14 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
             var location = expressionNode.GetLocation();
             typeInfo = semanticModel.GetTypeInfo(i);
             if (typeInfo.Type != null)
+            {
                 return new WorkflowCSharpEditorHoverInfoResult()
                 {
                     Information = typeInfo.Type.ToString(),
                     OffsetFrom = location.SourceSpan.Start,
                     OffsetTo = location.SourceSpan.End
                 };
+            }
         }
 
         var symbolInfo = semanticModel.GetSymbolInfo(expressionNode);
@@ -303,7 +294,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
             if (comma.Span.Start > invocation.Position)
                 break;
 
-            activeParameter += 1;
+            activeParameter++;
         }
 
         var signaturesSet = new HashSet<MonacoSignatures>();
@@ -320,7 +311,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
             var typeInfo = semanticModel.GetTypeInfo(throughExpression);
             throughSymbol = invocation.SemanticModel.GetSpeculativeSymbolInfo(invocation.Position, throughExpression, SpeculativeBindingOption.BindAsExpression).Symbol;
             throughType = invocation.SemanticModel.GetSpeculativeTypeInfo(invocation.Position, throughExpression, SpeculativeBindingOption.BindAsTypeOrNamespace).Type;
-            var includeInstance = throughSymbol != null && !(throughSymbol is ITypeSymbol) ||
+            var includeInstance = (throughSymbol != null && !(throughSymbol is ITypeSymbol)) ||
                 throughExpression is LiteralExpressionSyntax ||
                 throughExpression is TypeOfExpressionSyntax;
             var includeStatic = throughSymbol is INamedTypeSymbol || throughType != null;
@@ -329,7 +320,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
                 throughType = typeInfo.Type;
                 includeInstance = true;
             }
-            methodGroup = methodGroup.Where(m => m.IsStatic && includeStatic || !m.IsStatic && includeInstance);
+            methodGroup = methodGroup.Where(m => (m.IsStatic && includeStatic) || (!m.IsStatic && includeInstance));
         }
         else if (invocation.Receiver is SimpleNameSyntax && invocation.IsInStaticContext)
         {
@@ -381,8 +372,8 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
                 sb.Append(methodsymbol.Parameters[i].Type).Append(' ').Append(methodsymbol.Parameters[i].Name);
                 if (i < methodsymbol.Parameters.Length - 1) sb.Append(", ");
             }
-            sb.Append(") : ");
-            sb.Append(methodsymbol.ReturnType).ToString();
+            sb.Append(") : ")
+                .Append(methodsymbol.ReturnType).ToString();
             return sb.ToString();
         }
         if (symbolInfo.Symbol is ILocalSymbol localsymbol)
@@ -415,21 +406,19 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
         foreach (var parameter in symbol.Parameters)
         {
             parameters.Add(new MonacoSignatureParameter() { Label = parameter.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) });
-        };
-        var signature = new MonacoSignatures
+        }
+        return new MonacoSignatures
         {
             Documentation = symbol.GetDocumentationCommentXml(),
             Label = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
             Parameters = parameters.ToArray()
         };
-
-        return signature;
     }
 
     private int InvocationScore(IMethodSymbol symbol, IEnumerable<TypeInfo> types)
     {
         var parameters = symbol.Parameters;
-        if (parameters.Count() < types.Count())
+        if (parameters.Length < types.Count())
             return int.MinValue;
 
         var score = 0;
@@ -438,7 +427,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
         while (invocationEnum.MoveNext() && definitionEnum.MoveNext())
         {
             if (invocationEnum.Current.ConvertedType == null)
-                score += 1;
+                score++;
             else if (SymbolEqualityComparer.Default.Equals(invocationEnum.Current.ConvertedType, definitionEnum.Current.Type))
                 score += 2;
         }

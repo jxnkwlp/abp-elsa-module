@@ -27,10 +27,7 @@ public partial class Add_Elsa : Migration
                 LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                 LastModifierId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_ElsaBookmarks", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_ElsaBookmarks", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "ElsaTriggers",
@@ -49,10 +46,7 @@ public partial class Add_Elsa : Migration
                 LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                 LastModifierId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_ElsaTriggers", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_ElsaTriggers", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "ElsaWorkflowDefinitions",
@@ -81,10 +75,7 @@ public partial class Add_Elsa : Migration
                 DeleterId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_ElsaWorkflowDefinitions", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_ElsaWorkflowDefinitions", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "ElsaWorkflowInstances",
@@ -123,10 +114,7 @@ public partial class Add_Elsa : Migration
                 DeleterId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_ElsaWorkflowInstances", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_ElsaWorkflowInstances", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "ElsaWorkflowDefinitionVersions",

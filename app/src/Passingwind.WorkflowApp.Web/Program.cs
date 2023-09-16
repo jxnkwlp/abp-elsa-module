@@ -24,10 +24,7 @@ public static class Program
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Host.AddAppSettingsSecretsJson()
-                .ConfigureLogging((logging) =>
-                {
-                    logging.ClearProviders();
-                })
+                .ConfigureLogging((logging) => logging.ClearProviders())
                 .UseNLog(new NLogAspNetCoreOptions { RemoveLoggerFactoryFilter = false })
                 .UseAutofac();
 
@@ -48,7 +45,7 @@ public static class Program
                 var sp = scope.ServiceProvider;
                 await sp.GetRequiredService<IExternalLoginProviderManager>().RegisterAllAsync();
             }
-             
+
             await app.RunAsync();
             return 0;
         }

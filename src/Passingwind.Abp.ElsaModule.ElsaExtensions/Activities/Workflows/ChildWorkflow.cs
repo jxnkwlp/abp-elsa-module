@@ -1,9 +1,5 @@
-﻿//namespace Passingwind.Abp.ElsaModule.Activities.Workflows
-//{
-//    public class ChildWorkflow
-//    {
-//        public string Name { get; set; }
+﻿namespace Passingwind.Abp.ElsaModule.Activities.Workflows;
 
-//        public object Input { get; set; }
-//    }
-//}
+public class ChildWorkflow
+{
+}

@@ -1,29 +1,26 @@
-﻿//using System.Linq;
-//using System.Threading;
-//using System.Threading.Tasks;
-//using Elsa.Activities.Http;
-//using Elsa.Events;
-//using Elsa.Expressions;
-//using MediatR;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Elsa.Activities.Http;
+using Elsa.Events;
+using MediatR;
 
-//namespace Passingwind.Abp.ElsaModule.Activities.Http
-//{
-//    public class SendHttpRequestConfigureProperty : INotificationHandler<DescribingActivityType>
-//    {
-//        public Task Handle(DescribingActivityType notification, CancellationToken cancellationToken)
-//        {
-//            var activityType = notification.ActivityType;
+namespace Passingwind.Abp.ElsaModule.Activities.Http;
 
-//            if (activityType.Type != typeof(SendHttpRequest))
-//                return Task.CompletedTask;
+public class SendHttpRequestConfigureProperty : INotificationHandler<DescribingActivityType>
+{
+    public Task Handle(DescribingActivityType notification, CancellationToken cancellationToken)
+    {
+        var activityType = notification.ActivityType;
 
-//            var inputProperties = notification.ActivityDescriptor.InputProperties.ToList();
+        if (activityType.Type != typeof(SendHttpRequest))
+            return Task.CompletedTask;
 
-//            inputProperties.Add(new Elsa.Metadata.ActivityInputDescriptor("Timeout", typeof(int?), "Timeout", "Timeout", hint: "Request timeout, in seconds", supportedSyntaxes: new[] { SyntaxNames.JavaScript, SyntaxNames.Liquid }));
+        //var inputProperties = notification.ActivityDescriptor.InputProperties.ToList();
 
-//            notification.ActivityDescriptor.InputProperties = inputProperties.ToArray();
+        //inputProperties.Add(new Elsa.Metadata.ActivityInputDescriptor("Timeout", typeof(int?), "Timeout", "Timeout", hint: "Request timeout, in seconds", supportedSyntaxes: new[] { SyntaxNames.JavaScript, SyntaxNames.Liquid }));
 
-//            return Task.CompletedTask;
-//        }
-//    }
-//}
+        //notification.ActivityDescriptor.InputProperties = inputProperties.ToArray();
+
+        return Task.CompletedTask;
+    }
+}

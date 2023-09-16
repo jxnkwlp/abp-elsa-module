@@ -92,14 +92,13 @@ public class OAuth2Client : Activity, IActivityPropertyOptionsProvider
         SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid })]
     public string RefreshToken { get; set; }
 
-
     [ActivityInput(
         Label = "Request Timeout",
         Hint = "The request timeout (seconds)",
         SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid })]
     public int? RequestTimeout { get; set; }
 
-    [ActivityOutput()]
+    [ActivityOutput]
     public OAuth2ClientOutputModel Output { get; set; }
 
     private readonly HttpClient _httpClient;
@@ -213,7 +212,6 @@ public class OAuth2Client : Activity, IActivityPropertyOptionsProvider
 
         return null;
     }
-
 }
 
 public class OAuth2ClientOutputModel

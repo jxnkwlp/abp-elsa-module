@@ -5,5 +5,4 @@
  */
 public abstract class ElsaModuleMongoDbTestBase : ElsaModuleTestBase<ElsaModuleMongoDbTestModule>
 {
-
 }

@@ -29,5 +29,4 @@ public class WorkflowInstanceEventHander :
 
         await _mediator.Publish(new WorkflowInstanceDeleted(model));
     }
-
 }

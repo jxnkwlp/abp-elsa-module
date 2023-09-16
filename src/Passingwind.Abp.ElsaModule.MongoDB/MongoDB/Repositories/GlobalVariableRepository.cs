@@ -74,5 +74,4 @@ public class GlobalVariableRepository : MongoDbRepository<IElsaModuleMongoDbCont
             .As<IMongoQueryable<GlobalVariable>>()
             .ToListAsync(cancellationToken);
     }
-
 }

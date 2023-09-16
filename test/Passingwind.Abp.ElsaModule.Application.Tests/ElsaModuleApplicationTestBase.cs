@@ -5,5 +5,4 @@
  */
 public abstract class ElsaModuleApplicationTestBase : ElsaModuleTestBase<ElsaModuleApplicationTestModule>
 {
-
 }

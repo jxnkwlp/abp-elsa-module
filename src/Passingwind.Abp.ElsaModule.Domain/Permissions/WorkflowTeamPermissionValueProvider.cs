@@ -14,13 +14,13 @@ namespace Passingwind.Abp.ElsaModule.Permissions;
 ///  Workflow team permission
 /// </summary>
 /// <remarks>
-///     
-/// 
+///
+///
 ///  Permission key format:
 ///     Name => 'WorkflowTeam:{workflow-id}',
 ///     ProviderKey => {workflow-team-id},
 ///     ProviderName => WorkflowTeam
-/// </remarks> 
+/// </remarks>
 public class WorkflowTeamPermissionValueProvider : PermissionValueProvider
 {
     public const string ProviderName = "WorkflowTeam";
@@ -54,9 +54,7 @@ public class WorkflowTeamPermissionValueProvider : PermissionValueProvider
             return PermissionGrantResult.Undefined;
 
         // roles
-        var roleNames = teams.SelectMany(x => x.RoleScopes.Select(r => r.RoleName)).Distinct().ToArray();
-
-        foreach (var roleName in roleNames)
+        foreach (var roleName in teams.SelectMany(x => x.RoleScopes.Select(r => r.RoleName)).Distinct().ToArray())
         {
             if (await PermissionStore.IsGrantedAsync(context.Permission.Name, RolePermissionValueProvider.ProviderName, roleName))
             {
@@ -105,9 +103,7 @@ public class WorkflowTeamPermissionValueProvider : PermissionValueProvider
             return result;
 
         // roles
-        var roleNames = teams.SelectMany(x => x.RoleScopes.Select(r => r.RoleName)).Distinct().ToArray();
-
-        foreach (var roleName in roleNames)
+        foreach (var roleName in teams.SelectMany(x => x.RoleScopes.Select(r => r.RoleName)).Distinct().ToArray())
         {
             var multipleResult = await PermissionStore.IsGrantedAsync(permissionNames.ToArray(), RolePermissionValueProvider.ProviderName, roleName);
 

@@ -34,9 +34,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             // b.HasMany(x => x.Versions).WithOne(x => x.Definition).HasForeignKey(x => x.DefinitionId);
             b.HasIndex(x => x.Name);
-        });
-
-        builder.Entity<WorkflowDefinitionVersion>(b =>
+        })
+            .Entity<WorkflowDefinitionVersion>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowDefinitionVersions", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -48,9 +47,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.HasMany(x => x.Activities).WithOne().HasForeignKey(x => x.WorkflowDefinitionVersionId);
             b.HasMany(x => x.Connections).WithOne().HasForeignKey(x => x.WorkflowDefinitionVersionId);
-        });
-
-        builder.Entity<Activity>(b =>
+        })
+            .Entity<Activity>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "Activities", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -65,9 +63,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Properties).HasConversion(new EfCoreJsonValueConverter<List<Elsa.Models.ActivityDefinitionProperty>>(), ValueComparer.CreateDefault(typeof(List<Elsa.Models.ActivityDefinitionProperty>), false));
             b.Property(x => x.Attributes).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
             b.Property(x => x.PropertyStorageProviders).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, string>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, string>), false));
-        });
-
-        builder.Entity<ActivityConnection>(b =>
+        })
+            .Entity<ActivityConnection>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "ActivityConnections", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -76,9 +73,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.Property(x => x.Outcome).IsRequired().HasMaxLength(64);
             b.Property(x => x.Attributes).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
-        });
-
-        builder.Entity<Bookmark>(b =>
+        })
+            .Entity<Bookmark>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "Bookmarks", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -88,10 +84,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.ModelType).HasMaxLength(256);
             b.Property(x => x.ActivityType).HasMaxLength(256);
             b.Property(x => x.CorrelationId).HasMaxLength(128);
-
-        });
-
-        builder.Entity<Trigger>(b =>
+        })
+            .Entity<Trigger>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "Triggers", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -100,8 +94,11 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             // b.Property(x => x.Model).HasMaxLength(128);
             b.Property(x => x.ModelType).HasMaxLength(256);
             b.Property(x => x.ActivityType).HasMaxLength(256);
-
         });
+
+        // b.Property(x => x.Model).HasMaxLength(128);
+
+        // b.Property(x => x.Model).HasMaxLength(128);
 
         builder.Entity<WorkflowInstance>(b =>
         {
@@ -144,9 +141,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
 
             b.Property(x => x.Data).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
-        });
-
-        builder.Entity<WorkflowInstanceBlockingActivity>(b =>
+        })
+            .Entity<WorkflowInstanceBlockingActivity>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceBlockingActivities", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -154,9 +150,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
 
             b.Property(x => x.ActivityType).HasMaxLength(256).IsRequired();
-        });
-
-        builder.Entity<WorkflowInstanceScheduledActivity>(b =>
+        })
+            .Entity<WorkflowInstanceScheduledActivity>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceScheduledActivities", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -164,9 +159,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
 
             b.Property(x => x.Input).HasConversion(new EfCoreJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
-        });
-
-        builder.Entity<WorkflowInstanceMetadata>(b =>
+        })
+            .Entity<WorkflowInstanceMetadata>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceMetadata", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -176,9 +170,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Key).HasMaxLength(256).IsRequired();
 
             b.Property(x => x.Value).HasConversion(new EfCoreJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
-        });
-
-        builder.Entity<WorkflowInstanceActivityScope>(b =>
+        })
+            .Entity<WorkflowInstanceActivityScope>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceScopes", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -186,9 +179,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.HasKey(x => new { x.WorkflowInstanceId, x.ActivityId });
 
             b.Property(x => x.Variables).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
-        });
-
-        builder.Entity<WorkflowInstanceVariable>(b =>
+        })
+            .Entity<WorkflowInstanceVariable>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceVariables", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -200,9 +192,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Value).HasConversion(new EfCoreJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
 
             b.HasIndex(x => x.Key);
-        });
-
-        builder.Entity<WorkflowInstanceFault>(b =>
+        })
+            .Entity<WorkflowInstanceFault>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowInstanceFaults", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -211,9 +202,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
 
             b.Property(x => x.ActivityInput).HasConversion(new EfCoreJsonValueConverter<object>(), ValueComparer.CreateDefault(typeof(object), false));
             b.Property(x => x.Exception).HasConversion(new EfCoreJsonValueConverter<SimpleExceptionModel>(), ValueComparer.CreateDefault(typeof(SimpleExceptionModel), false));
-        });
-
-        builder.Entity<WorkflowExecutionLog>(b =>
+        })
+            .Entity<WorkflowExecutionLog>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowExecutionLogs", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -224,9 +214,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Data).HasConversion(new EfCoreJsonValueConverter<Dictionary<string, object>>(), ValueComparer.CreateDefault(typeof(Dictionary<string, object>), false));
 
             b.HasIndex(x => x.WorkflowInstanceId);
-        });
-
-        builder.Entity<GlobalVariable>(b =>
+        })
+            .Entity<GlobalVariable>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "GlobalVariables", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -235,9 +224,8 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.HasIndex(x => x.Key);
 
             b.HasIndex(x => x.Key);
-        });
-
-        builder.Entity<WorkflowTeam>(b =>
+        })
+            .Entity<WorkflowTeam>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowTeams", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -248,17 +236,15 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.HasMany(x => x.RoleScopes).WithOne().HasForeignKey(x => x.WorkflowTeamId);
 
             b.HasIndex(x => x.Name);
-        });
-
-        builder.Entity<WorkflowTeamUser>(b =>
+        })
+            .Entity<WorkflowTeamUser>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowTeamUsers", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
 
             b.HasKey(x => new { x.WorkflowTeamId, x.UserId });
-        });
-
-        builder.Entity<WorkflowTeamRoleScope>(b =>
+        })
+            .Entity<WorkflowTeamRoleScope>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowTeamRoleScopes", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
@@ -267,16 +253,14 @@ public static class ElsaModuleDbContextModelCreatingExtensions
             b.Property(x => x.Values).HasConversion(new EfCoreJsonValueConverter<List<WorkflowTeamRoleScopeValue>>(), ValueComparer.CreateDefault(typeof(List<WorkflowTeamRoleScopeValue>), false));
 
             b.HasKey(x => new { x.WorkflowTeamId, x.RoleName });
-        });
-
-        builder.Entity<WorkflowGroup>(b =>
+        })
+            .Entity<WorkflowGroup>(b =>
         {
             b.ToTable(ElsaModuleDbProperties.DbTablePrefix + "WorkflowGroups", ElsaModuleDbProperties.DbSchema);
             b.ConfigureByConvention();
 
             b.Property(x => x.Name).HasMaxLength(64).IsRequired();
             b.Property(x => x.Description).HasMaxLength(256);
-
         });
     }
 }

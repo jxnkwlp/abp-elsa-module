@@ -36,7 +36,6 @@ public class GlobalVariableDomainService : DomainService
 
         return cacheItem?.Value;
     }
-
 }
 
 public class GlobalVariableItem

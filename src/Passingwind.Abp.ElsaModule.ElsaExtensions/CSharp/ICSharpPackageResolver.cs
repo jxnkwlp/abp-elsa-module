@@ -9,6 +9,8 @@ public interface ICSharpPackageResolver : ITransientDependency
 {
     /// <summary>
     ///  resolve references from text
-    /// </summary> 
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="cancellationToken"></param>
     ValueTask<ImmutableArray<CSharpPackageReference>> ResolveAsync(string text, CancellationToken cancellationToken = default);
 }

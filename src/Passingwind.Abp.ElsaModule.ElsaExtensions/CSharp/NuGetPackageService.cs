@@ -19,7 +19,7 @@ namespace Passingwind.Abp.ElsaModule.CSharp;
 
 public class NuGetPackageService : INuGetPackageService
 {
-    private string _nuGetCacheFolder = null;
+    private string _nuGetCacheFolder;
 
     private readonly NuGet.Common.ILogger _nuGetLogger = NuGet.Common.NullLogger.Instance;
     private readonly SourceCacheContext _sourceCacheContext;
@@ -57,45 +57,40 @@ public class NuGetPackageService : INuGetPackageService
         _nuGetLogger = nuGetPackageLogger;
         _localRepository = new NuGetv3LocalRepository(NuGetCacheFolder);
         _logger = logger;
-
     }
 
-    public async Task<IEnumerable<string>> GetReferencesAsync(string id, string version, string tagetFrameworkName, bool resolveDependency = false, bool downloadPackage = false, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<string>> GetReferencesAsync(string packageId, string version, string tagetFrameworkName, bool resolveDependency = false, bool downloadPackage = false, CancellationToken cancellationToken = default)
     {
-        var packageId = new PackageIdentity(id, NuGetVersion.Parse(version));
+        var packageIdentity = new PackageIdentity(packageId, NuGetVersion.Parse(version));
         // project target framework
         var targetFramework = NuGetFramework.Parse(tagetFrameworkName);
 
-        _logger.LogDebug("Starting resolve package '{packageId}' references ", packageId);
+        _logger.LogDebug("Starting resolve package '{packageId}' references ", packageIdentity);
 
         var reposities = Repositories;
 
-        using MemoryStream nupkgStream = await GetNupkgStreamAsync(reposities, packageId, cancellationToken);
+        using MemoryStream nupkgStream = await GetNupkgStreamAsync(reposities, packageIdentity, cancellationToken);
 
         if (nupkgStream.Length == 0)
         {
-            throw new UserFriendlyException($"The nuget package {packageId} not found.");
+            throw new UserFriendlyException($"The nuget package {packageIdentity} not found.");
         }
 
         var nuGetAllReferences = new List<NuGetReference>();
 
-        await GetReferencesAsync(nuGetAllReferences, reposities, nupkgStream, packageId, targetFramework, resolveDependency, downloadPackage, cancellationToken);
+        await GetReferencesAsync(nuGetAllReferences, reposities, nupkgStream, packageIdentity, targetFramework, resolveDependency, downloadPackage, cancellationToken);
 
         // TODO 
         var result = new List<NuGetReference>();
         foreach (var item in nuGetAllReferences)
         {
-            if (result.Any(x => x.Identity.Id == item.Identity.Id && x.Identity.Version >= item.Identity.Version))
-            {
-                continue;
-            }
-            else
+            if (!result.Any(x => x.Identity.Id == item.Identity.Id && x.Identity.Version >= item.Identity.Version))
             {
                 result.Add(item);
             }
         }
 
-        _logger.LogDebug("Resolved package '{packageId}' references, count: {count} ", packageId, result.Count);
+        _logger.LogDebug("Resolved package '{packageId}' references, count: {count} ", packageIdentity, result.Count);
 
         return result.SelectMany(x => x.References);
     }
@@ -122,26 +117,26 @@ public class NuGetPackageService : INuGetPackageService
         return allVersion.Select(x => x.Version.ToString());
     }
 
-    public async Task DownloadAsync(string id, string version, string tagetFrameworkName, bool dependency = false, CancellationToken cancellationToken = default)
+    public async Task DownloadAsync(string packageId, string version, string tagetFrameworkName, bool dependency = false, CancellationToken cancellationToken = default)
     {
-        var packageId = new PackageIdentity(id, NuGetVersion.Parse(version));
+        var packageIdentity = new PackageIdentity(packageId, NuGetVersion.Parse(version));
         var targetFramework = NuGetFramework.Parse(tagetFrameworkName);
 
-        _logger.LogDebug("Starting download and extracte package '{packageId}'", packageId);
+        _logger.LogDebug("Starting download and extracte package '{packageId}'", packageIdentity);
 
         var reposities = Repositories;
 
         // local cache 
-        var nupkgFile = GetNupkgFileFromCacheAsync(packageId);
+        var nupkgFile = GetNupkgFileFromCache(packageIdentity);
 
         if (!string.IsNullOrWhiteSpace(nupkgFile))
         {
-            _logger.LogDebug("Find package '{packageId}' nupkg from file: {nupkgFile} ", packageId, nupkgFile);
+            _logger.LogDebug("Find package '{packageId}' nupkg from file: {nupkgFile} ", packageIdentity, nupkgFile);
         }
         // not found.
         else
         {
-            _logger.LogDebug("Package '{packageId}' in local cache folder not found, try find from repositories.", packageId);
+            _logger.LogDebug("Package '{packageId}' in local cache folder not found, try find from repositories.", packageIdentity);
 
             var packageExtractionContext = new PackageExtractionContext(PackageSaveMode.Defaultv3, XmlDocFileSaveMode.None, null, _nuGetLogger);
 
@@ -156,7 +151,7 @@ public class NuGetPackageService : INuGetPackageService
 
                 tasks.Add(Task.Factory.StartNew(async () =>
                 {
-                    var _packageId = packageId;
+                    var _packageId = packageIdentity;
                     var _resource = resource;
 
                     // download & extract
@@ -172,10 +167,8 @@ public class NuGetPackageService : INuGetPackageService
         {
             var dependencyPackages = new List<PackageIdentity>();
 
-
-
             // resolve 
-            await ResoveDependencyPackagesAsync(dependencyPackages, reposities, packageId, targetFramework, cancellationToken);
+            await ResoveDependencyPackagesAsync(dependencyPackages, reposities, packageIdentity, targetFramework, cancellationToken);
 
             var tasks = new List<Task>();
             foreach (var item in dependencyPackages.Distinct())
@@ -189,13 +182,12 @@ public class NuGetPackageService : INuGetPackageService
                     // do not resolve dependencies
                     await DownloadAsync(id, version.ToNormalizedString(), tagetFrameworkName, false, cancellationToken);
                 }));
-
             }
 
             Task.WaitAll(tasks.ToArray());
         }
 
-        _logger.LogDebug("Download and extracte package '{packageId}' done", packageId);
+        _logger.LogDebug("Download and extracte package '{packageId}' done", packageIdentity);
     }
 
     private async Task DownloadAndExtracteAsync(FindPackageByIdResource resource, PackageIdentity packageId, PackageExtractionContext packageExtractionContext, CancellationToken cancellationToken = default)
@@ -320,7 +312,7 @@ public class NuGetPackageService : INuGetPackageService
         MemoryStream nupkgStream = new MemoryStream();
 
         //  local cache
-        var nupkgFile = GetNupkgFileFromCacheAsync(packageId);
+        var nupkgFile = GetNupkgFileFromCache(packageId);
         if (!string.IsNullOrWhiteSpace(nupkgFile))
         {
             var fileBytes = File.ReadAllBytes(nupkgFile);
@@ -349,17 +341,7 @@ public class NuGetPackageService : INuGetPackageService
         return nupkgStream;
     }
 
-    private async Task<MemoryStream> GetNupkgStreamAsync(FindPackageByIdResource resource, PackageIdentity packageId, CancellationToken cancellationToken = default)
-    {
-        MemoryStream packageStream = new MemoryStream();
-        if (await resource.CopyNupkgToStreamAsync(packageId.Id, packageId.Version, packageStream, _sourceCacheContext, _nuGetLogger, cancellationToken))
-        {
-            return packageStream;
-        }
-        return null;
-    }
-
-    private string GetNupkgFileFromCacheAsync(PackageIdentity packageId)
+    private string GetNupkgFileFromCache(PackageIdentity packageId)
     {
         var package = _localRepository.FindPackage(packageId.Id, packageId.Version);
 
@@ -374,9 +356,7 @@ public class NuGetPackageService : INuGetPackageService
 
         var packageSource = packageSourceProvider.LoadPackageSources().First();
 
-        var repository = Repository.Factory.GetCoreV3(packageSource);
-
-        return repository;
+        return Repository.Factory.GetCoreV3(packageSource);
     }
 
     protected IEnumerable<SourceRepository> GetSourceRepositories()

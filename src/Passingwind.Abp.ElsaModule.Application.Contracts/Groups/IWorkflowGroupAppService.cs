@@ -16,5 +16,4 @@ public interface IWorkflowGroupAppService : IApplicationService
     Task<WorkflowGroupDto> UpdateAsync(Guid id, WorkflowGroupCreateOrUpdateDto input);
 
     Task DeleteAsync(Guid id);
-
 }

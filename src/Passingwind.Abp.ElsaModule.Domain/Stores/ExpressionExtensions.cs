@@ -5,7 +5,9 @@ using System.Linq.Expressions;
 
 namespace Passingwind.Abp.ElsaModule.Stores;
 
-// Taken & adapted from https://stackoverflow.com/a/30546883/690374
+/// <summary>
+/// Taken & adapted from https://stackoverflow.com/a/30546883/690374
+/// </summary>
 public static class ExpressionExtensions
 {
     public static Expression<Func<TTo, bool>> ConvertType<TFrom, TTo>(this Expression<Func<TFrom, bool>> from) => ConvertType<Func<TFrom, bool>, Func<TTo, bool>>(@from);
@@ -44,8 +46,10 @@ public static class ExpressionExtensions
         var newParams = new ParameterExpression[from.Parameters.Count];
 
         for (var i = 0; i < newParams.Length; i++)
+        {
             if (typeMap.TryGetValue(from.Parameters[i].Type, out Type newType))
                 parameterMap[from.Parameters[i]] = newParams[i] = Expression.Parameter(newType, from.Parameters[i].Name);
+        }
 
         return newParams;
     }
@@ -67,7 +71,7 @@ public static class ExpressionExtensions
             return found;
         }
 
-        public override Expression Visit(Expression node) => node is LambdaExpression lambda && !_parameterMap.ContainsKey(lambda.Parameters.First())
+        public override Expression Visit(Expression node) => node is LambdaExpression lambda && !_parameterMap.ContainsKey(lambda.Parameters[0])
             ? new TypeConversionVisitor<T>(_parameterMap).Visit(lambda.Body)
             : base.Visit(node)!;
 
@@ -76,23 +80,15 @@ public static class ExpressionExtensions
             return node.Update(Visit(node.Operand));
         }
 
-        protected override Expression VisitTypeBinary(TypeBinaryExpression node)
-        {
-            return base.VisitTypeBinary(node);
-        }
-
         protected override Expression VisitMember(MemberExpression node)
         {
             // Re-perform any member-binding.
             var expr = Visit(node.Expression);
 
-            if (expr.Type != node.Type)
+            if (expr.Type != node.Type && expr.Type.GetMember(node.Member.Name).Any())
             {
-                if (expr.Type.GetMember(node.Member.Name).Any())
-                {
-                    var newMember = expr.Type.GetMember(node.Member.Name).Single();
-                    return Expression.MakeMemberAccess(expr, newMember);
-                }
+                var newMember = expr.Type.GetMember(node.Member.Name).Single();
+                return Expression.MakeMemberAccess(expr, newMember);
             }
 
             return base.VisitMember(node);

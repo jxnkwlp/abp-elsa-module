@@ -175,4 +175,3 @@ public class DingtalkGroupBot : Activity, IActivityPropertyOptionsProvider
         public string ErrMsg { get; set; }
     }
 }
-

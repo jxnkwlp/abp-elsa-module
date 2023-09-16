@@ -62,10 +62,7 @@ public class ApiKeyAppService : WorkflowAppAppService, IApiKeyAppService
         var list = await _repository.GetPagedListAsync(input.SkipCount, input.MaxResultCount, userId, nameof(ApiKey.CreationTime) + " desc");
 
         var result = ObjectMapper.Map<List<ApiKey>, List<ApiKeyDto>>(list);
-        result.ForEach(x =>
-        {
-            x.Secret = null;
-        });
+        result.ForEach(x => x.Secret = null);
 
         return new PagedResultDto<ApiKeyDto>(count, result);
     }

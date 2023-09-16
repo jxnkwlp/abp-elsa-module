@@ -14,12 +14,13 @@ public class FakeCurrentPrincipalAccessor : ThreadCurrentPrincipalAccessor
     }
 
     private ClaimsPrincipal _principal;
+    private readonly object _lock = new object();
 
     private ClaimsPrincipal GetPrincipal()
     {
         if (_principal == null)
         {
-            lock (this)
+            lock (_lock)
             {
                 if (_principal == null)
                 {

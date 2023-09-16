@@ -48,5 +48,4 @@ public class NewWorkflowFactory : IWorkflowFactory
 
         return Task.FromResult(workflowInstanceModel);
     }
-
 }

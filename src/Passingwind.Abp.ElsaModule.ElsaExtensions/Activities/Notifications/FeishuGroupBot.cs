@@ -50,7 +50,6 @@ public class FeishuGroupBot : Activity, IActivityPropertyOptionsProvider
         SupportedSyntaxes = new[] { SyntaxNames.Literal, SyntaxNames.JavaScript, SyntaxNames.Liquid })]
     public string Content { get; set; }
 
-
     private const string _urlFormat = "https://open.feishu.cn/open-apis/bot/v2/hook/{0}";
     private readonly ILogger<WeChatWorkGroupBot> _logger;
     private readonly HttpClient _httpClient;
@@ -117,4 +116,3 @@ public class FeishuGroupBot : Activity, IActivityPropertyOptionsProvider
         public string Msg { get; set; }
     }
 }
-

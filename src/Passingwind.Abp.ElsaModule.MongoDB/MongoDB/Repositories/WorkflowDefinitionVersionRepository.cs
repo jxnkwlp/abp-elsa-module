@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -24,11 +24,9 @@ public class WorkflowDefinitionVersionRepository : MongoDbRepository<IElsaModule
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
-        var entity = await query
+        return await query
             .Where(x => x.DefinitionId == definitionId && x.Version == version)
             .FirstOrDefaultAsync(cancellationToken);
-
-        return entity;
     }
 
     public async Task<WorkflowDefinitionVersion> GetByVersionAsync(Guid definitionId, int version, bool includeDetails = true, CancellationToken cancellationToken = default)

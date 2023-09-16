@@ -26,5 +26,4 @@ public class ElsaModuleMongoDbContext : AbpMongoDbContext, IElsaModuleMongoDbCon
 
         modelBuilder.ConfigureElsaModule();
     }
-
 }

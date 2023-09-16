@@ -20,6 +20,6 @@ public class CSharpScriptContext
 
     public bool IsChanged(CSharpScriptContext other)
     {
-        return !(other.SourceText.Equals(SourceText));
+        return !other.SourceText.Equals(SourceText);
     }
 }

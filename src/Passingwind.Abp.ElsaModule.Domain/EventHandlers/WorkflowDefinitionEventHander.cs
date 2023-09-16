@@ -130,5 +130,4 @@ public class WorkflowDefinitionEventHander :
             await _workflowPermissionService.SetUserWorkflowPermissionGrantAsync(entity, user, true);
         }
     }
-
 }

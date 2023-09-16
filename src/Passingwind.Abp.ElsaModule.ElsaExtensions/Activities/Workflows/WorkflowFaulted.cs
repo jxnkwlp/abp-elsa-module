@@ -50,15 +50,12 @@ public class WorkflowFaulted : Activity
 
     protected override IActivityExecutionResult OnExecute(ActivityExecutionContext context)
     {
-        var now = _clock.GetCurrentInstant();
-
-        context.JournalData["Trigger At"] = now;
+        context.JournalData["Trigger At"] = _clock.GetCurrentInstant();
 
         Output = context.GetInput<WorkflowFaultedInput>();
 
         return Done();
     }
-
 }
 
 public class WorkflowFaultedInput

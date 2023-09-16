@@ -25,13 +25,13 @@ public class WorkflowDefinitionController : ElsaModuleController, IWorkflowDefin
         return _service.GetAsync(id);
     }
 
-    [HttpGet()]
+    [HttpGet]
     public virtual Task<PagedResultDto<WorkflowDefinitionBasicDto>> GetListAsync(WorkflowDefinitionListRequestDto input)
     {
         return _service.GetListAsync(input);
     }
 
-    [HttpPost()]
+    [HttpPost]
     public virtual Task<WorkflowDefinitionVersionDto> CreateAsync(WorkflowDefinitionVersionCreateOrUpdateDto input)
     {
         return _service.CreateAsync(input);

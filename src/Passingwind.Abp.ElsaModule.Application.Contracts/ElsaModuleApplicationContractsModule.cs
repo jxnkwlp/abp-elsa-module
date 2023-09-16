@@ -11,5 +11,4 @@ namespace Passingwind.Abp.ElsaModule;
     )]
 public class ElsaModuleApplicationContractsModule : AbpModule
 {
-
 }

@@ -15,10 +15,7 @@ public static class ServiceCollectionExtensions
             {
                 ob.UseStore()
                     .AddCustomTenantAccessor<AbpElsaTenantAccessor>()
-                    ;
-
-                ob
-                 .AddActivitiesFrom(typeof(ElsaModuleDomainModule))
+                    .AddActivitiesFrom(typeof(ElsaModuleDomainModule))
                  .AddConsoleActivities()
                  .AddJavaScriptActivities();
 
@@ -38,5 +35,4 @@ public static class ServiceCollectionExtensions
                    .UseWorkflowInstanceStore(sp => sp.GetRequiredService<WorkflowInstanceStore>())
                    ;
     }
-
 }

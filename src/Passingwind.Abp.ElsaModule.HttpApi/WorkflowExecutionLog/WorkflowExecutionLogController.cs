@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
@@ -24,10 +24,9 @@ public class WorkflowExecutionLogController : ElsaModuleController, IWorkflowExe
         return _service.GetAsync(id);
     }
 
-    [HttpGet()]
+    [HttpGet]
     public virtual Task<PagedResultDto<WorkflowExecutionLogDto>> GetListAsync(WorkflowExecutionLogListRequestDto input)
     {
         return _service.GetListAsync(input);
     }
-
 }

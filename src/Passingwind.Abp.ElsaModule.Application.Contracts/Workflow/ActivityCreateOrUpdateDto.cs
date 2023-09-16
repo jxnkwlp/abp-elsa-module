@@ -28,5 +28,4 @@ public class ActivityCreateOrUpdateDto
     public List<ActivityDefinitionProperty> Properties { get; set; }
 
     public Dictionary<string, string> PropertyStorageProviders { get; set; }
-
 }

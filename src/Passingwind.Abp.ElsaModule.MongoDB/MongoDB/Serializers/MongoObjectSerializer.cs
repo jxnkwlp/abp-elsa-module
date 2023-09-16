@@ -64,8 +64,6 @@ public class MongoObjectSerializer : SerializerBase<object>
                 return BsonSerializer.LookupSerializer(typeof(BsonMinKey)).Deserialize(context, args);
             case BsonType.MaxKey:
                 return BsonSerializer.LookupSerializer(typeof(BsonMaxKey)).Deserialize(context, args);
-            default:
-                break;
         }
 
         return null;

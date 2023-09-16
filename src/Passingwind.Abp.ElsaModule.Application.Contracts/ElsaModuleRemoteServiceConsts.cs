@@ -1,6 +1,6 @@
 ﻿namespace Passingwind.Abp.ElsaModule;
 
-public class ElsaModuleRemoteServiceConsts
+public static class ElsaModuleRemoteServiceConsts
 {
     public const string RemoteServiceName = "ElsaModule";
 

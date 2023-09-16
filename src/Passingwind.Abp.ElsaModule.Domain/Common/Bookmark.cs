@@ -24,5 +24,4 @@ public class Bookmark : AuditedAggregateRoot<Guid>, IMultiTenant
     public string Hash { get; set; }
     public string ModelType { get; set; }
     public string Model { get; set; }
-
 }

@@ -55,5 +55,4 @@ public class WorkflowDefinitionVersion : FullAuditedAggregateRoot<Guid>, IMultiT
     {
         IsPublished = value;
     }
-
 }

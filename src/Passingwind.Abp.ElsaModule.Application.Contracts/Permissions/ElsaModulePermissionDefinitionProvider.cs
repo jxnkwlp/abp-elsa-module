@@ -6,6 +6,7 @@ namespace Passingwind.Abp.ElsaModule.Permissions;
 
 public class ElsaModulePermissionDefinitionProvider : PermissionDefinitionProvider
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1201:Use method chaining.", Justification = "<Pending>")]
     public override void Define(IPermissionDefinitionContext context)
     {
         var myGroup = context.AddGroup(ElsaModulePermissions.GroupName, L("Permission:ElsaModule"));

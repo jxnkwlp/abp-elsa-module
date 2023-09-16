@@ -68,7 +68,6 @@ public class WorkflowInstance : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     public List<WorkflowInstanceActivityData> ActivityData { get; set; } = new List<WorkflowInstanceActivityData>();
 
-
     public IDictionary<string, object> GetMetadata()
     {
         var dict = new Dictionary<string, object>();

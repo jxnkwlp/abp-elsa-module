@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -23,13 +23,11 @@ public class WorkflowDefinitionVersionRepository : EfCoreRepository<ElsaModuleDb
     {
         var dbset = await GetDbSetAsync();
 
-        var entity = await dbset
+        return await dbset
             .IncludeIf(includeDetails, x => x.Activities)
             .IncludeIf(includeDetails, x => x.Connections)
             .Where(x => x.DefinitionId == definitionId && x.Version == version)
             .FirstOrDefaultAsync();
-
-        return entity;
     }
 
     public async Task<WorkflowDefinitionVersion> GetByVersionAsync(Guid definitionId, int version, bool includeDetails = true, CancellationToken cancellationToken = default)

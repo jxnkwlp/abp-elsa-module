@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
 using Volo.Abp.Application.Dtos;
@@ -35,5 +35,4 @@ public interface IWorkflowInstanceAppService : IApplicationService
     Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(WorkflowInstanceDateCountStatisticsRequestDto input);
 
     Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync(WorkflowInstanceStatusCountStatisticsRequestDto input);
-
 }

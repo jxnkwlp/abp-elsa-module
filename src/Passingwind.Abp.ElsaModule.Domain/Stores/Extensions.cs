@@ -10,13 +10,14 @@ public static class Extensions
 {
     /// <summary>
     ///  to Guid
-    /// </summary> 
+    /// </summary>
+    /// <param name="value"></param>
     public static Guid? ToGuid(this string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return null;
-        else
-            return Guid.Parse(value);
+
+        return Guid.Parse(value);
     }
 
     public static Expression<Func<WorkflowDefinitionVersion, bool>> WithVersion(this Expression<Func<WorkflowDefinitionVersion, bool>> expression, VersionOptions? versionOptions)

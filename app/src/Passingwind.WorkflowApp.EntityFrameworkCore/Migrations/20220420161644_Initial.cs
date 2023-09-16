@@ -38,10 +38,7 @@ public partial class Initial : Migration
                 ExtraProperties = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 ConcurrencyStamp = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpAuditLogs", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpAuditLogs", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpBackgroundJobs",
@@ -59,10 +56,7 @@ public partial class Initial : Migration
                 ExtraProperties = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 ConcurrencyStamp = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpBackgroundJobs", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpBackgroundJobs", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpClaimTypes",
@@ -79,10 +73,7 @@ public partial class Initial : Migration
                 ExtraProperties = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 ConcurrencyStamp = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpClaimTypes", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpClaimTypes", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpFeatureValues",
@@ -94,10 +85,7 @@ public partial class Initial : Migration
                 ProviderName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
                 ProviderKey = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpFeatureValues", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpFeatureValues", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpLinkUsers",
@@ -109,10 +97,7 @@ public partial class Initial : Migration
                 TargetUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 TargetTenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpLinkUsers", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpLinkUsers", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpOrganizationUnits",
@@ -153,10 +138,7 @@ public partial class Initial : Migration
                 ProviderName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                 ProviderKey = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpPermissionGrants", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpPermissionGrants", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpRoles",
@@ -172,10 +154,7 @@ public partial class Initial : Migration
                 ExtraProperties = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 ConcurrencyStamp = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpRoles", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpRoles", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpSecurityLogs",
@@ -197,10 +176,7 @@ public partial class Initial : Migration
                 ExtraProperties = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 ConcurrencyStamp = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpSecurityLogs", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpSecurityLogs", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpSettings",
@@ -212,10 +188,7 @@ public partial class Initial : Migration
                 ProviderName = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
                 ProviderKey = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpSettings", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpSettings", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpTenants",
@@ -233,10 +206,7 @@ public partial class Initial : Migration
                 DeleterId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpTenants", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpTenants", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpUsers",
@@ -271,10 +241,7 @@ public partial class Initial : Migration
                 DeleterId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AbpUsers", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AbpUsers", x => x.Id));
 
         migrationBuilder.CreateTable(
             name: "AbpAuditLogActions",

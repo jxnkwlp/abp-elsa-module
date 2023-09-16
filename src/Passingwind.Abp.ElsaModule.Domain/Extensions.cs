@@ -14,10 +14,8 @@ public static class Extensions
         {
             if (value is JToken token)
                 return token.ToObject<TData>();
-
             else if (value is JsonElement jsonElement)
                 return jsonElement.Deserialize<TData>();
-
             else
                 return (TData)Convert.ChangeType(value, typeof(TData), CultureInfo.InvariantCulture);
         }

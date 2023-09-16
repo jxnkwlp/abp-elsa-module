@@ -8,5 +8,4 @@ namespace Passingwind.Abp.ElsaModule;
     )]
 public class ElsaModuleApplicationTestModule : AbpModule
 {
-
 }

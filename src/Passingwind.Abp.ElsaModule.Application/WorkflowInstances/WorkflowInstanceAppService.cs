@@ -14,7 +14,6 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Authorization;
 using Volo.Abp.Caching;
 using Volo.Abp.Json;
-using WorkflowExecutionLog = Passingwind.Abp.ElsaModule.Common.WorkflowExecutionLog;
 
 namespace Passingwind.Abp.ElsaModule.WorkflowInstances;
 
@@ -77,7 +76,9 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
                 throw new UserFriendlyException($"Cannot cancel a workflow instance with status {result.WorkflowInstance!.WorkflowStatus}");
         }
         else
+        {
             throw new UserFriendlyException($"Cannot cancel a workflow instance with status {entity.WorkflowStatus}");
+        }
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
@@ -89,7 +90,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
         var instance = _storeMapper.MapToModel(entity);
 
-        if (input.RunImmediately == false)
+        if (!input.RunImmediately)
         {
             await _workflowReviver.ReviveAndQueueAsync(instance);
         }
@@ -135,9 +136,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
         // var input = await _workflowStorageService.LoadAsync(instance);
 
-        var dto = ObjectMapper.Map<WorkflowInstance, WorkflowInstanceDto>(entity);
-
-        return dto;
+        return ObjectMapper.Map<WorkflowInstance, WorkflowInstanceDto>(entity);
     }
 
     public async Task<WorkflowInstanceBasicDto> GetBasicAsync(Guid id)
@@ -187,9 +186,9 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
             status: input.WorkflowStatus,
             correlationId: input.CorrelationId,
             creationTimes: input.CreationTimes,
+            lastExecutedTimes: input.LastExecutedTimes,
             finishedTimes: input.FinishedTimes,
-            faultedTimes: input.FaultedTimes,
-            lastExecutedTimes: input.LastExecutedTimes);
+            faultedTimes: input.FaultedTimes);
 
         var list = await _workflowInstanceRepository.GetPagedListAsync(
             input.SkipCount,
@@ -201,9 +200,9 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
             status: input.WorkflowStatus,
             correlationId: input.CorrelationId,
             creationTimes: input.CreationTimes,
+            lastExecutedTimes: input.LastExecutedTimes,
             finishedTimes: input.FinishedTimes,
-            faultedTimes: input.FaultedTimes,
-            lastExecutedTimes: input.LastExecutedTimes);
+            faultedTimes: input.FaultedTimes);
 
         return new PagedResultDto<WorkflowInstanceBasicDto>(count, ObjectMapper.Map<List<WorkflowInstance>, List<WorkflowInstanceBasicDto>>(list));
     }
@@ -244,9 +243,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
             Activities = new List<WorkflowInstanceExecutionLogSummaryActivityDto>()
         };
 
-        var groupLogs = allLogs.GroupBy(x => x.ActivityId);
-
-        foreach (var itemLogs in groupLogs)
+        foreach (var itemLogs in (IEnumerable<IGrouping<Guid, Common.WorkflowExecutionLog>>)allLogs.GroupBy(x => x.ActivityId))
         {
             var logs = itemLogs.OrderByDescending(x => x.Timestamp);
 
@@ -266,7 +263,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
                 Outcomes = logs.Where(x => x.Data?.ContainsKey("Outcomes") == true).SelectMany(x => x.Data.SafeGetValue<string, object, string[]>("Outcomes")).ToArray(),
 
-                StateData = !fullDataAccess ? null : entity.ActivityData.FirstOrDefault(x => x.ActivityId == itemLogs.Key)?.Data ?? default,
+                StateData = !fullDataAccess ? null : entity.ActivityData.Find(x => x.ActivityId == itemLogs.Key)?.Data ?? default,
                 JournalData = !fullDataAccess ? null : logs.First().Data?.Where(x => x.Key != "Outcomes")?.ToDictionary(x => x.Key, x => x.Value),
                 Message = !fullDataAccess ? null : logs.First().Message,
             };
@@ -296,7 +293,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         if (input.WorkflowDefinitionId.HasValue)
             cacheKey = $"workflow:instance:{input.WorkflowDefinitionId}:statistics:datecount:dateperiod:{datePeriod}:tz:{tz}";
 
-        var dto = await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync(cacheKey, async () =>
+        return await _workflowInstanceDateCountStatisticsDistributedCache.GetOrAddAsync(cacheKey, async () =>
         {
             var finished = await _workflowInstanceRepository.GetStatusDateCountStatisticsAsync(
                 WorkflowInstanceStatus.Finished,
@@ -329,8 +326,6 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         {
             AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(5),
         });
-
-        return dto;
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Statistic)]
@@ -344,17 +339,17 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         {
             var allCount = await _workflowInstanceRepository.LongCountAsync(definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null);
             var runningCount = await _workflowInstanceRepository.LongCountAsync(
-                status: WorkflowInstanceStatus.Running,
-                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null);
+                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null,
+                status: WorkflowInstanceStatus.Running);
             var faultedCount = await _workflowInstanceRepository.LongCountAsync(
-                status: WorkflowInstanceStatus.Faulted,
-                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null);
+                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null,
+                status: WorkflowInstanceStatus.Faulted);
             var suspendedCount = await _workflowInstanceRepository.LongCountAsync(
-                status: WorkflowInstanceStatus.Suspended,
-                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null);
+                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null,
+                status: WorkflowInstanceStatus.Suspended);
             var finishedCount = await _workflowInstanceRepository.LongCountAsync(
-                status: WorkflowInstanceStatus.Finished,
-                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null);
+                definitionIds: input.WorkflowDefinitionId.HasValue ? new[] { input.WorkflowDefinitionId.Value } : null,
+                status: WorkflowInstanceStatus.Finished);
 
             return new WorkflowInstanceStatusCountStatisticsResultDto
             {

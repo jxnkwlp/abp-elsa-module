@@ -35,5 +35,4 @@ public class WorkflowTeamRepository : MongoDbRepository<IElsaModuleMongoDbContex
             }
         }
     }
-     
 }

@@ -26,7 +26,6 @@ public class RemoveCache : Activity
     [Required]
     public string Key { get; set; }
 
-
     private readonly IDistributedCache<CacheActivityCacheItem> _distributedCache;
 
     public RemoveCache(IDistributedCache<CacheActivityCacheItem> distributedCache)

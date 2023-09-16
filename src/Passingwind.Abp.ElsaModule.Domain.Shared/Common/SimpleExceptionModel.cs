@@ -42,5 +42,4 @@ public class SimpleExceptionModel
     {
         return new SimpleException(Type, Message, StackTrace, Data, InnerException?.ToException());
     }
-
 }

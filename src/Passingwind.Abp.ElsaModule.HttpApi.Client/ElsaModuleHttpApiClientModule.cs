@@ -17,10 +17,6 @@ public class ElsaModuleHttpApiClientModule : AbpModule
             ElsaModuleRemoteServiceConsts.RemoteServiceName
         );
 
-        Configure<AbpVirtualFileSystemOptions>(options =>
-        {
-            options.FileSets.AddEmbedded<ElsaModuleHttpApiClientModule>();
-        });
-
+        Configure<AbpVirtualFileSystemOptions>(options => options.FileSets.AddEmbedded<ElsaModuleHttpApiClientModule>());
     }
 }

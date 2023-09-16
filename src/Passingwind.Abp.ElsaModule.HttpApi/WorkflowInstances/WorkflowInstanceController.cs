@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
@@ -90,7 +90,7 @@ public class WorkflowInstanceController : ElsaModuleController, IWorkflowInstanc
         return _service.GetFaultsByWorkflowDefinitionAsync(id, input);
     }
 
-    [HttpGet()]
+    [HttpGet]
     public virtual Task<PagedResultDto<WorkflowInstanceBasicDto>> GetListAsync(WorkflowInstanceListRequestDto input)
     {
         return _service.GetListAsync(input);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -49,5 +49,4 @@ public class WorkflowExecutionLogRepository : MongoDbRepository<IElsaModuleMongo
             .PageBy<WorkflowExecutionLog, IMongoQueryable<WorkflowExecutionLog>>(skipCount, maxResultCount)
             .ToListAsync(cancellationToken);
     }
-
 }

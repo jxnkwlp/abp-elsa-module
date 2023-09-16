@@ -28,10 +28,7 @@ public partial class Add_ApiKey : Migration
                 DeleterId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                 DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true)
             },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_AppApiKeys", x => x.Id);
-            });
+            constraints: table => table.PrimaryKey("PK_AppApiKeys", x => x.Id));
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

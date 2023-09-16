@@ -21,9 +21,6 @@ public class WorkflowAppApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        Configure<AbpAutoMapperOptions>(options =>
-        {
-            options.AddMaps<WorkflowAppApplicationModule>();
-        });
+        Configure<AbpAutoMapperOptions>(options => options.AddMaps<WorkflowAppApplicationModule>());
     }
 }
