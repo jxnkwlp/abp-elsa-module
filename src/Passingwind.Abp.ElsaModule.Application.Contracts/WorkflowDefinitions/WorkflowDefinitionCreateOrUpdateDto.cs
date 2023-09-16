@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Elsa.Models;
 
@@ -23,6 +24,8 @@ public class WorkflowDefinitionCreateOrUpdateDto
 
     [MaxLength(64)]
     public string Tag { get; set; }
+
+    public Guid? GroupId { get; set; }
 
     public WorkflowPersistenceBehavior PersistenceBehavior { get; set; } = WorkflowPersistenceBehavior.WorkflowBurst;
 

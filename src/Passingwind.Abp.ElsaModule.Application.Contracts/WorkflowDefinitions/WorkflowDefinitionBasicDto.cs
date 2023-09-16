@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Elsa.Models;
 using Volo.Abp.Application.Dtos;
 
@@ -23,6 +23,10 @@ public class WorkflowDefinitionBasicDto : AuditedEntityDto<Guid>
     public string Channel { get; set; }
 
     public string Tag { get; set; }
+
+    public Guid? GroupId { get; set; }
+
+    public string GroupName { get; set; }
 
     public WorkflowPersistenceBehavior PersistenceBehavior { get; set; }
 }

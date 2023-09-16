@@ -49,14 +49,14 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
                 $"L:ElsaModule,Permission:${ElsaModulePermissions.GroupName}"));
         }
 
-        var parent = await _permissionDefinitionRepository.FindAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.Name == ElsaModulePermissions.Workflow.Default);
+        var parent = await _permissionDefinitionRepository.FindAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.Name == ElsaModulePermissions.Workflows.Default);
 
         if (parent == null)
         {
             parent = await _permissionDefinitionRepository.InsertAsync(new PermissionDefinitionRecord(
                 GuidGenerator.Create(),
                 ElsaModulePermissions.GroupName,
-                ElsaModulePermissions.Workflow.Default,
+                ElsaModulePermissions.Workflows.Default,
                 null,
                 "Workflows"));
         }
@@ -65,7 +65,7 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
     [UnitOfWork]
     public virtual async Task InitialPermissionDefinitionsAsync(CancellationToken cancellationToken = default)
     {
-        var exists = await _permissionDefinitionRepository.GetListAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.ParentName == ElsaModulePermissions.Workflow.Default, cancellationToken: cancellationToken);
+        var exists = await _permissionDefinitionRepository.GetListAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.ParentName == ElsaModulePermissions.Workflows.Default, cancellationToken: cancellationToken);
 
         var workflows = await _workflowDefinitionRepository.GetListAsync();
 
@@ -82,7 +82,7 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
                 GuidGenerator.Create(),
                 ElsaModulePermissions.GroupName,
                 name,
-                ElsaModulePermissions.Workflow.Default,
+                ElsaModulePermissions.Workflows.Default,
                 $"Workflows:{workflow.Id.ToString("d")}",
                 multiTenancySide: workflow.TenantId == null ? Volo.Abp.MultiTenancy.MultiTenancySides.Host : Volo.Abp.MultiTenancy.MultiTenancySides.Tenant), true, cancellationToken);
         }
@@ -92,7 +92,7 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
     {
         var granted = await _permissionGrantRepository.GetListAsync(WorkflowTeamPermissionValueProvider.ProviderName, workflowTeam.GetPermissionKey());
 
-        var ids = granted.ConvertAll(x => Guid.Parse(x.Name.Substring(ElsaModulePermissions.Workflow.Default.Length + 1)));
+        var ids = granted.ConvertAll(x => Guid.Parse(x.Name.Substring(ElsaModulePermissions.Workflows.Default.Length + 1)));
 
         return ids.Distinct().ToList();
     }

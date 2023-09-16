@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Passingwind.Abp.ElsaModule.Groups;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Content;
@@ -37,4 +38,5 @@ public interface IWorkflowDefinitionAppService : ICrudAppService<WorkflowDefinit
     Task<IRemoteStreamContent> ExportAsync(WorkflowDefinitionExportRequestDto input);
     Task<WorkflowDefinitionImportResultDto> ImportAsync(WorkflowDefinitionImportRequestDto input);
 
+    Task<ListResultDto<WorkflowGroupDto>> GetAssignableGroupsAsync();
 }

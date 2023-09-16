@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Elsa.Services.Models;
 using Passingwind.Abp.ElsaModule.Common;
@@ -21,12 +21,17 @@ public class WorkflowInstanceDto : AuditedEntityDto<Guid>
     public string ContextType { get; set; }
     public string ContextId { get; set; }
 
+    public Guid? GroupId { get; set; }
+
     public DateTime? LastExecutedTime { get; set; }
     public DateTime? FinishedTime { get; set; }
     public DateTime? CancelledTime { get; set; }
     public DateTime? FaultedTime { get; set; }
 
-    public TimeSpan? FinishedDuration { get; set; } // => FinishedTime - CreationTime;
+    /// <summary>
+    /// => FinishedTime - CreationTime;
+    /// </summary>
+    public TimeSpan? FinishedDuration { get; set; }
 
     public Guid? LastExecutedActivityId { get; set; }
     public WorkflowInputReference Input { get; set; }

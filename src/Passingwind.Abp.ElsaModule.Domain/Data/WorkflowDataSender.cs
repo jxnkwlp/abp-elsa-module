@@ -66,7 +66,7 @@ public class WorkflowDataSender : IWorkflowDataSender
                 // permissions
                 foreach (var name in ElsaModulePermissions.GetAll())
                 {
-                    if (name.EndsWith(".Delete") || name.StartsWith(ElsaModulePermissions.GlobalVariables.Default) || name.StartsWith(ElsaModulePermissions.WorkflowTeam.Default))
+                    if (name.EndsWith(".Delete") || name.StartsWith(ElsaModulePermissions.GlobalVariables.Default) || name.StartsWith(ElsaModulePermissions.WorkflowTeams.Default))
                         continue;
 
                     await PermissionManager.SetAsync(name, RolePermissionValueProvider.ProviderName, workflowDeveloperRoleName, true);
@@ -78,7 +78,7 @@ public class WorkflowDataSender : IWorkflowDataSender
                 (await RoleManager.CreateAsync(new IdentityRole(GuidGenerator.Create(), workflowViewerRoleName) { IsStatic = true })).CheckErrors();
 
                 // permissions
-                await PermissionManager.SetAsync(ElsaModulePermissions.Workflow.Default, RolePermissionValueProvider.ProviderName, workflowViewerRoleName, true);
+                await PermissionManager.SetAsync(ElsaModulePermissions.Workflows.Default, RolePermissionValueProvider.ProviderName, workflowViewerRoleName, true);
                 await PermissionManager.SetAsync(ElsaModulePermissions.Instances.Default, RolePermissionValueProvider.ProviderName, workflowViewerRoleName, true);
                 await PermissionManager.SetAsync(ElsaModulePermissions.Instances.Statistic, RolePermissionValueProvider.ProviderName, workflowViewerRoleName, true);
             }

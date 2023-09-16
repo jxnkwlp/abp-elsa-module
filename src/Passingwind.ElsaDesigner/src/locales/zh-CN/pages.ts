@@ -127,6 +127,7 @@ export default {
     'page.definition.field.displayName': '显示名称',
     'page.definition.field.displayName.tips': '工作流的用户友好显示名称',
     'page.definition.field.description': '描述',
+    'page.definition.field.groupName': '分组',
     'page.definition.field.variables': '变量',
     'page.definition.field.contextOptions.type': 'Type',
     'page.definition.field.contextOptions.type.placeholder': '完全限定的工作流上下文类型名称',
@@ -144,6 +145,7 @@ export default {
     'page.definition.field.version': '版本号',
     'page.definition.field.isLatest': '是否最新',
     'page.definition.field.isPublished': '是否发布',
+    'page.definition.field.deleteCompletedInstances': '删除实列',
     'page.definition.field.comparison': '比较',
     //
     'page.instance.field.definition': '定义',
@@ -212,6 +214,10 @@ export default {
     'page.workflowTeam.users': '用户',
     'page.workflowTeam.roleScopes': '角色作用域',
     'page.workflowTeam.manage': '管理',
+    //
+    'page.workflowGroup': '分组',
+    'page.workflowGroup.field.name': '名称',
+    'page.workflowGroup.field.description': '描述',
     //
     'page.variable.field.key': '名称',
     'page.variable.field.value': '值',

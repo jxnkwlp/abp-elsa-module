@@ -9,6 +9,7 @@ using MongoDB.Driver.Linq;
 using Passingwind.Abp.ElsaModule.Common;
 using Volo.Abp.Domain.Repositories.MongoDB;
 using Volo.Abp.MongoDB;
+using WorkflowDefinition = Passingwind.Abp.ElsaModule.Common.WorkflowDefinition;
 
 namespace Passingwind.Abp.ElsaModule.MongoDB.Repositories;
 
@@ -18,19 +19,22 @@ public class WorkflowDefinitionRepository : MongoDbRepository<IElsaModuleMongoDb
     {
     }
 
-    public async Task<long> CountAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, IEnumerable<Guid> filterIds = null, CancellationToken cancellationToken = default)
+    public async Task<long> CountAsync(string name = null, bool? isSingleton = null, bool? deleteCompletedInstances = null, int? publishedVersion = null, string channel = null, string tag = null, Guid? groupId = null, Elsa.Models.WorkflowPersistenceBehavior? workflowPersistenceBehavior = null, IEnumerable<Guid> filterIds = null, CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
         return await query
-              .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
-              .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel.Contains(name))
-              .WhereIf(!string.IsNullOrEmpty(tag), x => x.Channel.Contains(tag))
-              .WhereIf(filterIds?.Any() == true, x => filterIds.Contains(x.Id))
-              .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
-              .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
-              .As<IMongoQueryable<WorkflowDefinition>>()
-              .LongCountAsync(cancellationToken);
+            .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
+            .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel == channel)
+            .WhereIf(!string.IsNullOrEmpty(tag), x => x.Tag == tag)
+            .WhereIf(groupId.HasValue, x => x.GroupId == groupId)
+            .WhereIf(workflowPersistenceBehavior.HasValue, x => x.PersistenceBehavior == workflowPersistenceBehavior)
+            .WhereIf(filterIds?.Any() == true, x => filterIds.Contains(x.Id))
+            .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
+            .WhereIf(deleteCompletedInstances.HasValue, x => x.DeleteCompletedInstances == deleteCompletedInstances)
+            .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
+            .As<IMongoQueryable<WorkflowDefinition>>()
+            .LongCountAsync(cancellationToken);
     }
 
     public override async Task<long> GetCountAsync(CancellationToken cancellationToken = default)
@@ -72,36 +76,57 @@ public class WorkflowDefinitionRepository : MongoDbRepository<IElsaModuleMongoDb
         return (await query.Where(x => tags.Contains(x.Tag)).Select(x => x.Id).ToListAsync(cancellationToken)).ToArray();
     }
 
-    public async Task<List<WorkflowDefinition>> GetListAsync(string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, IEnumerable<Guid> filterIds = null, CancellationToken cancellationToken = default)
+    public async Task<List<WorkflowDefinition>> GetListAsync(string name = null, bool? isSingleton = null, bool? deleteCompletedInstances = null, int? publishedVersion = null, string channel = null, string tag = null, Guid? groupId = null, Elsa.Models.WorkflowPersistenceBehavior? workflowPersistenceBehavior = null, IEnumerable<Guid> filterIds = null, CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
         return await query
-              .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
-              .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel.Contains(name))
-              .WhereIf(!string.IsNullOrEmpty(tag), x => x.Channel.Contains(tag))
-              .WhereIf(filterIds?.Any() == true, x => filterIds.Contains(x.Id))
-              .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
-              .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
-              .As<IMongoQueryable<WorkflowDefinition>>()
-              .ToListAsync(cancellationToken);
+            .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
+            .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel == channel)
+            .WhereIf(!string.IsNullOrEmpty(tag), x => x.Tag == tag)
+            .WhereIf(groupId.HasValue, x => x.GroupId == groupId)
+            .WhereIf(workflowPersistenceBehavior.HasValue, x => x.PersistenceBehavior == workflowPersistenceBehavior)
+            .WhereIf(filterIds?.Any() == true, x => filterIds.Contains(x.Id))
+            .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
+            .WhereIf(deleteCompletedInstances.HasValue, x => x.DeleteCompletedInstances == deleteCompletedInstances)
+            .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
+            .As<IMongoQueryable<WorkflowDefinition>>()
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<WorkflowDefinition>> GetPagedListAsync(int skipCount, int maxResultCount, string name = null, bool? isSingleton = null, int? publishedVersion = null, string channel = null, string tag = null, IEnumerable<Guid> filterIds = null, string ordering = null, CancellationToken cancellationToken = default)
+    public async Task<List<WorkflowDefinition>> GetPagedListAsync(int skipCount, int maxResultCount, string name = null, bool? isSingleton = null, bool? deleteCompletedInstances = null, int? publishedVersion = null, string channel = null, string tag = null, Guid? groupId = null, Elsa.Models.WorkflowPersistenceBehavior? workflowPersistenceBehavior = null, IEnumerable<Guid> filterIds = null, string ordering = null, CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
         return await query
-              .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
-              .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel.Contains(name))
-              .WhereIf(!string.IsNullOrEmpty(tag), x => x.Channel.Contains(tag))
-              .WhereIf(filterIds?.Any() == true, x => filterIds.Contains(x.Id))
-              .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
-              .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
-              .OrderBy<WorkflowDefinition>(ordering ?? $"{nameof(WorkflowDefinition.CreationTime)} desc")
-              .PageBy(skipCount, maxResultCount)
-              .As<IMongoQueryable<WorkflowDefinition>>()
-              .ToListAsync(cancellationToken);
+            .WhereIf(!string.IsNullOrEmpty(name), x => x.Name.Contains(name) || x.DisplayName.Contains(name))
+            .WhereIf(!string.IsNullOrEmpty(channel), x => x.Channel == channel)
+            .WhereIf(!string.IsNullOrEmpty(tag), x => x.Tag == tag)
+            .WhereIf(groupId.HasValue, x => x.GroupId == groupId)
+            .WhereIf(workflowPersistenceBehavior.HasValue, x => x.PersistenceBehavior == workflowPersistenceBehavior)
+            .WhereIf(filterIds?.Any() == true, x => filterIds.Contains(x.Id))
+            .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
+            .WhereIf(deleteCompletedInstances.HasValue, x => x.DeleteCompletedInstances == deleteCompletedInstances)
+            .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
+            .OrderBy<WorkflowDefinition>(ordering ?? $"{nameof(WorkflowDefinition.CreationTime)} desc")
+            .PageBy(skipCount, maxResultCount)
+            .As<IMongoQueryable<WorkflowDefinition>>()
+            .ToListAsync(cancellationToken);
     }
 
+    public async Task RemoveGroupAsync(Guid groupId, CancellationToken cancellationToken = default)
+    {
+        var dbContext = await GetDbContextAsync(cancellationToken);
+        var collection = dbContext.Collection<WorkflowDefinition>();
+
+        await collection.UpdateManyAsync(x => x.GroupId == groupId, Builders<WorkflowDefinition>.Update.Set(x => x.GroupName, string.Empty).Set(x => x.GroupId, null));
+    }
+
+    public async Task UpdateGroupNameAsync(Guid groupId, string groupName, CancellationToken cancellationToken = default)
+    {
+        var dbContext = await GetDbContextAsync(cancellationToken);
+        var collection = dbContext.Collection<WorkflowDefinition>();
+
+        await collection.UpdateManyAsync(x => x.GroupId == groupId, Builders<WorkflowDefinition>.Update.Set(x => x.GroupName, groupName));
+    }
 }

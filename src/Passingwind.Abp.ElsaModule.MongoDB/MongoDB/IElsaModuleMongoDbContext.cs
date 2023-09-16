@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.Groups;
 using Passingwind.Abp.ElsaModule.Teams;
 using Volo.Abp.Data;
 using Volo.Abp.MongoDB;
@@ -16,4 +17,5 @@ public interface IElsaModuleMongoDbContext : IAbpMongoDbContext
     IMongoCollection<WorkflowExecutionLog> WorkflowExecutionLogs { get; }
     IMongoCollection<WorkflowInstance> WorkflowInstances { get; }
     IMongoCollection<WorkflowTeam> WorkflowTeams { get; }
+    IMongoCollection<WorkflowGroup> WorkflowGroups { get; }
 }

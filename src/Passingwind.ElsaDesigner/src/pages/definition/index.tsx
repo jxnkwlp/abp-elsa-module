@@ -1,6 +1,7 @@
 import {
     deleteWorkflowDefinition,
     deleteWorkflowDefinitionOwner,
+    getWorkflowDefinitionAssignableGroups,
     getWorkflowDefinitionIam,
     getWorkflowDefinitionList,
     getWorkflowDefinitionVersion,
@@ -247,10 +248,40 @@ const Index: React.FC = () => {
             width: 250,
         },
         {
+            dataIndex: 'groupName',
+            title: intl.formatMessage({ id: 'page.definition.field.groupName' }),
+            search: false,
+            width: 160,
+        },
+        {
+            dataIndex: 'groupId',
+            title: intl.formatMessage({ id: 'page.definition.field.groupName' }),
+            hideInTable: true,
+            request: async () => {
+                const result = await getWorkflowDefinitionAssignableGroups();
+                return (result?.items ?? []).map((x) => {
+                    return {
+                        label: x.name,
+                        value: x.id,
+                    };
+                });
+            },
+        },
+        {
             dataIndex: 'description',
             title: intl.formatMessage({ id: 'page.definition.field.description' }),
             search: false,
             width: 160,
+        },
+        {
+            dataIndex: 'channel',
+            title: intl.formatMessage({ id: 'page.definition.field.channel' }),
+            hideInTable: true,
+        },
+        {
+            dataIndex: 'tag',
+            title: intl.formatMessage({ id: 'page.definition.field.tag' }),
+            hideInTable: true,
         },
         {
             dataIndex: 'latestVersion',
@@ -271,7 +302,6 @@ const Index: React.FC = () => {
         {
             dataIndex: 'isSingleton',
             title: intl.formatMessage({ id: 'page.definition.field.isSingleton' }),
-            search: false,
             valueEnum: {
                 true: { text: 'Y' },
                 false: { text: 'N' },
@@ -280,6 +310,15 @@ const Index: React.FC = () => {
             sortOrder: tableQueryConfig?.sort?.isSingleton ?? null,
             width: 120,
             align: 'center',
+        },
+        {
+            dataIndex: 'deleteCompletedInstances',
+            title: intl.formatMessage({ id: 'page.definition.field.deleteCompletedInstances' }),
+            hideInTable: true,
+            valueEnum: {
+                true: { text: 'Y' },
+                false: { text: 'N' },
+            },
         },
         {
             dataIndex: 'lastModificationTime',
@@ -568,7 +607,7 @@ const Index: React.FC = () => {
                 }}
             />
 
-            {/*  */}
+            {/* Edit */}
             <ModalForm
                 form={editForm}
                 title={editModalTitle}
@@ -591,15 +630,11 @@ const Index: React.FC = () => {
                     }
                 }}
                 onFinish={async (value) => {
-                    const success = await handleEdit(
-                        editModalDataId!,
-                        Object.assign(
-                            {},
-                            editModalData,
-                            { variables: JSON.parse(value.variablesString ?? '{}') },
-                            value,
-                        ),
-                    );
+                    const success = await handleEdit(editModalDataId!, {
+                        ...editModalData,
+                        ...value,
+                        groupId: value.groupId,
+                    });
 
                     if (success) {
                         setEditModalVisible(false);
@@ -610,7 +645,7 @@ const Index: React.FC = () => {
                 <EditFormItems />
             </ModalForm>
 
-            {/*  */}
+            {/* dispatch */}
             <ModalForm
                 layout="horizontal"
                 modalProps={{ destroyOnClose: true, maskClosable: false }}

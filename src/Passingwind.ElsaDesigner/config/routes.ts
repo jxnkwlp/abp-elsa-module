@@ -88,6 +88,12 @@
                 access: 'ElsaWorkflow.WorkflowTeams',
             },
             {
+                path: '/workflows/group',
+                name: 'Groups',
+                component: './workflow/groups',
+                access: 'ElsaWorkflow.WorkflowGroups',
+            },
+            {
                 component: './404',
             },
         ],

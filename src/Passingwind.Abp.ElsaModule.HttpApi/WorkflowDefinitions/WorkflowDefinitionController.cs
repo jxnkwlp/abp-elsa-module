@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Passingwind.Abp.ElsaModule.Groups;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Content;
@@ -168,5 +169,11 @@ public class WorkflowDefinitionController : ElsaModuleController, IWorkflowDefin
     public Task<WorkflowDefinitionImportResultDto> ImportAsync([FromForm] WorkflowDefinitionImportRequestDto input)
     {
         return _service.ImportAsync(input);
+    }
+
+    [HttpGet("assignable-groups")]
+    public Task<ListResultDto<WorkflowGroupDto>> GetAssignableGroupsAsync()
+    {
+        return _service.GetAssignableGroupsAsync();
     }
 }

@@ -84,8 +84,8 @@ export enum WorkflowInstanceStatus {
  * *TODO*
  **/
 export enum WorkflowPersistenceBehavior {
-    Suspended = 'Suspended',
-    WorkflowBurst = 'WorkflowBurst',
-    ActivityExecuted = 'ActivityExecuted',
+    Suspended = 0,
+    WorkflowBurst = 1,
+    ActivityExecuted = 2,
 }
 

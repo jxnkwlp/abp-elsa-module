@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Elsa.Models;
+using Passingwind.Abp.ElsaModule.Groups;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 
@@ -18,9 +19,24 @@ public class WorkflowDefinition : FullAuditedAggregateRoot<Guid>, IMultiTenant
     [JsonConstructor]
     public WorkflowDefinition(Guid id) : base(id)
     {
+        Variables = new Dictionary<string, object>();
+        CustomAttributes = new Dictionary<string, object>();
     }
 
-    public WorkflowDefinition(Guid id, string name, string displayName, Guid? tenantId, string description, bool isSingleton, bool deleteCompletedInstances, string channel, string tag, WorkflowPersistenceBehavior persistenceBehavior, WorkflowContextOptions contextOptions, Dictionary<string, object> variables, Dictionary<string, object> customAttributes) : base(id)
+    public WorkflowDefinition(
+        Guid id,
+        string name,
+        string displayName,
+        Guid? tenantId,
+        string description = null,
+        bool isSingleton = false,
+        bool deleteCompletedInstances = false,
+        string channel = null,
+        string tag = null,
+        WorkflowPersistenceBehavior? persistenceBehavior = null,
+        WorkflowContextOptions contextOptions = null,
+        Dictionary<string, object> variables = null,
+        Dictionary<string, object> customAttributes = null) : base(id)
     {
         Name = name;
         DisplayName = displayName;
@@ -30,7 +46,7 @@ public class WorkflowDefinition : FullAuditedAggregateRoot<Guid>, IMultiTenant
         DeleteCompletedInstances = deleteCompletedInstances;
         Channel = channel;
         Tag = tag;
-        PersistenceBehavior = persistenceBehavior;
+        PersistenceBehavior = persistenceBehavior ?? WorkflowPersistenceBehavior.WorkflowBurst;
         ContextOptions = contextOptions;
         Variables = variables ?? new Dictionary<string, object>();
         CustomAttributes = customAttributes ?? new Dictionary<string, object>();
@@ -64,6 +80,9 @@ public class WorkflowDefinition : FullAuditedAggregateRoot<Guid>, IMultiTenant
 
     public string Tag { get; set; }
 
+    public Guid? GroupId { get; protected set; }
+    public string GroupName { get; set; }
+
     public WorkflowPersistenceBehavior PersistenceBehavior { get; set; } = WorkflowPersistenceBehavior.WorkflowBurst;
 
     public WorkflowContextOptions ContextOptions { get; set; }
@@ -91,5 +110,11 @@ public class WorkflowDefinition : FullAuditedAggregateRoot<Guid>, IMultiTenant
     public void ChangeName(string name)
     {
         Name = name;
+    }
+
+    public void SetGroup(WorkflowGroup workflowGroup)
+    {
+        GroupId = workflowGroup?.Id;
+        GroupName = workflowGroup?.Name;
     }
 }

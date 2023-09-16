@@ -1,3 +1,4 @@
+import { getWorkflowDefinitionAssignableGroups } from '@/services/WorkflowDefinition';
 import { WorkflowContextFidelity, WorkflowPersistenceBehavior } from '@/services/enums';
 import { ProFormSelect, ProFormSwitch, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { Tabs } from 'antd';
@@ -41,6 +42,24 @@ const EditFormItems: React.FC = () => {
                                     extra={intl.formatMessage({
                                         id: 'page.definition.field.displayName.tips',
                                     })}
+                                />
+                                <ProFormSelect
+                                    label={intl.formatMessage({
+                                        id: 'page.definition.field.groupName',
+                                    })}
+                                    name="groupId"
+                                    rules={[{ required: false }]}
+                                    request={async () => {
+                                        const result =
+                                            await getWorkflowDefinitionAssignableGroups();
+                                        return (result?.items ?? []).map((x) => {
+                                            return {
+                                                label: x.name,
+                                                value: x.id,
+                                            };
+                                        });
+                                    }}
+                                    // fieldProps={{ showSearch: true }}
                                 />
                                 <ProFormTextArea
                                     label={intl.formatMessage({
@@ -129,6 +148,12 @@ const EditFormItems: React.FC = () => {
                                         id: 'page.definition.field.isSingleton',
                                     })}
                                     name="isSingleton"
+                                />
+                                <ProFormSwitch
+                                    label={intl.formatMessage({
+                                        id: 'page.definition.field.deleteCompletedInstances',
+                                    })}
+                                    name="deleteCompletedInstances"
                                 />
                             </>
                         ),

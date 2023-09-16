@@ -9,6 +9,7 @@ using Elsa.Models;
 using Elsa.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using Passingwind.Abp.ElsaModule.Groups;
 using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.Teams;
 using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
@@ -32,6 +33,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     private readonly IdentityUserManager _identityUserManager;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IWorkflowImporter _workflowImporter;
+    private readonly IWorkflowGroupRepository _workflowGroupRepository;
 
     public WorkflowDefinitionAppService(
         IWorkflowDefinitionRepository workflowDefinitionRepository,
@@ -42,7 +44,8 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         IWorkflowTeamManager workflowTeamManager,
         IdentityUserManager identityUserManager,
         IJsonSerializer jsonSerializer,
-        IWorkflowImporter workflowImporter)
+        IWorkflowImporter workflowImporter,
+        IWorkflowGroupRepository workflowGroupRepository)
     {
         _workflowDefinitionRepository = workflowDefinitionRepository;
         _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
@@ -53,6 +56,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         _identityUserManager = identityUserManager;
         _jsonSerializer = jsonSerializer;
         _workflowImporter = workflowImporter;
+        _workflowGroupRepository = workflowGroupRepository;
     }
 
     [Authorize(Policy = ElsaModulePermissions.Definitions.CreateOrUpdateOrPublish)]
@@ -76,6 +80,17 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
 
         // check name
         await _workflowDefinitionManager.CheckNameExistsAsync(defintion);
+
+        if (input.Definition.GroupId.HasValue)
+        {
+            var group = await _workflowGroupRepository.FindAsync(input.Definition.GroupId.Value);
+
+            defintion.SetGroup(group);
+        }
+        else
+        {
+            defintion.SetGroup(null);
+        }
 
         WorkflowDefinitionVersion version = await _workflowDefinitionManager.CreateDefinitionVersionAsync(
             defintion.Id,
@@ -161,12 +176,21 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         var count = await _workflowDefinitionRepository.CountAsync(
             name: input.Filter,
             isSingleton: input.IsSingleton,
+            deleteCompletedInstances: input.DeleteCompletedInstances,
+            channel: input.Channel,
+            tag: input.Tag,
+            groupId: input.GroupId,
             filterIds: grantedResult.AllGranted ? null : grantedResult.WorkflowIds);
+
         var list = await _workflowDefinitionRepository.GetPagedListAsync(
             input.SkipCount,
             input.MaxResultCount,
             name: input.Filter,
             isSingleton: input.IsSingleton,
+            deleteCompletedInstances: input.DeleteCompletedInstances,
+            channel: input.Channel,
+            tag: input.Tag,
+            groupId: input.GroupId,
             filterIds: grantedResult.AllGranted ? null : grantedResult.WorkflowIds,
             ordering: input.Sorting);
 
@@ -192,7 +216,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
 
         await CheckWorkflowPermissionAsync(entity, ElsaModulePermissions.Definitions.Default);
 
-        if (previousVersion.HasValue == false)
+        if (!previousVersion.HasValue)
             return null;
 
         var versionEntity = await _workflowDefinitionVersionRepository.GetByVersionAsync(id, previousVersion.Value);
@@ -265,7 +289,6 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
 
             // new version
             await _workflowDefinitionVersionRepository.InsertAsync(currentVersion);
-
         }
         else
         {
@@ -310,6 +333,17 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         // check name
         await _workflowDefinitionManager.CheckNameExistsAsync(defintion);
 
+        if (input.Definition.GroupId.HasValue)
+        {
+            var group = await _workflowGroupRepository.FindAsync(input.Definition.GroupId.Value);
+
+            defintion.SetGroup(group);
+        }
+        else
+        {
+            defintion.SetGroup(null);
+        }
+
         // update
         await _workflowDefinitionRepository.UpdateAsync(defintion);
 
@@ -340,6 +374,17 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
 
         // check name
         await _workflowDefinitionManager.CheckNameExistsAsync(entity);
+
+        if (input.GroupId.HasValue)
+        {
+            var group = await _workflowGroupRepository.FindAsync(input.GroupId.Value);
+
+            entity.SetGroup(group);
+        }
+        else
+        {
+            entity.SetGroup(null);
+        }
 
         // update
         await _workflowDefinitionRepository.UpdateAsync(entity);
@@ -442,13 +487,13 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     public async Task<WorkflowDefinitionIamResultDto> GetIamAsync(Guid id)
     {
         var entity = await _workflowDefinitionRepository.GetAsync(id);
-        var groups = await _workflowTeamManager.GetListByWorkflowIdAsync(id);
+        var teams = await _workflowTeamManager.GetListByWorkflowIdAsync(id);
 
         var owners = await _workflowPermissionProvider.GetWorkflowOwnersAsync(entity);
 
         return new WorkflowDefinitionIamResultDto
         {
-            Teams = ObjectMapper.Map<IEnumerable<WorkflowTeam>, IEnumerable<WorkflowTeamBasicDto>>(groups),
+            Teams = ObjectMapper.Map<IEnumerable<WorkflowTeam>, IEnumerable<WorkflowTeamBasicDto>>(teams),
             Owners = ObjectMapper.Map<IEnumerable<IdentityUser>, IEnumerable<IdentityUserDto>>(owners),
         };
     }
@@ -522,7 +567,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
             // write file 
             foreach (var item in list)
             {
-                var version = versionList.FirstOrDefault(x => x.DefinitionId == item.Id);
+                var version = versionList.Find(x => x.DefinitionId == item.Id);
 
                 var content = _jsonSerializer.Serialize(item);
 
@@ -599,9 +644,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
             try
             {
                 using StreamReader sr = new StreamReader(input.File.GetStream());
-                var fileContent = await sr.ReadToEndAsync();
-
-                importList[input.File.FileName] = fileContent;
+                importList[input.File.FileName] = await sr.ReadToEndAsync();
             }
             catch (Exception ex)
             {
@@ -632,5 +675,12 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
         }
 
         return result;
+    }
+
+    public async Task<ListResultDto<WorkflowGroupDto>> GetAssignableGroupsAsync()
+    {
+        var list = await _workflowGroupRepository.GetListAsync();
+
+        return new ListResultDto<WorkflowGroupDto>(ObjectMapper.Map<List<WorkflowGroup>, List<WorkflowGroupDto>>(list));
     }
 }
