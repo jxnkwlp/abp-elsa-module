@@ -1,6 +1,9 @@
 import MonacoEditor from '@/components/MonacoEditor';
-import { getWorkflowDefinitionVersion } from '@/services/WorkflowDefinition';
-import { getWorkflowInstance, getWorkflowInstanceLogSummary } from '@/services/WorkflowInstance';
+import {
+    getWorkflowInstance,
+    getWorkflowInstanceDefinition,
+    getWorkflowInstanceLogSummary,
+} from '@/services/WorkflowInstance';
 import { WorkflowInstanceStatus } from '@/services/enums';
 import type { API } from '@/services/typings';
 import {
@@ -155,8 +158,8 @@ const Index: React.FC = () => {
         return list;
     };
 
-    const loadWorkflowDefinition = async (definitionId: string, version: number) => {
-        const result = await getWorkflowDefinitionVersion(definitionId, version);
+    const loadWorkflowDefinition = async (definitionId: string) => {
+        const result = await getWorkflowInstanceDefinition(definitionId);
 
         if (!result) {
             Modal.error({
@@ -200,7 +203,7 @@ const Index: React.FC = () => {
         }
 
         await loadLogsSummary(id);
-        await loadWorkflowDefinition(result.workflowDefinitionId!, result.version!);
+        await loadWorkflowDefinition(id);
 
         setLoading(false);
     };

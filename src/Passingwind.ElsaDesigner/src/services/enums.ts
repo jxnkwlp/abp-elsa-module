@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
  **/

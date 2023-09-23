@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 189
+ * Total count: 191
  **/
 import * as Enum from "./enums";
 
@@ -661,6 +661,13 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type IdentityUserListResult = {
+        items?: IdentityUser[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type IdentityUserPagedResult = {
         items?: IdentityUser[] | undefined;
         totalCount: number;
@@ -1173,11 +1180,11 @@ declare namespace API {
         channel?: string | undefined;
         tag?: string | undefined;
         groupId?: string | undefined;
+        groupName?: string | undefined;
         persistenceBehavior: Enum.WorkflowPersistenceBehavior;
         contextOptions: WorkflowContextOptions;
         variables?: any | undefined;
         customAttributes?: any | undefined;
-        groupName?: string | undefined;
     };
 
     /**
@@ -1205,9 +1212,16 @@ declare namespace API {
         deleteCompletedInstances?: boolean | undefined;
         channel?: string | undefined;
         tag?: string | undefined;
-        persistenceBehavior: Enum.WorkflowPersistenceBehavior;
         groupId?: string | undefined;
         groupName?: string | undefined;
+        persistenceBehavior: Enum.WorkflowPersistenceBehavior;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowDefinitionBasicListResult = {
+        items?: WorkflowDefinitionBasic[] | undefined;
     };
 
     /**
@@ -1547,6 +1561,7 @@ declare namespace API {
         correlationId?: string | undefined;
         contextType?: string | undefined;
         contextId?: string | undefined;
+        groupId?: string | undefined;
         lastExecutedTime?: string | undefined;
         finishedTime?: string | undefined;
         cancelledTime?: string | undefined;
@@ -1598,6 +1613,7 @@ declare namespace API {
         correlationId?: string | undefined;
         contextType?: string | undefined;
         contextId?: string | undefined;
+        groupId?: string | undefined;
         lastExecutedTime?: string | undefined;
         finishedTime?: string | undefined;
         cancelledTime?: string | undefined;

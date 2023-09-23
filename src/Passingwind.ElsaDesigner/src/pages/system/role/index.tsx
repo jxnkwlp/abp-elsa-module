@@ -1,6 +1,7 @@
 import { getPermissions, updatePermissions } from '@/services/Permissions';
 import { createRole, deleteRole, getRoleList, updateRole } from '@/services/Role';
 import type { API } from '@/services/typings';
+import { CheckCircleTwoTone, CloseCircleOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumnType } from '@ant-design/pro-components';
 import {
     ModalForm,
@@ -10,7 +11,7 @@ import {
     ProFormText,
     ProTable,
 } from '@ant-design/pro-components';
-import { Button, Checkbox, Col, Collapse, message, Popconfirm, Row } from 'antd';
+import { Button, Checkbox, Col, Collapse, Popconfirm, Row, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import { formatMessage, useAccess, useIntl } from 'umi';
 
@@ -62,7 +63,7 @@ const Index: React.FC = () => {
         });
         const result = await updatePermissions(
             {
-                providerKey: editModalData.name,
+                providerKey: editModalData!.name,
                 providerName: 'R',
             },
             {
@@ -118,8 +119,8 @@ const Index: React.FC = () => {
             search: false,
             align: 'center',
             valueEnum: {
-                true: { text: 'Y' },
-                false: { text: 'N' },
+                true: { text: <CheckCircleTwoTone /> },
+                false: { text: <CloseCircleOutlined /> },
             },
         },
         {
@@ -128,8 +129,8 @@ const Index: React.FC = () => {
             search: false,
             align: 'center',
             valueEnum: {
-                true: { text: 'Y' },
-                false: { text: 'N' },
+                true: { text: <CheckCircleTwoTone /> },
+                false: { text: <CloseCircleOutlined /> },
             },
         },
         {
@@ -138,26 +139,17 @@ const Index: React.FC = () => {
             search: false,
             align: 'center',
             valueEnum: {
-                true: { text: 'Y' },
-                false: { text: 'N' },
+                true: { text: <CheckCircleTwoTone /> },
+                false: { text: <CloseCircleOutlined /> },
             },
         },
-        // {
-        //     dataIndex: 'creationTime',
-        //     title: intl.formatMessage({ id: 'common.dict.lastModificationTime' }),
-        //     valueType: 'dateTime',
-        //     search: false,
-        //     renderText: (_, record) => {
-        //         return record.lastModificationTime ?? record.creationTime;
-        //     },
-        // },
         {
             title: intl.formatMessage({ id: 'common.dict.table-action' }),
             valueType: 'option',
             align: 'center',
             width: 160,
             render: (text, record, _, action) => [
-                !record.isStatic && access['AbpIdentity.Roles.Update'] && (
+                access['AbpIdentity.Roles.Update'] && (
                     <a
                         key="edit"
                         onClick={() => {

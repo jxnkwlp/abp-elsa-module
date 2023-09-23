@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -60,6 +61,12 @@ public class WorkflowInstanceController : ElsaModuleController, IWorkflowInstanc
         return _service.ExecuteAsync(id, input);
     }
 
+    [HttpGet("assignable-definitions")]
+    public Task<PagedResultDto<WorkflowDefinitionBasicDto>> GetAssignableDefinitionAsync(WorkflowDefinitionListRequestDto input)
+    {
+        return _service.GetAssignableDefinitionAsync(input);
+    }
+
     [HttpGet("{id}")]
     public virtual Task<WorkflowInstanceDto> GetAsync(Guid id)
     {
@@ -70,6 +77,12 @@ public class WorkflowInstanceController : ElsaModuleController, IWorkflowInstanc
     public Task<WorkflowInstanceBasicDto> GetBasicAsync(Guid id)
     {
         return _service.GetBasicAsync(id);
+    }
+
+    [HttpGet("{id}/definition")]
+    public Task<WorkflowDefinitionVersionDto> GetDefinitionAsync(Guid id)
+    {
+        return _service.GetDefinitionAsync(id);
     }
 
     [HttpGet("{id}/execution-logs")]

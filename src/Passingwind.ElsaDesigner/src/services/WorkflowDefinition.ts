@@ -122,6 +122,11 @@ export async function getWorkflowDefinitionList(
     params: {
         filter?: string | undefined,
         isSingleton?: boolean | undefined,
+        deleteCompletedInstances?: boolean | undefined,
+        channel?: string | undefined,
+        tag?: string | undefined,
+        groupId?: string | undefined,
+        persistenceBehavior?: any | undefined,
         sorting?: string | undefined,
         skipCount?: number | undefined,
         maxResultCount?: number | undefined

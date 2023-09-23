@@ -22,7 +22,12 @@ import {
     saveTableQueryConfig,
     showDownloadFile,
 } from '@/services/utils';
-import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
+import {
+    CheckCircleTwoTone,
+    CloseCircleOutlined,
+    DownloadOutlined,
+    UploadOutlined,
+} from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { ProForm } from '@ant-design/pro-components';
 import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
@@ -303,13 +308,25 @@ const Index: React.FC = () => {
             dataIndex: 'isSingleton',
             title: intl.formatMessage({ id: 'page.definition.field.isSingleton' }),
             valueEnum: {
-                true: { text: 'Y' },
-                false: { text: 'N' },
+                true: { text: <CheckCircleTwoTone /> },
+                false: { text: <CloseCircleOutlined /> },
             },
             sorter: true,
             sortOrder: tableQueryConfig?.sort?.isSingleton ?? null,
             width: 120,
             align: 'center',
+            request: async () => {
+                return [
+                    {
+                        label: 'Y',
+                        value: 'true',
+                    },
+                    {
+                        label: 'N',
+                        value: 'false',
+                    },
+                ];
+            },
         },
         {
             dataIndex: 'deleteCompletedInstances',

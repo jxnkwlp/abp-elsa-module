@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Permissions;
+using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Repositories;
@@ -19,17 +21,26 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
     private readonly IWorkflowTeamRepository _workflowTeamRepository;
     private readonly IPermissionManager _permissionManager;
     private readonly IdentityRoleManager _identityRoleManager;
+    private readonly IIdentityRoleRepository _roleRepository;
+    private readonly IIdentityUserRepository _userRepository;
+    private readonly IWorkflowDefinitionRepository _workflowDefinitionRepository;
 
     public WorkflowTeamAppService(
         IWorkflowTeamManager workflowTeamManager,
         IWorkflowTeamRepository workflowTeamRepository,
         IPermissionManager permissionManager,
-        IdentityRoleManager identityRoleManager)
+        IdentityRoleManager identityRoleManager,
+        IIdentityRoleRepository identityRoleRepository,
+        IIdentityUserRepository identityUserRepository,
+        IWorkflowDefinitionRepository workflowDefinitionRepository)
     {
         _workflowTeamManager = workflowTeamManager;
         _workflowTeamRepository = workflowTeamRepository;
         _permissionManager = permissionManager;
         _identityRoleManager = identityRoleManager;
+        _roleRepository = identityRoleRepository;
+        _userRepository = identityUserRepository;
+        _workflowDefinitionRepository = workflowDefinitionRepository;
     }
 
     public virtual async Task<PagedResultDto<WorkflowTeamBasicDto>> GetListAsync(WorkflowTeamListRequestDto input)
@@ -158,5 +169,35 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
         await _workflowTeamRepository.UpdateAsync(entity);
 
         await CurrentUnitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<ListResultDto<IdentityRoleDto>> GetAssignableRolesAsync()
+    {
+        var list = await _roleRepository.GetListAsync(sorting: nameof(IdentityRole.Name));
+
+        return new ListResultDto<IdentityRoleDto>(ObjectMapper.Map<List<IdentityRole>, List<IdentityRoleDto>>(list));
+    }
+
+    public async Task<ListResultDto<IdentityUserDto>> GetAssignableUsersAsync(WorkflowTeamAssignableUserListRequestDto input)
+    {
+        var list = await _userRepository.GetListAsync(sorting: nameof(IdentityUser.UserName), maxResultCount: input.MaxResultCount, filter: input.Filter, roleId: input.RoleId);
+
+        return new ListResultDto<IdentityUserDto>(ObjectMapper.Map<List<IdentityUser>, List<IdentityUserDto>>(list));
+    }
+
+    public async Task<ListResultDto<WorkflowDefinitionBasicDto>> GetAssignableDefinitionAsync(WorkflowDefinitionListRequestDto input)
+    {
+        var list = await _workflowDefinitionRepository.GetPagedListAsync(
+            0,
+            input.MaxResultCount,
+            name: input.Filter,
+            isSingleton: input.IsSingleton,
+            deleteCompletedInstances: input.DeleteCompletedInstances,
+            channel: input.Channel,
+            tag: input.Tag,
+            groupId: input.GroupId,
+            ordering: input.Sorting);
+
+        return new ListResultDto<WorkflowDefinitionBasicDto>(ObjectMapper.Map<List<WorkflowDefinition>, List<WorkflowDefinitionBasicDto>>(list));
     }
 }

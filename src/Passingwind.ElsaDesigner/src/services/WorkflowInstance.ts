@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 17
+ * Total count: 19
  **/
 // @ts-ignore
 /* eslint-disable */
@@ -51,6 +51,31 @@ export async function getWorkflowInstance(
 }
 
 /**
+ * *TODO* GET /api/elsa/workflow/instances/assignable-definitions 
+ **/
+export async function getWorkflowInstanceAssignableDefinition(
+    params: {
+        filter?: string | undefined,
+        isSingleton?: boolean | undefined,
+        deleteCompletedInstances?: boolean | undefined,
+        channel?: string | undefined,
+        tag?: string | undefined,
+        groupId?: string | undefined,
+        persistenceBehavior?: any | undefined,
+        sorting?: string | undefined,
+        skipCount?: number | undefined,
+        maxResultCount?: number | undefined
+    },
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowDefinitionBasicPagedResult>(`/api/elsa/workflow/instances/assignable-definitions`, {
+        method: 'GET',
+        params: params,
+        ...(options || {}),
+    });
+}
+
+/**
  * *TODO* GET /api/elsa/workflow/instances/{id}/basic 
  **/
 export async function getWorkflowInstanceBasic(
@@ -58,6 +83,19 @@ export async function getWorkflowInstanceBasic(
     options?: { [key: string]: any }
 ) {
     return request<API.WorkflowInstanceBasic>(`/api/elsa/workflow/instances/${id}/basic`, {
+        method: 'GET',
+        ...(options || {}),
+    });
+}
+
+/**
+ * *TODO* GET /api/elsa/workflow/instances/{id}/definition 
+ **/
+export async function getWorkflowInstanceDefinition(
+    id: string,
+    options?: { [key: string]: any }
+) {
+    return request<API.WorkflowDefinitionVersion>(`/api/elsa/workflow/instances/${id}/definition`, {
         method: 'GET',
         ...(options || {}),
     });

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.Permissions;
 using Passingwind.Abp.ElsaModule.Stores;
+using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -32,6 +33,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
     private readonly IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> _workflowInstanceDateCountStatisticsDistributedCache;
     private readonly IDistributedCache<WorkflowInstanceStatusCountStatisticsResultDto> _workflowInstanceStatusCountStatisticsDistributedCache;
     private readonly IWorkflowPermissionProvider _workflowPermissionProvider;
+    private readonly IWorkflowDefinitionVersionRepository _workflowDefinitionVersionRepository;
 
     public WorkflowInstanceAppService(
         IJsonSerializer jsonSerializer,
@@ -45,7 +47,8 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         IWorkflowStorageService workflowStorageService,
         IDistributedCache<WorkflowInstanceDateCountStatisticsResultDto> workflowInstanceDateCountStatisticsDistributedCache,
         IDistributedCache<WorkflowInstanceStatusCountStatisticsResultDto> workflowInstanceStatusCountStatisticsDistributedCache,
-        IWorkflowPermissionProvider workflowPermissionProvider)
+        IWorkflowPermissionProvider workflowPermissionProvider,
+        IWorkflowDefinitionVersionRepository workflowDefinitionVersionRepository)
     {
         _jsonSerializer = jsonSerializer;
         _workflowInstanceRepository = workflowInstanceRepository;
@@ -59,6 +62,7 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         _workflowInstanceDateCountStatisticsDistributedCache = workflowInstanceDateCountStatisticsDistributedCache;
         _workflowInstanceStatusCountStatisticsDistributedCache = workflowInstanceStatusCountStatisticsDistributedCache;
         _workflowPermissionProvider = workflowPermissionProvider;
+        _workflowDefinitionVersionRepository = workflowDefinitionVersionRepository;
     }
 
     [Authorize(Policy = ElsaModulePermissions.Instances.Action)]
@@ -406,5 +410,45 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         var list = await _workflowInstanceRepository.GetFaultsByWorkflowDefinitionAsync(id, input.SkipCount, input.MaxResultCount);
 
         return new PagedResultDto<WorkflowInstanceFaultDto>(count, ObjectMapper.Map<List<WorkflowInstanceFault>, List<WorkflowInstanceFaultDto>>(list));
+    }
+
+    public async Task<PagedResultDto<WorkflowDefinitionBasicDto>> GetAssignableDefinitionAsync(WorkflowDefinitionListRequestDto input)
+    {
+        var grantedResult = await _workflowPermissionProvider.GetGrantsAsync();
+
+        var count = await _workflowDefinitionRepository.CountAsync(
+            name: input.Filter,
+            isSingleton: input.IsSingleton,
+            deleteCompletedInstances: input.DeleteCompletedInstances,
+            channel: input.Channel,
+            tag: input.Tag,
+            groupId: input.GroupId,
+            filterIds: grantedResult.AllGranted ? null : grantedResult.WorkflowIds);
+
+        var list = await _workflowDefinitionRepository.GetPagedListAsync(
+            input.SkipCount,
+            input.MaxResultCount,
+            name: input.Filter,
+            isSingleton: input.IsSingleton,
+            deleteCompletedInstances: input.DeleteCompletedInstances,
+            channel: input.Channel,
+            tag: input.Tag,
+            groupId: input.GroupId,
+            filterIds: grantedResult.AllGranted ? null : grantedResult.WorkflowIds,
+            ordering: input.Sorting);
+
+        return new PagedResultDto<WorkflowDefinitionBasicDto>(count, ObjectMapper.Map<List<WorkflowDefinition>, List<WorkflowDefinitionBasicDto>>(list));
+    }
+
+    public async Task<WorkflowDefinitionVersionDto> GetDefinitionAsync(Guid id)
+    {
+        var instance = await _workflowInstanceRepository.GetAsync(id);
+
+        var definition = await _workflowDefinitionRepository.GetAsync(instance.WorkflowDefinitionId);
+        var version = await _workflowDefinitionVersionRepository.GetByVersionAsync(instance.WorkflowDefinitionId, instance.Version);
+
+        var dto = ObjectMapper.Map<WorkflowDefinitionVersion, WorkflowDefinitionVersionDto>(version);
+        dto.Definition = ObjectMapper.Map<WorkflowDefinition, WorkflowDefinitionDto>(definition);
+        return dto;
     }
 }

@@ -133,20 +133,20 @@
             {
                 path: 'users',
                 name: 'users',
-                component: './user',
+                component: './system/user',
                 access: 'AbpIdentity.Users',
             },
             {
                 path: 'roles',
                 name: 'roles',
-                component: './role',
+                component: './system/role',
                 access: 'AbpIdentity.Roles',
             },
             {
                 path: 'settings',
                 name: 'settings',
-                component: './setting',
-                access: 'public',
+                component: './system/setting',
+                access: 'systemSettings',
             },
             // {
             //     path: 'audit/logs',

@@ -10,8 +10,14 @@ export default function access(
         | undefined,
 ) {
     const { currentUser, grantedPolicies } = initialState ?? {};
+
+    const grandedKeys = Object.keys(grantedPolicies ?? {});
+
     const obj = {
         isAdmin: currentUser && (currentUser.roles ?? []).indexOf('admin') >= 0,
+        systemSettings:
+            grandedKeys.indexOf('SettingManagement.Emailing') >= 0 ||
+            grandedKeys.indexOf('SettingManagement.OAuth2') >= 0,
     };
 
     const base = {};

@@ -49,7 +49,7 @@ export default {
     'page.user.field.name': 'Name',
     'page.user.field.phoneNumber': 'Phone Number',
     'page.user.field.isActive': 'Active',
-    'page.user.field.lockoutEnabled': 'Lockout',
+    'page.user.field.lockoutEnabled': 'Lockout Enabled',
     'page.user.field.password': 'Password',
     //
     'page.role.permissions': 'Permissions',

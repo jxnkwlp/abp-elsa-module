@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Identity;
 
 namespace Passingwind.Abp.ElsaModule.Teams;
 
@@ -24,4 +26,8 @@ public interface IWorkflowTeamAppService : IApplicationService
     Task DeleteRoleScopeAsync(Guid id, string roleName);
 
     Task DeleteAsync(Guid id);
+
+    Task<ListResultDto<IdentityRoleDto>> GetAssignableRolesAsync();
+    Task<ListResultDto<IdentityUserDto>> GetAssignableUsersAsync(WorkflowTeamAssignableUserListRequestDto input);
+    Task<ListResultDto<WorkflowDefinitionBasicDto>> GetAssignableDefinitionAsync(WorkflowDefinitionListRequestDto input);
 }

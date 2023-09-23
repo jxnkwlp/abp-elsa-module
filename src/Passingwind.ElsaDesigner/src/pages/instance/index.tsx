@@ -1,23 +1,23 @@
-import { WorkflowInstanceStatus } from '@/services/enums';
-import type { GlobalAPI } from '@/services/global';
-import type { API } from '@/services/typings';
-import { formatTableSorter, getTableQueryConfig, saveTableQueryConfig } from '@/services/utils';
-import { getWorkflowDefinitionList } from '@/services/WorkflowDefinition';
 import {
     batchDeleteWorkflowInstance,
     deleteWorkflowInstance,
+    getWorkflowInstanceAssignableDefinition,
     getWorkflowInstanceList,
     workflowInstanceBatchCancel,
     workflowInstanceBatchRetry,
     workflowInstanceCancel,
     workflowInstanceRetry,
 } from '@/services/WorkflowInstance';
+import { WorkflowInstanceStatus } from '@/services/enums';
+import type { GlobalAPI } from '@/services/global';
+import type { API } from '@/services/typings';
+import { formatTableSorter, getTableQueryConfig, saveTableQueryConfig } from '@/services/utils';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { TableDropdown } from '@ant-design/pro-components';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumnType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, message, Modal, Space, Typography } from 'antd';
+import { Button, Modal, Space, Typography, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useAccess, useIntl } from 'umi';
 import { workflowStatusEnum } from './status';
@@ -50,10 +50,10 @@ const Index: React.FC = () => {
             hideInSearch: !access['ElsaWorkflow.Definitions'],
             valueType: 'select',
             request: async (p) => {
-                const list = await getWorkflowDefinitionList({
+                const list = await getWorkflowInstanceAssignableDefinition({
                     filter: p.keyWords ?? '',
                     sorting: 'name',
-                    maxResultCount: 100,
+                    maxResultCount: 50,
                 });
                 return (list.items ?? []).map((x) => {
                     return {
@@ -166,7 +166,7 @@ const Index: React.FC = () => {
             width: 80,
             align: 'center',
             fixed: 'right',
-            render: (text, record, _, action) => {
+            render: (_text, record, _, action) => {
                 return (
                     <Space>
                         <Link

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Identity;
 
 namespace Passingwind.Abp.ElsaModule.Teams;
 
@@ -33,6 +35,24 @@ public class WorkflowTeamController : Controller, IWorkflowTeamAppService
     public Task DeleteRoleScopeAsync(Guid id, string roleName)
     {
         return _service.DeleteRoleScopeAsync(id, roleName);
+    }
+
+    [HttpGet("assignable-definitions")]
+    public Task<ListResultDto<WorkflowDefinitionBasicDto>> GetAssignableDefinitionAsync(WorkflowDefinitionListRequestDto input)
+    {
+        return _service.GetAssignableDefinitionAsync(input);
+    }
+
+    [HttpGet("assignable-roles")]
+    public Task<ListResultDto<IdentityRoleDto>> GetAssignableRolesAsync()
+    {
+        return _service.GetAssignableRolesAsync();
+    }
+
+    [HttpGet("assignable-users")]
+    public Task<ListResultDto<IdentityUserDto>> GetAssignableUsersAsync(WorkflowTeamAssignableUserListRequestDto input)
+    {
+        return _service.GetAssignableUsersAsync(input);
     }
 
     [HttpGet("{id}")]

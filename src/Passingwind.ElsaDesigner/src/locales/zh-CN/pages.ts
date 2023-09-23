@@ -48,7 +48,7 @@ export default {
     'page.user.field.name': '名称',
     'page.user.field.phoneNumber': '电话号码',
     'page.user.field.isActive': '激活',
-    'page.user.field.lockoutEnabled': '锁定',
+    'page.user.field.lockoutEnabled': '允许锁定',
     'page.user.field.password': '密码',
     //
     'page.role.permissions': '权限',

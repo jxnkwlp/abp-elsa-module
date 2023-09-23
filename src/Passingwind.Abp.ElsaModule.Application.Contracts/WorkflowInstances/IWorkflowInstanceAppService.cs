@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 using Passingwind.Abp.ElsaModule.WorkflowExecutionLog;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -35,4 +36,8 @@ public interface IWorkflowInstanceAppService : IApplicationService
     Task<WorkflowInstanceDateCountStatisticsResultDto> GetStatusDateCountStatisticsAsync(WorkflowInstanceDateCountStatisticsRequestDto input);
 
     Task<WorkflowInstanceStatusCountStatisticsResultDto> GetStatusCountStatisticsAsync(WorkflowInstanceStatusCountStatisticsRequestDto input);
+
+    Task<PagedResultDto<WorkflowDefinitionBasicDto>> GetAssignableDefinitionAsync(WorkflowDefinitionListRequestDto input);
+
+    Task<WorkflowDefinitionVersionDto> GetDefinitionAsync(Guid id);
 }

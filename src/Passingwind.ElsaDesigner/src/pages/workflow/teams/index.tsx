@@ -1,14 +1,14 @@
 import TransferFormInput from '@/components/TransferFormInput';
-import { getAllRoleList } from '@/services/Role';
 import type { API } from '@/services/typings';
-import { getUserList } from '@/services/User';
 import { formatUserName } from '@/services/utils';
-import { getWorkflowDefinitionList } from '@/services/WorkflowDefinition';
 import {
     createWorkflowTeam,
     deleteWorkflowTeam,
     deleteWorkflowTeamRoleScope,
     getWorkflowTeam,
+    getWorkflowTeamAssignableDefinition,
+    getWorkflowTeamAssignableRoles,
+    getWorkflowTeamAssignableUsers,
     getWorkflowTeamList,
     getWorkflowTeamRoleScopes,
     updateWorkflowTeam,
@@ -23,7 +23,7 @@ import {
     ProFormSelect,
     ProFormText,
     ProFormTextArea,
-    ProTable
+    ProTable,
 } from '@ant-design/pro-components';
 import { Button, message, Modal, Popconfirm, Space, Table, Tabs, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
@@ -284,9 +284,8 @@ const Index: React.FC = () => {
                     name="userIds"
                     rules={[{ required: true }]}
                     request={async (q) => {
-                        const result = await getUserList({
+                        const result = await getWorkflowTeamAssignableUsers({
                             filter: q.keyWords ?? '',
-                            sorting: 'name',
                             maxResultCount: 20,
                         });
                         return (result?.items ?? []).map((x) => {
@@ -303,8 +302,10 @@ const Index: React.FC = () => {
                     name="description"
                     label={intl.formatMessage({ id: 'page.workflowTeam.field.description' })}
                 />
-            </ModalForm>
-            {/* settings */}
+            </ModalForm>;
+            {
+                /* settings */
+            }
             <Modal
                 open={settingsModalVisible}
                 onCancel={() => setSettingsModalVisible(false)}
@@ -342,10 +343,9 @@ const Index: React.FC = () => {
                                         <TransferFormInput<API.IdentityUser>
                                             request={async () => {
                                                 // todo
-                                                const result = await getUserList({
-                                                    maxResultCount: 1000,
-                                                    sorting: 'username',
-                                                });
+                                                const result = await getWorkflowTeamAssignableUsers(
+                                                    {},
+                                                );
                                                 return result?.items ?? [];
                                             }}
                                             render={(item) => item.userName ?? item.id}
@@ -448,7 +448,7 @@ const Index: React.FC = () => {
                     }
                 />
                 {/*  */}
-            </Modal>
+            </Modal>;
             {/* role scope form */}
             <ModalForm<{ roleName: string; workflowIds: string[] }>
                 visible={roleScopeModalVisible}
@@ -466,7 +466,7 @@ const Index: React.FC = () => {
                     name="roleName"
                     rules={[{ required: true }]}
                     request={async () => {
-                        const result = await getAllRoleList({});
+                        const result = await getWorkflowTeamAssignableRoles({});
                         return (result?.items ?? []).map((x) => {
                             return {
                                 label: x.name,
@@ -475,12 +475,6 @@ const Index: React.FC = () => {
                         });
                     }}
                 />
-                {/* <ProFormSelect
-                    name="workflowTeamIds"
-                    label={intl.formatMessage({ id: 'page.workflowTeam.field.workflowTeam' })}
-                    mode="multiple"
-                    options={[]}
-                /> */}
                 <ProForm.Item
                     name="workflowIds"
                     label={intl.formatMessage({ id: 'page.workflowTeam.field.workflow' })}
@@ -489,7 +483,7 @@ const Index: React.FC = () => {
                     <TransferFormInput<API.WorkflowDefinition>
                         request={async () => {
                             // todo
-                            const result = await getWorkflowDefinitionList({
+                            const result = await getWorkflowTeamAssignableDefinition({
                                 maxResultCount: 1000,
                                 sorting: 'name',
                             });

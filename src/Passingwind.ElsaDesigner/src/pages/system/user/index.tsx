@@ -1,13 +1,15 @@
-import { getRoleList } from '@/services/Role';
 import type { API } from '@/services/typings';
 import {
     createUser,
     deleteUser,
+    getUserAssignableRoles,
     getUserList,
     getUserRoles,
     updateUser,
     updateUserRoles,
 } from '@/services/User';
+import { formatUserName } from '@/services/utils';
+import { CheckCircleTwoTone, CloseCircleOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumnType } from '@ant-design/pro-components';
 import {
     ModalForm,
@@ -18,7 +20,7 @@ import {
     ProFormText,
     ProTable,
 } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Tag } from 'antd';
+import { Button, message, Popconfirm, Space, Tag } from 'antd';
 import moment from 'moment';
 import React, { useRef, useState } from 'react';
 import { formatMessage, useAccess, useIntl } from 'umi';
@@ -86,7 +88,7 @@ const Index: React.FC = () => {
             search: false,
             copyable: true,
             renderText: (_, record) => {
-                return `${_} ${record.surname ?? ''}`;
+                return formatUserName(record);
             },
         },
         {
@@ -102,8 +104,8 @@ const Index: React.FC = () => {
             align: 'center',
             width: 100,
             valueEnum: {
-                true: { text: 'Y' },
-                false: { text: 'N' },
+                true: { text: <CheckCircleTwoTone /> },
+                false: { text: <CloseCircleOutlined /> },
             },
         },
         {
@@ -117,15 +119,16 @@ const Index: React.FC = () => {
             //     false: { text: 'N' },
             // },
             renderText: (_, record) => {
-                if (_ && record.lockoutEnd)
+                if (_)
                     return (
-                        <>
-                            <span>Y</span>
-                            <br />
-                            <Tag>{moment(record.lockoutEnd).format()}</Tag>
-                        </>
+                        <Space direction="vertical">
+                            <span>
+                                <CheckCircleTwoTone />
+                            </span>
+                            {record.lockoutEnd && <Tag color='warning'>{moment(record.lockoutEnd).format()}</Tag>}
+                        </Space>
                     );
-                else return 'N';
+                else return <CloseCircleOutlined />;
             },
         },
         {
@@ -301,10 +304,10 @@ const Index: React.FC = () => {
                     name="isActive"
                     label={intl.formatMessage({ id: 'page.user.field.isActive' })}
                 />
-                {/* <ProFormSwitch
+                <ProFormSwitch
                     name="lockoutEnabled"
                     label={intl.formatMessage({ id: 'page.user.field.lockoutEnabled' })}
-                /> */}
+                />
                 <ProFormText
                     rules={[{ required: !editModalDataId }, { max: 32 }, { min: 6 }]}
                     name="password"
@@ -317,10 +320,7 @@ const Index: React.FC = () => {
                         mode="multiple"
                         showSearch
                         request={async (params) => {
-                            const result = await getRoleList({
-                                filter: params.keyWords ?? '',
-                                maxResultCount: 100,
-                            });
+                            const result = await getUserAssignableRoles({});
                             return (result?.items ?? []).map((x) => {
                                 return {
                                     label: x.name,
@@ -364,9 +364,7 @@ const Index: React.FC = () => {
                     label=""
                     name="roleNames"
                     request={async () => {
-                        const result = await getRoleList({
-                            maxResultCount: 100,
-                        });
+                        const result = await getUserAssignableRoles({});
                         return (result?.items ?? []).map((x) => {
                             return {
                                 label: x.name,
