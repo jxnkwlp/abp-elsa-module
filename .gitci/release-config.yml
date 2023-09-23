@@ -11,8 +11,12 @@
       - ":arrow_up:"
       - "🚀"
       - ":rocket:"
+      - "♻️"
       - ":recycle:"
+      - "⚡️"
       - ":zap:"
+      - "🚩"
+      - ":triangular_flag_on_post:"
     labels:
       - "Versioning - Minor"
   patch:
