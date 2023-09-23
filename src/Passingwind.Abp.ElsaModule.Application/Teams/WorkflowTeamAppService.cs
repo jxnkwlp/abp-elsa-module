@@ -119,7 +119,9 @@ public class WorkflowTeamAppService : ElsaModuleAppService, IWorkflowTeamAppServ
     {
         var entity = await _workflowTeamRepository.GetAsync(id);
 
-        return new ListResultDto<WorkflowTeamRoleScopeDto>(ObjectMapper.Map<List<WorkflowTeamRoleScope>, List<WorkflowTeamRoleScopeDto>>(entity.RoleScopes));
+        var roleScopes = entity.RoleScopes ?? new List<WorkflowTeamRoleScope>();
+
+        return new ListResultDto<WorkflowTeamRoleScopeDto>(ObjectMapper.Map<List<WorkflowTeamRoleScope>, List<WorkflowTeamRoleScopeDto>>(roleScopes));
     }
 
     [Authorize(Policy = ElsaModulePermissions.WorkflowTeams.Update)]
