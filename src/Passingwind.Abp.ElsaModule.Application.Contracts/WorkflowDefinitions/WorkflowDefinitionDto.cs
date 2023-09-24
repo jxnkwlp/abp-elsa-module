@@ -33,7 +33,5 @@ public class WorkflowDefinitionDto : AuditedEntityDto<Guid>
 
     public WorkflowContextOptions ContextOptions { get; set; }
 
-    public Dictionary<string, object> Variables { get; set; }
-
     public Dictionary<string, object> CustomAttributes { get; set; }
 }

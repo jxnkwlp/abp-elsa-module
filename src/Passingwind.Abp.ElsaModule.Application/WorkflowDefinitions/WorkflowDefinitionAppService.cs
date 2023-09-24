@@ -369,7 +369,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
                input.Tag,
                input.PersistenceBehavior,
                input.ContextOptions,
-               input.Variables,
+               entity.Variables,
                entity.CustomAttributes);
 
         // check name

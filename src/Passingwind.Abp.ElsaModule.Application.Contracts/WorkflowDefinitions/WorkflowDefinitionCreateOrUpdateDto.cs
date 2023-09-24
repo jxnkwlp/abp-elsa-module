@@ -29,7 +29,5 @@ public class WorkflowDefinitionCreateOrUpdateDto
 
     public WorkflowPersistenceBehavior PersistenceBehavior { get; set; } = WorkflowPersistenceBehavior.WorkflowBurst;
 
-    public WorkflowContextOptions ContextOptions { get; set; }
-
-    public Dictionary<string, object> Variables { get; set; }
+    public WorkflowContextOptions ContextOptions { get; set; } 
 }
