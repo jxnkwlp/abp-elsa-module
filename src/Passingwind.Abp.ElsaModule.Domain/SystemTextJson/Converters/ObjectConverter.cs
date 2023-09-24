@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Passingwind.Abp.ElsaModule.SystemTextJson.Converters;
 
 public class ObjectConverter : System.Text.Json.Serialization.JsonConverter<object>
 {
+    private static readonly Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings(JsonConvert.DefaultSettings?.Invoke())
+    {
+        // when handle object, need this config
+        TypeNameHandling = TypeNameHandling.Auto,
+    };
+
     public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         switch (reader.TokenType)
@@ -22,15 +29,12 @@ public class ObjectConverter : System.Text.Json.Serialization.JsonConverter<obje
                 return null;
         }
 
-        // use Newtonsoft.Json to handle this!
         var jsonString = JsonDocument.ParseValue(ref reader).RootElement.Clone().GetRawText();
-        return Newtonsoft.Json.JsonConvert.DeserializeObject(jsonString);
+        return Newtonsoft.Json.JsonConvert.DeserializeObject(jsonString, JsonSerializerSettings);
     }
 
     public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
     {
-        // use Newtonsoft.Json to handle this!
-        var json = Newtonsoft.Json.JsonConvert.SerializeObject(value);
-        writer.WriteRawValue(json);
+        writer.WriteRawValue(Newtonsoft.Json.JsonConvert.SerializeObject(value, JsonSerializerSettings));
     }
 }

@@ -130,6 +130,7 @@ public class WorkflowAppWebModule : AbpModule
             options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
             options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
             options.JsonSerializerOptions.Converters.Add(new JArrayConverter());
+            options.JsonSerializerOptions.Converters.Add(new ObjectToDictionaryConverter());
             options.JsonSerializerOptions.Converters.Add(new ObjectConverter());
             options.JsonSerializerOptions.Converters.RemoveAll(x => x.GetType() == typeof(Volo.Abp.Json.SystemTextJson.JsonConverters.ObjectToInferredTypesConverter));
         });
@@ -140,6 +141,7 @@ public class WorkflowAppWebModule : AbpModule
             options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
             options.JsonSerializerOptions.Converters.Add(new JArrayConverter());
             options.JsonSerializerOptions.Converters.Add(new JObjectConverter());
+            options.JsonSerializerOptions.Converters.Add(new ObjectToDictionaryConverter());
             options.JsonSerializerOptions.Converters.Add(new ObjectConverter());
             options.JsonSerializerOptions.Converters.RemoveAll(x => x.GetType() == typeof(Volo.Abp.Json.SystemTextJson.JsonConverters.ObjectToInferredTypesConverter));
         });
@@ -192,7 +194,7 @@ public class WorkflowAppWebModule : AbpModule
         settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
         settings.NullValueHandling = NullValueHandling.Ignore;
         settings.DefaultValueHandling = DefaultValueHandling.Include;
-        settings.TypeNameHandling = TypeNameHandling.Auto;
+        settings.TypeNameHandling = TypeNameHandling.None; // As default, we want output the type name of json object
         settings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
         settings.PreserveReferencesHandling = PreserveReferencesHandling.None;
     }
