@@ -61,6 +61,10 @@ export default {
     'menu.Workflows.Variables': 'Global Variables',
     'menu.Workflows.Teams': 'Teams',
     'menu.Workflows.Groups': 'Groups',
+    'menu.Workflows.GlobalCode': 'Global Codes',
+    'menu.Workflows.GlobalCode.create': 'Create',
+    'menu.Workflows.GlobalCode.edit': 'Edit',
+    //
     'menu.Change Password': 'Change Password',
     'menu.system': 'System',
     'menu.system.users': 'Users',

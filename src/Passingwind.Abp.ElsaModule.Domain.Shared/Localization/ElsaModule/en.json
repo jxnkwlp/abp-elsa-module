@@ -1,7 +1,8 @@
 ﻿{
   "culture": "en",
   "texts": {
-    "ElsaModule:WorkflowDefinition.NameExists": "Workflow definition name '{name}' exists",
+    "ElsaModule:Error:0101": "Workflow definition name '{name}' exists",
+    "ElsaModule:Error:0501": "Global code name is exists",
 
     "Permission:ElsaModule": "Workflow management",
 

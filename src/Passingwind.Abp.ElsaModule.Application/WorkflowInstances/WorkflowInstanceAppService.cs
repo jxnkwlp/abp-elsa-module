@@ -251,6 +251,10 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
         {
             var logs = itemLogs.OrderByDescending(x => x.Timestamp);
 
+            var exectutingLog = logs.FirstOrDefault(x => x.EventName == "Executing");
+            var exectutedLog = logs.FirstOrDefault(x => x.EventName == "Executed");
+            var faultedLog = logs.FirstOrDefault(x => x.EventName == "Faulted");
+
             var summary = new WorkflowInstanceExecutionLogSummaryActivityDto()
             {
                 ActivityId = itemLogs.Key,
@@ -258,7 +262,9 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
 
                 StartTime = logs.Last().Timestamp,
                 EndTime = logs.First().Timestamp,
+
                 ExecutedCount = logs.Count(),
+
                 Duration = (logs.First().Timestamp - logs.Last().Timestamp).TotalMilliseconds,
 
                 IsExecuted = logs.Any(x => x.EventName == "Executed"),
@@ -268,7 +274,9 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
                 Outcomes = logs.Where(x => x.Data?.ContainsKey("Outcomes") == true).SelectMany(x => x.Data.SafeGetValue<string, object, string[]>("Outcomes")).ToArray(),
 
                 StateData = !fullDataAccess ? null : entity.ActivityData.Find(x => x.ActivityId == itemLogs.Key)?.Data ?? default,
-                JournalData = !fullDataAccess ? null : logs.First().Data?.Where(x => x.Key != "Outcomes")?.ToDictionary(x => x.Key, x => x.Value),
+
+                JournalData = !fullDataAccess ? null : logs.First().Data,
+
                 Message = !fullDataAccess ? null : logs.First().Message,
             };
 

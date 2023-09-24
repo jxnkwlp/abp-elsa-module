@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.GlobalCodes;
 using Passingwind.Abp.ElsaModule.Groups;
 using Passingwind.Abp.ElsaModule.Teams;
 using Volo.Abp.Data;
@@ -19,4 +20,7 @@ public interface IElsaModuleDbContext : IEfCoreDbContext
     DbSet<GlobalVariable> GlobalVariables { get; }
     DbSet<WorkflowTeam> WorkflowTeams { get; }
     DbSet<WorkflowGroup> WorkflowGroups { get; }
+    DbSet<GlobalCode> GlobalCodes { get; }
+    DbSet<GlobalCodeVersion> GlobalCodeVersions { get; }
+    DbSet<GlobalCodeContent> GlobalCodeContents { get; }
 }

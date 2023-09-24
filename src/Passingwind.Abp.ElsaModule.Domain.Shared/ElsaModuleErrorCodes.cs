@@ -2,8 +2,7 @@
 
 public static class ElsaModuleErrorCodes
 {
-    /// <summary>
-    /// Add your business exception error codes here...
-    /// </summary>
-    public const string WorkflowDefinitionNameExists = "ElsaModule:WorkflowDefinition.NameExists";
+    public const string WorkflowDefinitionNameExists = "ElsaModule:Error:0101";
+
+    public const string GlobalCodeNameExists = "ElsaModule:Error:0501";
 }

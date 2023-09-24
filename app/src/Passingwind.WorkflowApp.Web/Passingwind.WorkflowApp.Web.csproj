@@ -1,88 +1,89 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <Import Project="..\..\common.props" />
+  <Import Project="..\..\common.props" />
 
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <RootNamespace>Passingwind.WorkflowApp.Web</RootNamespace>
-        <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-        <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-        <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
-        <PreserveCompilationReferences>true</PreserveCompilationReferences>
-        <UserSecretsId>Passingwind.WorkflowApp-4681b4fd-151f-4221-84a4-929d86723e4c</UserSecretsId>
-        <InvariantGlobalization>false</InvariantGlobalization>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>Passingwind.WorkflowApp.Web</RootNamespace>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
+    <PreserveCompilationReferences>true</PreserveCompilationReferences>
+    <UserSecretsId>Passingwind.WorkflowApp-4681b4fd-151f-4221-84a4-929d86723e4c</UserSecretsId>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.8" />
-        <PackageReference Include="Hangfire.Core" Version="1.7.29" />
-        <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
-        <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.8.5" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="7.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.8" />
-        <PackageReference Include="DistributedLock.FileSystem" Version="1.0.1" />
-        <PackageReference Include="DistributedLock.Redis" Version="1.0.2" />
-        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.2" />
-        <PackageReference Include="Owl.Abp.CultureMap" Version="7.0.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.8" />
+    <PackageReference Include="Hangfire.Core" Version="1.7.29" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
+    <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.8.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="7.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.8" />
+    <PackageReference Include="DistributedLock.FileSystem" Version="1.0.1" />
+    <PackageReference Include="DistributedLock.Redis" Version="1.0.2" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.2" />
+    <PackageReference Include="Owl.Abp.CultureMap" Version="7.0.0" />
+    <PackageReference Include="Passingwind.SwaggerExtensions" Version="0.5.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" Version="7.2.3" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" Version="7.2.3" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Volo.Abp.Autofac" Version="7.2.3" />
-        <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="7.2.3" />
-        <PackageReference Include="Volo.Abp.DistributedLocking" Version="7.2.3" /> 
-        <PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="7.2.3" /> 
-        <PackageReference Include="Volo.Abp.Http.Client.IdentityModel.Web" Version="7.2.3" />
-        <PackageReference Include="Volo.Abp.Swashbuckle" Version="7.2.3" />
-        <PackageReference Include="Volo.Abp.Identity.Web" Version="7.2.3" /> 
-        <PackageReference Include="Volo.Abp.Account.Web" Version="7.2.3" /> 
-        <PackageReference Include="Volo.Abp.MailKit" Version="7.2.3" />
-        <PackageReference Include="Volo.Abp.BackgroundJobs.HangFire" Version="7.2.3" />
-        <PackageReference Include="Volo.Abp.BackgroundWorkers.Hangfire" Version="7.2.3" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Autofac" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.DistributedLocking" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.Http.Client.IdentityModel.Web" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.Swashbuckle" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.Identity.Web" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.Account.Web" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.MailKit" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs.HangFire" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.BackgroundWorkers.Hangfire" Version="7.2.3" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Elsa" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.Email" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.Http" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.UserTask" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.BlobStorage" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.File" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.Entity" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.RabbitMq" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.Sql" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.Http.OpenApi" Version="2.12.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Elsa" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.Email" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.Http" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.UserTask" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.BlobStorage" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.File" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.Entity" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.RabbitMq" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.Sql" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.Http.OpenApi" Version="2.12.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.Application\Passingwind.Abp.ElsaModule.Application.csproj" />
-        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.ElsaExtensions\Passingwind.Abp.ElsaModule.ElsaExtensions.csproj" />
-        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.EntityFrameworkCore\Passingwind.Abp.ElsaModule.EntityFrameworkCore.csproj" />
-        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.HttpApi\Passingwind.Abp.ElsaModule.HttpApi.csproj" />
-        <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.MongoDB\Passingwind.Abp.ElsaModule.MongoDB.csproj" />
-        <ProjectReference Include="..\Passingwind.WorkflowApp.Application\Passingwind.WorkflowApp.Application.csproj" />
-        <ProjectReference Include="..\Passingwind.WorkflowApp.EntityFrameworkCore\Passingwind.WorkflowApp.EntityFrameworkCore.csproj" />
-        <ProjectReference Include="..\Passingwind.WorkflowApp.HttpApi\Passingwind.WorkflowApp.HttpApi.csproj" />
-        <ProjectReference Include="..\Passingwind.WorkflowApp.Domain.Shared\Passingwind.WorkflowApp.Domain.Shared.csproj" />
-        <ProjectReference Include="..\Passingwind.WorkflowApp.MongoDB\Passingwind.WorkflowApp.MongoDB.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.Application\Passingwind.Abp.ElsaModule.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.ElsaExtensions\Passingwind.Abp.ElsaModule.ElsaExtensions.csproj" />
+    <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.EntityFrameworkCore\Passingwind.Abp.ElsaModule.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.HttpApi\Passingwind.Abp.ElsaModule.HttpApi.csproj" />
+    <ProjectReference Include="..\..\..\src\Passingwind.Abp.ElsaModule.MongoDB\Passingwind.Abp.ElsaModule.MongoDB.csproj" />
+    <ProjectReference Include="..\Passingwind.WorkflowApp.Application\Passingwind.WorkflowApp.Application.csproj" />
+    <ProjectReference Include="..\Passingwind.WorkflowApp.EntityFrameworkCore\Passingwind.WorkflowApp.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\Passingwind.WorkflowApp.HttpApi\Passingwind.WorkflowApp.HttpApi.csproj" />
+    <ProjectReference Include="..\Passingwind.WorkflowApp.Domain.Shared\Passingwind.WorkflowApp.Domain.Shared.csproj" />
+    <ProjectReference Include="..\Passingwind.WorkflowApp.MongoDB\Passingwind.WorkflowApp.MongoDB.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Remove="Logs\**" />
-        <Content Remove="Logs\**" />
-        <EmbeddedResource Remove="Logs\**" />
-        <None Remove="Logs\**" />
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Logs\**" />
+    <Content Remove="Logs\**" />
+    <EmbeddedResource Remove="Logs\**" />
+    <None Remove="Logs\**" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\" />
-    </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
 
 </Project>

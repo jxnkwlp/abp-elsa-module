@@ -8,7 +8,8 @@ using Volo.Abp.Content;
 
 namespace Passingwind.Abp.ElsaModule.WorkflowDefinitions;
 
-[RemoteService]
+[Area(ElsaModuleRemoteServiceConsts.RemoteServiceName)]
+[RemoteService(Name = ElsaModuleRemoteServiceConsts.RemoteServiceName)]
 [Route("api/elsa/workflow/definitions")]
 public class WorkflowDefinitionController : ElsaModuleController, IWorkflowDefinitionAppService
 {

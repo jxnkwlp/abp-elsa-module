@@ -5,7 +5,8 @@ using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.Workflow;
 
-[RemoteService]
+[Area(ElsaModuleRemoteServiceConsts.RemoteServiceName)]
+[RemoteService(Name = ElsaModuleRemoteServiceConsts.RemoteServiceName)]
 [Route("api/elsa/workflow/channels")]
 public class WorkflowChannelController : ElsaModuleController, IWorkflowChannelAppService
 {

@@ -8,7 +8,8 @@ using Volo.Abp.Identity;
 
 namespace Passingwind.Abp.ElsaModule.Teams;
 
-[RemoteService]
+[Area(ElsaModuleRemoteServiceConsts.RemoteServiceName)]
+[RemoteService(Name = ElsaModuleRemoteServiceConsts.RemoteServiceName)]
 [Route("api/elsa/workflow/teams")]
 public class WorkflowTeamController : Controller, IWorkflowTeamAppService
 {

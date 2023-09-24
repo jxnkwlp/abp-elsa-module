@@ -1,7 +1,7 @@
 ﻿/**
  * Generate from url: https://localhost:44345/swagger/v1/swagger.json
  * It is recommended not to modify the document
- * Total count: 191
+ * Total count: 218
  **/
 import * as Enum from "./enums";
 
@@ -17,8 +17,8 @@ declare namespace API {
     /**
      * *TODO*
      **/
-    type AbpLoginResult = {
-        result: Enum.LoginResultType;
+    type AbpLoginResult1 = {
+        result: Enum.LoginResultType1;
         description?: string | undefined;
     };
 
@@ -282,6 +282,30 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type Assembly = {
+        definedTypes?: any[] | undefined;
+        exportedTypes?: any[] | undefined;
+        codeBase?: string | undefined;
+        entryPoint?: any | undefined;
+        fullName?: string | undefined;
+        imageRuntimeVersion?: string | undefined;
+        isDynamic?: boolean | undefined;
+        location?: string | undefined;
+        reflectionOnly?: boolean | undefined;
+        isCollectible?: boolean | undefined;
+        isFullyTrusted?: boolean | undefined;
+        customAttributes?: any[] | undefined;
+        escapedCodeBase?: string | undefined;
+        manifestModule?: any | undefined;
+        modules?: any[] | undefined;
+        globalAssemblyCache?: boolean | undefined;
+        hostContext: number;
+        securityRuleSet: Enum.SecurityRuleSet;
+    };
+
+    /**
+     * *TODO*
+     **/
     type ChangePasswordInput = {
         currentPassword?: string | undefined;
         newPassword: string;
@@ -292,6 +316,44 @@ declare namespace API {
      **/
     type Clock = {
         kind?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type ConstructorInfo = {
+        name?: string | undefined;
+        declaringType?: any | undefined;
+        reflectedType?: any | undefined;
+        module?: any | undefined;
+        customAttributes?: any[] | undefined;
+        isCollectible?: boolean | undefined;
+        metadataToken: number;
+        attributes: Enum.MethodAttributes;
+        methodImplementationFlags: Enum.MethodImplAttributes;
+        callingConvention: Enum.CallingConventions;
+        isAbstract?: boolean | undefined;
+        isConstructor?: boolean | undefined;
+        isFinal?: boolean | undefined;
+        isHideBySig?: boolean | undefined;
+        isSpecialName?: boolean | undefined;
+        isStatic?: boolean | undefined;
+        isVirtual?: boolean | undefined;
+        isAssembly?: boolean | undefined;
+        isFamily?: boolean | undefined;
+        isFamilyAndAssembly?: boolean | undefined;
+        isFamilyOrAssembly?: boolean | undefined;
+        isPrivate?: boolean | undefined;
+        isPublic?: boolean | undefined;
+        isConstructedGenericMethod?: boolean | undefined;
+        isGenericMethod?: boolean | undefined;
+        isGenericMethodDefinition?: boolean | undefined;
+        containsGenericParameters?: boolean | undefined;
+        methodHandle?: any | undefined;
+        isSecurityCritical?: boolean | undefined;
+        isSecuritySafeCritical?: boolean | undefined;
+        isSecurityTransparent?: boolean | undefined;
+        memberType: Enum.MemberTypes;
     };
 
     /**
@@ -365,6 +427,34 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type CustomAttributeData = {
+        attributeType?: any | undefined;
+        constructor?: any | undefined;
+        constructorArguments?: any[] | undefined;
+        namedArguments?: any[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type CustomAttributeNamedArgument = {
+        memberInfo?: any | undefined;
+        typedValue?: any | undefined;
+        memberName?: string | undefined;
+        isField?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type CustomAttributeTypedArgument = {
+        argumentType?: any | undefined;
+        value?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type DateTimeFormat = {
         calendarAlgorithmType?: string | undefined;
         dateTimeFormatLong?: string | undefined;
@@ -396,6 +486,27 @@ declare namespace API {
     type EntityExtension = {
         properties?: Record<any, ExtensionProperty> | undefined;
         configuration?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type EventInfo = {
+        name?: string | undefined;
+        declaringType?: any | undefined;
+        reflectedType?: any | undefined;
+        module?: any | undefined;
+        customAttributes?: any[] | undefined;
+        isCollectible?: boolean | undefined;
+        metadataToken: number;
+        memberType: Enum.MemberTypes;
+        attributes: Enum.EventAttributes;
+        isSpecialName?: boolean | undefined;
+        addMethod?: any | undefined;
+        removeMethod?: any | undefined;
+        raiseMethod?: any | undefined;
+        isMulticast?: boolean | undefined;
+        eventHandlerType?: any | undefined;
     };
 
     /**
@@ -512,6 +623,38 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type FieldInfo = {
+        name?: string | undefined;
+        declaringType?: any | undefined;
+        reflectedType?: any | undefined;
+        module?: any | undefined;
+        customAttributes?: any[] | undefined;
+        isCollectible?: boolean | undefined;
+        metadataToken: number;
+        memberType: Enum.MemberTypes;
+        attributes: Enum.FieldAttributes;
+        fieldType?: any | undefined;
+        isInitOnly?: boolean | undefined;
+        isLiteral?: boolean | undefined;
+        isNotSerialized?: boolean | undefined;
+        isPinvokeImpl?: boolean | undefined;
+        isSpecialName?: boolean | undefined;
+        isStatic?: boolean | undefined;
+        isAssembly?: boolean | undefined;
+        isFamily?: boolean | undefined;
+        isFamilyAndAssembly?: boolean | undefined;
+        isFamilyOrAssembly?: boolean | undefined;
+        isPrivate?: boolean | undefined;
+        isPublic?: boolean | undefined;
+        isSecurityCritical?: boolean | undefined;
+        isSecuritySafeCritical?: boolean | undefined;
+        isSecurityTransparent?: boolean | undefined;
+        fieldHandle?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type FindTenantResult = {
         success?: boolean | undefined;
         tenantId?: string | undefined;
@@ -525,6 +668,47 @@ declare namespace API {
     type GetPermissionListResult = {
         entityDisplayName?: string | undefined;
         groups?: PermissionGroup[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type GlobalCode = {
+        extraProperties?: any | undefined;
+        id: string;
+        creationTime: string;
+        creatorId?: string | undefined;
+        lastModificationTime?: string | undefined;
+        lastModifierId?: string | undefined;
+        name?: string | undefined;
+        description?: string | undefined;
+        language: Enum.GlobalCodeLanguage;
+        type: Enum.GlobalCodeType;
+        latestVersion: number;
+        publishedVersion: number;
+        tenantId?: string | undefined;
+        content?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type GlobalCodeCreateOrUpdate = {
+        extraProperties?: any | undefined;
+        name: string;
+        description?: string | undefined;
+        language: Enum.GlobalCodeLanguage;
+        type: Enum.GlobalCodeType;
+        publish?: boolean | undefined;
+        content?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type GlobalCodePagedResult = {
+        items?: GlobalCode[] | undefined;
+        totalCount: number;
     };
 
     /**
@@ -563,6 +747,12 @@ declare namespace API {
      **/
     type IanaTimeZone = {
         timeZoneName?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type ICustomAttributeProvider = {
     };
 
     /**
@@ -700,10 +890,23 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type Int32ListResult = {
+        items?: number[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type InterfaceMethodApiDescriptionModel = {
         name?: string | undefined;
         parametersOnMethod?: MethodParameterApiDescriptionModel[] | undefined;
         returnValue: ReturnValueApiDescriptionModel;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type IntPtr = {
     };
 
     /**
@@ -728,6 +931,99 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type MemberInfo = {
+        memberType: Enum.MemberTypes;
+        name?: string | undefined;
+        declaringType?: any | undefined;
+        reflectedType?: any | undefined;
+        module?: any | undefined;
+        customAttributes?: any[] | undefined;
+        isCollectible?: boolean | undefined;
+        metadataToken: number;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type MethodBase = {
+        memberType: Enum.MemberTypes;
+        name?: string | undefined;
+        declaringType?: any | undefined;
+        reflectedType?: any | undefined;
+        module?: any | undefined;
+        customAttributes?: any[] | undefined;
+        isCollectible?: boolean | undefined;
+        metadataToken: number;
+        attributes: Enum.MethodAttributes;
+        methodImplementationFlags: Enum.MethodImplAttributes;
+        callingConvention: Enum.CallingConventions;
+        isAbstract?: boolean | undefined;
+        isConstructor?: boolean | undefined;
+        isFinal?: boolean | undefined;
+        isHideBySig?: boolean | undefined;
+        isSpecialName?: boolean | undefined;
+        isStatic?: boolean | undefined;
+        isVirtual?: boolean | undefined;
+        isAssembly?: boolean | undefined;
+        isFamily?: boolean | undefined;
+        isFamilyAndAssembly?: boolean | undefined;
+        isFamilyOrAssembly?: boolean | undefined;
+        isPrivate?: boolean | undefined;
+        isPublic?: boolean | undefined;
+        isConstructedGenericMethod?: boolean | undefined;
+        isGenericMethod?: boolean | undefined;
+        isGenericMethodDefinition?: boolean | undefined;
+        containsGenericParameters?: boolean | undefined;
+        methodHandle?: any | undefined;
+        isSecurityCritical?: boolean | undefined;
+        isSecuritySafeCritical?: boolean | undefined;
+        isSecurityTransparent?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type MethodInfo = {
+        name?: string | undefined;
+        declaringType?: any | undefined;
+        reflectedType?: any | undefined;
+        module?: any | undefined;
+        customAttributes?: any[] | undefined;
+        isCollectible?: boolean | undefined;
+        metadataToken: number;
+        attributes: Enum.MethodAttributes;
+        methodImplementationFlags: Enum.MethodImplAttributes;
+        callingConvention: Enum.CallingConventions;
+        isAbstract?: boolean | undefined;
+        isConstructor?: boolean | undefined;
+        isFinal?: boolean | undefined;
+        isHideBySig?: boolean | undefined;
+        isSpecialName?: boolean | undefined;
+        isStatic?: boolean | undefined;
+        isVirtual?: boolean | undefined;
+        isAssembly?: boolean | undefined;
+        isFamily?: boolean | undefined;
+        isFamilyAndAssembly?: boolean | undefined;
+        isFamilyOrAssembly?: boolean | undefined;
+        isPrivate?: boolean | undefined;
+        isPublic?: boolean | undefined;
+        isConstructedGenericMethod?: boolean | undefined;
+        isGenericMethod?: boolean | undefined;
+        isGenericMethodDefinition?: boolean | undefined;
+        containsGenericParameters?: boolean | undefined;
+        methodHandle?: any | undefined;
+        isSecurityCritical?: boolean | undefined;
+        isSecuritySafeCritical?: boolean | undefined;
+        isSecurityTransparent?: boolean | undefined;
+        memberType: Enum.MemberTypes;
+        returnParameter?: any | undefined;
+        returnType?: any | undefined;
+        returnTypeCustomAttributes?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type MethodParameterApiDescriptionModel = {
         name?: string | undefined;
         typeAsString?: string | undefined;
@@ -735,6 +1031,21 @@ declare namespace API {
         typeSimple?: string | undefined;
         isOptional?: boolean | undefined;
         defaultValue?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type Module = {
+        assembly?: any | undefined;
+        fullyQualifiedName?: string | undefined;
+        name?: string | undefined;
+        mdStreamVersion: number;
+        moduleVersionId: string;
+        scopeName?: string | undefined;
+        moduleHandle?: any | undefined;
+        customAttributes?: any[] | undefined;
+        metadataToken: number;
     };
 
     /**
@@ -752,6 +1063,13 @@ declare namespace API {
     type ModuleExtension = {
         entities?: Record<any, EntityExtension> | undefined;
         configuration?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type ModuleHandle = {
+        mdStreamVersion: number;
     };
 
     /**
@@ -839,6 +1157,27 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type ParameterInfo = {
+        attributes: Enum.ParameterAttributes;
+        member?: any | undefined;
+        name?: string | undefined;
+        parameterType?: any | undefined;
+        position: number;
+        isIn?: boolean | undefined;
+        isLcid?: boolean | undefined;
+        isOptional?: boolean | undefined;
+        isOut?: boolean | undefined;
+        isRetval?: boolean | undefined;
+        defaultValue?: any | undefined;
+        rawDefaultValue?: any | undefined;
+        hasDefaultValue?: boolean | undefined;
+        customAttributes?: any[] | undefined;
+        metadataToken: number;
+    };
+
+    /**
+     * *TODO*
+     **/
     type PermissionGrantInfo = {
         name?: string | undefined;
         displayName?: string | undefined;
@@ -888,6 +1227,27 @@ declare namespace API {
         minimum?: string | undefined;
         maximum?: string | undefined;
         regex?: string | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type PropertyInfo = {
+        name?: string | undefined;
+        declaringType?: any | undefined;
+        reflectedType?: any | undefined;
+        module?: any | undefined;
+        customAttributes?: any[] | undefined;
+        isCollectible?: boolean | undefined;
+        metadataToken: number;
+        memberType: Enum.MemberTypes;
+        propertyType?: any | undefined;
+        attributes: Enum.PropertyAttributes;
+        isSpecialName?: boolean | undefined;
+        canRead?: boolean | undefined;
+        canWrite?: boolean | undefined;
+        getMethod?: any | undefined;
+        setMethod?: any | undefined;
     };
 
     /**
@@ -955,6 +1315,20 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type RuntimeFieldHandle = {
+        value?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type RuntimeMethodHandle = {
+        value?: any | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type RuntimeSelectListContext = {
         providerTypeName: string;
         context?: any | undefined;
@@ -966,6 +1340,13 @@ declare namespace API {
     type RuntimeSelectListResult = {
         isFlagsEnum?: boolean | undefined;
         items?: SelectListItem[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type RuntimeTypeHandle = {
+        value?: any | undefined;
     };
 
     /**
@@ -1017,6 +1398,35 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type StructLayoutAttribute = {
+        typeId?: any | undefined;
+        value: Enum.LayoutKind;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type TimeSpan = {
+        ticks: number;
+        days: number;
+        hours: number;
+        milliseconds: number;
+        microseconds: number;
+        nanoseconds: number;
+        minutes: number;
+        seconds: number;
+        totalDays: number;
+        totalHours: number;
+        totalMilliseconds: number;
+        totalMicroseconds: number;
+        totalNanoseconds: number;
+        totalMinutes: number;
+        totalSeconds: number;
+    };
+
+    /**
+     * *TODO*
+     **/
     type TimeZone = {
         iana: IanaTimeZone;
         windows: WindowsTimeZone;
@@ -1032,6 +1442,83 @@ declare namespace API {
     /**
      * *TODO*
      **/
+    type Type = {
+        name?: string | undefined;
+        customAttributes?: any[] | undefined;
+        isCollectible?: boolean | undefined;
+        metadataToken: number;
+        isInterface?: boolean | undefined;
+        memberType: Enum.MemberTypes;
+        namespace?: string | undefined;
+        assemblyQualifiedName?: string | undefined;
+        fullName?: string | undefined;
+        assembly?: any | undefined;
+        module?: any | undefined;
+        isNested?: boolean | undefined;
+        declaringType?: any | undefined;
+        declaringMethod?: any | undefined;
+        reflectedType?: any | undefined;
+        underlyingSystemType?: any | undefined;
+        isTypeDefinition?: boolean | undefined;
+        isArray?: boolean | undefined;
+        isByRef?: boolean | undefined;
+        isPointer?: boolean | undefined;
+        isConstructedGenericType?: boolean | undefined;
+        isGenericParameter?: boolean | undefined;
+        isGenericTypeParameter?: boolean | undefined;
+        isGenericMethodParameter?: boolean | undefined;
+        isGenericType?: boolean | undefined;
+        isGenericTypeDefinition?: boolean | undefined;
+        isSZArray?: boolean | undefined;
+        isVariableBoundArray?: boolean | undefined;
+        isByRefLike?: boolean | undefined;
+        hasElementType?: boolean | undefined;
+        genericTypeArguments?: any[] | undefined;
+        genericParameterPosition: number;
+        genericParameterAttributes: Enum.GenericParameterAttributes;
+        attributes: Enum.TypeAttributes;
+        isAbstract?: boolean | undefined;
+        isImport?: boolean | undefined;
+        isSealed?: boolean | undefined;
+        isSpecialName?: boolean | undefined;
+        isClass?: boolean | undefined;
+        isNestedAssembly?: boolean | undefined;
+        isNestedFamANDAssem?: boolean | undefined;
+        isNestedFamily?: boolean | undefined;
+        isNestedFamORAssem?: boolean | undefined;
+        isNestedPrivate?: boolean | undefined;
+        isNestedPublic?: boolean | undefined;
+        isNotPublic?: boolean | undefined;
+        isPublic?: boolean | undefined;
+        isAutoLayout?: boolean | undefined;
+        isExplicitLayout?: boolean | undefined;
+        isLayoutSequential?: boolean | undefined;
+        isAnsiClass?: boolean | undefined;
+        isAutoClass?: boolean | undefined;
+        isUnicodeClass?: boolean | undefined;
+        isCOMObject?: boolean | undefined;
+        isContextful?: boolean | undefined;
+        isEnum?: boolean | undefined;
+        isMarshalByRef?: boolean | undefined;
+        isPrimitive?: boolean | undefined;
+        isValueType?: boolean | undefined;
+        isSignatureType?: boolean | undefined;
+        isSecurityCritical?: boolean | undefined;
+        isSecuritySafeCritical?: boolean | undefined;
+        isSecurityTransparent?: boolean | undefined;
+        structLayoutAttribute?: any | undefined;
+        typeInitializer?: any | undefined;
+        typeHandle?: any | undefined;
+        guid: string;
+        baseType?: any | undefined;
+        isSerializable?: boolean | undefined;
+        containsGenericParameters?: boolean | undefined;
+        isVisible?: boolean | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
     type TypeApiDescriptionModel = {
         baseType?: string | undefined;
         isEnum?: boolean | undefined;
@@ -1039,6 +1526,92 @@ declare namespace API {
         enumValues?: any[] | undefined;
         genericArguments?: string[] | undefined;
         properties?: PropertyApiDescriptionModel[] | undefined;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type TypeInfo = {
+        name?: string | undefined;
+        customAttributes?: any[] | undefined;
+        isCollectible?: boolean | undefined;
+        metadataToken: number;
+        isInterface?: boolean | undefined;
+        memberType: Enum.MemberTypes;
+        namespace?: string | undefined;
+        assemblyQualifiedName?: string | undefined;
+        fullName?: string | undefined;
+        assembly?: any | undefined;
+        module?: any | undefined;
+        isNested?: boolean | undefined;
+        declaringType?: any | undefined;
+        declaringMethod?: any | undefined;
+        reflectedType?: any | undefined;
+        underlyingSystemType?: any | undefined;
+        isTypeDefinition?: boolean | undefined;
+        isArray?: boolean | undefined;
+        isByRef?: boolean | undefined;
+        isPointer?: boolean | undefined;
+        isConstructedGenericType?: boolean | undefined;
+        isGenericParameter?: boolean | undefined;
+        isGenericTypeParameter?: boolean | undefined;
+        isGenericMethodParameter?: boolean | undefined;
+        isGenericType?: boolean | undefined;
+        isGenericTypeDefinition?: boolean | undefined;
+        isSZArray?: boolean | undefined;
+        isVariableBoundArray?: boolean | undefined;
+        isByRefLike?: boolean | undefined;
+        hasElementType?: boolean | undefined;
+        genericTypeArguments?: any[] | undefined;
+        genericParameterPosition: number;
+        genericParameterAttributes: Enum.GenericParameterAttributes;
+        attributes: Enum.TypeAttributes;
+        isAbstract?: boolean | undefined;
+        isImport?: boolean | undefined;
+        isSealed?: boolean | undefined;
+        isSpecialName?: boolean | undefined;
+        isClass?: boolean | undefined;
+        isNestedAssembly?: boolean | undefined;
+        isNestedFamANDAssem?: boolean | undefined;
+        isNestedFamily?: boolean | undefined;
+        isNestedFamORAssem?: boolean | undefined;
+        isNestedPrivate?: boolean | undefined;
+        isNestedPublic?: boolean | undefined;
+        isNotPublic?: boolean | undefined;
+        isPublic?: boolean | undefined;
+        isAutoLayout?: boolean | undefined;
+        isExplicitLayout?: boolean | undefined;
+        isLayoutSequential?: boolean | undefined;
+        isAnsiClass?: boolean | undefined;
+        isAutoClass?: boolean | undefined;
+        isUnicodeClass?: boolean | undefined;
+        isCOMObject?: boolean | undefined;
+        isContextful?: boolean | undefined;
+        isEnum?: boolean | undefined;
+        isMarshalByRef?: boolean | undefined;
+        isPrimitive?: boolean | undefined;
+        isValueType?: boolean | undefined;
+        isSignatureType?: boolean | undefined;
+        isSecurityCritical?: boolean | undefined;
+        isSecuritySafeCritical?: boolean | undefined;
+        isSecurityTransparent?: boolean | undefined;
+        structLayoutAttribute?: any | undefined;
+        typeInitializer?: any | undefined;
+        typeHandle?: any | undefined;
+        guid: string;
+        baseType?: any | undefined;
+        isSerializable?: boolean | undefined;
+        containsGenericParameters?: boolean | undefined;
+        isVisible?: boolean | undefined;
+        genericTypeParameters?: any[] | undefined;
+        declaredConstructors?: any[] | undefined;
+        declaredEvents?: any[] | undefined;
+        declaredFields?: any[] | undefined;
+        declaredMembers?: any[] | undefined;
+        declaredMethods?: any[] | undefined;
+        declaredNestedTypes?: any[] | undefined;
+        declaredProperties?: any[] | undefined;
+        implementedInterfaces?: any[] | undefined;
     };
 
     /**
@@ -1306,17 +1879,7 @@ declare namespace API {
         totalCount: number;
         successCount: number;
         failedCount: number;
-        results?: WorkflowDefinitionImportResultWorkflowImportResult[] | undefined;
-    };
-
-    /**
-     * *TODO*
-     **/
-    type WorkflowDefinitionImportResultWorkflowImportResult = {
-        fileName?: string | undefined;
-        hasError?: boolean | undefined;
-        errorMessage?: string | undefined;
-        workflow: WorkflowDefinitionBasic;
+        results?: WorkflowImportResult[] | undefined;
     };
 
     /**
@@ -1527,6 +2090,16 @@ declare namespace API {
     type WorkflowGroupPagedResult = {
         items?: WorkflowGroup[] | undefined;
         totalCount: number;
+    };
+
+    /**
+     * *TODO*
+     **/
+    type WorkflowImportResult = {
+        fileName?: string | undefined;
+        hasError?: boolean | undefined;
+        errorMessage?: string | undefined;
+        workflow: WorkflowDefinitionBasic;
     };
 
     /**

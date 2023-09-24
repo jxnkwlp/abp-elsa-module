@@ -8,7 +8,8 @@ using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.WorkflowInstances;
 
-[RemoteService]
+[Area(ElsaModuleRemoteServiceConsts.RemoteServiceName)]
+[RemoteService(Name = ElsaModuleRemoteServiceConsts.RemoteServiceName)]
 [Route("api/elsa/workflow/instances")]
 public class WorkflowInstanceController : ElsaModuleController, IWorkflowInstanceAppService
 {

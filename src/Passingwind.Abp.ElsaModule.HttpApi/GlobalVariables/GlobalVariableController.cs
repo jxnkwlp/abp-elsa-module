@@ -6,7 +6,8 @@ using Volo.Abp.Application.Dtos;
 
 namespace Passingwind.Abp.ElsaModule.GlobalVariables;
 
-[RemoteService]
+[Area(ElsaModuleRemoteServiceConsts.RemoteServiceName)]
+[RemoteService(Name = ElsaModuleRemoteServiceConsts.RemoteServiceName)]
 [Route("api/elsa/workflow/global-variables")]
 public class GlobalVariableController : ElsaModuleController, IGlobalVariableAppService
 {

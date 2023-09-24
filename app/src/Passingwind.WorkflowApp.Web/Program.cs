@@ -47,6 +47,7 @@ public static class Program
             }
 
             await app.RunAsync();
+
             return 0;
         }
         catch (Exception ex)

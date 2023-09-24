@@ -60,7 +60,7 @@ export async function loginExternalLoginCallback(
     },
     options?: { [key: string]: any }
 ) {
-    return request<API.AbpLoginResult>(`/api/account/login/external/callback`, {
+    return request<API.AbpLoginResult1>(`/api/account/login/external/callback`, {
         method: 'GET',
         params: params,
         ...(options || {}),

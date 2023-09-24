@@ -1,5 +1,4 @@
 import MonacoEditor from '@/components/MonacoEditor';
-import { randString } from '@/services/utils';
 import { ExpandOutlined } from '@ant-design/icons';
 import { Modal, Spin, Tag } from 'antd';
 import type * as monaco from 'monaco-editor';
@@ -11,7 +10,7 @@ type MonacorEditorInputProps = {
     value?: string;
     onChange?: (value: string) => void;
     language?: string;
-    width?: number;
+    // width?: number;
     height?: number;
     options?: monaco.editor.IStandaloneEditorConstructionOptions;
     showFullScreen?: false;
@@ -51,6 +50,7 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
 
     useEffect(() => {
         // update
+        console.debug('language => ', props.language);
         setLanguage(props.language ?? 'plaintext');
     }, [props.language]);
 
@@ -73,7 +73,7 @@ const MonacorEditorInput: React.FC<MonacorEditorInputProps> = (props) => {
         <div
             className="monaco-editor-container"
             id={props.id}
-            style={{ height: currentSize?.h }}
+            style={{ height: props.height ?? currentSize?.h }}
             onKeyDown={(e) => {
                 // keyCode: 27
                 if (e.code == 'Escape') {
