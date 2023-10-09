@@ -2,6 +2,7 @@
   "culture": "zh-Hans",
   "texts": {
     "ElsaModule:WorkflowDefinition.NameExists": "流程定义名称'{name}'已经存在",
+    "ElsaModule:Error:0501": "代码块名称已经存在",
 
     "Permission:ElsaModule": "Workflow 模块",
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.GlobalCodes;
 using Passingwind.Abp.ElsaModule.Groups;
 using Passingwind.Abp.ElsaModule.Teams;
 using Volo.Abp.Data;
@@ -19,16 +20,19 @@ public class ElsaModuleDbContext : AbpDbContext<ElsaModuleDbContext>, IElsaModul
     public DbSet<GlobalVariable> GlobalVariables { get; set; }
     public DbSet<WorkflowTeam> WorkflowTeams { get; set; }
     public DbSet<WorkflowGroup> WorkflowGroups { get; set; }
+    public DbSet<GlobalCode> GlobalCodes { get; set; }
+    public DbSet<GlobalCodeVersion> GlobalCodeVersions { get; set; }
+    public DbSet<GlobalCodeContent> GlobalCodeContents { get; }
 
     public ElsaModuleDbContext(DbContextOptions<ElsaModuleDbContext> options)
         : base(options)
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(modelBuilder);
 
-        builder.ConfigureElsaModule();
+        modelBuilder.ConfigureElsaModule();
     }
 }

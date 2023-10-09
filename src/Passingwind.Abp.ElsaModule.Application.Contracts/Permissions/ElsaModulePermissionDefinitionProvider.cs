@@ -40,6 +40,11 @@ public class ElsaModulePermissionDefinitionProvider : PermissionDefinitionProvid
         workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroups.Create, L("Permission:Create"));
         workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroups.Update, L("Permission:Update"));
         workflowGroupPermission.AddChild(ElsaModulePermissions.WorkflowGroups.Delete, L("Permission:Delete"));
+
+        var globalCodes = myGroup.AddPermission(ElsaModulePermissions.GlobalCodes.Default, L("Permission:GlobalCodes"));
+        globalCodes.AddChild(ElsaModulePermissions.GlobalCodes.Create, L("Permission:Create"));
+        globalCodes.AddChild(ElsaModulePermissions.GlobalCodes.Update, L("Permission:Update"));
+        globalCodes.AddChild(ElsaModulePermissions.GlobalCodes.Delete, L("Permission:Delete"));
     }
 
     private static LocalizableString L(string name)

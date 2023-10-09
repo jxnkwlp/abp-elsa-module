@@ -2,6 +2,7 @@
 using AutoMapper;
 using Elsa.Metadata;
 using Passingwind.Abp.ElsaModule.Common;
+using Passingwind.Abp.ElsaModule.GlobalCodes;
 using Passingwind.Abp.ElsaModule.GlobalVariables;
 using Passingwind.Abp.ElsaModule.Groups;
 using Passingwind.Abp.ElsaModule.Teams;
@@ -57,5 +58,8 @@ public class ElsaModuleApplicationAutoMapperProfile : Profile
         CreateMap<WorkflowTeamRoleScopeValue, WorkflowTeamRoleScopeValueDto>();
 
         CreateMap<WorkflowGroup, WorkflowGroupDto>();
+
+        CreateMap<GlobalCode, GlobalCodeDto>()
+            .Ignore(x => x.Content);
     }
 }

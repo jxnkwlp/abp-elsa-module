@@ -51,14 +51,14 @@ public class WorkflowDefinitionVersionRepository : MongoDbRepository<IElsaModule
             .LongCountAsync(cancellationToken);
     }
 
-    public async Task<WorkflowDefinitionVersion> GetLatestAsync(Guid id, bool includeDetails = true, CancellationToken cancellationToken = default)
+    public async Task<WorkflowDefinitionVersion> GetLatestAsync(Guid definitionId, bool includeDetails = true, CancellationToken cancellationToken = default)
     {
         var query = await GetMongoQueryableAsync(cancellationToken);
 
         var entity = await query
             .OrderByDescending(x => x.Version)
-            .Where(x => x.DefinitionId == id)
-            .FirstOrDefaultAsync();
+            .Where(x => x.DefinitionId == definitionId)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
         if (entity == null)
             throw new EntityNotFoundException();

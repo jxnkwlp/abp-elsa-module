@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Elsa;
-using Elsa.Activities.Http.OpenApi;
 using Elsa.Activities.Http.Services;
 using Elsa.Activities.Sql.Extensions;
 using Elsa.Activities.UserTask.Extensions;
@@ -44,6 +43,7 @@ using Passingwind.WorkflowApp.Web.ApiKeys;
 using Passingwind.WorkflowApp.Web.Services;
 using StackExchange.Redis;
 using Storage.Net;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.Authentication.OpenIdConnect;
@@ -238,25 +238,7 @@ public class WorkflowAppWebModule : AbpModule
                 options.DefaultScheme = IdentityConstants.ApplicationScheme;
                 options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
             })
-                        //.AddAbpOpenIdConnect("oidc", options =>
-                        //{
-                        //    options.Authority = configuration["AuthServer:Authority"];
-                        //    options.RequireHttpsMetadata = Convert.ToBoolean(configuration["AuthServer:RequireHttpsMetadata"]);
-                        //    options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
-
-                        //    options.ClientId = configuration["AuthServer:ClientId"];
-                        //    options.ClientSecret = configuration["AuthServer:ClientSecret"];
-
-                        //    options.UsePkce = true;
-                        //    options.SaveTokens = true;
-                        //    options.GetClaimsFromUserInfoEndpoint = true;
-
-                        //    options.Scope.Add("roles");
-                        //    options.Scope.Add("email");
-                        //    options.Scope.Add("phone");
-                        //    //options.Scope.Add("WorkflowApp");
-                        //})
-                        .AddApiKey(options => options.KeyName = ApiKeyDefaults.ApiKeyName)
+            .AddApiKey(options => options.KeyName = ApiKeyDefaults.ApiKeyName)
             ;
 
         context.Services.ConfigureApplicationCookie(optopns =>
@@ -347,68 +329,8 @@ public class WorkflowAppWebModule : AbpModule
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "Workflow App API", Version = "v1" });
                 options.DocInclusionPredicate((docName, description) => true);
                 options.CustomSchemaIds(type => type.FullName);
-                // 
-                options.DocumentFilter<HttpEndpointDocumentFilter>();
-                options.SchemaFilter<SwaggerEnumDescriptions>();
-                // 
-                options.CustomSchemaIds(type =>
-                {
-                    if (type.IsGenericType)
-                    {
-                        string part1 = type.FullName.Substring(0, type.FullName.IndexOf("`")).RemovePostFix("Dto");
-                        string part2 = string.Concat(type.GetGenericArguments().Select(x => x.Name.RemovePostFix("Dto")));
-
-                        if (part1.EndsWith("ListResult") || part1.EndsWith("PagedResult"))
-                        {
-                            string temp1 = part1.Substring(0, part1.LastIndexOf("."));
-                            string temp2 = part1.Substring(part1.LastIndexOf(".") + 1);
-                            return $"{temp1}.{part2}{temp2}";
-                        }
-
-                        return $"{part1}.{part2}";
-                    }
-
-                    return type.FullName.RemovePostFix("Dto").Replace("Dto+", null);
-                });
-
-                options.CustomOperationIds(e =>
-                {
-                    string action = e.ActionDescriptor.RouteValues["action"];
-                    string controller = e.ActionDescriptor.RouteValues["controller"];
-                    string method = e.HttpMethod;
-
-                    if (action == "GetList")
-                        return $"Get{controller}List";
-
-                    if (action == "GetAllList")
-                        return $"GetAll{controller}List";
-
-                    if (action.StartsWith("GetAll"))
-                        return $"GetAll{controller}{action.RemovePreFix("GetAll")}";
-
-                    if (action == "Get" || action == "Create" || action == "Update" || action == "Delete")
-                        return action + controller;
-
-                    if (action.StartsWith("Get"))
-                        return $"Get{controller}{action.RemovePreFix("Get")}";
-
-                    if (action.StartsWith("Create"))
-                        return $"Create{controller}{action.RemovePreFix("Create")}";
-
-                    if (action.StartsWith("Update"))
-                        return $"Update{controller}{action.RemovePreFix("Update")}";
-
-                    if (action.StartsWith("Delete"))
-                        return $"Delete{controller}{action.RemovePreFix("Delete")}";
-
-                    if (action.StartsWith("BatchDelete"))
-                        return $"BatchDelete{controller}";
-
-                    if (method == "HttpGet")
-                        return action + controller;
-
-                    return controller + action;
-                });
+                options.OrderActionsBy(x => x.GroupName + x.RelativePath);
+                options.ApplyExtensions();
             });
     }
 

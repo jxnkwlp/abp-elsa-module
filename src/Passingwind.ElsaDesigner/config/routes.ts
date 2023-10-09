@@ -82,6 +82,19 @@
                 access: 'ElsaWorkflow.GlobalVariables',
             },
             {
+                path: '/workflows/code-block',
+                name: 'GlobalCode',
+                component: './workflow/code-block',
+                access: 'ElsaWorkflow.GlobalVariables',
+            },
+            {
+                path: '/workflows/code-block/edit/:id?',
+                name: 'GlobalCode.edit',
+                component: './workflow/code-block/edit',
+                access: 'ElsaWorkflow.GlobalVariables',
+                hideInMenu: true,
+            },
+            {
                 path: '/workflows/teams',
                 name: 'Teams',
                 component: './workflow/teams',

@@ -1,6 +1,5 @@
 import Editor from '@monaco-editor/react';
 import type * as monaco from 'monaco-editor';
-import { useEffect } from 'react';
 
 // monaco
 type Monaco = typeof monaco;
@@ -49,6 +48,7 @@ const MonacoEditor: React.FC<MonacoEditorProps> = (props) => {
                 height={height}
                 path={path}
                 defaultLanguage={language}
+                language={language}
                 value={value}
                 options={{
                     minimap: { enabled: minimap ?? true, autohide: true },

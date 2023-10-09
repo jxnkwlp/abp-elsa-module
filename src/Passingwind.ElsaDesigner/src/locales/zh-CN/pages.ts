@@ -266,4 +266,15 @@ export default {
     'page.apikey.tips.p1': '您的新 API 密钥是:',
     'page.apikey.tips.p2':
         'API 密钥一旦创建就无法检索。 确保将此密钥保存在安全的地方，例如密码管理工具。',
+
+    'page.globalCode': '代码块',
+    'page.globalCode.field.name': '名称',
+    'page.globalCode.field.description': '描述',
+    'page.globalCode.field.language': '语言',
+    'page.globalCode.field.type': '类型',
+    'page.globalCode.field.content': '内容',
+    'page.globalCode.field.publishedVersion': '已发布版本',
+    'page.globalCode.field.latestVersion': '最新版本',
+    'page.globalCode.save': '保存',
+    'page.globalCode.publish': '发布',
 };

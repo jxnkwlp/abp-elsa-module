@@ -4,7 +4,8 @@ using Volo.Abp;
 
 namespace Passingwind.Abp.ElsaModule.Workflow;
 
-[RemoteService]
+[Area(ElsaModuleRemoteServiceConsts.RemoteServiceName)]
+[RemoteService(Name = ElsaModuleRemoteServiceConsts.RemoteServiceName)]
 [Route("api/elsa/workflows/signals")]
 public class WorkflowSignalController : ElsaModuleController, IWorkflowSignalAppService
 {

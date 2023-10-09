@@ -272,4 +272,15 @@ export default {
     'page.apikey.tips.p1': 'Your new API key is:',
     'page.apikey.tips.p2':
         'An API key cannot be retrieved once created. Make sure to keep this key in a safe place, such as a password management tool. ',
+
+    'page.globalCode': 'Global code',
+    'page.globalCode.field.name': 'Name',
+    'page.globalCode.field.description': 'Description',
+    'page.globalCode.field.language': 'Language',
+    'page.globalCode.field.type': 'Type',
+    'page.globalCode.field.content': 'Content',
+    'page.globalCode.field.publishedVersion': 'Published Version',
+    'page.globalCode.field.latestVersion': 'Latest Version',
+    'page.globalCode.save': 'Save',
+    'page.globalCode.publish': 'Publish',
 };
