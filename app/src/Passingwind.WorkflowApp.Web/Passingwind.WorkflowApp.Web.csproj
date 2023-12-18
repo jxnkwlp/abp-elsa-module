@@ -22,7 +22,7 @@
     <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.8.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="7.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.14" />
     <PackageReference Include="DistributedLock.FileSystem" Version="1.0.1" />
     <PackageReference Include="DistributedLock.Redis" Version="1.0.2" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.2" />
@@ -42,7 +42,7 @@
     <PackageReference Include="Volo.Abp.Http.Client.IdentityModel.Web" Version="7.2.3" />
     <PackageReference Include="Volo.Abp.Swashbuckle" Version="7.2.3" />
     <PackageReference Include="Volo.Abp.Identity.Web" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.Account.Web" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.Account.Web" Version="7.4.4" />
     <PackageReference Include="Volo.Abp.MailKit" Version="7.2.3" />
     <PackageReference Include="Volo.Abp.BackgroundJobs.HangFire" Version="7.2.3" />
     <PackageReference Include="Volo.Abp.BackgroundWorkers.Hangfire" Version="7.2.3" />
