@@ -13,11 +13,11 @@ namespace Passingwind.Abp.ElsaModule.EntityFrameworkCore;
 
 public class EfCoreJsonValueConverter<TModel> : ValueConverter<TModel, string>
 {
-    public static Func<JsonSerializerSettings> Create;
+    public static Func<JsonSerializerSettings> CreateSettingsFunc;
 
     static EfCoreJsonValueConverter()
     {
-        Create = () =>
+        CreateSettingsFunc = () =>
         {
             var settings = new JsonSerializerSettings()
             {
@@ -56,13 +56,13 @@ public class EfCoreJsonValueConverter<TModel> : ValueConverter<TModel, string>
 
     private static string Serialize<T>(T value)
     {
-        var settings = Create();
+        var settings = CreateSettingsFunc();
         return JsonConvert.SerializeObject(value, Formatting.None, settings);
     }
 
     private static T Deserialize<T>(string json)
     {
-        var settings = Create();
+        var settings = CreateSettingsFunc();
         return JsonConvert.DeserializeObject<T>(json, settings);
     }
 }

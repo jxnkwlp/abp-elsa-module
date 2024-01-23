@@ -35,6 +35,6 @@ public class ObjectConverter : System.Text.Json.Serialization.JsonConverter<obje
 
     public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
     {
-        writer.WriteRawValue(Newtonsoft.Json.JsonConvert.SerializeObject(value, JsonSerializerSettings));
+        writer.WriteRawValue(JsonConvert.SerializeObject(value, JsonSerializerSettings));
     }
 }

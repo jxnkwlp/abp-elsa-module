@@ -126,6 +126,7 @@ const Edit: React.FC = () => {
                         label={intl.formatMessage({ id: 'page.globalCode.field.description' })}
                         name="description"
                         rules={[{ max: 128 }]}
+                        width="lg"
                         fieldProps={{ rows: 1 }}
                     />
                     <ProFormRadio.Group

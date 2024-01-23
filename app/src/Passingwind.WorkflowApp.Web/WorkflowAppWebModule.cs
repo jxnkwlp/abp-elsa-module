@@ -194,7 +194,7 @@ public class WorkflowAppWebModule : AbpModule
         settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
         settings.NullValueHandling = NullValueHandling.Ignore;
         settings.DefaultValueHandling = DefaultValueHandling.Include;
-        settings.TypeNameHandling = TypeNameHandling.None; // As default, we want output the type name of json object
+        settings.TypeNameHandling = TypeNameHandling.None;
         settings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
         settings.PreserveReferencesHandling = PreserveReferencesHandling.None;
     }

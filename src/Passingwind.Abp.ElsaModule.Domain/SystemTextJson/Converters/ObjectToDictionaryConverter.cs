@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using JsonException = System.Text.Json.JsonException;
 
 namespace Passingwind.Abp.ElsaModule.SystemTextJson.Converters;
 
-public class ObjectToDictionaryConverter : JsonConverter<Dictionary<string, object>>
+public class ObjectToDictionaryConverter : System.Text.Json.Serialization.JsonConverter<Dictionary<string, object>>
 {
     public override Dictionary<string, object> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -81,73 +82,6 @@ public class ObjectToDictionaryConverter : JsonConverter<Dictionary<string, obje
 
     public override void Write(Utf8JsonWriter writer, Dictionary<string, object> value, JsonSerializerOptions options)
     {
-        writer.WriteStartObject();
-
-        foreach (var key in value.Keys)
-        {
-            HandleValue(writer, key, value[key]);
-        }
-
-        writer.WriteEndObject();
-    }
-
-    private static void HandleValue(Utf8JsonWriter writer, string key, object objectValue)
-    {
-        if (key != null)
-        {
-            writer.WritePropertyName(key);
-        }
-
-        switch (objectValue)
-        {
-            case string stringValue:
-                writer.WriteStringValue(stringValue);
-                break;
-            case DateTime dateTime:
-                writer.WriteStringValue(dateTime);
-                break;
-            case long longValue:
-                writer.WriteNumberValue(longValue);
-                break;
-            case int intValue:
-                writer.WriteNumberValue(intValue);
-                break;
-            case float floatValue:
-                writer.WriteNumberValue(floatValue);
-                break;
-            case double doubleValue:
-                writer.WriteNumberValue(doubleValue);
-                break;
-            case decimal decimalValue:
-                writer.WriteNumberValue(decimalValue);
-                break;
-            case bool boolValue:
-                writer.WriteBooleanValue(boolValue);
-                break;
-            case Dictionary<string, object> dict:
-                writer.WriteStartObject();
-                foreach (var item in dict)
-                {
-                    HandleValue(writer, item.Key, item.Value);
-                }
-                writer.WriteEndObject();
-                break;
-            case object[] array:
-                writer.WriteStartArray();
-                foreach (var item in array)
-                {
-                    HandleValue(writer, item);
-                }
-                writer.WriteEndArray();
-                break;
-            default:
-                writer.WriteNullValue();
-                break;
-        }
-    }
-
-    private static void HandleValue(Utf8JsonWriter writer, object value)
-    {
-        HandleValue(writer, null, value);
+        writer.WriteRawValue(JsonConvert.SerializeObject(value));
     }
 }
