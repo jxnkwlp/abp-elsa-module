@@ -491,6 +491,7 @@ tab_width = 4
 dotnet_diagnostic.CA1848.severity = silent
 dotnet_diagnostic.CA1305.severity = silent
 dotnet_diagnostic.CA2016.severity = warning
+dotnet_diagnostic.ide0011.severity = warning
 
 [{*.har,*.jsb2,*.jsb3,*.json,.babelrc,.eslintrc,.stylelintrc,bowerrc,jest.config}]
 indent_style = space

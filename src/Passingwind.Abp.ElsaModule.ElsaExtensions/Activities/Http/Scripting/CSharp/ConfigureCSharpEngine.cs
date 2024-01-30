@@ -27,7 +27,7 @@ public class ConfigureCSharpEngine : INotificationHandler<CSharpScriptEvaluation
         var global = notification.EvaluationGlobal;
 
         if (_httpContextAccessor.HttpContext == null)
-            throw new System.Exception("The HttpContext is null");
+            return Task.CompletedTask;
 
         global.Context.QueryString = (Func<string, string>)(key => _httpContextAccessor.HttpContext!.Request.Query[key].ToString());
         global.Context.AbsoluteUrl = (Func<string, string>)(url => _absoluteUrlProvider.ToAbsoluteUrl(url).ToString());

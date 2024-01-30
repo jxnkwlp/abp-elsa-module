@@ -1,4 +1,4 @@
-﻿namespace Passingwind.Abp.ElsaModule.CSharp;
+﻿namespace Passingwind.CSharpScriptEngine;
 public struct NuGetPackageId
 {
     public string Id;

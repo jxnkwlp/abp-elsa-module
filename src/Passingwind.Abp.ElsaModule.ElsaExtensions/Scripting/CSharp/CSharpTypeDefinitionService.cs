@@ -3,8 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elsa.Models;
 using MediatR;
-using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
+using Passingwind.CSharpScriptEngine;
 
 namespace Passingwind.Abp.ElsaModule.Scripting.CSharp;
 
@@ -21,13 +21,11 @@ public class CSharpTypeDefinitionService : ICSharpTypeDefinitionService
     {
         var reference = new CSharpScriptReference();
 
-        var imports = reference.Imports;
-
         StringBuilder sb = new StringBuilder();
 
         sb.AppendLine("public static class Context { ");
 
-        await _mediator.Publish<CSharpTypeDefinitionNotification>(new CSharpTypeDefinitionNotification(workflowDefinition, sb, reference));
+        await _mediator.Publish(new CSharpTypeDefinitionNotification(workflowDefinition, sb, reference), cancellationToken);
 
         sb.AppendLine("}");
 

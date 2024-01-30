@@ -1,15 +1,15 @@
 ﻿using System;
 
-namespace Passingwind.Abp.ElsaModule.Roslyn;
+namespace Passingwind.CSharpScriptEngine.Roslyn;
 
 public class SourceTextCompare : IComparable<string>, IComparable
 {
-    public int CompareTo(string other)
+    public int CompareTo(string? other)
     {
         throw new NotImplementedException();
     }
 
-    public int CompareTo(object obj)
+    public int CompareTo(object? obj)
     {
         if (obj == null)
         {

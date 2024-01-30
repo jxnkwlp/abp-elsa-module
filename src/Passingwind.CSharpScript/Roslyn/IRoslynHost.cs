@@ -5,18 +5,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Volo.Abp.DependencyInjection;
 
-namespace Passingwind.Abp.ElsaModule.Roslyn;
+namespace Passingwind.CSharpScriptEngine.Roslyn;
 
-public interface IRoslynHost : ISingletonDependency
+public interface IRoslynHost
 {
     DocumentId CreateOrUpdateDocument(string projectName, string name, string text, bool isScript = false);
     Document GetDocument(string projectName, string name);
     Document GetDocument(string projectName, DocumentId documentId);
     void DeleteDocument(string projectName, string name);
 
-    RoslynProject GetOrCreateProject(string projectName, IEnumerable<Assembly> additionalAssemblies = null, IEnumerable<string> additionalImports = null);
+    RoslynProject GetOrCreateProject(string projectName, IEnumerable<Assembly>? additionalAssemblies = null, IEnumerable<string>? additionalImports = null);
     RoslynProject GetRoslynProject(string projectName);
     void DeleteProject(string projectName);
 

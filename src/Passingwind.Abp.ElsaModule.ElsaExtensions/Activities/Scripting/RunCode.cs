@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.GlobalCodes;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp;
+using Passingwind.CSharpScriptEngine;
 
 namespace Passingwind.Abp.ElsaModule.Activities.Scripting;
 

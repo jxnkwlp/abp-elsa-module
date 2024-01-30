@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Volo.Abp.DependencyInjection;
 
-namespace Passingwind.Abp.ElsaModule.CSharp;
+namespace Passingwind.CSharpScriptEngine;
 
-public interface INuGetPackageService : ISingletonDependency
+public interface INuGetPackageService
 {
-    string NuGetCacheFolder { get; set; }
-
     Task<IEnumerable<string>> SearchAsync(string name, int resultCount = 10, CancellationToken cancellationToken = default);
     Task DownloadAsync(string packageId, string version, string tagetFrameworkName, bool dependency = false, CancellationToken cancellationToken = default);
     Task<IEnumerable<string>> GetPackageVersionsAsync(string packageId, CancellationToken cancellationToken = default);

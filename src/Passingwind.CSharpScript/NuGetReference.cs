@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using NuGet.Packaging.Core;
 
-namespace Passingwind.Abp.ElsaModule.CSharp;
+namespace Passingwind.CSharpScriptEngine;
 
 public class NuGetReference : IEquatable<NuGetReference>
 {
@@ -17,12 +17,12 @@ public class NuGetReference : IEquatable<NuGetReference>
 
     public ImmutableArray<string> References { get; }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return Equals(obj as NuGetReference);
     }
 
-    public bool Equals(NuGetReference other)
+    public bool Equals(NuGetReference? other)
     {
         return other is not null &&
                EqualityComparer<PackageIdentity>.Default.Equals(Identity, other.Identity);

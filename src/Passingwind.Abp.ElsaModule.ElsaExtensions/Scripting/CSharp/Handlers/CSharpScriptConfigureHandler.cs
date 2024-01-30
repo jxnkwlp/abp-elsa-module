@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using NodaTime;
 using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
+using Passingwind.CSharpScriptEngine;
 using Volo.Abp.Json;
 
 namespace Passingwind.Abp.ElsaModule.Scripting.CSharp.Handlers;

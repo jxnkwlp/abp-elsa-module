@@ -13,8 +13,8 @@ using Microsoft.CodeAnalysis.Shared.Extensions;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.CSharp;
-using Passingwind.Abp.ElsaModule.Roslyn;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp;
+using Passingwind.CSharpScriptEngine.Roslyn;
 
 namespace Passingwind.Abp.ElsaModule.Services;
 
@@ -71,7 +71,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
         var documentId = _roslynHost.CreateOrUpdateDocument(project.Name, textId, text, true);
         var document = _roslynHost.GetDocument(project.Name, documentId);
 
-        var formattedDocument = await Formatter.FormatAsync(document);
+        var formattedDocument = await Formatter.FormatAsync(document, cancellationToken: cancellationToken);
         var sourceText = await formattedDocument.GetTextAsync(cancellationToken);
 
         _roslynHost.DeleteProject(project.Name);
@@ -96,7 +96,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
         var document = _roslynHost.GetDocument(project.Name, documentId);
 
         var completionService = CompletionService.GetService(document);
-        var helper = Microsoft.CodeAnalysis.Completion.CompletionHelper.GetHelper(document);
+        //var helper = Microsoft.CodeAnalysis.Completion.CompletionHelper.GetHelper(document);
 
         if (completionService == null)
         {
@@ -117,7 +117,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
 
         var results = new List<WorkflowCSharpEditorCompletionItem>();
 
-        if (!completionResult.IsEmpty)
+        if (completionResult.ItemsList.Count > 0)
         {
             var textSpanToTextCache = new Dictionary<TextSpan, string>();
 
@@ -203,7 +203,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
             SyntaxNode childNode = expressionNode.ChildNodes()?.FirstOrDefault()?.ChildNodes()?.FirstOrDefault();
             if (childNode != null)
             {
-                typeInfo = semanticModel.GetTypeInfo(childNode);
+                typeInfo = semanticModel.GetTypeInfo(childNode, cancellationToken: cancellationToken);
                 var location = expressionNode.GetLocation();
                 if (typeInfo.Type != null)
                 {
@@ -242,7 +242,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
         if (expressionNode is IdentifierNameSyntax i)
         {
             var location = expressionNode.GetLocation();
-            typeInfo = semanticModel.GetTypeInfo(i);
+            typeInfo = semanticModel.GetTypeInfo(i, cancellationToken: cancellationToken);
             if (typeInfo.Type != null)
             {
                 return new WorkflowCSharpEditorHoverInfoResult()
@@ -254,7 +254,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
             }
         }
 
-        var symbolInfo = semanticModel.GetSymbolInfo(expressionNode);
+        var symbolInfo = semanticModel.GetSymbolInfo(expressionNode, cancellationToken: cancellationToken);
         if (symbolInfo.Symbol != null)
         {
             var location = expressionNode.GetLocation();
@@ -282,7 +282,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
 
         var compilation = await _roslynHost.GetCompilationAsync(project.Name, cancellationToken);
 
-        var syntaxTree = await document.GetSyntaxTreeAsync();
+        var syntaxTree = await document.GetSyntaxTreeAsync(cancellationToken);
         var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
         var invocation = await InvocationContext.GetInvocation(document, position);
@@ -304,11 +304,11 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
         var types = invocation.ArgumentTypes;
         ISymbol throughSymbol = null;
         ISymbol throughType = null;
-        var methodGroup = invocation.SemanticModel.GetMemberGroup(invocation.Receiver).OfType<IMethodSymbol>();
+        var methodGroup = invocation.SemanticModel.GetMemberGroup(invocation.Receiver, cancellationToken: cancellationToken).OfType<IMethodSymbol>();
         if (invocation.Receiver is MemberAccessExpressionSyntax)
         {
             var throughExpression = ((MemberAccessExpressionSyntax)invocation.Receiver).Expression;
-            var typeInfo = semanticModel.GetTypeInfo(throughExpression);
+            var typeInfo = semanticModel.GetTypeInfo(throughExpression, cancellationToken: cancellationToken);
             throughSymbol = invocation.SemanticModel.GetSpeculativeSymbolInfo(invocation.Position, throughExpression, SpeculativeBindingOption.BindAsExpression).Symbol;
             throughType = invocation.SemanticModel.GetSpeculativeTypeInfo(invocation.Position, throughExpression, SpeculativeBindingOption.BindAsTypeOrNamespace).Type;
             var includeInstance = (throughSymbol != null && !(throughSymbol is ITypeSymbol)) ||
@@ -363,7 +363,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
     {
         if (symbolInfo.Symbol is IMethodSymbol methodsymbol)
         {
-            var sb = new StringBuilder().Append("(method) ").Append(methodsymbol.DeclaredAccessibility.ToString().ToLower()).Append(' ');
+            var sb = new StringBuilder().Append("(method) ").Append(methodsymbol.DeclaredAccessibility.ToString().ToLower(System.Globalization.CultureInfo.CurrentCulture)).Append(' ');
             if (methodsymbol.IsStatic)
                 sb.Append("static").Append(' ');
             sb.Append(methodsymbol.Name).Append('(');
@@ -386,7 +386,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
         }
         if (symbolInfo.Symbol is IFieldSymbol fieldSymbol)
         {
-            var sb = new StringBuilder().Append(fieldSymbol.Name).Append(" : ").Append(fieldSymbol.DeclaredAccessibility.ToString().ToLower()).Append(' ');
+            var sb = new StringBuilder().Append(fieldSymbol.Name).Append(" : ").Append(fieldSymbol.DeclaredAccessibility.ToString().ToLower(System.Globalization.CultureInfo.CurrentCulture)).Append(' ');
             if (fieldSymbol.IsStatic)
                 sb.Append("static").Append(' ');
             if (fieldSymbol.IsReadOnly)
@@ -415,7 +415,7 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
         };
     }
 
-    private int InvocationScore(IMethodSymbol symbol, IEnumerable<TypeInfo> types)
+    private static int InvocationScore(IMethodSymbol symbol, IEnumerable<TypeInfo> types)
     {
         var parameters = symbol.Parameters;
         if (parameters.Length < types.Count())

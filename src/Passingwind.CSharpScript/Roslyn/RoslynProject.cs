@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 
-namespace Passingwind.Abp.ElsaModule.Roslyn;
+namespace Passingwind.CSharpScriptEngine.Roslyn;
 
 public class RoslynProject
 {
@@ -16,7 +16,7 @@ public class RoslynProject
 
     public ImmutableArray<MetadataReference> ResolvedReferences => GetResolvedReferences();
 
-    public ImmutableArray<MetadataReference> AllMetadataReferences => RoslynHost.DefaultMetadataReferences.Concat(Assemblies.Select(x => GetMetadataReference(x))).Concat(ResolvedReferences).ToImmutableArray();
+    public ImmutableArray<MetadataReference> AllMetadataReferences => RoslynHost.DefaultReferences.Concat(Assemblies.Select(x => GetMetadataReference(x))).Concat(ResolvedReferences).ToImmutableArray();
     public ImmutableArray<string> AllImports => RoslynHost.DefaultImports.Concat(Imports).Concat(Imports);
 
     private readonly Dictionary<string, ImmutableArray<MetadataReference>> _documentResolvedReferences = new Dictionary<string, ImmutableArray<MetadataReference>>();

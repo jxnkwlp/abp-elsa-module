@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 
-namespace Passingwind.Abp.ElsaModule.CSharp;
+namespace Passingwind.CSharpScriptEngine;
 
 public class CSharpScriptReference
 {

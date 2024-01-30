@@ -1,27 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\..\common.props" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props" />
 
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <RootNamespace>Passingwind.Abp.ElsaModule</RootNamespace>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>Passingwind.Abp.ElsaModule</RootNamespace>  
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.8" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.6.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.6.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.6.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.6.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.6.0" />
-        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-        <PackageReference Include="Basic.Reference.Assemblies" Version="1.4.2" />
-        <PackageReference Include="IdentityModel" Version="6.1.0" />
-        <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.6.0" />
-        <PackageReference Include="NuGet.Protocol" Version="6.6.1" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.8" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="IdentityModel" Version="6.1.0" />
+  </ItemGroup>
 
-    <!--<Target Name="GetLibReferences" AfterTargets="ResolveFrameworkReferences">
+  <!--<Target Name="GetLibReferences" AfterTargets="ResolveFrameworkReferences">
         <MSBuild Projects="@(ProjectReference)" Targets="GetLibReferences">
             <Output ItemName="LibReference" TaskParameter="TargetOutputs" />
         </MSBuild>
@@ -31,32 +22,58 @@
         </ItemGroup>
     </Target>-->
 
-    <ItemGroup>
-        <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp" />
-        <InternalsAssemblyName Include="Microsoft.CodeAnalysis.Features" />
-        <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.Features" />
-        <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.EditorFeatures" />
-        <InternalsAssemblyName Include="Microsoft.CodeAnalysis.Scripting" />
-        <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.Scripting" />
-        <InternalsAssemblyName Include="Microsoft.CodeAnalysis.Workspaces" />
-        <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
-        <InternalsAssemblyName Include="Microsoft.CodeAnalysis.LanguageServer.Protocol" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.EventBus" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.Emailing" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="7.2.3" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Volo.Abp.EventBus" Version="7.2.3" />
-        <PackageReference Include="Volo.Abp.Emailing" Version="7.2.3" />
-        <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="7.2.3" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Elsa.Activities.Email" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.Http" Version="2.12.0" />
+    <PackageReference Include="Elsa.Activities.Temporal.Common" Version="2.12.0" />
+  </ItemGroup>
+ 
+  <ItemGroup>
+    <PackageReference Include="Teronis.MSBuild.Packaging.ProjectBuildInPackage" Version="1.0.0" Condition=" $(Configuration) == 'Release' ">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Elsa.Activities.Email" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.Http" Version="2.12.0" />
-        <PackageReference Include="Elsa.Activities.Temporal.Common" Version="2.12.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Domain\Passingwind.Abp.ElsaModule.Domain.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Domain\Passingwind.Abp.ElsaModule.Domain.csproj" />
+    <ProjectReference Include="..\Passingwind.CSharpScript\Passingwind.CSharpScriptEngine.csproj"  >
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+ 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.8.0" />
+    <PackageReference Include="NuGet.Protocol" Version="6.8.0" />
+    <PackageReference Include="Basic.Reference.Assemblies" Version="1.4.5" />
+    <PackageReference Include="Basic.Reference.Assemblies.Net70" Version="1.4.5" />
+    <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.7.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.Features" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.Features" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.EditorFeatures" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.Scripting" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.Scripting" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.Workspaces" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.LanguageServer.Protocol" />
+  </ItemGroup>
  
 </Project>

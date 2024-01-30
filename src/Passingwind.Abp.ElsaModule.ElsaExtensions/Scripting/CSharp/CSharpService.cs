@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Elsa.Services.Models;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
+using Passingwind.CSharpScriptEngine;
 
 namespace Passingwind.Abp.ElsaModule.Scripting.CSharp;
 
@@ -24,28 +25,34 @@ public class CSharpService : ICSharpService
 
     public async Task<object> EvaluateAsync(string expression, Type returnType, ActivityExecutionContext context, Action<CSharpScriptEvaluationGlobal> globalConfigure = null, CancellationToken cancellationToken = default)
     {
-        CSharpScriptEvaluationGlobal scriptEvaluationGlobal = new CSharpScriptEvaluationGlobal();
+        CSharpScriptEvaluationGlobal scriptEvaluationGlobal = new();
 
         globalConfigure?.Invoke(scriptEvaluationGlobal);
 
         // 
-        await _mediator.Publish(new CSharpScriptEvaluationNotification(expression, context, scriptEvaluationGlobal));
+        await _mediator.Publish(new CSharpScriptEvaluationNotification(expression, context, scriptEvaluationGlobal), cancellationToken);
 
         // 
-        var scriptConfigure = new CSharpScriptConfigureNotification(expression);
-        await _mediator.Publish(scriptConfigure);
+        CSharpScriptConfigureNotification scriptConfigure = new(expression);
+        await _mediator.Publish(scriptConfigure, cancellationToken);
 
-        var scriptId = $"{context.WorkflowExecutionContext.WorkflowBlueprint.VersionId}:{context.ActivityId}";
+        string scriptId = $"{context.WorkflowExecutionContext.WorkflowBlueprint.VersionId}:{context.ActivityId}";
 
-        _logger.LogDebug($"Evaluate csharp code with id '{scriptId}' ");
+        _logger.LogDebug("Evaluate csharp code with id '{ScriptId}' ", scriptId);
 
-        CSharpScriptContext scriptContext = new CSharpScriptContext(expression, scriptEvaluationGlobal, scriptConfigure.Reference.Assemblies, scriptConfigure.Reference.Imports);
+        CSharpScriptContext scriptContext = new(expression, scriptEvaluationGlobal, scriptConfigure.Reference.Assemblies, scriptConfigure.Reference.Imports)
+        {
+            ScriptId = scriptId,
+        };
 
-        var resultValue = await _cSharpScriptHost.RunWithIdAsync(scriptId, scriptContext, (_) => { }, cancellationToken);
+        Stopwatch sw = Stopwatch.StartNew();
 
-        if (resultValue == null)
-            return null;
+        object resultValue = await _cSharpScriptHost.RunAsync(scriptContext, cancellationToken: cancellationToken);
 
-        return Convert.ChangeType(resultValue, returnType);
+        sw.Stop();
+
+        _logger.LogDebug("Evaluate csharp code with id '{ScriptId}' in {Elapsed} ", scriptId, sw.Elapsed);
+
+        return resultValue == null ? null : Convert.ChangeType(resultValue, returnType);
     }
 }

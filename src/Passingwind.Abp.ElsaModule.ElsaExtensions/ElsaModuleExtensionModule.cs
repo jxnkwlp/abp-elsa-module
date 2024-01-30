@@ -6,6 +6,7 @@ using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp.Expressions;
 using Passingwind.Abp.ElsaModule.Scripting.JavaScript;
 using Passingwind.Abp.ElsaModule.Services;
+using Passingwind.CSharpScriptEngine;
 using Volo.Abp.Emailing;
 using Volo.Abp.EventBus;
 using Volo.Abp.Modularity;
@@ -55,6 +56,8 @@ public class ElsaModuleExtensionModule : AbpModule
 
         // 
         context.Services.AddTransient<IWorkflowCSharpEditorService, WorkflowCSharpEditorService>();
+
+        context.Services.AddCSharpScriptEngine();
     }
 
     public override void PostConfigureServices(ServiceConfigurationContext context)

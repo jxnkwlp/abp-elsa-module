@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net6.0;net7.0;</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.8.0" />
+    <PackageReference Include="NuGet.Protocol" Version="6.8.0" />
+    <PackageReference Include="Basic.Reference.Assemblies" Version="1.4.5" />
+    <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.7.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == 'net8.0' ">
+    <PackageReference Include="Basic.Reference.Assemblies.Net80" Version="1.4.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == 'net7.0' ">
+    <PackageReference Include="Basic.Reference.Assemblies.Net70" Version="1.4.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == 'net6.0' ">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.1' ">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" /> 
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.Features" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.Features" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.EditorFeatures" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.Scripting" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.Scripting" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.Workspaces" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <InternalsAssemblyName Include="Microsoft.CodeAnalysis.LanguageServer.Protocol" />
+  </ItemGroup>
+</Project>

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
 
-namespace Passingwind.Abp.ElsaModule.CSharp;
+namespace Passingwind.CSharpScriptEngine;
 
 public class CSharpScriptEvaluationGlobal
 {
@@ -19,7 +19,7 @@ public class CSharpScriptEvaluationGlobal
     {
         private static readonly Dictionary<string, object> _member = new();
 
-        public override bool TrySetMember(SetMemberBinder binder, object value)
+        public override bool TrySetMember(SetMemberBinder binder, object? value)
         {
             _member[binder.Name.ToLowerInvariant()] = value;
             return true;

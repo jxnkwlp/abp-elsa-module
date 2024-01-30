@@ -261,3 +261,5 @@ paket-files/
 /app/src/Passingwind.WorkflowApp.Web/storage/*
 /app/src/Passingwind.WorkflowApp.HttpApi.Host/storage/*
 .nuget
+
+pack_out/

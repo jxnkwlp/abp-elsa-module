@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 
-namespace Passingwind.Abp.ElsaModule.CSharp;
+namespace Passingwind.CSharpScriptEngine;
 
 public class CSharpScriptContext
 {
-    public CSharpScriptContext(string sourceText, CSharpScriptEvaluationGlobal evaluationGlobal, List<Assembly> assemblies, List<string> imports)
+    public CSharpScriptContext(string sourceText, CSharpScriptEvaluationGlobal? evaluationGlobal = null, List<Assembly>? assemblies = null, List<string>? imports = null)
     {
         SourceText = sourceText;
-        EvaluationGlobal = evaluationGlobal;
-        Assemblies = assemblies;
-        Imports = imports;
+        EvaluationGlobal = evaluationGlobal ?? new CSharpScriptEvaluationGlobal();
+        Assemblies = assemblies ?? new List<Assembly>();
+        Imports = imports ?? new List<string>();
     }
 
+    public string? ScriptId { get; set; }
     public string SourceText { get; }
     public CSharpScriptEvaluationGlobal EvaluationGlobal { get; }
     public List<Assembly> Assemblies { get; }

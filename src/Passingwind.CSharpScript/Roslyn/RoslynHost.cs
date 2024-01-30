@@ -14,10 +14,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.Text;
-using Nito.AsyncEx;
-using Passingwind.Abp.ElsaModule.CSharp;
+using Microsoft.Extensions.Logging;
 
-namespace Passingwind.Abp.ElsaModule.Roslyn;
+namespace Passingwind.CSharpScriptEngine.Roslyn;
 
 public class RoslynHost : IDisposable, IRoslynHost
 {
@@ -49,43 +48,29 @@ public class RoslynHost : IDisposable, IRoslynHost
 
     public static ImmutableArray<string> DefaultSuppressedDiagnostics => ImmutableArray.Create("CS1701", "CS1702", "CS1705", "CS7011", "CS8097");
 
-    public static ImmutableArray<string> DefaultImports => ImmutableArray.Create(new[]{
-        "System",
-        "System.Threading",
-        "System.Threading.Tasks",
-        "System.Collections",
-        "System.Collections.Generic",
-        "System.Text",
-        "System.Text.RegularExpressions",
-        "System.Linq",
-        "System.IO",
-        "System.Reflection",
-    });
+    public static ImmutableArray<string> DefaultImports => CSharpScriptHost.DefaultImports;
 
-    public static ImmutableArray<MetadataReference> DefaultMetadataReferences => Basic.Reference.Assemblies.Net60.References.All.ToImmutableArray<MetadataReference>();
+    public static ImmutableArray<MetadataReference> DefaultReferences => CSharpScriptHost.DefaultRuntimeMetadataReference;
 
     #endregion static
 
-    private ParseOptions _parseOptions;
-    private CompositionHost _compositionHost;
-    private HostServices _hostServices;
-    private AdhocWorkspace _workspace;
+    private readonly ParseOptions _parseOptions;
+    private readonly CompositionHost _compositionHost;
+    private readonly HostServices _hostServices;
+    private readonly AdhocWorkspace _workspace;
 
     private readonly ConcurrentDictionary<string, Lazy<RoslynProject>> _projects = new ConcurrentDictionary<string, Lazy<RoslynProject>>();
     private readonly Dictionary<string, ReportDiagnostic> _specificDiagnosticOptions = new Dictionary<string, ReportDiagnostic>();
 
-    private readonly ICSharpPackageResolver _cSharpPackageResolver;
-    private readonly IServiceProvider _serviceProvider;
 
-    public RoslynHost(ICSharpPackageResolver cSharpPackageResolver, IServiceProvider serviceProvider)
-    {
-        _cSharpPackageResolver = cSharpPackageResolver;
-        _serviceProvider = serviceProvider;
-        Initial();
-    }
+    private readonly ILogger<RoslynHost> _logger;
+    private readonly IScriptReferenceResolver _scriptReferenceResolver;
 
-    public void Initial()
+    public RoslynHost(ILogger<RoslynHost> logger, IScriptReferenceResolver scriptReferenceResolver)
     {
+        _logger = logger;
+        _scriptReferenceResolver = scriptReferenceResolver;
+
         _parseOptions = GetParseOptions();
         var partTypes = GetCompositionTypes();
 
@@ -113,8 +98,8 @@ public class RoslynHost : IDisposable, IRoslynHost
         lock (projectId)
         {
             var doc = _workspace.AddDocument(DocumentInfo.Create(
-                   DocumentId.CreateNewId(projectId),
-                   name,
+                   id: DocumentId.CreateNewId(projectId),
+                   name: name,
                     sourceCodeKind: isScript ? SourceCodeKind.Script : SourceCodeKind.Regular,
                    loader: TextLoader.From(TextAndVersion.Create(SourceText.From(text, Encoding.UTF8), VersionStamp.Default)),
                    filePath: $"{name}.cs"));
@@ -209,13 +194,13 @@ public class RoslynHost : IDisposable, IRoslynHost
         }
     }
 
-    public RoslynProject GetOrCreateProject(string projectName, IEnumerable<Assembly> additionalAssemblies = null, IEnumerable<string> additionalImports = null)
+    public RoslynProject GetOrCreateProject(string projectName, IEnumerable<Assembly>? additionalAssemblies = null, IEnumerable<string>? additionalImports = null)
     {
         return _projects.GetOrAdd(projectName, (key) =>
         {
             return new Lazy<RoslynProject>(() =>
             {
-                var project = CreateProject(_workspace, projectName, additionalAssemblies, additionalImports);
+                var project = CreateProject(_workspace, projectName, additionalAssemblies!, additionalImports!);
 
                 return new RoslynProject(
                      key,
@@ -247,13 +232,25 @@ public class RoslynHost : IDisposable, IRoslynHost
         _workspace.Dispose();
     }
 
-    private readonly ConcurrentDictionary<string, Lazy<AsyncLock>> _projectAnalysisLock = new ConcurrentDictionary<string, Lazy<AsyncLock>>();
+    private readonly ConcurrentDictionary<string, bool> _projectAnalysisLock = new ConcurrentDictionary<string, bool>();
 
     public async Task AnalysisProjectAsync(string projectName, CancellationToken cancellationToken = default)
     {
-        var @lock = _projectAnalysisLock.GetOrAdd(projectName, () => new Lazy<AsyncLock>()).Value;
+        if (_projectAnalysisLock.TryGetValue(projectName, out var running) && running)
+        {
+            return;
+        }
 
-        using (await @lock.LockAsync(cancellationToken))
+        if (_projectAnalysisLock.ContainsKey(projectName))
+        {
+            _projectAnalysisLock.TryAdd(projectName, true);
+        }
+        else
+        {
+            _projectAnalysisLock.TryUpdate(projectName, true, false);
+        }
+
+        try
         {
             var roslynProject = GetRoslynProject(projectName);
             var project = _workspace.CurrentSolution.GetProject(roslynProject.Id);
@@ -267,18 +264,23 @@ public class RoslynHost : IDisposable, IRoslynHost
 
                 // resolve document references
                 var documentTxt = (await document.GetTextAsync(cancellationToken)).ToString();
-                var documentMetaReferences = new List<MetadataReference>();
-                var packageReferences = await _cSharpPackageResolver.ResolveAsync(documentTxt, cancellationToken);
-                foreach (var packageReference in packageReferences)
-                {
-                    documentMetaReferences.AddRange(await packageReference.GetReferencesAsync(_serviceProvider, cancellationToken));
-                }
+
+                var documentMetaReferences = await _scriptReferenceResolver.ResolveReferencesAsync(documentTxt, cancellationToken);
+
                 roslynProject.UpdateDocumentMetadataReferences(document.Name, documentMetaReferences);
             }
 
             var solution = _workspace.CurrentSolution.WithProjectMetadataReferences(roslynProject.Id, roslynProject.AllMetadataReferences);
 
             _workspace.TryApplyChanges(solution);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Analysis the project file failed.");
+        }
+        finally
+        {
+            _projectAnalysisLock.TryUpdate(projectName, false, true);
         }
     }
 
@@ -296,12 +298,9 @@ public class RoslynHost : IDisposable, IRoslynHost
 
             // resolve document references
             var documentTxt = (await document.GetTextAsync(cancellationToken)).ToString();
-            var documentMetaReferences = new List<MetadataReference>();
-            var packageReferences = await _cSharpPackageResolver.ResolveAsync(documentTxt, cancellationToken);
-            foreach (var packageReference in packageReferences)
-            {
-                documentMetaReferences.AddRange(await packageReference.GetReferencesAsync(_serviceProvider, cancellationToken));
-            }
+
+            var documentMetaReferences = await _scriptReferenceResolver.ResolveReferencesAsync(documentTxt, cancellationToken);
+
             roslynProject.UpdateDocumentMetadataReferences(document.Name, documentMetaReferences);
         }
 
@@ -365,19 +364,19 @@ public class RoslynHost : IDisposable, IRoslynHost
         return result.ToImmutableArray();
     }
 
-    protected IEnumerable<Type> GetCompositionTypes() => DefaultCompositionTypes;
+    protected static IEnumerable<Type> GetCompositionTypes() => DefaultCompositionTypes;
 
-    protected ParseOptions GetParseOptions() => DefaultParseOptions;
+    protected static ParseOptions GetParseOptions() => DefaultParseOptions;
 
     // protected IEnumerable<string> GetImports() => _defaultImports.Concat(_additionalImports ?? new string[0]);
 
-    protected Project CreateProject(AdhocWorkspace workspace, string projectName, IEnumerable<Assembly> _additionalAssemblies, IEnumerable<string> _additionalImports)
+    protected Project CreateProject(AdhocWorkspace workspace, string projectName, IEnumerable<Assembly> AdditionalAssemblies, IEnumerable<string> AdditionalImports)
     {
-        var references = DefaultMetadataReferences.ToList();
-        if (_additionalAssemblies != null)
-            references.AddRange(_additionalAssemblies.Select(x => MetadataReference.CreateFromFile(x.Location)));
+        var references = DefaultReferences.ToList();
+        if (AdditionalAssemblies != null)
+            references.AddRange(AdditionalAssemblies.Select(x => MetadataReference.CreateFromFile(x.Location)));
 
-        var compilationOptions = CreateCompilationOptions(_additionalImports);
+        var compilationOptions = CreateCompilationOptions(AdditionalImports);
 
         // var analyzerReferences = GetAnalyzerReferences(_compositionHost.GetExport<IAnalyzerAssemblyLoader>());
 
@@ -411,9 +410,9 @@ public class RoslynHost : IDisposable, IRoslynHost
         return project;
     }
 
-    protected CSharpCompilationOptions CreateCompilationOptions(IEnumerable<string> _additionalImports)
+    protected CSharpCompilationOptions CreateCompilationOptions(IEnumerable<string> AdditionalImports)
     {
-        var hostImports = DefaultImports.Concat(_additionalImports ?? new string[0]);
+        var hostImports = DefaultImports.Concat(AdditionalImports ?? Array.Empty<string>());
 
         return new CSharpCompilationOptions(
             OutputKind.DynamicallyLinkedLibrary,
@@ -424,7 +423,7 @@ public class RoslynHost : IDisposable, IRoslynHost
             generalDiagnosticOption: ReportDiagnostic.Warn,
             specificDiagnosticOptions: _specificDiagnosticOptions,
             concurrentBuild: false,
-            metadataReferenceResolver: CSharpScriptMetadataResolver.Instance,
+            metadataReferenceResolver: CSharpScriptMetadataReferenceResolver.Instance,
             nullableContextOptions: NullableContextOptions.Enable);
     }
 
