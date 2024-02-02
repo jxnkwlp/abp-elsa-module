@@ -84,7 +84,7 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
             "System.ValueTuple",
         }.ToImmutableArray();
 
-    private static readonly ConcurrentDictionary<string, CSharpScriptContextState> _scriptStateCache = new ConcurrentDictionary<string, CSharpScriptContextState>();
+    private static readonly ConcurrentDictionary<string, CSharpScriptContextState> ScriptStateCache = new ConcurrentDictionary<string, CSharpScriptContextState>();
 
     private readonly IScriptReferenceResolver _scriptReferenceResolver;
 
@@ -109,7 +109,7 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
             CSharpScriptContextState? currentState = null;
 
             bool changed = false;
-            if (_scriptStateCache.TryGetValue(scriptId, out var previousContext))
+            if (ScriptStateCache.TryGetValue(scriptId, out var previousContext))
             {
                 changed = context.IsChanged(previousContext.Context);
                 currentState = previousContext;
@@ -117,7 +117,7 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
 
             if (changed || currentState == null)
             {
-                var options = CreateOptions(context.Imports, context.Assemblies);
+                var options = CreateScriptOptions(context.Imports, context.Assemblies);
                 scriptOptions?.Invoke(options);
 
                 options = options.AddReferences(StandardMetadataReference);
@@ -127,14 +127,14 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
                     Script = await CreateScriptAsync(context.SourceText, options, context.EvaluationGlobal.GetType(), cancellationToken)
                 };
 
-                _scriptStateCache[scriptId] = currentState;
+                ScriptStateCache[scriptId] = currentState;
             }
 
             script = currentState.Script;
         }
         else
         {
-            var options = CreateOptions(context.Imports, context.Assemblies);
+            var options = CreateScriptOptions(context.Imports, context.Assemblies);
             scriptOptions?.Invoke(options);
 
             options = options.AddReferences(StandardMetadataReference);
@@ -160,7 +160,7 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
 
     public async Task<EmitResult?> CompileAsync(CSharpScriptCompileContext context, CancellationToken cancellationToken = default)
     {
-        var scriptOptions = CreateOptions(context.Imports, context.Assemblies);
+        var scriptOptions = CreateScriptOptions(context.Imports, context.Assemblies);
         var parseOptions = CreateParseOptions();
 
         scriptOptions = scriptOptions.AddReferences(StandardPortableReference);
@@ -168,10 +168,7 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
         var syntaxTree = SyntaxFactory.ParseSyntaxTree(context.SourceText, options: parseOptions, encoding: Encoding.UTF8, cancellationToken: cancellationToken);
 
         // remove reference directive
-        var syntaxRoot = syntaxTree.GetRoot(cancellationToken);
-        var nodeRemove = syntaxTree.GetCompilationUnitRoot(cancellationToken: cancellationToken).GetReferenceDirectives();
-        syntaxRoot = syntaxRoot.RemoveNodes(nodeRemove, SyntaxRemoveOptions.KeepExteriorTrivia);
-        syntaxTree = syntaxTree.WithRootAndOptions(syntaxRoot!, parseOptions);
+        syntaxTree = syntaxTree.RemoveReferenceDirectives(parseOptions, cancellationToken: cancellationToken);
 
         var name = Guid.NewGuid().ToString("N");
         var rootFolder = Path.Combine(Path.GetTempPath(), "workflow", "csharp", name);
@@ -201,14 +198,7 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
         await using var peStream = File.OpenWrite($"{file}.dll");
         await using var pdbStream = File.OpenWrite($"{file}.pdb");
 
-        var emitResult = compilation.Emit(peStream, pdbStream, options: new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb), cancellationToken: cancellationToken);
-
-        if (emitResult != null && emitResult?.Success != true)
-        {
-            throw new AggregateException(emitResult!.Diagnostics.Select(x => new Exception(x.ToString())));
-        }
-
-        return emitResult;
+        return compilation.Emit(peStream, pdbStream, options: new EmitOptions(debugInformationFormat: DebugInformationFormat.PortablePdb), cancellationToken: cancellationToken);
     }
 
     private async Task<Script<object>> CreateScriptAsync(string code, ScriptOptions options, Type globalType, CancellationToken cancellationToken = default)
@@ -222,12 +212,12 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
         return CSharpScript.Create(code, options: options, globalsType: globalType, assemblyLoader: loader);
     }
 
-    private static ScriptOptions CreateOptions(IEnumerable<string> imports, IEnumerable<Assembly> assemblies)
+    public static ScriptOptions CreateScriptOptions(IEnumerable<string>? imports = null, IEnumerable<Assembly>? assemblies = null)
     {
         var parseOptions = CreateParseOptions();
 
         var options = ScriptOptions.Default
-            .AddReferences(DefaultRuntimeMetadataReference)
+            .WithReferences(DefaultRuntimeMetadataReference)
             .AddImports(DefaultImports)
             .WithMetadataResolver(CSharpScriptMetadataReferenceResolver.Instance)
             .WithSourceResolver(SourceFileResolver.Default)
@@ -254,7 +244,7 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
         return options;
     }
 
-    private static ParseOptions CreateParseOptions()
+    public static ParseOptions CreateParseOptions()
     {
         return DefaultParseOptions;
     }
@@ -271,6 +261,6 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
 
     public void Dispose()
     {
-        _scriptStateCache.Clear();
+        ScriptStateCache.Clear();
     }
 }

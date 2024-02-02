@@ -1,80 +1,90 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Elsa.Models;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Completion;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Shared.Extensions;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp;
-using Passingwind.CSharpScriptEngine.Roslyn;
+using Passingwind.CSharpScriptEngine;
 
 namespace Passingwind.Abp.ElsaModule.Services;
 
 public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
 {
-    private const string _generatedTypeClassName = "GeneratedTypes";
+    private const string GeneratedTypeClassName = "GeneratedTypes";
 
     private readonly ILogger<WorkflowCSharpEditorService> _logger;
-    private readonly IRoslynHost _roslynHost;
     private readonly ICSharpTypeDefinitionService _cSharpTypeDefinitionService;
+    private readonly ICSharpScriptWorkspace _cSharpScriptWorkspace;
 
-    public WorkflowCSharpEditorService(ILogger<WorkflowCSharpEditorService> logger, IRoslynHost roslynHost, ICSharpTypeDefinitionService cSharpTypeDefinitionService)
+    public WorkflowCSharpEditorService(ILogger<WorkflowCSharpEditorService> logger, ICSharpTypeDefinitionService cSharpTypeDefinitionService, ICSharpScriptWorkspace cSharpScriptWorkspace)
     {
         _logger = logger;
-        _roslynHost = roslynHost;
         _cSharpTypeDefinitionService = cSharpTypeDefinitionService;
+        _cSharpScriptWorkspace = cSharpScriptWorkspace;
     }
 
     public async Task<WorkflowCSharpEditorCodeAnalysisResult> GetCodeAnalysisAsync(WorkflowDefinition workflowDefinition, string textId, string text, CancellationToken cancellationToken = default)
     {
         var generated = await _cSharpTypeDefinitionService.GenerateAsync(workflowDefinition, cancellationToken);
 
-        // one workflow to on adhoc project
-        var project = _roslynHost.GetOrCreateProject(workflowDefinition.DefinitionId.Replace("-", null), generated.Assemblies, generated.Imports);
+        var projectName = workflowDefinition.DefinitionId.Replace("-", null);
 
-        _roslynHost.CreateOrUpdateDocument(project.Name, _generatedTypeClassName, generated.Text);
-        _roslynHost.CreateOrUpdateDocument(project.Name, textId, text, true);
+        var project = _cSharpScriptWorkspace.GetOrCreateProject(projectName);
 
-        var diagnostics = await _roslynHost.GetDocumentDiagnosticsAsync(project.Name, textId, cancellationToken);
+        project.CreateOrUpdateDocument(GeneratedTypeClassName, generated.Text);
+
+        project.CreateOrUpdateDocument(textId, text);
+
+        var tmpFile = Path.GetTempFileName();
+
+        var compilation = await _cSharpScriptWorkspace.CreateCompilationAsync(project, cancellationToken);
+
+        var emitResult = compilation.Emit(tmpFile, cancellationToken: cancellationToken);
 
         var result = new List<WorkflowCSharpEditorCodeAnalysis>();
 
-        foreach (var diagnostic in diagnostics)
+        if (emitResult?.Success == false)
         {
-            var severity = MapDiagnosticSeverity(diagnostic);
-
-            var msg = new WorkflowCSharpEditorCodeAnalysis()
+            foreach (var diagnostic in emitResult.Diagnostics)
             {
-                Id = diagnostic.Id,
-                Message = diagnostic.GetMessage(),
-                OffsetFrom = diagnostic.Location.SourceSpan.Start,
-                OffsetTo = diagnostic.Location.SourceSpan.End,
-                Severity = severity,
-                SeverityNumeric = (int)severity,
-            };
-            result.Add(msg);
+                var severity = MapDiagnosticSeverity(diagnostic);
+
+                var msg = new WorkflowCSharpEditorCodeAnalysis()
+                {
+                    Id = diagnostic.Id,
+                    Message = diagnostic.GetMessage(),
+                    OffsetFrom = diagnostic.Location.SourceSpan.Start,
+                    OffsetTo = diagnostic.Location.SourceSpan.End,
+                    Severity = severity,
+                    SeverityNumeric = (int)severity,
+                };
+                result.Add(msg);
+            }
         }
+
         return new WorkflowCSharpEditorCodeAnalysisResult() { Items = result };
     }
 
     public async Task<WorkflowCSharpEditorFormatterResult> CodeFormatterAsync(string textId, string text, CancellationToken cancellationToken = default)
     {
-        var project = _roslynHost.GetOrCreateProject(Guid.NewGuid().ToString());
-        var documentId = _roslynHost.CreateOrUpdateDocument(project.Name, textId, text, true);
-        var document = _roslynHost.GetDocument(project.Name, documentId);
+        var project = ProjectInfo.Create(ProjectId.CreateNewId(), VersionStamp.Create(), "tmp", "tmp", LanguageNames.CSharp);
+        var documentInfo = DocumentInfo.Create(DocumentId.CreateNewId(project.Id), "tmp");
+
+        using AdhocWorkspace workspce = new AdhocWorkspace();
+        var document = workspce.AddDocument(documentInfo);
 
         var formattedDocument = await Formatter.FormatAsync(document, cancellationToken: cancellationToken);
         var sourceText = await formattedDocument.GetTextAsync(cancellationToken);
-
-        _roslynHost.DeleteProject(project.Name);
 
         return new WorkflowCSharpEditorFormatterResult
         {
@@ -86,72 +96,38 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
     {
         var generated = await _cSharpTypeDefinitionService.GenerateAsync(workflowDefinition, cancellationToken);
 
-        var project = _roslynHost.GetOrCreateProject(workflowDefinition.DefinitionId.Replace("-", null), generated.Assemblies, generated.Imports);
+        var projectName = workflowDefinition.DefinitionId.Replace("-", null);
 
-        _ = _roslynHost.CreateOrUpdateDocument(project.Name, _generatedTypeClassName, generated.Text);
-        var documentId = _roslynHost.CreateOrUpdateDocument(project.Name, textId, text, true);
+        var project = _cSharpScriptWorkspace.GetOrCreateProject(projectName);
 
-        await _roslynHost.AnalysisProjectAsync(project.Name, cancellationToken);
+        project.CreateOrUpdateDocument(GeneratedTypeClassName, generated.Text);
 
-        var document = _roslynHost.GetDocument(project.Name, documentId);
+        var document = project.CreateOrUpdateDocument(textId, text);
 
-        var completionService = CompletionService.GetService(document);
-        //var helper = Microsoft.CodeAnalysis.Completion.CompletionHelper.GetHelper(document);
+        var completionItems = await project.GetCompletionsAsync(document, position);
 
-        if (completionService == null)
+        var result = new List<WorkflowCSharpEditorCompletionItem>();
+
+        foreach (var item in completionItems)
         {
-            return new WorkflowCSharpEditorCompletionResult();
-        }
-
-        var sourceText = await document.GetTextAsync(cancellationToken);
-
-        //CompletionTrigger completionTrigger = CompletionTrigger.Invoke;
-        //var triggerText = sourceText.GetSubText(position <= 0 ? 0 : position - 1)?.ToString();
-        //if (triggerText.Length > 0)
-        //{
-        //    if (triggerText[0] != '.')
-        //        completionTrigger = CompletionTrigger.CreateInsertionTrigger(triggerText[0]);
-        //}
-
-        var completionResult = await completionService.GetCompletionsAsync(document, position, cancellationToken: cancellationToken);
-
-        var results = new List<WorkflowCSharpEditorCompletionItem>();
-
-        if (completionResult.ItemsList.Count > 0)
-        {
-            var textSpanToTextCache = new Dictionary<TextSpan, string>();
-
-            //.Where(x =>
-            //{
-            //    if (!textSpanToTextCache.TryGetValue(x.Span, out var spanTxt))
-            //    {
-            //        spanTxt = textSpanToTextCache[x.Span] = sourceText.GetSubText(x.Span).ToString();
-            //    }
-
-            //    return helper.MatchesPattern(x, spanTxt, CultureInfo.InvariantCulture);
-            //});
-
-            foreach (var item in (IReadOnlyList<CompletionItem>)completionResult.ItemsList)
+            SymbolKind symbolKind = SymbolKind.Local;
+            if (item.Properties.TryGetValue(nameof(SymbolKind), out var kindValue))
             {
-                SymbolKind symbolKind = SymbolKind.Local;
-                if (item.Properties.TryGetValue(nameof(SymbolKind), out var kindValue))
-                {
-                    symbolKind = Enum.Parse<SymbolKind>(kindValue);
-                }
-
-                var completionDescription = await completionService.GetDescriptionAsync(document, item, cancellationToken);
-
-                results.Add(new WorkflowCSharpEditorCompletionItem
-                {
-                    Description = completionDescription.Text,
-                    Suggestion = item.DisplayText,
-                    SymbolKind = symbolKind.ToString(),
-                    ItemKind = MapKind(symbolKind),
-                });
+                symbolKind = Enum.Parse<SymbolKind>(kindValue);
             }
+
+            // var completionDescription = await CompletionService.GetDescriptionAsync(document, item, cancellationToken);
+
+            result.Add(new WorkflowCSharpEditorCompletionItem
+            {
+                // Description = completionDescription.Text,
+                Suggestion = item.DisplayText,
+                SymbolKind = symbolKind.ToString(),
+                ItemKind = MapKind(symbolKind),
+            });
         }
 
-        return new WorkflowCSharpEditorCompletionResult(results);
+        return new WorkflowCSharpEditorCompletionResult(result);
 
         WorkflowCSharpEditorCompletionItemKind MapKind(SymbolKind symbolKind)
         {
@@ -182,16 +158,18 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
     {
         var generated = await _cSharpTypeDefinitionService.GenerateAsync(workflowDefinition, cancellationToken);
 
-        var project = _roslynHost.GetOrCreateProject(workflowDefinition.DefinitionId.Replace("-", null), generated.Assemblies, generated.Imports);
+        var projectName = workflowDefinition.DefinitionId.Replace("-", null);
 
-        _ = _roslynHost.CreateOrUpdateDocument(project.Name, _generatedTypeClassName, generated.Text);
-        var documentId = _roslynHost.CreateOrUpdateDocument(project.Name, textId, text, true);
+        var project = _cSharpScriptWorkspace.GetOrCreateProject(projectName);
 
-        var document = _roslynHost.GetDocument(project.Name, documentId);
+        project.CreateOrUpdateDocument(GeneratedTypeClassName, generated.Text);
 
-        var compilation = await _roslynHost.GetCompilationAsync(project.Name, cancellationToken);
+        var document = project.CreateOrUpdateDocument(textId, text);
+
+        var compilation = await _cSharpScriptWorkspace.CreateCompilationAsync(project, cancellationToken);
 
         var syntaxTree = await document.GetSyntaxTreeAsync(cancellationToken);
+
         var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
         var syntaxRoot = await document.GetSyntaxRootAsync(cancellationToken);
@@ -273,14 +251,15 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
     {
         var generated = await _cSharpTypeDefinitionService.GenerateAsync(workflowDefinition, cancellationToken);
 
-        var project = _roslynHost.GetOrCreateProject(workflowDefinition.DefinitionId.Replace("-", null), generated.Assemblies, generated.Imports);
+        var projectName = workflowDefinition.DefinitionId.Replace("-", null);
 
-        _ = _roslynHost.CreateOrUpdateDocument(project.Name, _generatedTypeClassName, generated.Text);
-        var documentId = _roslynHost.CreateOrUpdateDocument(project.Name, textId, text, true);
+        var project = _cSharpScriptWorkspace.GetOrCreateProject(projectName);
 
-        var document = _roslynHost.GetDocument(project.Name, documentId);
+        project.CreateOrUpdateDocument(GeneratedTypeClassName, generated.Text);
 
-        var compilation = await _roslynHost.GetCompilationAsync(project.Name, cancellationToken);
+        var document = project.CreateOrUpdateDocument(textId, text);
+
+        var compilation = await _cSharpScriptWorkspace.CreateCompilationAsync(project, cancellationToken);
 
         var syntaxTree = await document.GetSyntaxTreeAsync(cancellationToken);
         var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
