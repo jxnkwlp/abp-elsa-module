@@ -36,7 +36,7 @@ public class CSharpService : ICSharpService
         CSharpScriptConfigureNotification scriptConfigure = new(expression);
         await _mediator.Publish(scriptConfigure, cancellationToken);
 
-        string scriptId = $"{context.WorkflowExecutionContext.WorkflowBlueprint.VersionId}:{context.ActivityId}";
+        string scriptId = $"{context.WorkflowExecutionContext.WorkflowBlueprint.VersionId}_{context.ActivityId}".Replace("-", null);
 
         _logger.LogDebug("Evaluate csharp code with id '{ScriptId}' ", scriptId);
 
@@ -47,7 +47,7 @@ public class CSharpService : ICSharpService
 
         Stopwatch sw = Stopwatch.StartNew();
 
-        object resultValue = await _cSharpScriptHost.RunAsync(scriptContext, cancellationToken: cancellationToken);
+        var resultValue = await _cSharpScriptHost.RunAsync(scriptContext, cancellationToken: cancellationToken);
 
         sw.Stop();
 

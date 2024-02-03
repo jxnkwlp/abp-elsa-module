@@ -19,8 +19,10 @@ public static class ServiceCollectionExtensions
 
         services.TryAddSingleton<ICSharpScriptWorkspace, CSharpScriptWorkspace>();
 
+        services.TryAddSingleton<NuGet.Common.ILogger, NuGetLogger>();
         services.TryAddSingleton<NuGetLogger>();
-        services.TryAddSingleton<INuGetPackageService, NuGetPackageService>();
+        services.TryAddSingleton<INuGetPackageService, DefaultNuGetPackageService>();
+        services.TryAddSingleton<INuGetLocalPackageAssemblyResolver, DefaultNuGetLocalPackageAssemblyResolver>();
 
         return services;
     }

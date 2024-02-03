@@ -31,7 +31,10 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
     public static ParseOptions DefaultParseOptions => CSharpParseOptions
         .Default
         .WithPreprocessorSymbols(PreprocessorSymbols)
-        .WithKind(SourceCodeKind.Script);
+        .WithDocumentationMode(DocumentationMode.Parse)
+        .WithLanguageVersion(LanguageVersion.Latest)
+        .WithKind(SourceCodeKind.Script)
+        .CommonWithKind(SourceCodeKind.Script);
 
 #if NET8_0
     public static ImmutableArray<MetadataReference> StandardMetadataReference = ImmutableArray.CreateRange(Basic.Reference.Assemblies.Net80.References.All.Select(GetMetadataReference));
@@ -66,22 +69,15 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
             "System.Collections",
             "System.Collections.Concurrent",
             "System.Collections.Generic",
-            "System.Console",
             "System.Dynamic",
             "System.Globalization",
             "System.IO",
             "System.Linq",
             "System.Reflection",
             "System.Text",
-            "System.Text",
-            "System.Text.Encoding",
-            "System.Text.RegularExpressions",
             "System.Text.RegularExpressions",
             "System.Threading",
-            "System.Threading.Tasks",
-            "System.Threading.Tasks.Parallel",
-            "System.Threading.Thread",
-            "System.ValueTuple",
+            "System.Threading.Tasks"
         }.ToImmutableArray();
 
     private static readonly ConcurrentDictionary<string, CSharpScriptContextState> ScriptStateCache = new ConcurrentDictionary<string, CSharpScriptContextState>();

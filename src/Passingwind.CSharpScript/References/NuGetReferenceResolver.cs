@@ -23,16 +23,14 @@ public class NuGetReferenceResolver : IScriptDirectiveReferenceResolver<NuGetDir
             throw new ArgumentNullException(nameof(reference));
         }
 
-        // TODO
         var files = await _nuGetPackageService.GetReferencesAsync(
             packageId: reference.PackageId,
             version: reference.Version,
-            tagetFrameworkName: CSharpEnvironment.GetCurrentShortTargetFramework(),
+            targetFramework: AppContext.TargetFrameworkName!,
             resolveDependency: true,
-            downloadPackage: false,
             cancellationToken: cancellationToken);
 
-        if (files?.Any() == true)
+        if (files.Any())
         {
             return files.Select(x => MetadataReference.CreateFromFile(x)).ToImmutableArray<MetadataReference>();
         }

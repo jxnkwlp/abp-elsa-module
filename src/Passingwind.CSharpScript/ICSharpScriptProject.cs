@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
@@ -11,17 +12,17 @@ public interface ICSharpScriptProject
     string Id { get; }
     string Name { get; }
 
-    Project Project { get; }
+    ProjectId ProjectId { get; }
 
-    void Refresh();
+    void ReloadProject();
 
     Document CreateOrUpdateDocument(string fileName, string sourceText);
 
-    Task<IReadOnlyList<CompletionItem>> GetCompletionsAsync(Document document, int position);
-
-    void AddReferences(IEnumerable<Assembly> assemblies);
-    void AddImports(IEnumerable<string> usings);
+    ICSharpScriptProject AddReferences(IEnumerable<Assembly> assemblies);
+    ICSharpScriptProject AddImports(IEnumerable<string> usings);
 
     IReadOnlyList<string> GetImports();
     IReadOnlyList<Assembly> GetReferences();
+
+    Task SaveAsync();
 }

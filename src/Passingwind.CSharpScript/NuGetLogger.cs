@@ -6,11 +6,11 @@ namespace Passingwind.CSharpScriptEngine;
 
 public class NuGetLogger : LoggerBase
 {
-    private readonly ILogger<NuGetLogger> _logger;
+    private readonly Microsoft.Extensions.Logging.ILogger _logger;
 
-    public NuGetLogger(ILogger<NuGetLogger> logger)
+    public NuGetLogger(ILoggerFactory loggerFactory)
     {
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger("NuGet");
     }
 
     public override void Log(ILogMessage message)

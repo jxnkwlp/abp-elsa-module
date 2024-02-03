@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Completion;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Passingwind.CSharpScriptEngine;
@@ -16,24 +14,25 @@ public class CSharpScriptProject : ICSharpScriptProject
     private readonly List<Assembly> _references = new List<Assembly>();
     private readonly List<string> _imports = new List<string>();
 
+    private Project _project = null!;
+
     public string Id { get; }
     public string Name { get; }
-
-    public Project Project { get; private set; }
-
+    public ProjectId ProjectId { get; }
     protected AdhocWorkspace Workspace { get; }
 
-    public CSharpScriptProject(AdhocWorkspace workspace, Project project)
+    public CSharpScriptProject(AdhocWorkspace workspace, ProjectId projectId, string projectName)
     {
-        Id = project.Id.Id.ToString();
-        Name = project.Name;
+        Id = projectId.Id.ToString();
+        Name = projectName;
         Workspace = workspace;
-        Project = project;
+        ProjectId = projectId;
+        ReloadProject();
     }
 
-    public void Refresh()
+    public void ReloadProject()
     {
-        Project = Workspace.CurrentSolution.GetProject(Project.Id)!;
+        _project = Workspace.CurrentSolution.GetProject(ProjectId)!;
     }
 
     public IReadOnlyList<string> GetImports()
@@ -46,14 +45,20 @@ public class CSharpScriptProject : ICSharpScriptProject
         return _references;
     }
 
-    public void AddReferences(IEnumerable<Assembly> assemblies)
+    public ICSharpScriptProject AddReferences(IEnumerable<Assembly> assemblies)
     {
         _references.AddRange(assemblies);
+
+        _project = _project.AddMetadataReferences(assemblies.Select(x => MetadataReference.CreateFromFile(x.Location)));
+
+        return this;
     }
 
-    public void AddImports(IEnumerable<string> usings)
+    public ICSharpScriptProject AddImports(IEnumerable<string> usings)
     {
         _imports.AddRange(usings);
+
+        return this;
     }
 
     public Document CreateOrUpdateDocument(string fileName, string sourceText)
@@ -62,62 +67,44 @@ public class CSharpScriptProject : ICSharpScriptProject
         {
             var name = Path.GetFileNameWithoutExtension(fileName);
 
-            var document = Project.Documents.FirstOrDefault(x => x.Name == name);
+            var document = _project.Documents.FirstOrDefault(x => x.Name == name);
 
             if (document != null)
             {
-                var solution = Workspace.CurrentSolution.WithDocumentText(document.Id, SourceText.From(sourceText, Encoding.UTF8));
-                // Workspace.TryApplyChanges(solution);
-            }
-            else
-            {
-                document = Workspace.AddDocument(Project.Id, name, SourceText.From(sourceText));
-                Workspace.TryApplyChanges(Project.Solution);
+                _ = Workspace.CurrentSolution.RemoveDocument(document.Id);
             }
 
-            Refresh();
+            document = Workspace.AddDocument(_project.Id, name, SourceText.From(sourceText, Encoding.UTF8));
+
+            Workspace.TryApplyChanges(Workspace.CurrentSolution);
+
+            ReloadProject();
 
             return document;
         }
     }
 
-    public async Task<IReadOnlyList<CompletionItem>> GetCompletionsAsync(Document document, int position)
+    public async Task SaveAsync()
     {
-        var completionService = CompletionService.GetService(document);
+        var root = _project.FilePath;
 
-        if (completionService == null)
+        if (string.IsNullOrWhiteSpace(root))
         {
-            return new List<CompletionItem>();
+            return;
         }
 
-        var completionResult = await completionService.GetCompletionsAsync(document, position, CompletionTrigger.Invoke);
-
-        var text = await document.GetTextAsync();
-
-        var textSpanToText = new Dictionary<TextSpan, string>();
-
-        return completionResult.ItemsList.Where(item => MatchesFilterText(completionService, document, item, text, textSpanToText)).ToList();
-    }
-
-    private static bool MatchesFilterText(CompletionService completionService, Document document, CompletionItem item, SourceText text, Dictionary<TextSpan, string> textSpanToText)
-    {
-        var filterText = GetFilterText(item, text, textSpanToText);
-        if (string.IsNullOrEmpty(filterText))
+        if (!Directory.Exists(root))
         {
-            return true;
+            Directory.CreateDirectory(root);
         }
 
-        return completionService.FilterItems(document, ImmutableArray.Create(item), filterText).Length > 0;
-    }
-
-    private static string GetFilterText(CompletionItem item, SourceText text, Dictionary<TextSpan, string> textSpanToText)
-    {
-        var textSpan = item.Span;
-        if (!textSpanToText.TryGetValue(textSpan, out var filterText))
+        foreach (var document in _project.Documents)
         {
-            filterText = text.GetSubText(textSpan).ToString();
-            textSpanToText[textSpan] = filterText;
+            var file = Path.Combine(root, document.FilePath ?? document.Name + ".cs");
+            var text = await document.GetTextAsync();
+            await File.WriteAllTextAsync(file, text?.ToString());
         }
-        return filterText;
+        // TODO
+        // project file ?
     }
 }

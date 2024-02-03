@@ -4,12 +4,11 @@ namespace Passingwind.CSharpScriptEngine;
 
 public class CSharpScriptContextState
 {
-    public CSharpScriptContext Context { get; }
+    public CSharpScriptContext Context { get; } = null!;
+    public Script Script { get; set; } = null!;
 
     public CSharpScriptContextState(CSharpScriptContext context)
     {
         Context = context;
     }
-
-    public Script Script { get; set; }
 }

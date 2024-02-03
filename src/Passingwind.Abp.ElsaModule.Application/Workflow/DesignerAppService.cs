@@ -11,6 +11,7 @@ using Elsa.Scripting.JavaScript.Services;
 using Elsa.Services;
 using Elsa.Services.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.Common;
 using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Permissions;
@@ -128,12 +129,20 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 
         var workflowDefinition = _storeMapper.MapToModel(version, definition);
 
-        var result = await _workflowCSharpEditorService.GetCompletionAsync(workflowDefinition, input.Id, input.Text, input.Position);
-
-        return new WorkflowDesignerCSharpLanguageCompletionProviderResultDto
+        try
         {
-            Items = result?.Items ?? new List<WorkflowCSharpEditorCompletionItem>(),
-        };
+            var result = await _workflowCSharpEditorService.GetCompletionAsync(workflowDefinition, input.Id, input.Text, input.Position);
+
+            return new WorkflowDesignerCSharpLanguageCompletionProviderResultDto
+            {
+                Items = result?.Items ?? new List<WorkflowCSharpEditorCompletionItem>(),
+            };
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Get csharp language completions failed.");
+            return new WorkflowDesignerCSharpLanguageCompletionProviderResultDto();
+        }
     }
 
     public async Task<WorkflowDesignerCSharpLanguageHoverProviderResultDto> CSharpLanguageHoverProviderAsync(Guid id, WorkflowDesignerCSharpLanguageHoverProviderRequestDto input)
@@ -143,17 +152,27 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 
         var workflowDefinition = _storeMapper.MapToModel(version, definition);
 
-        var result = await _workflowCSharpEditorService.GetHoverInfoAsync(workflowDefinition, input.Id, input.Text, input.Position);
-
-        if (result == null)
-            return null;
-
-        return new WorkflowDesignerCSharpLanguageHoverProviderResultDto
+        try
         {
-            Information = result.Information,
-            OffsetFrom = result.OffsetFrom,
-            OffsetTo = result.OffsetTo,
-        };
+            var result = await _workflowCSharpEditorService.GetHoverInfoAsync(workflowDefinition, input.Id, input.Text, input.Position);
+
+            if (result == null)
+            {
+                return null;
+            }
+
+            return new WorkflowDesignerCSharpLanguageHoverProviderResultDto
+            {
+                Information = result.Information,
+                OffsetFrom = result.OffsetFrom,
+                OffsetTo = result.OffsetTo,
+            };
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Get csharp language hover info failed.");
+            return null;
+        }
     }
 
     public async Task<WorkflowDesignerCSharpLanguageSignatureProviderResultDto> CSharpLanguageSignatureProviderAsync(Guid id, WorkflowDesignerCSharpLanguageSignatureProviderRequestDto input)
@@ -163,17 +182,25 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 
         var workflowDefinition = _storeMapper.MapToModel(version, definition);
 
-        var result = await _workflowCSharpEditorService.GetSignaturesAsync(workflowDefinition, input.Id, input.Text, input.Position);
-
-        if (result == null)
-            return null;
-
-        return new WorkflowDesignerCSharpLanguageSignatureProviderResultDto
+        try
         {
-            Signatures = result.Signatures,
-            ActiveParameter = result.ActiveParameter,
-            ActiveSignature = result.ActiveSignature,
-        };
+            var result = await _workflowCSharpEditorService.GetSignaturesAsync(workflowDefinition, input.Id, input.Text, input.Position);
+
+            if (result == null)
+                return null;
+
+            return new WorkflowDesignerCSharpLanguageSignatureProviderResultDto
+            {
+                Signatures = result.Signatures,
+                ActiveParameter = result.ActiveParameter,
+                ActiveSignature = result.ActiveSignature,
+            };
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Get csharp language signature failed.");
+            return null;
+        }
     }
 
     public async Task<WorkflowDesignerCSharpLanguageAnalysisResultDto> CSharpLanguageCodeAnalysisAsync(Guid id, WorkflowDesignerCSharpLanguageAnalysisRequestDto input)
@@ -183,12 +210,20 @@ public class DesignerAppService : ElsaModuleAppService, IDesignerAppService
 
         var workflowDefinition = _storeMapper.MapToModel(version, definition);
 
-        var result = await _workflowCSharpEditorService.GetCodeAnalysisAsync(workflowDefinition, input.Id, input.Text);
-
-        return new WorkflowDesignerCSharpLanguageAnalysisResultDto
+        try
         {
-            Items = result?.Items ?? new List<WorkflowCSharpEditorCodeAnalysis>(),
-        };
+            var result = await _workflowCSharpEditorService.GetCodeAnalysisAsync(workflowDefinition, input.Id, input.Text);
+
+            return new WorkflowDesignerCSharpLanguageAnalysisResultDto
+            {
+                Items = result?.Items ?? new List<WorkflowCSharpEditorCodeAnalysis>(),
+            };
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Get csharp language analysis failed.");
+            return new WorkflowDesignerCSharpLanguageAnalysisResultDto();
+        }
     }
 
     public async Task<WorkflowDesignerCSharpLanguageFormatterResult> CSharpLanguageCodeFormatterAsync(WorkflowDesignerCSharpLanguageFormatterRequestDto input)
