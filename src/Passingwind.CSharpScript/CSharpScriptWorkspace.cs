@@ -177,7 +177,7 @@ public class CSharpScriptWorkspace : ICSharpScriptWorkspace, IDisposable
             // generalDiagnosticOption: ReportDiagnostic.Default,
             specificDiagnosticOptions: _specificDiagnosticOptions,
             concurrentBuild: false,
-            metadataReferenceResolver: CSharpScriptMetadataReferenceResolver.Instance,
+            metadataReferenceResolver: NuGetMetadataReferenceResolver.Instance,
             nullableContextOptions: NullableContextOptions.Enable);
     }
 

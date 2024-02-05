@@ -13,6 +13,7 @@ using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Shared.Extensions;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp;
 using Passingwind.CSharpScriptEngine;
@@ -26,12 +27,14 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
     private readonly ILogger<WorkflowCSharpEditorService> _logger;
     private readonly ICSharpTypeDefinitionService _cSharpTypeDefinitionService;
     private readonly ICSharpScriptWorkspace _cSharpScriptWorkspace;
+    private readonly CSharpEditorOptions _cSharpEditorOptions;
 
-    public WorkflowCSharpEditorService(ILogger<WorkflowCSharpEditorService> logger, ICSharpTypeDefinitionService cSharpTypeDefinitionService, ICSharpScriptWorkspace cSharpScriptWorkspace)
+    public WorkflowCSharpEditorService(ILogger<WorkflowCSharpEditorService> logger, ICSharpTypeDefinitionService cSharpTypeDefinitionService, ICSharpScriptWorkspace cSharpScriptWorkspace, IOptions<CSharpEditorOptions> cSharpEditorOptions)
     {
         _logger = logger;
         _cSharpTypeDefinitionService = cSharpTypeDefinitionService;
         _cSharpScriptWorkspace = cSharpScriptWorkspace;
+        _cSharpEditorOptions = cSharpEditorOptions.Value;
     }
 
     protected async Task<ICSharpScriptProject> GetProjectAsync(WorkflowDefinition workflowDefinition, CancellationToken cancellationToken = default)
@@ -53,6 +56,11 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
 
     public async Task<WorkflowCSharpEditorCodeAnalysisResult> GetCodeAnalysisAsync(WorkflowDefinition workflowDefinition, string textId, string text, CancellationToken cancellationToken = default)
     {
+        if (!_cSharpEditorOptions.EnableCodeAnalysis)
+        {
+            return new WorkflowCSharpEditorCodeAnalysisResult();
+        }
+
         var project = await GetProjectAsync(workflowDefinition, cancellationToken);
 
         project.CreateOrUpdateDocument(textId, text);
@@ -114,6 +122,11 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
 
     public async Task<WorkflowCSharpEditorCompletionResult> GetCompletionAsync(WorkflowDefinition workflowDefinition, string textId, string text, int position, CancellationToken cancellationToken = default)
     {
+        if (!_cSharpEditorOptions.EnableCompletion)
+        {
+            return new WorkflowCSharpEditorCompletionResult();
+        }
+
         var project = await GetProjectAsync(workflowDefinition, cancellationToken);
 
         if (position > text.Length)
@@ -170,6 +183,11 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
 
     public async Task<WorkflowCSharpEditorHoverInfoResult> GetHoverInfoAsync(WorkflowDefinition workflowDefinition, string textId, string text, int position, CancellationToken cancellationToken = default)
     {
+        if (!_cSharpEditorOptions.EnableHoverInfo)
+        {
+            return null;
+        }
+
         var project = await GetProjectAsync(workflowDefinition, cancellationToken);
 
         var document = project.CreateOrUpdateDocument(textId, text);
@@ -263,6 +281,11 @@ public class WorkflowCSharpEditorService : IWorkflowCSharpEditorService
 
     public async Task<WorkflowCSharpEditorSignatureResult> GetSignaturesAsync(WorkflowDefinition workflowDefinition, string textId, string text, int position, CancellationToken cancellationToken = default)
     {
+        if (!_cSharpEditorOptions.EnableSignatures)
+        {
+            return null;
+        }
+
         var project = await GetProjectAsync(workflowDefinition, cancellationToken);
 
         var document = project.CreateOrUpdateDocument(textId, text);

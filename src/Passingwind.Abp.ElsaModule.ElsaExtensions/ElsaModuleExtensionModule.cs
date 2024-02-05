@@ -58,6 +58,8 @@ public class ElsaModuleExtensionModule : AbpModule
         context.Services.AddTransient<IWorkflowCSharpEditorService, WorkflowCSharpEditorService>();
 
         context.Services.AddCSharpScriptEngine();
+
+        context.Services.AddOptions<CSharpEditorOptions>();
     }
 
     public override void PostConfigureServices(ServiceConfigurationContext context)

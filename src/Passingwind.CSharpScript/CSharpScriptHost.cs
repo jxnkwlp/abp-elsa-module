@@ -215,7 +215,7 @@ public class CSharpScriptHost : ICSharpScriptHost, IDisposable
         var options = ScriptOptions.Default
             .WithReferences(DefaultRuntimeMetadataReference)
             .AddImports(DefaultImports)
-            .WithMetadataResolver(CSharpScriptMetadataReferenceResolver.Instance)
+            .WithMetadataResolver(NuGetMetadataReferenceResolver.Instance)
             .WithSourceResolver(SourceFileResolver.Default)
             .WithAllowUnsafe(false)
             .WithCheckOverflow(true)
