@@ -30,7 +30,12 @@ public static ").Append(typeof(ActivityExecutionContext).FullName).Append(@" Act
 public static ").Append(typeof(WorkflowExecutionContext).FullName).AppendLine(@" WorkflowExecutionContext => throw new System.NotImplementedException();
 public static object WorkflowContext => throw new System.NotImplementedException(); 
 
+// Core functions
+public static object? GetService(Type type) => throw new System.NotImplementedException(); 
+public static object GetRequiredService(Type type) => throw new System.NotImplementedException(); 
+
 // methods
+public static void AddJournalData(string key, object? value) => throw new System.NotImplementedException(); 
 public static object GetWorkflowContext() => throw new System.NotImplementedException(); 
 public static object GetTransientVariable(string name) => throw new System.NotImplementedException(); 
 public static void SetTransientVariable(string name, object value) => throw new System.NotImplementedException(); 
@@ -41,6 +46,7 @@ public static string JsonEncode(object value) => throw new System.NotImplemented
 public static dynamic JsonDecode(string value) => throw new System.NotImplementedException();
 public static string GetWorkflowDefinitionIdByName(string name) => throw new System.NotImplementedException(); 
 public static string GetWorkflowDefinitionIdByTag(string tag) => throw new System.NotImplementedException(); 
+public static void AddEntry(string eventName, string message, object? data) => throw new System.NotImplementedException(); 
 
 // activities
 public static IDictionary<string, object> GetActivity(string name) => throw new System.NotImplementedException(); 

@@ -12,9 +12,9 @@ using Elsa.Services;
 using Elsa.Services.Models;
 using Elsa.Services.WorkflowStorage;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NodaTime;
-using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
 using Passingwind.CSharpScriptEngine;
 using Volo.Abp.Json;
@@ -71,7 +71,12 @@ public class CSharpScriptConfigureHandler : INotificationHandler<CSharpScriptEva
         global.Context.WorkflowInstance = context.WorkflowExecutionContext.WorkflowInstance;
         global.Context.WorkflowContext = context.GetWorkflowContext();
 
+        // Core functions
+        global.Context.GetService = (Action<Type>)((Type type) => context.ServiceProvider.GetService(type));
+        global.Context.GetRequiredService = (Action<Type>)((Type type) => context.ServiceProvider.GetRequiredService(type));
+
         // Global functions.
+        global.Context.AddJournalData = (Action<string, object>)((string key, object value) => context.JournalData.Add(key, value));
         global.Context.GetTransientVariable = (Func<string, object>)((string name) => context.GetTransientVariable(name));
         global.Context.SetTransientVariable = (Action<string, object>)((string name, object value) => context.SetTransientVariable(name, value));
         global.Context.GetVariable = (Func<string, object>)((string name) => context.GetVariable(name));
@@ -87,12 +92,15 @@ public class CSharpScriptConfigureHandler : INotificationHandler<CSharpScriptEva
         global.Context.getWorkflowDefinitionIdByTag = (Func<string, string>)(tag => GetWorkflowDefinitionIdByTag(context, tag));
         global.Context.GetActivity = (Func<string, object>)(idOrName => GetActivityModel(context, idOrName));
         global.Context.GetActivityId = (Func<string, string>)(activityName => GetActivityId(context, activityName));
+        global.Context.AddEntry = (Action<string, string, object>)((string eventName, string message, object data) => context.AddEntry(eventName, message, data));
 
         // Workflow variables.
         var variables = context.WorkflowExecutionContext.GetMergedVariables();
 
         foreach (var variable in variables.Data)
+        {
             global.AddVariable(variable.Key, variable.Value);
+        }
 
         // activity output
         await AddActivityOutputAsync(global, context, cancellationToken);
@@ -128,28 +136,28 @@ public class CSharpScriptConfigureHandler : INotificationHandler<CSharpScriptEva
         global.Context.ActivitityData = activities;
     }
 
-    private string GetWorkflowDefinitionIdByTag(ActivityExecutionContext activityExecutionContext, string tag)
+    private static string GetWorkflowDefinitionIdByTag(ActivityExecutionContext activityExecutionContext, string tag)
     {
         var workflowRegistry = activityExecutionContext.GetService<IWorkflowRegistry>();
         var workflowBlueprint = workflowRegistry.FindByTagAsync(tag, VersionOptions.Published).Result;
         return workflowBlueprint?.Id;
     }
 
-    private string GetWorkflowDefinitionIdByName(ActivityExecutionContext activityExecutionContext, string name)
+    private static string GetWorkflowDefinitionIdByName(ActivityExecutionContext activityExecutionContext, string name)
     {
         var workflowRegistry = activityExecutionContext.GetService<IWorkflowRegistry>();
         var workflowBlueprint = workflowRegistry.FindByNameAsync(name, VersionOptions.Published).Result;
         return workflowBlueprint?.Id;
     }
 
-    private string GetActivityId(ActivityExecutionContext context, string activityName)
+    private static string GetActivityId(ActivityExecutionContext context, string activityName)
     {
         var workflowExecutionContext = context.WorkflowExecutionContext;
         var activity = workflowExecutionContext.GetActivityBlueprintByName(activityName);
         return activity?.Id;
     }
 
-    private object GetActivityModel(ActivityExecutionContext context, string idOrName)
+    private static object GetActivityModel(ActivityExecutionContext context, string idOrName)
     {
         var workflowExecutionContext = context.WorkflowExecutionContext;
         var activity = workflowExecutionContext.GetActivityBlueprintByName(idOrName) ?? workflowExecutionContext.GetActivityBlueprintById(idOrName);
