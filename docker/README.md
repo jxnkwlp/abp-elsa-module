@@ -1,4 +1,4 @@
-# ABP with Elsa Application
+﻿# ABP with Elsa Application
 
 ## Prerequisites
 
@@ -35,11 +35,11 @@ services:
     image: passingwind/abp-elsa-app
     restart: unless-stopped
     ports:
-      - 10000:80
+      - 8080:8080
     environment:
       TZ: Asia/Shanghai
       ConnectionStrings__Default: "Server=db;Database=workflowapp;User Id=sa;Password=<YourStrong!Passw0rd>;TrustServerCertificate=true;"
-      Elsa__Server__BaseUrl: "http://localhost:10000"
+      Elsa__Server__BaseUrl: "http://localhost:8080"
     # volumes:
     #   - ./appsettings.json:/app/appsettings.json 
     depends_on:
