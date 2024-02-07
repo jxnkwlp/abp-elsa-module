@@ -11,8 +11,10 @@ using Elsa.Activities.UserTask.Extensions;
 using Elsa.Providers.Workflows;
 using Elsa.Providers.WorkflowStorage;
 using Elsa.Scripting.JavaScript.Options;
+using FluentStorage;
 using Hangfire;
 using Hangfire.MemoryStorage;
+using Hangfire.Redis.StackExchange;
 using Medallion.Threading;
 using Medallion.Threading.FileSystem;
 using Medallion.Threading.Redis;
@@ -22,6 +24,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +45,6 @@ using Passingwind.WorkflowApp.MultiTenancy;
 using Passingwind.WorkflowApp.Web.ApiKeys;
 using Passingwind.WorkflowApp.Web.Services;
 using StackExchange.Redis;
-using Storage.Net;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
@@ -399,7 +401,7 @@ public class WorkflowAppWebModule : AbpModule
         {
             if (configuration.GetValue<bool>("Redis:IsEnabled"))
             {
-                config.UseRedisStorage(configuration["Redis:Configuration"], new Hangfire.Redis.RedisStorageOptions { Prefix = $"{appName}:Hangfire:" });
+                config.UseRedisStorage(configuration["Redis:Configuration"], new RedisStorageOptions { Prefix = $"{appName}:Hangfire:" });
             }
             else
             {
@@ -487,8 +489,8 @@ public class WorkflowAppWebModule : AbpModule
         {
             OnPrepareResponse = (context) =>
             {
-                context.Context.Response.Headers.Add("cache-control", new[] { "public, max-age=31536000" });
-                context.Context.Response.Headers.Add("Expires", new[] { DateTime.UtcNow.AddYears(1).ToString("R") }); // Format RFC1123
+                context.Context.Response.Headers.Append("cache-control", new[] { "public, max-age=31536000" });
+                context.Context.Response.Headers.Append("Expires", new[] { DateTime.UtcNow.AddYears(1).ToString("R") }); // Format RFC1123
             }
         });
 

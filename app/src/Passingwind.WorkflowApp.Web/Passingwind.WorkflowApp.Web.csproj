@@ -3,7 +3,7 @@
   <Import Project="..\..\common.props" />
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Passingwind.WorkflowApp.Web</RootNamespace>
     <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -16,50 +16,50 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.8" />
-    <PackageReference Include="Hangfire.Core" Version="1.7.29" />
-    <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
-    <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.8.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="7.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.*" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.6" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.0" />
+    <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.9.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="8.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.*" />
     <PackageReference Include="DistributedLock.FileSystem" Version="1.0.1" />
     <PackageReference Include="DistributedLock.Redis" Version="1.0.2" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.2" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.8" />
     <PackageReference Include="Owl.Abp.CultureMap" Version="7.0.0" />
     <PackageReference Include="Passingwind.SwaggerExtensions" Version="0.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" Version="$(AbpVersion)" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Autofac" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.DistributedLocking" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.Http.Client.IdentityModel.Web" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.Swashbuckle" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.Identity.Web" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.Account.Web" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.MailKit" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.BackgroundJobs.HangFire" Version="7.2.3" />
-    <PackageReference Include="Volo.Abp.BackgroundWorkers.Hangfire" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.Autofac" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.DistributedLocking" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Authentication.OpenIdConnect" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Http.Client.IdentityModel.Web" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Swashbuckle" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Identity.Web" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Account.Web" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.MailKit" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs.HangFire" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.BackgroundWorkers.Hangfire" Version="$(AbpVersion)" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Elsa" Version="2.12.0" />
-    <PackageReference Include="Elsa.Activities.Email" Version="2.12.0" />
-    <PackageReference Include="Elsa.Activities.Http" Version="2.12.0" />
-    <PackageReference Include="Elsa.Activities.UserTask" Version="2.12.0" />
-    <PackageReference Include="Elsa.Activities.BlobStorage" Version="2.12.0" />
-    <PackageReference Include="Elsa.Activities.File" Version="2.12.0" />
-    <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="2.12.0" />
-    <PackageReference Include="Elsa.Activities.Entity" Version="2.12.0" />
-    <PackageReference Include="Elsa.Activities.RabbitMq" Version="2.12.0" />
-    <PackageReference Include="Elsa.Activities.Sql" Version="2.12.0" />
-    <PackageReference Include="Elsa.Activities.Http.OpenApi" Version="2.12.0" />
+    <PackageReference Include="Elsa" Version="$(ElsaVersion)" />
+    <PackageReference Include="Elsa.Activities.Email" Version="$(ElsaVersion)" />
+    <PackageReference Include="Elsa.Activities.Http" Version="$(ElsaVersion)" />
+    <PackageReference Include="Elsa.Activities.UserTask" Version="$(ElsaVersion)" />
+    <PackageReference Include="Elsa.Activities.BlobStorage" Version="$(ElsaVersion)" />
+    <PackageReference Include="Elsa.Activities.File" Version="$(ElsaVersion)" />
+    <PackageReference Include="Elsa.Activities.Temporal.Hangfire" Version="$(ElsaVersion)" />
+    <PackageReference Include="Elsa.Activities.Entity" Version="$(ElsaVersion)" />
+    <PackageReference Include="Elsa.Activities.RabbitMq" Version="$(ElsaVersion)" />
+    <PackageReference Include="Elsa.Activities.Sql" Version="$(ElsaVersion)" />
+    <PackageReference Include="Elsa.Activities.Http.OpenApi" Version="$(ElsaVersion)" />
   </ItemGroup>
 
   <ItemGroup>

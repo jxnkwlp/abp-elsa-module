@@ -10,10 +10,10 @@
 
     <ItemGroup>
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-        <PackageReference Include="Volo.Abp.Validation" Version="7.2.3" />
+        <PackageReference Include="Volo.Abp.Validation" Version="$(AbpVersion)" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="7.0.*" />
-        <PackageReference Include="Elsa.Abstractions" Version="2.12.0" />
+        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.*" />
+        <PackageReference Include="Elsa.Abstractions" Version="$(ElsaVersion)" />
     </ItemGroup>
 
     <ItemGroup>
