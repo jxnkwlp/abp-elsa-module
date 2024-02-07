@@ -72,8 +72,8 @@ public class CSharpScriptConfigureHandler : INotificationHandler<CSharpScriptEva
         global.Context.WorkflowContext = context.GetWorkflowContext();
 
         // Core functions
-        global.Context.GetService = (Action<Type>)((Type type) => context.ServiceProvider.GetService(type));
-        global.Context.GetRequiredService = (Action<Type>)((Type type) => context.ServiceProvider.GetRequiredService(type));
+        global.Context.GetService = (Func<Type, object>)((Type type) => context.ServiceProvider.GetService(type));
+        global.Context.GetRequiredService = (Func<Type, object>)((Type type) => context.ServiceProvider.GetRequiredService(type));
 
         // Global functions.
         global.Context.AddJournalData = (Action<string, object>)((string key, object value) => context.JournalData.Add(key, value));
@@ -127,7 +127,9 @@ public class CSharpScriptConfigureHandler : INotificationHandler<CSharpScriptEva
                 var propertyName = property.Name;
                 var storageProviderName = storageProviderLookup.GetItem(propertyName) ?? property.DefaultWorkflowStorageProvider;
 
+#pragma warning disable CA2012 // Use ValueTasks correctly
                 activityModel[propertyName] = () => _workflowStorageService.LoadAsync(storageProviderName, storageContext, propertyName, cancellationToken).Result;
+#pragma warning restore CA2012 // Use ValueTasks correctly
             }
 
             activities[activity.Name!] = activityModel;

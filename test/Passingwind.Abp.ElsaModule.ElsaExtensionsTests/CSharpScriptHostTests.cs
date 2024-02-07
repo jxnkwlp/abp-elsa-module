@@ -1,6 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
-using NSubstitute;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Passingwind.CSharpScriptEngine;
 using Shouldly;
 using Xunit;
@@ -9,10 +8,12 @@ namespace Passingwind.Abp.ElsaModule;
 
 public class CSharpScriptHostTests : ElsaModuleExtensionTestBase
 {
+    private readonly ILogger _logger;
     private readonly ICSharpScriptHost _cSharpScriptHost;
 
     public CSharpScriptHostTests()
     {
+        _logger = GetRequiredService<ILogger<CSharpScriptHostTests>>();
         _cSharpScriptHost = GetRequiredService<ICSharpScriptHost>();
     }
 
@@ -23,7 +24,7 @@ public class CSharpScriptHostTests : ElsaModuleExtensionTestBase
 
 Console.WriteLine(""Hello, World!"");"
 ;
-        var result = await _cSharpScriptHost.CompileAsync(new CSharpScriptCompileContext(code));
+        var result = await _cSharpScriptHost.CompileAsync(new CSharpScriptCompileContext(_logger, code));
 
         result.Success.ShouldBeTrue();
     }
@@ -34,7 +35,7 @@ Console.WriteLine(""Hello, World!"");"
         const string code = @" 
 Console.WriteLine(""Hello, World!"");"
 ;
-        var result = await _cSharpScriptHost.CompileAsync(new CSharpScriptCompileContext(code));
+        var result = await _cSharpScriptHost.CompileAsync(new CSharpScriptCompileContext(_logger, code));
 
         result.Success.ShouldBeFalse();
     }
@@ -49,7 +50,7 @@ Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(new { a = 1 }));
 
 "
 ;
-        var result = await _cSharpScriptHost.CompileAsync(new CSharpScriptCompileContext(code));
+        var result = await _cSharpScriptHost.CompileAsync(new CSharpScriptCompileContext(_logger, code));
 
         result.Success.ShouldBeTrue();
     }
@@ -85,7 +86,7 @@ foreach (var u in users)
      Console.WriteLine(u);
 "
 ;
-        var result = await _cSharpScriptHost.CompileAsync(new CSharpScriptCompileContext(code));
+        var result = await _cSharpScriptHost.CompileAsync(new CSharpScriptCompileContext(_logger, code));
 
         result.Success.ShouldBeTrue();
     }
@@ -121,7 +122,7 @@ foreach (var u in users)
      Console.WriteLine(u);
 "
 ;
-        var _ = await _cSharpScriptHost.RunAsync(new CSharpScriptCompileContext(code));
+        var _ = await _cSharpScriptHost.RunAsync(new CSharpScriptCompileContext(_logger, code));
     }
 
     [Fact]
@@ -134,7 +135,7 @@ return Newtonsoft.Json.JsonConvert.SerializeObject(new { a = 1 });
 
 "
 ;
-        var result = await _cSharpScriptHost.RunAsync(new CSharpScriptCompileContext(code));
+        var result = await _cSharpScriptHost.RunAsync(new CSharpScriptCompileContext(_logger, code));
 
         result.GetType().ShouldBe(typeof(string));
     }
@@ -146,7 +147,7 @@ return Newtonsoft.Json.JsonConvert.SerializeObject(new { a = 1 });
 return 1;
 "
 ;
-        var result = await _cSharpScriptHost.RunAsync(new CSharpScriptCompileContext(code));
+        var result = await _cSharpScriptHost.RunAsync(new CSharpScriptCompileContext(_logger, code));
 
         result.GetType().ShouldBe(typeof(int));
     }

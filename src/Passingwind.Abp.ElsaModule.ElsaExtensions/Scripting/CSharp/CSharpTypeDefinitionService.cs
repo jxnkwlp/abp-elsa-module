@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elsa.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Passingwind.Abp.ElsaModule.Scripting.CSharp.Messages;
 using Passingwind.CSharpScriptEngine;
 
@@ -21,13 +22,14 @@ public class CSharpTypeDefinitionService : ICSharpTypeDefinitionService
     {
         var reference = new CSharpScriptReference();
 
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
 
-        sb.AppendLine("public static class Context { ");
+        sb = sb.AppendLine("public static class Context { ");
 
         await _mediator.Publish(new CSharpTypeDefinitionNotification(workflowDefinition, sb, reference), cancellationToken);
 
-        sb.AppendLine("}");
+        sb = sb.AppendLine("}")
+            .AppendLine($"public static {typeof(ILogger)} Logger {{get; set;}}");
 
         return new CSharpTypeDefinition
         {

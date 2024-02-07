@@ -25,7 +25,7 @@ public class CSharpService : ICSharpService
 
     public async Task<object> EvaluateAsync(string expression, Type returnType, ActivityExecutionContext context, Action<CSharpScriptEvaluationGlobal> globalConfigure = null, CancellationToken cancellationToken = default)
     {
-        CSharpScriptEvaluationGlobal scriptEvaluationGlobal = new();
+        CSharpScriptEvaluationGlobal scriptEvaluationGlobal = new CSharpScriptEvaluationGlobal(_logger);
 
         globalConfigure?.Invoke(scriptEvaluationGlobal);
 
@@ -40,7 +40,7 @@ public class CSharpService : ICSharpService
 
         _logger.LogDebug("Evaluate csharp code with id '{ScriptId}' ", scriptId);
 
-        CSharpScriptContext scriptContext = new(expression, scriptEvaluationGlobal, scriptConfigure.Reference.Assemblies, scriptConfigure.Reference.Imports)
+        CSharpScriptContext scriptContext = new(_logger, expression, scriptEvaluationGlobal, scriptConfigure.Reference.Assemblies, scriptConfigure.Reference.Imports)
         {
             ScriptId = scriptId,
         };
