@@ -40,7 +40,7 @@ public class RunWorkflowWorkflowDefinitionIdRuntimeSelectListProvider : IRuntime
 
     public async ValueTask<SelectList> GetSelectListAsync(object context = null, CancellationToken cancellationToken = default)
     {
-        var list = await _workflowDefinitionRepository.GetListAsync(includeDetails: false);
+        var list = await _workflowDefinitionRepository.GetListAsync(includeDetails: false, cancellationToken: cancellationToken);
 
         return new SelectList(list.OrderBy(x => x.Name).Select(x => new SelectListItem($"{x.DisplayName}({x.Name})", x.Id.ToString())).ToArray());
     }

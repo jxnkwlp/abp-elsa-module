@@ -52,7 +52,7 @@ public class TriggerStore : Store<TriggerModel, Trigger, Guid>, ITriggerStore
             case TriggerModelTypeSpecification modelTypeSpecification:
                 {
                     var tenantId = modelTypeSpecification.TenantId.ToGuid();
-                    return x => modelTypeSpecification.ModelType.Equals(x.ModelType) && x.TenantId == tenantId;
+                    return x => modelTypeSpecification.ModelType.Equals(x.ModelType, StringComparison.Ordinal) && x.TenantId == tenantId;
                 }
 
             case TriggerIdsSpecification triggerIdsSpecification:

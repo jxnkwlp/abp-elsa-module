@@ -61,7 +61,7 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
         var entity = await MapToEntityAsync(model);
         await Repository.InsertAsync(entity, true, cancellationToken);
 
-        await uow.SaveChangesAsync();
+        await uow.SaveChangesAsync(cancellationToken);
     }
 
     public virtual async Task AddManyAsync(IEnumerable<TModel> models, CancellationToken cancellationToken = default)
@@ -82,7 +82,7 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
         await Repository.InsertManyAsync(entities, true, cancellationToken);
 
-        await uow.SaveChangesAsync();
+        await uow.SaveChangesAsync(cancellationToken);
     }
 
     public virtual async Task<int> CountAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
@@ -100,7 +100,7 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
         var id = (TKey)Convert.ChangeType(model.Id, typeof(TKey));
         await Repository.DeleteAsync(x => x.Id.Equals(id), true, cancellationToken);
 
-        await uow.SaveChangesAsync();
+        await uow.SaveChangesAsync(cancellationToken);
     }
 
     public virtual async Task<int> DeleteManyAsync(ISpecification<TModel> specification, CancellationToken cancellationToken = default)
@@ -113,7 +113,7 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
         var count = await Repository.CountAsync(expression, cancellationToken);
         await Repository.DeleteAsync(expression, true, cancellationToken);
 
-        await uow.SaveChangesAsync();
+        await uow.SaveChangesAsync(cancellationToken);
 
         return count;
     }
@@ -154,7 +154,7 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
         if (paging != null)
             query = query.Skip(paging.Skip).Take(paging.Take);
 
-        var list = await AsyncExecuter.ToListAsync(query).ConfigureAwait(false);
+        var list = await AsyncExecuter.ToListAsync(query, cancellationToken).ConfigureAwait(false);
 
         var result = new List<TModel>();
 
@@ -228,7 +228,7 @@ public abstract class Store<TModel, TEntity, TKey> : ITransientDependency where 
 
         await Repository.UpdateAsync(entity, true, cancellationToken);
 
-        await uow.SaveChangesAsync();
+        await uow.SaveChangesAsync(cancellationToken);
     }
 
     protected virtual async Task<Expression<Func<TEntity, bool>>> MapSpecificationAsync(ISpecification<TModel> specification)

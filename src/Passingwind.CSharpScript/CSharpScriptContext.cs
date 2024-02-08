@@ -6,7 +6,7 @@ namespace Passingwind.CSharpScriptEngine;
 
 public class CSharpScriptContext
 {
-    public CSharpScriptContext(ILogger logger,  string sourceText, CSharpScriptEvaluationGlobal? evaluationGlobal = null, List<Assembly>? assemblies = null, List<string>? imports = null)
+    public CSharpScriptContext(ILogger logger, string sourceText, CSharpScriptEvaluationGlobal? evaluationGlobal = null, List<Assembly>? assemblies = null, List<string>? imports = null)
     {
         SourceText = sourceText;
         EvaluationGlobal = evaluationGlobal ?? new CSharpScriptEvaluationGlobal(logger);

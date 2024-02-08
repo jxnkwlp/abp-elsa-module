@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Elsa.Services.Models;
-using Passingwind.Abp.ElsaModule.CSharp;
 using Passingwind.CSharpScriptEngine;
 using Volo.Abp.DependencyInjection;
 

@@ -22,8 +22,8 @@ public class WorkflowFaultedBookmarkProvider : BookmarkProvider<WorkflowFaultedB
 {
     public override async ValueTask<IEnumerable<BookmarkResult>> GetBookmarksAsync(BookmarkProviderContext<WorkflowFaulted> context, CancellationToken cancellationToken)
     {
-        var name = await context.ReadActivityPropertyAsync(x => x.DefinitionName);
-        var version = await context.ReadActivityPropertyAsync(x => x.DefinitionVersion);
+        var name = await context.ReadActivityPropertyAsync(x => x.DefinitionName, cancellationToken);
+        var version = await context.ReadActivityPropertyAsync(x => x.DefinitionVersion, cancellationToken);
 
         var bookmark = new WorkflowFaultedBookmark(name, version);
 

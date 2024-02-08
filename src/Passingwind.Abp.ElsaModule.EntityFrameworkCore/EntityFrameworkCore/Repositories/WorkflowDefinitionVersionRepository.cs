@@ -27,7 +27,7 @@ public class WorkflowDefinitionVersionRepository : EfCoreRepository<ElsaModuleDb
             .IncludeIf(includeDetails, x => x.Activities)
             .IncludeIf(includeDetails, x => x.Connections)
             .Where(x => x.DefinitionId == definitionId && x.Version == version)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<WorkflowDefinitionVersion> GetByVersionAsync(Guid definitionId, int version, bool includeDetails = true, CancellationToken cancellationToken = default)
@@ -38,7 +38,7 @@ public class WorkflowDefinitionVersionRepository : EfCoreRepository<ElsaModuleDb
             .IncludeIf(includeDetails, x => x.Activities)
             .IncludeIf(includeDetails, x => x.Connections)
             .Where(x => x.DefinitionId == definitionId && x.Version == version)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
         if (entity == null)
             throw new EntityNotFoundException();
@@ -56,7 +56,7 @@ public class WorkflowDefinitionVersionRepository : EfCoreRepository<ElsaModuleDb
             .LongCountAsync(cancellationToken);
     }
 
-    public async Task<WorkflowDefinitionVersion> GetLatestAsync(Guid id, bool includeDetails = true, CancellationToken cancellationToken = default)
+    public async Task<WorkflowDefinitionVersion> GetLatestAsync(Guid definitionId, bool includeDetails = true, CancellationToken cancellationToken = default)
     {
         var dbset = await GetDbSetAsync();
 
@@ -64,8 +64,8 @@ public class WorkflowDefinitionVersionRepository : EfCoreRepository<ElsaModuleDb
             .IncludeIf(includeDetails, x => x.Activities)
             .IncludeIf(includeDetails, x => x.Connections)
             .OrderByDescending(x => x.Version)
-            .Where(x => x.DefinitionId == id)
-            .FirstOrDefaultAsync();
+            .Where(x => x.DefinitionId == definitionId)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
         if (entity == null)
             throw new EntityNotFoundException();
@@ -107,6 +107,6 @@ public class WorkflowDefinitionVersionRepository : EfCoreRepository<ElsaModuleDb
             .OrderByDescending(x => x.Version)
             .Where(x => x.Version < version)
             .Select(x => x.Version)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 }

@@ -22,7 +22,7 @@ public class WorkflowTeamRepository : MongoDbRepository<IElsaModuleMongoDbContex
 
         // TODO: performance optimization
 
-        var list = await query.Where(x => x.RoleScopes.Any(r => r.RoleName == oldName)).As<IMongoQueryable<WorkflowTeam>>().ToListAsync();
+        var list = await query.Where(x => x.RoleScopes.Any(r => r.RoleName == oldName)).As<IMongoQueryable<WorkflowTeam>>().ToListAsync(cancellationToken: cancellationToken);
 
         foreach (var item in list)
         {

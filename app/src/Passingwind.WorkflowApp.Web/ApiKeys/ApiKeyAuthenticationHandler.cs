@@ -20,12 +20,36 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyOptions>
     private readonly AbpSignInManager _signInManager;
     private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-    public ApiKeyAuthenticationHandler(IOptionsMonitor<ApiKeyOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock, ApiKeyDomainService domainService, AbpSignInManager signInManager, IUnitOfWorkManager unitOfWorkManager, IIdentityUserRepository userRepository) : base(options, logger, encoder, clock)
+    [Obsolete]
+    public ApiKeyAuthenticationHandler(
+        IOptionsMonitor<ApiKeyOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder,
+        ISystemClock clock,
+        ApiKeyDomainService domainService,
+        AbpSignInManager signInManager,
+        IUnitOfWorkManager unitOfWorkManager,
+        IIdentityUserRepository userRepository) : base(options, logger, encoder, clock)
     {
         _domainService = domainService;
         _signInManager = signInManager;
         _unitOfWorkManager = unitOfWorkManager;
         _userRepository = userRepository;
+    }
+
+    public ApiKeyAuthenticationHandler(
+        IOptionsMonitor<ApiKeyOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder,
+        ApiKeyDomainService domainService,
+        IIdentityUserRepository userRepository,
+        AbpSignInManager signInManager,
+        IUnitOfWorkManager unitOfWorkManager) : base(options, logger, encoder)
+    {
+        _domainService = domainService;
+        _userRepository = userRepository;
+        _signInManager = signInManager;
+        _unitOfWorkManager = unitOfWorkManager;
     }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()

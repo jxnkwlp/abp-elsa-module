@@ -28,11 +28,10 @@ public class GlobalVariableDomainService : DomainService
             {
                 Value = entity?.Value,
             };
-        },
-        () => new DistributedCacheEntryOptions
+        }, () => new DistributedCacheEntryOptions
         {
             AbsoluteExpiration = DateTimeOffset.Now.AddDays(1)
-        });
+        }, token: cancellationToken);
 
         return cacheItem?.Value;
     }

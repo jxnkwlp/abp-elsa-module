@@ -30,9 +30,9 @@ public class WorkflowPermissionGrantResult
     {
         lock (WorkflowGrantProviders)
         {
-            if (WorkflowGrantProviders.ContainsKey(workflowId))
+            if (WorkflowGrantProviders.TryGetValue(workflowId, out var grantProviders))
             {
-                var providers = WorkflowGrantProviders[workflowId].ToList();
+                var providers = grantProviders.ToList();
 
                 providers.Add(new WorkflowPermissionGrantProvider(name, value));
                 WorkflowGrantProviders[workflowId] = providers;

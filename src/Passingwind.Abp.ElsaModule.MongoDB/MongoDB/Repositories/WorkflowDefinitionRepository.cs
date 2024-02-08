@@ -119,7 +119,7 @@ public class WorkflowDefinitionRepository : MongoDbRepository<IElsaModuleMongoDb
         var dbContext = await GetDbContextAsync(cancellationToken);
         var collection = dbContext.Collection<WorkflowDefinition>();
 
-        await collection.UpdateManyAsync(x => x.GroupId == groupId, Builders<WorkflowDefinition>.Update.Set(x => x.GroupName, string.Empty).Set(x => x.GroupId, null));
+        await collection.UpdateManyAsync(x => x.GroupId == groupId, Builders<WorkflowDefinition>.Update.Set(x => x.GroupName, string.Empty).Set(x => x.GroupId, null), cancellationToken: cancellationToken);
     }
 
     public async Task UpdateGroupNameAsync(Guid groupId, string groupName, CancellationToken cancellationToken = default)
@@ -127,6 +127,6 @@ public class WorkflowDefinitionRepository : MongoDbRepository<IElsaModuleMongoDb
         var dbContext = await GetDbContextAsync(cancellationToken);
         var collection = dbContext.Collection<WorkflowDefinition>();
 
-        await collection.UpdateManyAsync(x => x.GroupId == groupId, Builders<WorkflowDefinition>.Update.Set(x => x.GroupName, groupName));
+        await collection.UpdateManyAsync(x => x.GroupId == groupId, Builders<WorkflowDefinition>.Update.Set(x => x.GroupName, groupName), cancellationToken: cancellationToken);
     }
 }

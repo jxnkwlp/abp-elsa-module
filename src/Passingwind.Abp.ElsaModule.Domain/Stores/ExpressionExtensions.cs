@@ -85,7 +85,7 @@ public static class ExpressionExtensions
             // Re-perform any member-binding.
             var expr = Visit(node.Expression);
 
-            if (expr.Type != node.Type && expr.Type.GetMember(node.Member.Name).Any())
+            if (expr.Type != node.Type && expr.Type.GetMember(node.Member.Name).Length != 0)
             {
                 var newMember = expr.Type.GetMember(node.Member.Name).Single();
                 return Expression.MakeMemberAccess(expr, newMember);

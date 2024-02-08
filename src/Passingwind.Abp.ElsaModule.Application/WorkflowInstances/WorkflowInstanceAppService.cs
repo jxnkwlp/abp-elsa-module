@@ -328,8 +328,8 @@ public class WorkflowInstanceAppService : ElsaModuleAppService, IWorkflowInstanc
                 dto.Items.Add(new WorkflowInstanceDateCountStatisticDto
                 {
                     Date = date,
-                    FailedCount = faulted.ContainsKey(date.Date) ? faulted[date.Date] : 0,
-                    FinishedCount = finished.ContainsKey(date.Date) ? finished[date.Date] : 0,
+                    FailedCount = faulted.TryGetValue(date.Date, out var value) ? value : 0,
+                    FinishedCount = finished.TryGetValue(date.Date, out var value2) ? value2 : 0,
                 });
             }
 

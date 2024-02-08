@@ -20,6 +20,6 @@ internal static class WorkflowHelper
 
     public static Guid ResolveWorkflowIdFromPermissionKey(string key)
     {
-        return Guid.Parse(key.Substring(WorkflowPermissionKeyPrefix.Length + 1));
+        return Guid.Parse(key.AsSpan(WorkflowPermissionKeyPrefix.Length + 1));
     }
 }

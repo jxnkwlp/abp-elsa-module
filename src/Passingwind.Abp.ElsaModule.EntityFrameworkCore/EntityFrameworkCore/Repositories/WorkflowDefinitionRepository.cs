@@ -33,35 +33,35 @@ public class WorkflowDefinitionRepository : EfCoreRepository<IElsaModuleDbContex
               .WhereIf(isSingleton.HasValue, x => x.IsSingleton == isSingleton)
               .WhereIf(deleteCompletedInstances.HasValue, x => x.DeleteCompletedInstances == deleteCompletedInstances)
               .WhereIf(publishedVersion.HasValue, x => x.PublishedVersion == publishedVersion)
-              .LongCountAsync();
+              .LongCountAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<Guid> GetIdByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         var dbset = await GetDbSetAsync();
 
-        return await dbset.Where(x => x.Name == name).Select(x => x.Id).FirstOrDefaultAsync();
+        return await dbset.Where(x => x.Name == name).Select(x => x.Id).FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<Guid> GetIdByTagAsync(string tags, CancellationToken cancellationToken = default)
     {
         var dbset = await GetDbSetAsync();
 
-        return await dbset.Where(x => x.Tag == tags).Select(x => x.Id).FirstOrDefaultAsync();
+        return await dbset.Where(x => x.Tag == tags).Select(x => x.Id).FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<Guid[]> GetIdsByNamesAsync(IEnumerable<string> names, CancellationToken cancellationToken = default)
     {
         var dbset = await GetDbSetAsync();
 
-        return await dbset.Where(x => names.Contains(x.Name)).Select(x => x.Id).ToArrayAsync();
+        return await dbset.Where(x => names.Contains(x.Name)).Select(x => x.Id).ToArrayAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<Guid[]> GetIdsByTagsAsync(IEnumerable<string> tags, CancellationToken cancellationToken = default)
     {
         var dbset = await GetDbSetAsync();
 
-        return await dbset.Where(x => tags.Contains(x.Tag)).Select(x => x.Id).ToArrayAsync();
+        return await dbset.Where(x => tags.Contains(x.Tag)).Select(x => x.Id).ToArrayAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<List<WorkflowDefinition>> GetListAsync(string name = null, bool? isSingleton = null, bool? deleteCompletedInstances = null, int? publishedVersion = null, string channel = null, string tag = null, Guid? groupId = null, WorkflowPersistenceBehavior? workflowPersistenceBehavior = null, IEnumerable<Guid> filterIds = null, CancellationToken cancellationToken = default)
@@ -104,13 +104,13 @@ public class WorkflowDefinitionRepository : EfCoreRepository<IElsaModuleDbContex
     {
         var dbset = await GetDbSetAsync();
 
-        await dbset.Where(x => x.GroupId == groupId).ExecuteUpdateAsync(x => x.SetProperty(p => p.GroupName, _ => string.Empty).SetProperty(p => p.GroupId, _ => null));
+        await dbset.Where(x => x.GroupId == groupId).ExecuteUpdateAsync(x => x.SetProperty(p => p.GroupName, _ => string.Empty).SetProperty(p => p.GroupId, _ => null), cancellationToken: cancellationToken);
     }
 
     public async Task UpdateGroupNameAsync(Guid groupId, string groupName, CancellationToken cancellationToken = default)
     {
         var dbset = await GetDbSetAsync();
 
-        await dbset.Where(x => x.GroupId == groupId).ExecuteUpdateAsync(x => x.SetProperty(p => p.GroupName, _ => groupName));
+        await dbset.Where(x => x.GroupId == groupId).ExecuteUpdateAsync(x => x.SetProperty(p => p.GroupName, _ => groupName), cancellationToken: cancellationToken);
     }
 }

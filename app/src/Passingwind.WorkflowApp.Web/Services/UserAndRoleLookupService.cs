@@ -19,7 +19,7 @@ public class UserAndRoleLookupService : IUserLookupService, IRoleLookupService
 
     public async Task<UserLookupResultItem> FindByUserNameAsync(string userName, CancellationToken cancellationToken = default)
     {
-        var item = await _identityUserRepository.FindByNormalizedUserNameAsync(userName);
+        var item = await _identityUserRepository.FindByNormalizedUserNameAsync(userName, cancellationToken: cancellationToken);
 
         if (item == null)
             return null;
@@ -34,7 +34,7 @@ public class UserAndRoleLookupService : IUserLookupService, IRoleLookupService
 
     public async Task<List<UserLookupResultItem>> GetListAsync(string filter = null, CancellationToken cancellationToken = default)
     {
-        var list = await _identityUserRepository.GetListAsync();
+        var list = await _identityUserRepository.GetListAsync(cancellationToken: cancellationToken);
         return list.ConvertAll(x => new UserLookupResultItem
         {
             UserName = x.UserName,
@@ -45,7 +45,7 @@ public class UserAndRoleLookupService : IUserLookupService, IRoleLookupService
 
     public async Task<List<UserLookupResultItem>> GetListByRoleNameAsync(string roleName, CancellationToken cancellationToken = default)
     {
-        var users = await _identityUserRepository.GetListByNormalizedRoleNameAsync(roleName);
+        var users = await _identityUserRepository.GetListByNormalizedRoleNameAsync(roleName, cancellationToken: cancellationToken);
 
         return users.ConvertAll(x => new UserLookupResultItem
         {
@@ -57,7 +57,7 @@ public class UserAndRoleLookupService : IUserLookupService, IRoleLookupService
 
     async Task<List<RoleLookupResultItem>> IRoleLookupService.GetListAsync(string filter, CancellationToken cancellationToken)
     {
-        var list = await _identityRoleRepository.GetListAsync();
+        var list = await _identityRoleRepository.GetListAsync(cancellationToken: cancellationToken);
         return list.ConvertAll(x => new RoleLookupResultItem
         {
             Id = x.Id.ToString(),

@@ -42,13 +42,13 @@ public class WorkflowImporter : IWorkflowImporter
         var name = jsonNode["Name"].GetValue<string>();
         var version = jsonNode["PublishedVersion"].GetValue<int>();
 
-        var workflow = await _workflowDefinitionRepository.FindAsync(x => x.Name == name);
+        var workflow = await _workflowDefinitionRepository.FindAsync(x => x.Name == name, cancellationToken: cancellationToken);
 
         // check exists workflow
         if (workflow != null)
         {
             // check permssion
-            if (!await _workflowPermissionService.IsGrantedAsync(workflow.Id, ElsaModulePermissions.Definitions.Import))
+            if (!await _workflowPermissionService.IsGrantedAsync(workflow.Id, ElsaModulePermissions.Definitions.Import, cancellationToken))
             {
                 throw new Exception($"Workflow '{name}' unauthorized access.");
             }
@@ -94,7 +94,7 @@ public class WorkflowImporter : IWorkflowImporter
             workflow.SetLatestVersion(version);
             workflow.SetPublishedVersion(version);
 
-            workflow = await _workflowDefinitionRepository.InsertAsync(workflow);
+            workflow = await _workflowDefinitionRepository.InsertAsync(workflow, cancellationToken: cancellationToken);
 
             // add permission
             // auto added by event handler
@@ -118,11 +118,11 @@ public class WorkflowImporter : IWorkflowImporter
             workflow.SetLatestVersion(version);
             workflow.SetPublishedVersion(version);
 
-            workflow = await _workflowDefinitionRepository.UpdateAsync(workflow);
+            workflow = await _workflowDefinitionRepository.UpdateAsync(workflow, cancellationToken: cancellationToken);
         }
 
         // version  
-        var publishedVersion = await _workflowDefinitionVersionRepository.FindByVersionAsync(workflow.Id, version, true);
+        var publishedVersion = await _workflowDefinitionVersionRepository.FindByVersionAsync(workflow.Id, version, true, cancellationToken);
 
         if (publishedVersion == null)
         {
@@ -137,7 +137,7 @@ public class WorkflowImporter : IWorkflowImporter
             workflowVersion.SetIsLatest(true);
             workflowVersion.SetIsPublished(true);
 
-            workflowVersion = await _workflowDefinitionVersionRepository.InsertAsync(workflowVersion);
+            workflowVersion = await _workflowDefinitionVersionRepository.InsertAsync(workflowVersion, cancellationToken: cancellationToken);
         }
         else
         {

@@ -600,7 +600,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
     public async Task<WorkflowDefinitionImportResultDto> ImportAsync(WorkflowDefinitionImportRequestDto input)
     {
         if (input.File?.ContentLength == 0)
-            throw new ArgumentNullException();
+            throw new ArgumentNullException(nameof(input.File));
 
         var randomName = Path.GetFileNameWithoutExtension(Path.GetTempFileName());
         var zipFilePath = Path.Combine(Path.GetTempPath(), "workflow", "import", $"{randomName}.zip");
@@ -620,7 +620,7 @@ public class WorkflowDefinitionAppService : ElsaModuleAppService, IWorkflowDefin
             // extract zip file
             try
             {
-                using MemoryStream ms = new MemoryStream();
+                await using MemoryStream ms = new MemoryStream();
 
                 await input.File.GetStream().CopyToAsync(ms);
 

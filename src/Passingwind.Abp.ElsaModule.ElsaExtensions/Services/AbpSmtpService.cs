@@ -34,10 +34,10 @@ public class AbpSmtpService : ISmtpService
             BodyEncoding = Encoding.UTF8,
         };
 
-        if (message.From.Any())
+        if (message.From.Count != 0)
             mailMessage.From = new MailAddress(((MailboxAddress)message.From[0]).Address);
 
-        if (message.To.Any())
+        if (message.To.Count != 0)
         {
             foreach (var item in message.To)
             {
@@ -45,7 +45,7 @@ public class AbpSmtpService : ISmtpService
             }
         }
 
-        if (message.Cc.Any())
+        if (message.Cc.Count != 0)
         {
             foreach (var item in message.Cc)
             {
@@ -53,7 +53,7 @@ public class AbpSmtpService : ISmtpService
             }
         }
 
-        if (message.Bcc.Any())
+        if (message.Bcc.Count != 0)
         {
             foreach (var item in message.Bcc)
             {

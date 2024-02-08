@@ -209,12 +209,12 @@ public class SendEmailV2 : Activity, IActivityPropertyOptionsProvider, IRuntimeS
         {
             if (context2.Name == "Users")
             {
-                var list = await _userLookupService.GetListAsync();
+                var list = await _userLookupService.GetListAsync(cancellationToken: cancellationToken);
                 return new SelectList(list?.Select(x => new SelectListItem(x.DisplayName, x.UserName)).ToArray());
             }
             else if (context2.Name == "Roles")
             {
-                var list = await _roleLookupService.GetListAsync();
+                var list = await _roleLookupService.GetListAsync(cancellationToken: cancellationToken);
                 return new SelectList(list?.Select(x => new SelectListItem(x.Name, x.Name)).ToArray());
             }
         }

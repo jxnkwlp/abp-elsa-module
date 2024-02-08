@@ -40,16 +40,16 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
     [UnitOfWork]
     public virtual async Task EnsurePermissionDefinitionsAsync(CancellationToken cancellationToken = default)
     {
-        var group = await _permissionGroupDefinitionRepository.FindAsync(x => x.Name == ElsaModulePermissions.GroupName);
+        var group = await _permissionGroupDefinitionRepository.FindAsync(x => x.Name == ElsaModulePermissions.GroupName, cancellationToken: cancellationToken);
         if (group == null)
         {
             group = await _permissionGroupDefinitionRepository.InsertAsync(new PermissionGroupDefinitionRecord(
                 GuidGenerator.Create(),
                 ElsaModulePermissions.GroupName,
-                $"L:ElsaModule,Permission:${ElsaModulePermissions.GroupName}"));
+                $"L:ElsaModule,Permission:${ElsaModulePermissions.GroupName}"), cancellationToken: cancellationToken);
         }
 
-        var parent = await _permissionDefinitionRepository.FindAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.Name == ElsaModulePermissions.Workflows.Default);
+        var parent = await _permissionDefinitionRepository.FindAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.Name == ElsaModulePermissions.Workflows.Default, cancellationToken: cancellationToken);
 
         if (parent == null)
         {
@@ -58,7 +58,7 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
                 ElsaModulePermissions.GroupName,
                 ElsaModulePermissions.Workflows.Default,
                 null,
-                "Workflows"));
+                "Workflows"), cancellationToken: cancellationToken);
         }
     }
 
@@ -67,7 +67,7 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
     {
         var exists = await _permissionDefinitionRepository.GetListAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.ParentName == ElsaModulePermissions.Workflows.Default, cancellationToken: cancellationToken);
 
-        var workflows = await _workflowDefinitionRepository.GetListAsync();
+        var workflows = await _workflowDefinitionRepository.GetListAsync(cancellationToken: cancellationToken);
 
         foreach (var workflow in workflows)
         {
@@ -90,9 +90,9 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
 
     public async Task<IReadOnlyList<Guid>> GetGrantedWorkflowIdsAsync(WorkflowTeam workflowTeam, CancellationToken cancellationToken = default)
     {
-        var granted = await _permissionGrantRepository.GetListAsync(WorkflowTeamPermissionValueProvider.ProviderName, workflowTeam.GetPermissionKey());
+        var granted = await _permissionGrantRepository.GetListAsync(WorkflowTeamPermissionValueProvider.ProviderName, workflowTeam.GetPermissionKey(), cancellationToken);
 
-        var ids = granted.ConvertAll(x => Guid.Parse(x.Name.Substring(ElsaModulePermissions.Workflows.Default.Length + 1)));
+        var ids = granted.ConvertAll(x => Guid.Parse(x.Name.AsSpan(ElsaModulePermissions.Workflows.Default.Length + 1)));
 
         return ids.Distinct().ToList();
     }
@@ -108,7 +108,7 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
     {
         var name = WorkflowHelper.GenerateWorkflowPermissionKey(workflowId);
         // TODO
-        var list = await _permissionGrantRepository.GetListAsync();
+        var list = await _permissionGrantRepository.GetListAsync(cancellationToken: cancellationToken);
         var groupPermissionGrants = list.Where(x => x.Name == name && x.ProviderName == WorkflowTeamPermissionValueProvider.ProviderName);
 
         var groupIds = groupPermissionGrants.Select(x => x.ProviderKey).Select(x => Guid.Parse(x));
@@ -116,16 +116,16 @@ public class WorkflowTeamManager : DomainService, IWorkflowTeamManager
         if (!groupIds.Distinct().Any())
             return Array.Empty<WorkflowTeam>();
 
-        return await _workflowTeamRepository.GetListAsync(x => groupIds.Contains(x.Id));
+        return await _workflowTeamRepository.GetListAsync(x => groupIds.Contains(x.Id), cancellationToken: cancellationToken);
     }
 
     public async Task UpdatePermissionGrantsAsync(WorkflowTeam workflowTeam, CancellationToken cancellationToken = default)
     {
         // ensure data is fill
-        await _workflowTeamRepository.EnsureCollectionLoadedAsync(workflowTeam, x => x.RoleScopes);
-        await _workflowTeamRepository.EnsureCollectionLoadedAsync(workflowTeam, x => x.Users);
+        await _workflowTeamRepository.EnsureCollectionLoadedAsync(workflowTeam, x => x.RoleScopes, cancellationToken: cancellationToken);
+        await _workflowTeamRepository.EnsureCollectionLoadedAsync(workflowTeam, x => x.Users, cancellationToken: cancellationToken);
 
-        var grantedWorkflowIds = await GetGrantedWorkflowIdsAsync(workflowTeam);
+        var grantedWorkflowIds = await GetGrantedWorkflowIdsAsync(workflowTeam, cancellationToken);
 
         var teamWorkflowIds = workflowTeam
             .RoleScopes

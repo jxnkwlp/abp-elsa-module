@@ -102,7 +102,7 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
         }
 
         // get user owners 
-        var userGrantedList = await PermissionGrantRepository.GetListAsync(WorkflowUserOwnerPermissionValueProvider.ProviderName, userId.Value.ToString("d"));
+        var userGrantedList = await PermissionGrantRepository.GetListAsync(WorkflowUserOwnerPermissionValueProvider.ProviderName, userId.Value.ToString("d"), cancellationToken);
 
         foreach (var permissionGrant in userGrantedList)
         {
@@ -116,7 +116,7 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
 
     public virtual async Task<WorkflowPermissionGrantResult> GetGrantsAsync(CancellationToken cancellationToken = default)
     {
-        return await GetGrantsAsync(PrincipalAccessor.Principal);
+        return await GetGrantsAsync(PrincipalAccessor.Principal, cancellationToken);
     }
 
     public virtual async Task<bool> IsGrantedAsync(ClaimsPrincipal claimsPrincipal, Guid workflowId, string name, CancellationToken cancellationToken = default)
@@ -145,7 +145,7 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
 
     public virtual async Task<bool> IsGrantedAsync(Guid workflowId, string name, CancellationToken cancellationToken = default)
     {
-        return await IsGrantedAsync(PrincipalAccessor.Principal, workflowId, name);
+        return await IsGrantedAsync(PrincipalAccessor.Principal, workflowId, name, cancellationToken);
     }
 
     public virtual async Task SetUserWorkflowPermissionGrantAsync(WorkflowDefinition workflowDefinition, IdentityUser user, bool isGranted, CancellationToken cancellationToken = default)
@@ -157,17 +157,17 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
     public virtual async Task InitialWorkflowPermissionDefinitionsAsync(CancellationToken cancellationToken = default)
     {
         // group
-        var group = await PermissionGroupDefinitionRepository.FindAsync(x => x.Name == ElsaModulePermissions.GroupName);
+        var group = await PermissionGroupDefinitionRepository.FindAsync(x => x.Name == ElsaModulePermissions.GroupName, cancellationToken: cancellationToken);
         if (group == null)
         {
             group = await PermissionGroupDefinitionRepository.InsertAsync(new PermissionGroupDefinitionRecord(
                 GuidGenerator.Create(),
                 ElsaModulePermissions.GroupName,
-                $"L:ElsaModule,Permission:${ElsaModulePermissions.GroupName}"));
+                $"L:ElsaModule,Permission:${ElsaModulePermissions.GroupName}"), cancellationToken: cancellationToken);
         }
 
         // parent
-        var parent = await PermissionDefinitionRepository.FindAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.Name == ElsaModulePermissions.Workflows.Default);
+        var parent = await PermissionDefinitionRepository.FindAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.Name == ElsaModulePermissions.Workflows.Default, cancellationToken: cancellationToken);
 
         if (parent == null)
         {
@@ -176,12 +176,12 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
                 ElsaModulePermissions.GroupName,
                 ElsaModulePermissions.Workflows.Default,
                 null,
-                "Workflows"));
+                "Workflows"), cancellationToken: cancellationToken);
         }
 
         var exists = await PermissionDefinitionRepository.GetListAsync(x => x.GroupName == ElsaModulePermissions.GroupName && x.ParentName == ElsaModulePermissions.Workflows.Default, cancellationToken: cancellationToken);
 
-        var workflows = await WorkflowDefinitionRepository.GetListAsync();
+        var workflows = await WorkflowDefinitionRepository.GetListAsync(cancellationToken: cancellationToken);
 
         foreach (var workflow in workflows)
         {
@@ -221,7 +221,7 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
         var name = WorkflowHelper.GenerateWorkflowPermissionKey(workflowDefinition.Id);
 
         // TODO
-        var list = await PermissionGrantRepository.GetListAsync();
+        var list = await PermissionGrantRepository.GetListAsync(cancellationToken: cancellationToken);
         var grants = list.Where(x => x.Name == name && x.ProviderName == WorkflowUserOwnerPermissionValueProvider.ProviderName);
 
         var userIds = grants.Select(x => x.ProviderKey).Select(x => Guid.Parse(x));
@@ -248,7 +248,7 @@ public class WorkflowPermissionProvider : IWorkflowPermissionProvider
     [UnitOfWork]
     public async Task RestoreWorkflowTeamPermissionGrantsAsync(CancellationToken cancellationToken = default)
     {
-        var teams = await WorkflowTeamRepository.GetListAsync(true);
+        var teams = await WorkflowTeamRepository.GetListAsync(true, cancellationToken);
 
         foreach (var team in teams)
         {
