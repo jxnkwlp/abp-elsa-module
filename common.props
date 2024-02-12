@@ -4,7 +4,7 @@
     <Version>0.1.0</Version>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <AbpProjectType>module</AbpProjectType>
-    <AbpVersion>8.0.2</AbpVersion>
+    <AbpVersion>8.0.3</AbpVersion>
     <ElsaVersion>2.14.1</ElsaVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
