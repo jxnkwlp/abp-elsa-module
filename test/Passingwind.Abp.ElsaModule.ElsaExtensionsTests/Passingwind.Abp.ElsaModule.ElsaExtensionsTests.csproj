@@ -12,6 +12,6 @@
         <ProjectReference Include="..\..\src\Passingwind.Abp.ElsaModule.ElsaExtensions\Passingwind.Abp.ElsaModule.ElsaExtensions.csproj" />
         <ProjectReference Include="..\..\src\Passingwind.CSharpScript\Passingwind.CSharpScriptEngine.csproj" /> 
         <ProjectReference Include="..\Passingwind.Abp.ElsaModule.Domain.Tests\Passingwind.Abp.ElsaModule.Domain.Tests.csproj" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     </ItemGroup>
 </Project>
