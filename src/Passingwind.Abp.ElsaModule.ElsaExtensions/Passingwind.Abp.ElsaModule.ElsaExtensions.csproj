@@ -56,7 +56,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.8.0" />
-    <PackageReference Include="NuGet.Protocol" Version="6.8.0" />
+    <PackageReference Include="NuGet.Protocol" Version="6.9.1" />
     <PackageReference Include="Basic.Reference.Assemblies" Version="1.4.5" />
     <PackageReference Include="Basic.Reference.Assemblies.Net80" Version="1.4.5" />
     <PackageReference Include="IgnoresAccessChecksToGenerator" Version="0.7.0">
