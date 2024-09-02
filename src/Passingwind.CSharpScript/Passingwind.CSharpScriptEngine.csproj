@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'net7.0' ">
-    <PackageReference Include="Basic.Reference.Assemblies.Net70" Version="1.4.5" />
+    <PackageReference Include="Basic.Reference.Assemblies.Net70" Version="1.7.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
