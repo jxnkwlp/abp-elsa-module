@@ -47,7 +47,7 @@
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.1' ">
     <PackageReference Include="Basic.Reference.Assemblies.NetStandard20" Version="1.7.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" /> 
   </ItemGroup>
 
