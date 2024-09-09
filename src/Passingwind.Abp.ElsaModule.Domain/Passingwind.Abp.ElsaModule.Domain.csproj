@@ -24,7 +24,7 @@
     <ItemGroup>
         <PackageReference Include="Elsa" Version="$(ElsaVersion)" />
         <!--overwrite-->
-        <PackageReference Include="Rebus.ServiceProvider" Version="10.1.2" />
+        <PackageReference Include="Rebus.ServiceProvider" Version="10.2.0" />
         <PackageReference Include="Rebus.Microsoft.Extensions.Logging" Version="5.0.0" />
     </ItemGroup>
 
