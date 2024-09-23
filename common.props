@@ -31,7 +31,7 @@
   <ItemGroup>
     <PackageReference Include="Roslynator.Analyzers" Version="4.12.4" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
     <PackageReference Include="Roslynator.Formatting.Analyzers" Version="4.12.4" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-    <PackageReference Include="Roslynator.CodeAnalysis.Analyzers" Version="4.12.4" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+    <PackageReference Include="Roslynator.CodeAnalysis.Analyzers" Version="4.12.6" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
   </ItemGroup>
 
   <Target Name="NoWarnOnRazorViewImportedTypeConflicts" BeforeTargets="RazorCoreCompile">
